@@ -9,8 +9,7 @@ This repo is intentionally **work-in-progress** to showcase:
 - A **Python FastAPI** backend
 - A **Supabase** Postgres database integration (via environment variables)
 
-The focus right now is on **clean structure** and **good engineering habits**,
-so recruiters and hiring managers can quickly understand the architecture.
+
 
 ---
 
