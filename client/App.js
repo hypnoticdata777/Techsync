@@ -63,7 +63,7 @@ function App() {
           <FlatList
             data={workOrders}
             keyExtractor={item => String(item.id)}
-            renderItem={WorkOrderItem}
+            renderItem={({item}) => <WorkOrderItem item={item} />}
             ListEmptyComponent={
               <Text style={styles.emptyState}>
                 No work orders yet – backend is running but database is empty.
