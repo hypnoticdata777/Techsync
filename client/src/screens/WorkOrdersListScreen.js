@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import {API_BASE_URL} from '../config';
 import {useAuth} from '../context/AuthContext';
@@ -15,6 +16,7 @@ function WorkOrdersListScreen({navigation}) {
   const {token, user, logout} = useAuth();
   const [workOrders, setWorkOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchWorkOrders = async () => {
@@ -42,6 +44,12 @@ function WorkOrdersListScreen({navigation}) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchWorkOrders();
+    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -99,7 +107,14 @@ function WorkOrdersListScreen({navigation}) {
       </View>
 
       {loading && <ActivityIndicator style={styles.loader} />}
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchWorkOrders}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       {!loading && !error && (
         <FlatList
           data={workOrders}
@@ -111,6 +126,14 @@ function WorkOrdersListScreen({navigation}) {
             </Text>
           }
           contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#38bdf8"
+              colors={['#38bdf8']}
+            />
+          }
         />
       )}
     </View>
@@ -195,11 +218,26 @@ const styles = StyleSheet.create({
     marginTop: 24,
     textAlign: 'center',
   },
+  errorContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
   errorText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#f97373',
-    marginHorizontal: 16,
-    marginTop: 8,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  retryButton: {
+    backgroundColor: '#38bdf8',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  retryButtonText: {
+    color: '#050816',
+    fontWeight: '600',
+    fontSize: 14,
   },
   loader: {
     marginTop: 24,
