@@ -8,8 +8,10 @@ import {
   ScrollView,
 } from 'react-native';
 import {API_BASE_URL} from '../config';
+import {useAuth} from '../context/AuthContext';
 
 function WorkOrderDetailsScreen({route, navigation}) {
+  const {token} = useAuth();
   const {workOrder} = route.params;
   const [deleting, setDeleting] = useState(false);
 
@@ -31,7 +33,12 @@ function WorkOrderDetailsScreen({route, navigation}) {
               setDeleting(true);
               const res = await fetch(
                 `${API_BASE_URL}/work-orders/${workOrder.id}`,
-                {method: 'DELETE'},
+                {
+                  method: 'DELETE',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                },
               );
 
               if (res.ok || res.status === 204) {

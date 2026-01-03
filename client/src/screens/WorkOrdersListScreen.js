@@ -6,10 +6,13 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import {API_BASE_URL} from '../config';
+import {useAuth} from '../context/AuthContext';
 
 function WorkOrdersListScreen({navigation}) {
+  const {token, user, logout} = useAuth();
   const [workOrders, setWorkOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,10 +20,22 @@ function WorkOrdersListScreen({navigation}) {
   const fetchWorkOrders = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/work-orders`);
-      const json = await res.json();
-      setWorkOrders(json);
-      setError(null);
+      const res = await fetch(`${API_BASE_URL}/work-orders`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        setWorkOrders(json);
+        setError(null);
+      } else if (res.status === 401) {
+        setError('Session expired. Please login again.');
+        await logout();
+      } else {
+        setError('Unable to load work orders.');
+      }
     } catch (err) {
       console.error(err);
       setError('Unable to load work orders.');
@@ -54,8 +69,26 @@ function WorkOrdersListScreen({navigation}) {
     </TouchableOpacity>
   );
 
+  const handleLogout = () => {
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      {text: 'Cancel', style: 'cancel'},
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: () => logout(),
+      },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
+      <View style={styles.userBar}>
+        <Text style={styles.userName}>{user?.full_name || 'User'}</Text>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.header}>
         <Text style={styles.sectionTitle}>Work Orders</Text>
         <TouchableOpacity
@@ -88,6 +121,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#050816',
+  },
+  userBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  userName: {
+    fontSize: 12,
+    color: '#9ca3af',
+  },
+  logoutText: {
+    fontSize: 12,
+    color: '#ef4444',
+    fontWeight: '600',
   },
   header: {
     flexDirection: 'row',
