@@ -1,4 +1,37 @@
 {
-  "name": "TechSync",
-  "displayName": "TechSync"
+  "expo": {
+    "name": "TechSync",
+    "slug": "techsync",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#050816"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.techsync.app"
+    },
+    "android": {
+      "package": "com.techsync.app",
+      "compileSdkVersion": 34,
+      "targetSdkVersion": 34,
+      "minSdkVersion": 23,
+      "backgroundColor": "#050816"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0",
+            "kotlinVersion": "1.9.22"
+          }
+        }
+      ]
+    ]
+  }
 }
