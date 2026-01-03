@@ -9,6 +9,23 @@ import {
 } from 'react-native';
 import {API_BASE_URL} from '../config';
 import {useAuth} from '../context/AuthContext';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
+
+// Helper function to get status color
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'pending':
+      return '#fbbf24'; // yellow
+    case 'in_progress':
+      return '#38bdf8'; // blue
+    case 'completed':
+      return '#a3e635'; // green
+    case 'cancelled':
+      return '#ef4444'; // red
+    default:
+      return '#9ca3af'; // gray
+  }
+};
 
 function WorkOrderDetailsScreen({route, navigation}) {
   const {token} = useAuth();
@@ -31,7 +48,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
           onPress: async () => {
             try {
               setDeleting(true);
-              const res = await fetch(
+              const res = await fetchWithTimeout(
                 `${API_BASE_URL}/work-orders/${workOrder.id}`,
                 {
                   method: 'DELETE',
@@ -48,7 +65,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
               }
             } catch (err) {
               console.error(err);
-              Alert.alert('Error', 'Failed to delete work order');
+              Alert.alert('Error', err.message || 'Failed to delete work order');
             } finally {
               setDeleting(false);
             }
@@ -66,7 +83,9 @@ function WorkOrderDetailsScreen({route, navigation}) {
         <View style={styles.section}>
           <Text style={styles.label}>Status</Text>
           <View style={styles.statusBadge}>
-            <Text style={styles.statusText}>{workOrder.status}</Text>
+            <Text style={[styles.statusText, {color: getStatusColor(workOrder.status)}]}>
+              {workOrder.status.replace('_', ' ')}
+            </Text>
           </View>
         </View>
 
@@ -84,14 +103,14 @@ function WorkOrderDetailsScreen({route, navigation}) {
 
         <View style={styles.actions}>
           <TouchableOpacity
-            style={styles.editButton}
+            style={[styles.editButton, deleting && styles.buttonDisabled]}
             onPress={handleEdit}
             disabled={deleting}>
             <Text style={styles.editButtonText}>Edit</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.deleteButton}
+            style={[styles.deleteButton, deleting && styles.buttonDisabled]}
             onPress={handleDelete}
             disabled={deleting}>
             <Text style={styles.deleteButtonText}>
@@ -137,7 +156,6 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 14,
-    color: '#a3e635',
     fontWeight: '600',
   },
   description: {
@@ -176,6 +194,9 @@ const styles = StyleSheet.create({
     color: '#ef4444',
     fontWeight: '600',
     fontSize: 16,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
 });
 

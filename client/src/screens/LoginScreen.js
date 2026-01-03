@@ -11,6 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import {isValidEmail} from '../utils/validation';
 
 function LoginScreen({navigation}) {
   const {login} = useAuth();
@@ -21,6 +22,11 @@ function LoginScreen({navigation}) {
   const handleLogin = async () => {
     if (!email.trim() || !password) {
       Alert.alert('Error', 'Please enter email and password');
+      return;
+    }
+
+    if (!isValidEmail(email.trim())) {
+      Alert.alert('Error', 'Please enter a valid email address');
       return;
     }
 

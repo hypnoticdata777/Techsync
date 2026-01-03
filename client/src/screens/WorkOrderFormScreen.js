@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {API_BASE_URL} from '../config';
 import {useAuth} from '../context/AuthContext';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 function WorkOrderFormScreen({route, navigation}) {
   const {token} = useAuth();
@@ -46,7 +47,7 @@ function WorkOrderFormScreen({route, navigation}) {
 
       const method = isEditing ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await fetchWithTimeout(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -58,11 +59,12 @@ function WorkOrderFormScreen({route, navigation}) {
       if (res.ok) {
         navigation.goBack();
       } else {
-        Alert.alert('Error', 'Failed to save work order');
+        const errorData = await res.json().catch(() => ({}));
+        Alert.alert('Error', errorData.detail || 'Failed to save work order');
       }
     } catch (err) {
       console.error(err);
-      Alert.alert('Error', 'Failed to save work order');
+      Alert.alert('Error', err.message || 'Failed to save work order');
     } finally {
       setSaving(false);
     }

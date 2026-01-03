@@ -12,6 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import {isValidEmail, validatePassword} from '../utils/validation';
 
 function RegisterScreen({navigation}) {
   const {register} = useAuth();
@@ -27,13 +28,19 @@ function RegisterScreen({navigation}) {
       return;
     }
 
+    if (!isValidEmail(email.trim())) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
       return;
     }
 
-    if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters');
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      Alert.alert('Error', passwordValidation.error);
       return;
     }
 

@@ -1,6 +1,7 @@
 from typing import List, Optional
 
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Response
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
 from supabase_client import get_supabase_client, SupabaseNotConfigured
@@ -20,6 +21,26 @@ app = FastAPI(
     title="TechSync API",
     version="0.1.0",
     description="MVP backend for TechSync field service management platform.",
+)
+
+# Configure CORS to allow mobile app and web clients to connect
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8081",  # React Native Metro bundler
+        "http://localhost:19000",  # Expo
+        "http://localhost:19001",  # Expo
+        "http://localhost:19002",  # Expo
+        "http://localhost:3000",   # React web app (if applicable)
+        "http://127.0.0.1:8081",
+        "http://127.0.0.1:19000",
+        "http://127.0.0.1:19001",
+        "http://127.0.0.1:19002",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -331,13 +352,13 @@ def delete_work_order(
         if not response.data:
             raise HTTPException(status_code=404, detail="Work order not found")
 
-        return None
+        return Response(status_code=204)
     except SupabaseNotConfigured:
         # Delete from in-memory list
         for i, work_order in enumerate(MOCK_WORK_ORDERS):
             if work_order.id == work_order_id:
                 MOCK_WORK_ORDERS.pop(i)
-                return None
+                return Response(status_code=204)
         raise HTTPException(status_code=404, detail="Work order not found")
     except HTTPException:
         raise
