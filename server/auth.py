@@ -6,10 +6,11 @@ Handles password hashing, JWT token creation/validation, and user verification.
 from datetime import datetime, timedelta
 from typing import Optional
 import os
+import re
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, field_validator, Field
 
 # Security configuration
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
@@ -21,7 +22,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class User(BaseModel):
     id: int
-    email: str
+    email: EmailStr
     full_name: str
     role: str
     is_active: bool = True
@@ -32,14 +33,30 @@ class UserInDB(User):
 
 
 class UserCreate(BaseModel):
-    email: str
-    password: str
-    full_name: str
-    role: str = "technician"
+    email: EmailStr
+    password: str = Field(..., min_length=8, max_length=100)
+    full_name: str = Field(..., min_length=2, max_length=100)
+    role: str = Field(default="technician", pattern="^(admin|technician)$")
+
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters')
+        if not re.search(r'[a-zA-Z]', v):
+            raise ValueError('Password must contain at least one letter')
+        return v
+
+    @field_validator('full_name')
+    @classmethod
+    def validate_full_name(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Full name cannot be empty')
+        return v.strip()
 
 
 class UserLogin(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 

@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException, Depends, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 from supabase_client import get_supabase_client, SupabaseNotConfigured
 from auth import (
@@ -14,6 +14,7 @@ from auth import (
     create_access_token,
 )
 from dependencies import get_current_user
+from logger import logger
 
 app = FastAPI(
     title="TechSync API",
@@ -97,7 +98,7 @@ def register(user_data: UserCreate):
     except HTTPException:
         raise
     except Exception as exc:
-        print(f"Error creating user: {exc}")
+        logger.error(f"Error creating user: {exc}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create user",
@@ -151,7 +152,7 @@ def login(credentials: UserLogin):
     except HTTPException:
         raise
     except Exception as exc:
-        print(f"Error during login: {exc}")
+        logger.error(f"Error during login: {exc}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed",
@@ -193,20 +194,34 @@ def list_work_orders(current_user: User = Depends(get_current_user)):
         ]
     except Exception as exc:  # noqa: BLE001
         # In a real system we'd log this; here we just fall back to mock data
-        print(f"Error querying Supabase: {exc}")
+        logger.error(f"Error querying Supabase: {exc}")
         return MOCK_WORK_ORDERS
 
 
 class WorkOrderCreate(BaseModel):
-    title: str
-    description: Optional[str] = None
-    status: str = "pending"
+    title: str = Field(..., min_length=3, max_length=200)
+    description: Optional[str] = Field(None, max_length=1000)
+    status: str = Field(default="pending", pattern="^(pending|in_progress|completed|cancelled)$")
+
+    @field_validator('title')
+    @classmethod
+    def validate_title(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Title cannot be empty')
+        return v.strip()
 
 
 class WorkOrderUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    status: Optional[str] = None
+    title: Optional[str] = Field(None, min_length=3, max_length=200)
+    description: Optional[str] = Field(None, max_length=1000)
+    status: Optional[str] = Field(None, pattern="^(pending|in_progress|completed|cancelled)$")
+
+    @field_validator('title')
+    @classmethod
+    def validate_title(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and (not v or not v.strip()):
+            raise ValueError('Title cannot be empty')
+        return v.strip() if v else None
 
 
 @app.post("/work-orders", response_model=WorkOrder, status_code=201)
@@ -242,7 +257,7 @@ def create_work_order(
         MOCK_WORK_ORDERS.append(work_order)
         return work_order
     except Exception as exc:  # noqa: BLE001
-        print(f"Error inserting into Supabase: {exc}")
+        logger.error(f"Error inserting into Supabase: {exc}")
         raise HTTPException(status_code=500, detail="Failed to create work order")
 
 
@@ -294,7 +309,7 @@ def update_work_order(
     except HTTPException:
         raise
     except Exception as exc:  # noqa: BLE001
-        print(f"Error updating work order in Supabase: {exc}")
+        logger.error(f"Error updating work order in Supabase: {exc}")
         raise HTTPException(status_code=500, detail="Failed to update work order")
 
 
@@ -327,5 +342,5 @@ def delete_work_order(
     except HTTPException:
         raise
     except Exception as exc:  # noqa: BLE001
-        print(f"Error deleting work order from Supabase: {exc}")
+        logger.error(f"Error deleting work order from Supabase: {exc}")
         raise HTTPException(status_code=500, detail="Failed to delete work order")
