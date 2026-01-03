@@ -9,8 +9,10 @@ import {
   Alert,
 } from 'react-native';
 import {API_BASE_URL} from '../config';
+import {useAuth} from '../context/AuthContext';
 
 function WorkOrderFormScreen({route, navigation}) {
+  const {token} = useAuth();
   const existingWorkOrder = route.params?.workOrder;
   const isEditing = !!existingWorkOrder;
 
@@ -46,7 +48,10 @@ function WorkOrderFormScreen({route, navigation}) {
 
       const res = await fetch(url, {
         method,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(payload),
       });
 

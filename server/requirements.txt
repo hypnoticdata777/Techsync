@@ -1,5 +1,8 @@
 fastapi
 uvicorn[standard]
 python-dotenv
-pydantic
+pydantic[email]
 supabase
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart

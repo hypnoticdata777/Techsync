@@ -6,27 +6,50 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   StyleSheet,
+  Alert,
+  RefreshControl,
 } from 'react-native';
 import {API_BASE_URL} from '../config';
+import {useAuth} from '../context/AuthContext';
 
 function WorkOrdersListScreen({navigation}) {
+  const {token, user, logout} = useAuth();
   const [workOrders, setWorkOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchWorkOrders = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/work-orders`);
-      const json = await res.json();
-      setWorkOrders(json);
-      setError(null);
+      const res = await fetch(`${API_BASE_URL}/work-orders`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        setWorkOrders(json);
+        setError(null);
+      } else if (res.status === 401) {
+        setError('Session expired. Please login again.');
+        await logout();
+      } else {
+        setError('Unable to load work orders.');
+      }
     } catch (err) {
       console.error(err);
       setError('Unable to load work orders.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchWorkOrders();
+    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -54,8 +77,26 @@ function WorkOrdersListScreen({navigation}) {
     </TouchableOpacity>
   );
 
+  const handleLogout = () => {
+    Alert.alert('Logout', 'Are you sure you want to logout?', [
+      {text: 'Cancel', style: 'cancel'},
+      {
+        text: 'Logout',
+        style: 'destructive',
+        onPress: () => logout(),
+      },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
+      <View style={styles.userBar}>
+        <Text style={styles.userName}>{user?.full_name || 'User'}</Text>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.header}>
         <Text style={styles.sectionTitle}>Work Orders</Text>
         <TouchableOpacity
@@ -66,7 +107,14 @@ function WorkOrdersListScreen({navigation}) {
       </View>
 
       {loading && <ActivityIndicator style={styles.loader} />}
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchWorkOrders}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       {!loading && !error && (
         <FlatList
           data={workOrders}
@@ -78,6 +126,14 @@ function WorkOrdersListScreen({navigation}) {
             </Text>
           }
           contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#38bdf8"
+              colors={['#38bdf8']}
+            />
+          }
         />
       )}
     </View>
@@ -88,6 +144,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#050816',
+  },
+  userBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  userName: {
+    fontSize: 12,
+    color: '#9ca3af',
+  },
+  logoutText: {
+    fontSize: 12,
+    color: '#ef4444',
+    fontWeight: '600',
   },
   header: {
     flexDirection: 'row',
@@ -145,11 +218,26 @@ const styles = StyleSheet.create({
     marginTop: 24,
     textAlign: 'center',
   },
+  errorContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
   errorText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#f97373',
-    marginHorizontal: 16,
-    marginTop: 8,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  retryButton: {
+    backgroundColor: '#38bdf8',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  retryButtonText: {
+    color: '#050816',
+    fontWeight: '600',
+    fontSize: 14,
   },
   loader: {
     marginTop: 24,
