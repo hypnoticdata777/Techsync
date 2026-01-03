@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,23 @@ import {
 } from 'react-native';
 import {API_BASE_URL} from '../config';
 import {useAuth} from '../context/AuthContext';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
+
+// Helper function to get status color
+const getStatusColor = (status) => {
+  switch (status) {
+    case 'pending':
+      return '#fbbf24'; // yellow
+    case 'in_progress':
+      return '#38bdf8'; // blue
+    case 'completed':
+      return '#a3e635'; // green
+    case 'cancelled':
+      return '#ef4444'; // red
+    default:
+      return '#9ca3af'; // gray
+  }
+};
 
 function WorkOrdersListScreen({navigation}) {
   const {token, user, logout} = useAuth();
@@ -19,10 +36,10 @@ function WorkOrdersListScreen({navigation}) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchWorkOrders = async () => {
+  const fetchWorkOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/work-orders`, {
+      const res = await fetchWithTimeout(`${API_BASE_URL}/work-orders`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -40,11 +57,11 @@ function WorkOrdersListScreen({navigation}) {
       }
     } catch (err) {
       console.error(err);
-      setError('Unable to load work orders.');
+      setError(err.message || 'Unable to load work orders.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, logout]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -61,7 +78,7 @@ function WorkOrdersListScreen({navigation}) {
     });
 
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, fetchWorkOrders]);
 
   const renderWorkOrder = ({item}) => (
     <TouchableOpacity
@@ -73,7 +90,9 @@ function WorkOrdersListScreen({navigation}) {
           {item.description}
         </Text>
       ) : null}
-      <Text style={styles.workOrderMeta}>Status: {item.status}</Text>
+      <Text style={[styles.workOrderMeta, {color: getStatusColor(item.status)}]}>
+        Status: {item.status.replace('_', ' ')}
+      </Text>
     </TouchableOpacity>
   );
 

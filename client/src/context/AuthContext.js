@@ -1,6 +1,7 @@
 import React, {createContext, useState, useEffect, useContext} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {API_BASE_URL} from '../config';
+import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 const AuthContext = createContext();
 
@@ -39,7 +40,7 @@ export const AuthProvider = ({children}) => {
 
   const fetchUserInfo = async authToken => {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/me`, {
+      const res = await fetchWithTimeout(`${API_BASE_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -54,12 +55,13 @@ export const AuthProvider = ({children}) => {
       }
     } catch (error) {
       console.error('Error fetching user info:', error);
+      // Don't logout on network errors, only on invalid token (handled above)
     }
   };
 
   const login = async (email, password) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      const res = await fetchWithTimeout(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,13 +87,13 @@ export const AuthProvider = ({children}) => {
       }
     } catch (error) {
       console.error('Login error:', error);
-      return {success: false, error: 'Network error. Please try again.'};
+      return {success: false, error: error.message || 'Network error. Please try again.'};
     }
   };
 
   const register = async (email, password, fullName) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/register`, {
+      const res = await fetchWithTimeout(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +118,7 @@ export const AuthProvider = ({children}) => {
       }
     } catch (error) {
       console.error('Registration error:', error);
-      return {success: false, error: 'Network error. Please try again.'};
+      return {success: false, error: error.message || 'Network error. Please try again.'};
     }
   };
 
