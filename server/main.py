@@ -78,6 +78,12 @@ class WorkOrderCreate(BaseModel):
     status: str = "pending"
 
 
+class WorkOrderUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[str] = None
+
+
 @app.post("/work-orders", response_model=WorkOrder, status_code=201)
 def create_work_order(payload: WorkOrderCreate):
     """
@@ -111,3 +117,82 @@ def create_work_order(payload: WorkOrderCreate):
     except Exception as exc:  # noqa: BLE001
         print(f"Error inserting into Supabase: {exc}")
         raise HTTPException(status_code=500, detail="Failed to create work order")
+
+
+@app.put("/work-orders/{work_order_id}", response_model=WorkOrder)
+def update_work_order(work_order_id: int, payload: WorkOrderUpdate):
+    """
+    Update an existing work order.
+
+    If Supabase is configured, update in DB.
+    Otherwise, update the in-memory list.
+    """
+    try:
+        client = get_supabase_client()
+
+        # Build update data with only provided fields
+        update_data = {k: v for k, v in payload.dict().items() if v is not None}
+
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+
+        response = client.table("work_orders").update(update_data).eq("id", work_order_id).execute()
+
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Work order not found")
+
+        row = response.data[0]
+        return WorkOrder(
+            id=row.get("id"),
+            title=row.get("title", ""),
+            description=row.get("description"),
+            status=row.get("status", "pending"),
+        )
+    except SupabaseNotConfigured:
+        # Update in-memory list
+        for work_order in MOCK_WORK_ORDERS:
+            if work_order.id == work_order_id:
+                if payload.title is not None:
+                    work_order.title = payload.title
+                if payload.description is not None:
+                    work_order.description = payload.description
+                if payload.status is not None:
+                    work_order.status = payload.status
+                return work_order
+        raise HTTPException(status_code=404, detail="Work order not found")
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        print(f"Error updating work order in Supabase: {exc}")
+        raise HTTPException(status_code=500, detail="Failed to update work order")
+
+
+@app.delete("/work-orders/{work_order_id}", status_code=204)
+def delete_work_order(work_order_id: int):
+    """
+    Delete a work order.
+
+    If Supabase is configured, delete from DB.
+    Otherwise, remove from the in-memory list.
+    """
+    try:
+        client = get_supabase_client()
+
+        response = client.table("work_orders").delete().eq("id", work_order_id).execute()
+
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Work order not found")
+
+        return None
+    except SupabaseNotConfigured:
+        # Delete from in-memory list
+        for i, work_order in enumerate(MOCK_WORK_ORDERS):
+            if work_order.id == work_order_id:
+                MOCK_WORK_ORDERS.pop(i)
+                return None
+        raise HTTPException(status_code=404, detail="Work order not found")
+    except HTTPException:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        print(f"Error deleting work order from Supabase: {exc}")
+        raise HTTPException(status_code=500, detail="Failed to delete work order")

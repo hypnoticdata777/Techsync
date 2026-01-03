@@ -1,146 +1,167 @@
-# TechSync — Field Service Management Platform (In Development)
+# TechSync
 
-TechSync is a field service management platform designed to help property
-management and service companies coordinate field technicians, work orders,
-and documentation in one place.
+A modern field service management platform for property management and service companies to coordinate technicians, work orders, and documentation.
 
-This repo is intentionally **work-in-progress** to showcase:
-- A **React Native** mobile client (plain RN CLI, not Expo)
-- A **Python FastAPI** backend
-- A **Supabase** Postgres database integration (via environment variables)
+## Overview
 
-
-
----
+TechSync provides a complete solution for managing field service operations with a mobile-first approach. The platform features a React Native mobile application for technicians and a FastAPI backend with Supabase database integration.
 
 ## Tech Stack
 
-- **Frontend (client/)**
-  - React Native (plain CLI)
-  - React Navigation
-  - Fetching data from a FastAPI backend
-- **Backend (server/)**
-  - FastAPI
-  - Uvicorn
-  - Supabase (Postgres) via `supabase-py`
-- **Database**
-  - Supabase (external project, configured via env vars)
+**Frontend**
+- React Native (CLI)
+- React Navigation
+- Modern component architecture
 
----
+**Backend**
+- FastAPI
+- Uvicorn ASGI server
+- Supabase (PostgreSQL)
 
 ## Project Structure
 
-```text
-client/   # React Native mobile app (techs & field ops)
-server/   # FastAPI backend + Supabase integration
+```
+.
+├── client/              # React Native mobile application
+│   ├── src/
+│   │   ├── screens/    # Application screens
+│   │   └── config.js   # Configuration
+│   ├── App.js          # Navigation setup
+│   └── package.json
+└── server/              # FastAPI backend
+    ├── main.py         # API endpoints
+    ├── supabase_client.py
+    ├── schema.sql      # Database schema
+    ├── requirements.txt
+    └── .env.example
 ```
 
----
+## Features
 
-## Setup Instructions
+- **Work Order Management**: Create, view, edit, and delete work orders
+- **Mobile Navigation**: Multi-screen mobile interface
+- **Status Tracking**: Track work order status (pending, in_progress, completed, cancelled)
+- **Offline Fallback**: Graceful degradation when database is unavailable
+- **RESTful API**: Full CRUD operations via FastAPI
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 16+
+- Python 3.9+
+- Supabase account
+- Android Studio or Xcode (for mobile development)
 
 ### Backend Setup
 
-1. **Navigate to the server directory:**
-   ```bash
-   cd server
-   ```
+1. Navigate to the server directory:
+```bash
+cd server
+```
 
-2. **Create a virtual environment (recommended):**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+3. Configure environment variables:
+```bash
+cp .env.example .env
+```
 
-4. **Configure Supabase (optional):**
-   - Copy `.env.example` to `.env`
-   - Add your Supabase URL and API key from https://supabase.com
-   - If not configured, the API will use mock data
+Edit `.env` with your Supabase credentials:
+```
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-anon-public-key-here
+```
 
-5. **Run the server:**
-   ```bash
-   uvicorn main:app --reload --host 0.0.0.0 --port 8000
-   ```
+4. Set up the database:
+- Go to your Supabase project SQL Editor
+- Run the SQL in `schema.sql`
 
-   The API will be available at `http://localhost:8000`
-   - Health check: `http://localhost:8000/health`
-   - API docs: `http://localhost:8000/docs`
+5. Start the server:
+```bash
+uvicorn main:app --reload
+```
 
-### Frontend Setup
+The API will be available at `http://localhost:8000`
 
-1. **Navigate to the client directory:**
-   ```bash
-   cd client
-   ```
+### Mobile App Setup
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+1. Navigate to the client directory:
+```bash
+cd client
+```
 
-3. **Update API URL if needed:**
-   - Edit `client/App.js` and change `API_BASE_URL` if your backend is not on `localhost:8000`
-   - For Android emulator: use `http://10.0.2.2:8000`
-   - For iOS simulator: use `http://localhost:8000`
-   - For physical device: use your computer's IP address
+2. Install dependencies:
+```bash
+npm install
+```
 
-4. **Run the app:**
+3. Update API configuration (optional):
+Edit `src/config.js` if your backend is not running on localhost:8000
 
-   **For iOS:**
-   ```bash
-   npm run ios
-   # or
-   npx react-native run-ios
-   ```
+4. Start Metro bundler:
+```bash
+npm start
+```
 
-   **For Android:**
-   ```bash
-   npm run android
-   # or
-   npx react-native run-android
-   ```
+5. Run on your platform:
+```bash
+# Android
+npm run android
 
-   Note: Make sure you have the React Native development environment set up. See [React Native Environment Setup](https://reactnative.dev/docs/environment-setup) for details.
+# iOS
+npm run ios
+```
 
----
+## API Documentation
+
+Once the server is running, visit `http://localhost:8000/docs` for interactive API documentation.
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+| GET | `/work-orders` | List all work orders |
+| POST | `/work-orders` | Create work order |
+| PUT | `/work-orders/{id}` | Update work order |
+| DELETE | `/work-orders/{id}` | Delete work order |
 
 ## Database Schema
 
-If using Supabase, create a `work_orders` table with the following schema:
-
 ```sql
-CREATE TABLE work_orders (
-  id SERIAL PRIMARY KEY,
+work_orders (
+  id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
-  status TEXT DEFAULT 'pending',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+  status TEXT NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP WITH TIME ZONE,
+  updated_at TIMESTAMP WITH TIME ZONE
+)
 ```
 
----
+## Development
 
-## API Endpoints
+The backend includes intelligent fallback to mock data when Supabase is not configured, allowing development without immediate database setup.
 
-- `GET /health` - Health check
-- `GET /work-orders` - List all work orders
-- `POST /work-orders` - Create a new work order
+### Testing the API
 
----
+```bash
+# Health check
+curl http://localhost:8000/health
 
-## Development Status
+# List work orders
+curl http://localhost:8000/work-orders
 
-This is a work-in-progress MVP scaffold demonstrating:
-- ✅ React Native mobile client with work order listing
-- ✅ FastAPI backend with REST endpoints
-- ✅ Supabase integration with fallback to mock data
-- ✅ Basic error handling and loading states
+# Create work order
+curl -X POST http://localhost:8000/work-orders \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Fix leak","description":"Kitchen sink","status":"pending"}'
+```
 
-See the roadmap below for planned features and next steps
+## License
+
+MIT
