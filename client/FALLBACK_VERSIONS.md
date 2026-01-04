@@ -75,4 +75,4 @@ This stack works. Stop messing with versions and just use this.
 
 ---
 
-**Last Updated:** January 4, 2026 (after 10 hours of version hell)
+**Last Updated:** January 3, 2026 (Saturday - after 10 hours of version hell)
