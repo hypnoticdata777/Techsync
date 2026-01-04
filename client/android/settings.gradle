@@ -10,7 +10,10 @@ pluginManagement {
   }
 }
 
-plugins { id("com.facebook.react.settings") }
+plugins {
+  id("com.facebook.react.settings") version "0.73.6" apply false
+}
+apply plugin: "com.facebook.react.settings"
 
 def getRNMinorVersion() {
   def version = providers.exec {
