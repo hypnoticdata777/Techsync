@@ -1,103 +1,105 @@
-# Android SDK Setup for TechSync
+# Android SDK Setup - My Notes
 
-## Issue
-The build cannot find the Android SDK. This is because the ANDROID_HOME environment variable is not set.
+## The Issue
 
-## Solution
+Build can't find the Android SDK because ANDROID_HOME environment variable isn't set.
 
-### For Windows 11 (Your System)
+## My Solution (Windows 11)
 
-1. **Find your Android SDK location:**
-   - Open Android Studio
-   - Go to **File** → **Settings** (or **Configure** → **Settings** from welcome screen)
-   - Navigate to **Appearance & Behavior** → **System Settings** → **Android SDK**
-   - Copy the **Android SDK Location** path (usually something like `C:\Users\YourName\AppData\Local\Android\Sdk`)
+### Finding My Android SDK Location
 
-2. **Set Environment Variables:**
+1. Open Android Studio
+2. Go to **File** → **Settings**
+3. Navigate to **Appearance & Behavior** → **System Settings** → **Android SDK**
+4. Copy the path (mine is: `C:\Users\enchi\AppData\Local\Android\Sdk`)
 
-   **Option A: Set for current terminal session (temporary):**
-   ```bash
-   # In PowerShell or Command Prompt
-   set ANDROID_HOME=C:\Users\YourName\AppData\Local\Android\Sdk
-   set PATH=%PATH%;%ANDROID_HOME%\platform-tools;%ANDROID_HOME%\tools
-   ```
+### Setting Environment Variables
 
-   **Option B: Set permanently (recommended):**
-   1. Press `Win + X` and select **System**
-   2. Click **Advanced system settings**
-   3. Click **Environment Variables**
-   4. Under **User variables**, click **New**
-   5. Variable name: `ANDROID_HOME`
-   6. Variable value: `C:\Users\YourName\AppData\Local\Android\Sdk` (your actual path)
-   7. Click **OK**
-   8. Find **Path** in User variables, click **Edit**
-   9. Click **New** and add: `%ANDROID_HOME%\platform-tools`
-   10. Click **New** and add: `%ANDROID_HOME%\tools`
-   11. Click **OK** on all dialogs
-   12. **Restart VS Code** for changes to take effect
-
-3. **Verify ADB is accessible:**
-   ```bash
-   adb version
-   ```
-
-### For VS Code Terminal
-
-If you're using VS Code with WSL or Git Bash, you may need to set the variables there as well:
-
-**For WSL/Linux:**
-```bash
-export ANDROID_HOME=/mnt/c/Users/YourName/AppData/Local/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools
+**Option A: Current Session Only (Quick Fix)**
+```powershell
+# In PowerShell
+$env:ANDROID_HOME = "C:\Users\enchi\AppData\Local\Android\Sdk"
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 ```
 
-Add these lines to your `~/.bashrc` or `~/.zshrc` to make them permanent.
+**Option B: Permanent (What I Should Do)**
+1. Press `Win + X` → select **System**
+2. Click **Advanced system settings**
+3. Click **Environment Variables**
+4. Under **User variables**, click **New**:
+   - Variable name: `ANDROID_HOME`
+   - Variable value: `C:\Users\enchi\AppData\Local\Android\Sdk`
+5. Click **OK**
+6. Find **Path** in User variables, click **Edit**
+7. Click **New** and add: `%ANDROID_HOME%\platform-tools`
+8. Click **New** and add: `%ANDROID_HOME%\tools`
+9. Click **OK** on all dialogs
+10. **Restart VS Code** for changes to take effect
 
-## After Setting Environment Variables
+### Same for JAVA_HOME
+- Variable name: `JAVA_HOME`
+- Variable value: `C:\Program Files\Android\Android Studio\jbr`
 
-1. **Start your Android emulator** from Android Studio:
-   - Open Android Studio
-   - Go to **Tools** → **Device Manager**
-   - Click the **Play** button next to your Pixel 5 emulator
+### Verify ADB is Accessible
 
-2. **Verify emulator is running:**
+```bash
+adb version
+```
+
+## Using Pixel 5 Emulator
+
+1. **Start emulator** from Android Studio:
+   - Tools → Device Manager
+   - Click Play button next to Pixel 5
+   - Wait for it to boot
+
+2. **Verify it's running:**
    ```bash
    adb devices
    ```
-   You should see your emulator listed.
+   Should see my emulator listed (like `emulator-5554`)
 
-3. **Run the app:**
+3. **Run my app:**
    ```bash
-   cd /home/user/Techsync/client
+   cd C:\Users\enchi\OneDrive\Escritorio\Coding Practices\Techsync\client
    npx expo run:android
    ```
 
 ## Alternative: Build Directly with Gradle
 
-If environment variables are still problematic, you can build directly:
+If environment variables are still problematic:
 
 ```bash
-cd /home/user/Techsync/client/android
-./gradlew assembleDebug
+cd android
+.\gradlew assembleDebug
 ```
 
 Then install manually:
 ```bash
-adb install app/build/outputs/apk/debug/app-debug.apk
+adb install app\build\outputs\apk\debug\app-debug.apk
 ```
 
 ## Troubleshooting
 
 ### "SDK location not found"
 - Make sure Android Studio SDK is fully installed
-- Check that the SDK path exists on your system
-- Verify environment variables are set correctly
+- Check that the SDK path exists
+- Verify environment variables are correct
 
 ### "adb: command not found"
-- Ensure platform-tools are included in your PATH
-- Try using the full path to adb: `C:\Users\YourName\AppData\Local\Android\Sdk\platform-tools\adb.exe`
+- Make sure platform-tools are in PATH
+- Try full path: `C:\Users\enchi\AppData\Local\Android\Sdk\platform-tools\adb.exe`
 
 ### Emulator not detected
-- Start the emulator from Android Studio first
-- Run `adb devices` to verify connection
+- Start emulator from Android Studio first
+- Run `adb devices` to verify
 - Try `adb kill-server` then `adb start-server`
+
+---
+
+**My Setup:**
+- Windows 11
+- Android Studio with Pixel 5 emulator (Android 14)
+- VS Code for development
+- Java 17 (from Android Studio JBR)
+- Gradle 8.3

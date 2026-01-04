@@ -1,8 +1,12 @@
-# Emergency Fallback: Downgrade to Proven Stable Versions
+# Emergency Fallback: Stable Versions That Work
 
-## If the serviceOf error persists, use these KNOWN WORKING versions for Windows:
+## When to Use This
 
-1. **Edit `package.json` and change these versions:**
+If I'm getting endless Kotlin/Gradle errors and just want the damn thing to build, use these **proven stable versions** for Windows 11 + Android 14:
+
+## The Working Stack
+
+Edit `package.json` with these versions:
 
 ```json
 {
@@ -22,25 +26,53 @@
 }
 ```
 
-2. **Then run:**
+Then run:
 
 ```powershell
+# Clean everything
 Remove-Item -Recurse -Force node_modules, package-lock.json, android
+
+# Reinstall
 npm install
+
+# Set Java to 17
+$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+
+# Prebuild
 npx expo prebuild --clean
+
+# Fix Gradle version
+(Get-Content android\gradle\wrapper\gradle-wrapper.properties) -replace 'gradle-8\.14\.3', 'gradle-8.3' | Set-Content android\gradle\wrapper\gradle-wrapper.properties
+
+# Build
 npx expo run:android
 ```
 
-## Why this works:
+## Why This Works
 
-- Expo 50 is more stable on Windows
-- React Native 0.73.6 doesn't have the serviceOf issue
-- These versions are battle-tested
+- **Expo 50** is more stable on Windows than 51
+- **React Native 0.73.6** doesn't have the serviceOf issue
+- These versions are battle-tested together
+- Gradle 8.3 is compatible with this stack
 
-## When to use this:
+## My Experience
 
-- If the fix-gradle-plugin.js script doesn't work
-- If you keep getting Kotlin/Gradle errors
-- If you just want it to build NOW without debugging
+This is what I ended up settling on after trying:
+- ❌ Expo 51 + RN 0.74.5 (too new, unstable)
+- ❌ Plain RN 0.72.0 (too old for Android 14)
+- ✅ Expo 50 + RN 0.73.6 (Goldilocks zone)
 
-This is a proven stack that works on Windows 11 + Android 14.
+## Complete Working Environment
+
+- Windows 11
+- Expo 50
+- React Native 0.73.6
+- Gradle 8.3 (manually set after prebuild)
+- Java 17 (Android Studio JBR)
+- Android SDK 34
+
+This stack works. Stop messing with versions and just use this.
+
+---
+
+**Last Updated:** January 4, 2026 (after 10 hours of version hell)
