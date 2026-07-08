@@ -8,23 +8,22 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import {API_BASE_URL} from '../config';
 import {useAuth} from '../context/AuthContext';
-import fetchWithTimeout from '../utils/fetchWithTimeout';
+
+const PRIORITY_OPTIONS = ['low', 'medium', 'high', 'emergency'];
 
 function WorkOrderFormScreen({route, navigation}) {
-  const {token} = useAuth();
+  const {authFetch} = useAuth();
   const existingWorkOrder = route.params?.workOrder;
   const isEditing = !!existingWorkOrder;
 
   const [title, setTitle] = useState(existingWorkOrder?.title || '');
-  const [description, setDescription] = useState(
-    existingWorkOrder?.description || '',
-  );
-  const [status, setStatus] = useState(existingWorkOrder?.status || 'pending');
+  const [description, setDescription] = useState(existingWorkOrder?.description || '');
+  const [customerName, setCustomerName] = useState(existingWorkOrder?.customer_name || '');
+  const [address, setAddress] = useState(existingWorkOrder?.address || '');
+  const [serviceType, setServiceType] = useState(existingWorkOrder?.service_type || 'general');
+  const [priority, setPriority] = useState(existingWorkOrder?.priority || 'medium');
   const [saving, setSaving] = useState(false);
-
-  const statusOptions = ['pending', 'in_progress', 'completed', 'cancelled'];
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -35,24 +34,30 @@ function WorkOrderFormScreen({route, navigation}) {
     try {
       setSaving(true);
 
-      const payload = {
-        title: title.trim(),
-        description: description.trim() || null,
-        status,
-      };
+      const path = isEditing ? `/work-orders/${existingWorkOrder.id}` : '/work-orders';
+      const method = isEditing ? 'PATCH' : 'POST';
+      const payload = isEditing
+        ? {
+            title: title.trim(),
+            description: description.trim() || null,
+            customer_name: customerName.trim() || null,
+            address: address.trim() || null,
+            service_type: serviceType,
+            priority,
+          }
+        : {
+            title: title.trim(),
+            description: description.trim() || null,
+            customer_name: customerName.trim() || null,
+            address: address.trim() || null,
+            service_type: serviceType,
+            priority,
+            auto_assign: true,
+          };
 
-      const url = isEditing
-        ? `${API_BASE_URL}/work-orders/${existingWorkOrder.id}`
-        : `${API_BASE_URL}/work-orders`;
-
-      const method = isEditing ? 'PUT' : 'POST';
-
-      const res = await fetchWithTimeout(url, {
+      const res = await authFetch(path, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload),
       });
 
@@ -60,7 +65,10 @@ function WorkOrderFormScreen({route, navigation}) {
         navigation.goBack();
       } else {
         const errorData = await res.json().catch(() => ({}));
-        Alert.alert('Error', errorData.detail || 'Failed to save work order');
+        const message = Array.isArray(errorData.detail)
+          ? errorData.detail.map(d => d.msg || JSON.stringify(d)).join('\n')
+          : errorData.detail || 'Failed to save work order';
+        Alert.alert('Error', message);
       }
     } catch (err) {
       console.error(err);
@@ -102,22 +110,56 @@ function WorkOrderFormScreen({route, navigation}) {
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Status</Text>
+          <Text style={styles.label}>Customer Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g., Jane Doe"
+            placeholderTextColor="#6b7280"
+            value={customerName}
+            onChangeText={setCustomerName}
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g., 123 Main St, Apt 4"
+            placeholderTextColor="#6b7280"
+            value={address}
+            onChangeText={setAddress}
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Service Type</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g., plumbing, hvac, electrical"
+            placeholderTextColor="#6b7280"
+            value={serviceType}
+            onChangeText={setServiceType}
+            autoCapitalize="none"
+          />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Priority</Text>
           <View style={styles.statusOptions}>
-            {statusOptions.map(option => (
+            {PRIORITY_OPTIONS.map(option => (
               <TouchableOpacity
                 key={option}
                 style={[
                   styles.statusOption,
-                  status === option && styles.statusOptionActive,
+                  priority === option && styles.statusOptionActive,
                 ]}
-                onPress={() => setStatus(option)}>
+                onPress={() => setPriority(option)}>
                 <Text
                   style={[
                     styles.statusOptionText,
-                    status === option && styles.statusOptionTextActive,
+                    priority === option && styles.statusOptionTextActive,
                   ]}>
-                  {option.replace('_', ' ')}
+                  {option}
                 </Text>
               </TouchableOpacity>
             ))}

@@ -5,7 +5,10 @@ import {StatusBar, ActivityIndicator, View, StyleSheet} from 'react-native';
 
 import {AuthProvider, useAuth} from './src/context/AuthContext';
 import LoginScreen from './src/screens/LoginScreen';
-import RegisterScreen from './src/screens/RegisterScreen';
+import OnboardingScreen from './src/screens/OnboardingScreen';
+import AcceptInvitationScreen from './src/screens/AcceptInvitationScreen';
+import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
+import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import WorkOrdersListScreen from './src/screens/WorkOrdersListScreen';
 import WorkOrderDetailsScreen from './src/screens/WorkOrderDetailsScreen';
 import WorkOrderFormScreen from './src/screens/WorkOrderFormScreen';
@@ -50,10 +53,31 @@ function Navigation() {
               }}
             />
             <Stack.Screen
-              name="Register"
-              component={RegisterScreen}
+              name="Onboarding"
+              component={OnboardingScreen}
               options={{
-                title: 'Create Account',
+                title: 'Create Organization',
+              }}
+            />
+            <Stack.Screen
+              name="AcceptInvitation"
+              component={AcceptInvitationScreen}
+              options={{
+                title: 'Accept Invitation',
+              }}
+            />
+            <Stack.Screen
+              name="ForgotPassword"
+              component={ForgotPasswordScreen}
+              options={{
+                title: 'Reset Password',
+              }}
+            />
+            <Stack.Screen
+              name="ResetPassword"
+              component={ResetPasswordScreen}
+              options={{
+                title: 'Set New Password',
               }}
             />
           </>

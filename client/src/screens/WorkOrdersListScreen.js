@@ -9,14 +9,12 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
-import {API_BASE_URL} from '../config';
 import {useAuth} from '../context/AuthContext';
-import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 // Helper function to get status color
 const getStatusColor = (status) => {
   switch (status) {
-    case 'pending':
+    case 'open':
       return '#fbbf24'; // yellow
     case 'in_progress':
       return '#38bdf8'; // blue
@@ -30,20 +28,20 @@ const getStatusColor = (status) => {
 };
 
 function WorkOrdersListScreen({navigation}) {
-  const {token, user, logout} = useAuth();
+  const {user, logout, authFetch} = useAuth();
   const [workOrders, setWorkOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
+  // RF-22: technicians see their assigned queue ordered by priority;
+  // admins/coordinators see the org-wide list (RF-21).
+  const endpoint = user?.role === 'technician' ? '/work-orders/mine' : '/work-orders';
+
   const fetchWorkOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetchWithTimeout(`${API_BASE_URL}/work-orders`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await authFetch(endpoint);
 
       if (res.ok) {
         const json = await res.json();
@@ -61,7 +59,7 @@ function WorkOrdersListScreen({navigation}) {
     } finally {
       setLoading(false);
     }
-  }, [token, logout]);
+  }, [authFetch, endpoint, logout]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -118,11 +116,13 @@ function WorkOrdersListScreen({navigation}) {
 
       <View style={styles.header}>
         <Text style={styles.sectionTitle}>Work Orders</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('WorkOrderForm')}>
-          <Text style={styles.addButtonText}>+ Add</Text>
-        </TouchableOpacity>
+        {user?.role !== 'technician' && (
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate('WorkOrderForm')}>
+            <Text style={styles.addButtonText}>+ Add</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {loading && <ActivityIndicator style={styles.loader} />}

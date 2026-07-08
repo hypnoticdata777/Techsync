@@ -1,5 +1,12 @@
 # TechSync - Technical Appendix
 
+> **Note:** this document predates the multi-tenant SaaS transformation
+> (see `README.md` and `Techsync_SaaS_Requirements.md` for the current
+> architecture, multi-tenancy model, and API surface). It's kept here as a
+> historical record of the original single-tenant MVP's design rationale;
+> treat anything below about auth, roles, or the data model as describing
+> that earlier version, not the current one.
+
 ## Overview
 
 This document provides a comprehensive technical overview of TechSync, explaining the technology choices, architectural decisions, what this Proof of Concept (POC) validates, and the roadmap to production.
