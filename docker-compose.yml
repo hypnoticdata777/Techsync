@@ -1,0 +1,9 @@
+services:
+  api:
+    build:
+      context: ./server
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./server/.env
+    restart: unless-stopped

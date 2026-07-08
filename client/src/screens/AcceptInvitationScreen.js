@@ -12,24 +12,20 @@ import {
   ScrollView,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
-import {isValidEmail, validatePassword} from '../utils/validation';
+import {validatePassword} from '../utils/validation';
 
-function RegisterScreen({navigation}) {
-  const {register} = useAuth();
+/** RF-07: join an organization using the invite token from the emailed link. */
+function AcceptInvitationScreen({navigation}) {
+  const {acceptInvitation} = useAuth();
+  const [token, setToken] = useState('');
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = async () => {
-    if (!fullName.trim() || !email.trim() || !password || !confirmPassword) {
+  const handleAccept = async () => {
+    if (!token.trim() || !fullName.trim() || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    if (!isValidEmail(email.trim())) {
-      Alert.alert('Error', 'Please enter a valid email address');
       return;
     }
 
@@ -45,15 +41,15 @@ function RegisterScreen({navigation}) {
     }
 
     setLoading(true);
-    const result = await register(
-      email.trim().toLowerCase(),
+    const result = await acceptInvitation({
+      token: token.trim(),
+      full_name: fullName.trim(),
       password,
-      fullName.trim(),
-    );
+    });
     setLoading(false);
 
     if (!result.success) {
-      Alert.alert('Registration Failed', result.error);
+      Alert.alert('Could Not Join', result.error);
     }
     // Navigation handled by App.js based on auth state
   };
@@ -65,9 +61,22 @@ function RegisterScreen({navigation}) {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
           <Text style={styles.logo}>TechSync</Text>
-          <Text style={styles.subtitle}>Create Your Account</Text>
+          <Text style={styles.subtitle}>Accept Your Invitation</Text>
 
           <View style={styles.form}>
+            <View style={styles.field}>
+              <Text style={styles.label}>Invitation Token</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Paste the token from your invite email"
+                placeholderTextColor="#6b7280"
+                value={token}
+                onChangeText={setToken}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+
             <View style={styles.field}>
               <Text style={styles.label}>Full Name</Text>
               <TextInput
@@ -77,20 +86,6 @@ function RegisterScreen({navigation}) {
                 value={fullName}
                 onChangeText={setFullName}
                 autoCapitalize="words"
-              />
-            </View>
-
-            <View style={styles.field}>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="email@example.com"
-                placeholderTextColor="#6b7280"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                autoCorrect={false}
               />
             </View>
 
@@ -121,20 +116,19 @@ function RegisterScreen({navigation}) {
             </View>
 
             <TouchableOpacity
-              style={[styles.registerButton, loading && styles.buttonDisabled]}
-              onPress={handleRegister}
+              style={[styles.acceptButton, loading && styles.buttonDisabled]}
+              onPress={handleAccept}
               disabled={loading}>
               {loading ? (
                 <ActivityIndicator color="#050816" />
               ) : (
-                <Text style={styles.registerButtonText}>Sign Up</Text>
+                <Text style={styles.acceptButtonText}>Join Organization</Text>
               )}
             </TouchableOpacity>
 
             <View style={styles.loginSection}>
-              <Text style={styles.loginText}>Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Text style={styles.loginLink}>Sign In</Text>
+                <Text style={styles.loginLink}>Back to Sign In</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -168,7 +162,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#9ca3af',
     textAlign: 'center',
-    marginBottom: 48,
+    marginBottom: 32,
   },
   form: {
     width: '100%',
@@ -192,7 +186,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#e5e7eb',
   },
-  registerButton: {
+  acceptButton: {
     backgroundColor: '#38bdf8',
     padding: 16,
     borderRadius: 8,
@@ -202,7 +196,7 @@ const styles = StyleSheet.create({
   buttonDisabled: {
     opacity: 0.6,
   },
-  registerButtonText: {
+  acceptButtonText: {
     color: '#050816',
     fontWeight: '600',
     fontSize: 16,
@@ -212,10 +206,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 24,
   },
-  loginText: {
-    color: '#9ca3af',
-    fontSize: 14,
-  },
   loginLink: {
     color: '#38bdf8',
     fontSize: 14,
@@ -223,4 +213,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegisterScreen;
+export default AcceptInvitationScreen;

@@ -1,410 +1,282 @@
 # TechSync
 
-A modern field service management platform for property management and service companies to coordinate technicians, work orders, and documentation.
+A multi-tenant SaaS platform for field service companies to onboard their
+organization, ingest work orders from multiple sources, auto-assign them to
+the right technician, and track them to completion — with a React Native
+mobile app for technicians and a FastAPI + Supabase backend.
+
+This repository implements the POC scope defined in
+`Techsync_SaaS_Requirements.md` (Functional/Non-Functional requirements
+RF-01..RF-29, RNF-01..RNF-14). See [Spec Coverage](#spec-coverage) below for
+what's implemented vs. deferred.
 
 ## Overview
 
-TechSync provides a complete solution for managing field service operations with a mobile-first approach. The platform features a React Native mobile application for technicians and a FastAPI backend with Supabase database integration.
+TechSync ingests work orders from any source — CSV upload, an external
+webhook, (PDF/email are deferred, see below) — validates and normalizes
+them, and assigns them to the best-fit technician based on skills,
+proximity, and current workload. Every organization (tenant) that signs up
+gets its own isolated slice of data, enforced both in the application layer
+and at the database layer via Postgres Row Level Security.
 
 ## Tech Stack
 
-**Frontend**
-- React Native (CLI)
+**Client**
+- React Native (Expo-managed, RN 0.73.6)
 - React Navigation
-- Modern component architecture
 
 **Backend**
-- FastAPI
-- Uvicorn ASGI server
-- Supabase (PostgreSQL)
+- FastAPI + Uvicorn
+- Supabase (PostgreSQL), accessed via `supabase-py` (PostgREST) at runtime
+  and via a direct Postgres connection for Alembic migrations
+- Pydantic v2 for request/response validation
+- Alembic for versioned migrations
+- JWT (access + refresh) for auth, bcrypt for password hashing
 
 ## Project Structure
 
 ```
 .
-├── client/              # React Native mobile application
-│   ├── src/
-│   │   ├── screens/    # Application screens
-│   │   └── config.js   # Configuration
-│   ├── App.js          # Navigation setup
-│   └── package.json
-└── server/              # FastAPI backend
-    ├── main.py         # API endpoints
-    ├── supabase_client.py
-    ├── schema.sql      # Database schema
-    ├── requirements.txt
-    └── .env.example
+├── client/                    # React Native mobile application
+│   └── src/
+│       ├── context/AuthContext.js   # tokens, onboarding, invites, refresh
+│       ├── screens/                 # Login, Onboarding, Invite, Password reset,
+│       │                            # Work order list/details/form
+│       └── config.js
+└── server/                    # FastAPI backend
+    ├── main.py                 # app wiring: routers, CORS, exception handlers
+    ├── core/                   # config.py, security.py (JWT, hashing)
+    ├── models/                 # Pydantic request/response schemas
+    ├── repositories/           # Supabase data access, always org-scoped
+    ├── services/               # business logic (matching, ingestion, billing...)
+    ├── routers/                # HTTP endpoints, one file per resource
+    ├── dependencies.py         # auth, tenant-scoping, role-check dependencies
+    ├── alembic/                # versioned DB migrations (RNF-10)
+    ├── schema.sql              # same schema, for pasting into Supabase SQL editor
+    ├── tests/                  # pytest suite (auth, matching, tenant isolation...)
+    ├── Dockerfile / .dockerignore
+    └── requirements.txt
 ```
 
-## Features
+## Multi-Tenancy Model (RF-05, RNF-05)
 
-- **User Authentication**: Secure JWT-based authentication with login and registration
-- **Work Order Management**: Create, view, edit, and delete work orders
-- **Mobile Navigation**: Multi-screen mobile interface with auth flow
-- **Status Tracking**: Track work order status (pending, in_progress, completed, cancelled)
-- **Role-Based Access**: Support for admin and technician roles
-- **Secure Storage**: JWT tokens stored securely in AsyncStorage
-- **Offline Fallback**: Graceful degradation when database is unavailable
-- **RESTful API**: Full CRUD operations via FastAPI
+Every tenant-scoped table (`users`, `technicians`, `work_orders`,
+`work_order_events`, `work_order_attachments`, `invitations`,
+`org_priority_rules`) carries an `organization_id` column.
+
+Two enforcement layers:
+
+1. **Application layer (primary for this POC)** — every function in
+   `server/repositories/*.py` takes an `organization_id` and filters on it
+   explicitly. `server/tests/test_tenant_isolation.py` asserts this for the
+   core repositories. `server/dependencies.py::get_current_organization`
+   resolves the caller's org from their JWT and every router depends on it.
+2. **Row Level Security (backstop)** — every tenant table has RLS enabled
+   with a policy scoping rows to `techsync_current_org_id()`, which reads an
+   `organization_id` claim off the PostgREST JWT. This was manually verified
+   against a local Postgres instance during development: with RLS on and no
+   org claim set, queries return zero rows (fail-closed); with the claim set
+   to org A, only org A's rows are visible, even though org B's rows exist
+   in the same table.
+
+**Caveat**: the backend currently talks to Supabase using the
+`service_role` key (needed for cross-tenant admin operations like
+onboarding), which bypasses RLS by design in Supabase. That makes the
+application-layer scoping the actual enforcement path today. RLS is fully
+defined and tested so that the moment any code path uses the `anon` key
+with a user-scoped JWT (e.g. a future "mobile app talks to Supabase
+directly" path), it's already protected — see the comment block at the top
+of `server/schema.sql` for how to mint a PostgREST-compatible JWT with an
+`organization_id` claim.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 16+
-- Python 3.9+
-- Supabase account
-- Android Studio or Xcode (for mobile development)
+- Python 3.11+
+- A Supabase project (or local Postgres for schema/migration testing)
+- Android Studio or Xcode for mobile development
 
 ### Backend Setup
 
-1. Navigate to the server directory:
 ```bash
 cd server
-```
-
-2. Install dependencies:
-```bash
 pip install -r requirements.txt
-```
-
-3. Configure environment variables:
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your Supabase credentials and JWT secret:
-```
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-anon-public-key-here
-JWT_SECRET_KEY=your-secret-key-here-generate-with-openssl-rand-hex-32
-```
-
-Generate a secure JWT secret key:
-```bash
-openssl rand -hex 32
-```
-
-4. Set up the database:
-- Go to your Supabase project SQL Editor
-- Run the SQL in `schema.sql`
-
-5. Start the server:
-```bash
-uvicorn main:app --reload
-```
-
-The API will be available at `http://localhost:8000`
-
-### Mobile App Setup
-
-1. Navigate to the client directory:
-```bash
-cd client
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Update API configuration (optional):
-Edit `src/config.js` if your backend is not running on localhost:8000
-
-4. Start Metro bundler:
-```bash
-npm start
-```
-
-5. Run on your platform:
-```bash
-# Android
-npm run android
-
-# iOS
-npm run ios
-```
-
-## API Documentation
-
-Once the server is running, visit `http://localhost:8000/docs` for interactive API documentation.
-
-### Endpoints
-
-**Authentication**
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/auth/register` | Register new user | No |
-| POST | `/auth/login` | Login and get JWT token | No |
-| GET | `/auth/me` | Get current user info | Yes |
-
-**Work Orders**
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/health` | Health check | No |
-| GET | `/work-orders` | List all work orders | Yes |
-| POST | `/work-orders` | Create work order | Yes |
-| PUT | `/work-orders/{id}` | Update work order | Yes |
-| DELETE | `/work-orders/{id}` | Delete work order | Yes |
-
-## Database Schema
-
-```sql
-users (
-  id BIGSERIAL PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  full_name TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'technician',
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMP WITH TIME ZONE,
-  updated_at TIMESTAMP WITH TIME ZONE
-)
-
-work_orders (
-  id BIGSERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  description TEXT,
-  status TEXT NOT NULL DEFAULT 'pending',
-  assigned_to BIGINT REFERENCES users(id),
-  created_by BIGINT REFERENCES users(id),
-  created_at TIMESTAMP WITH TIME ZONE,
-  updated_at TIMESTAMP WITH TIME ZONE
-)
-```
-
-## Authentication
-
-The app uses JWT (JSON Web Tokens) for secure authentication. Tokens are valid for 7 days.
-
-### Demo Accounts
-
-The database includes two demo accounts for testing:
-
-- **Admin**: `admin@techsync.com` / `password123`
-- **Technician**: `tech@techsync.com` / `password123`
-
-### Mobile App Login
-
-1. Launch the app
-2. You'll see the login screen
-3. Enter one of the demo accounts or register a new account
-4. Token is automatically stored and persists across app restarts
-
-## Development
-
-The backend includes intelligent fallback to mock data when Supabase is not configured, allowing development without immediate database setup.
-
-### Testing the API
-
-```bash
-# Register a new user
-curl -X POST http://localhost:8000/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"password123","full_name":"Test User"}'
-
-# Login
-curl -X POST http://localhost:8000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@techsync.com","password":"password123"}'
-
-# Save the token from login response, then use it for authenticated requests
-TOKEN="your-jwt-token-here"
-
-# Get current user info
-curl http://localhost:8000/auth/me \
-  -H "Authorization: Bearer $TOKEN"
-
-# List work orders (requires authentication)
-curl http://localhost:8000/work-orders \
-  -H "Authorization: Bearer $TOKEN"
-
-# Create work order (requires authentication)
-curl -X POST http://localhost:8000/work-orders \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{"title":"Fix leak","description":"Kitchen sink","status":"pending"}'
-```
-
-## How to Run
-
-This section provides detailed instructions for running TechSync locally or on a physical device.
-
-### Quick Start (Local Development)
-
-**1. Start the Backend**
-
-```bash
-# Navigate to server directory
-cd server
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up environment (for development, Supabase is optional)
-cp .env.example .env
-# Edit .env and add your JWT secret:
-# JWT_SECRET_KEY=$(openssl rand -hex 32)
-
-# Start the server
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The API will be available at `http://localhost:8000`
-
-**2. Start the Mobile App (iOS Simulator)**
-
-```bash
-# In a new terminal, navigate to client directory
-cd client
-
-# Install dependencies
-npm install
-
-# Install iOS dependencies (macOS only)
-cd ios && pod install && cd ..
-
-# Start Metro bundler
-npm start
-
-# In another terminal, run on iOS
-npm run ios
-```
-
-**3. Login to the App**
-
-When the app launches, use one of the demo accounts:
-- Email: `admin@techsync.com`
-- Password: `password123`
-
-### Running on Android Emulator
-
-```bash
-# Make sure Android Studio is installed and an emulator is running
-cd client
-
-# Update API URL for Android emulator
-# Edit src/config.js and change to:
-# export const API_BASE_URL = 'http://10.0.2.2:8000';
-
-# Install and run
-npm install
-npm run android
-```
-
-### Running on Physical Device
-
-**iOS Device:**
-
-1. Update API configuration:
-```bash
-# Find your computer's IP address
-ifconfig | grep "inet " | grep -v 127.0.0.1
-
-# Edit client/src/config.js
-# export const API_BASE_URL = 'http://192.168.1.100:8000';  # Use your IP
-```
-
-2. Ensure your device is on the same Wi-Fi network as your computer
-
-3. Run the app:
-```bash
-cd client
-npm run ios --device
-```
-
-**Android Device:**
-
-1. Enable USB debugging on your Android device
-
-2. Update API configuration:
-```bash
-# Find your computer's IP address
-ifconfig | grep "inet " | grep -v 127.0.0.1
-
-# Edit client/src/config.js
-# export const API_BASE_URL = 'http://192.168.1.100:8000';  # Use your IP
-```
-
-3. Connect device via USB and run:
-```bash
-cd client
-npm run android
-```
-
-4. Accept USB debugging prompt on device
-
-### Running with Supabase (Full Setup)
-
-1. Create a Supabase project at https://supabase.com
-
-2. Run the database schema:
-   - Go to Supabase SQL Editor
-   - Copy and paste contents of `server/schema.sql`
-   - Execute the SQL
-
-3. Configure environment variables:
-```bash
-cd server
 cp .env.example .env
 ```
 
 Edit `.env`:
 ```
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-anon-key-here
-JWT_SECRET_KEY=your-generated-secret-key
+SUPABASE_KEY=your-service-role-key
+DATABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
+JWT_SECRET_KEY=$(openssl rand -hex 32)
 ```
 
-4. Start the server and mobile app as described above
+Apply the schema — either paste `schema.sql` into the Supabase SQL editor,
+or run the equivalent migration (RNF-10):
+```bash
+alembic upgrade head
+```
 
-### Troubleshooting
+Run the server:
+```bash
+uvicorn main:app --reload
+```
+API docs: `http://localhost:8000/docs`
 
-**Backend won't start:**
-- Check Python version: `python --version` (requires 3.9+)
-- Reinstall dependencies: `pip install --upgrade -r requirements.txt`
-- Check port 8000 is not in use: `lsof -i :8000`
+### Run the tests
 
-**Mobile app can't connect to backend:**
-- Verify backend is running: `curl http://localhost:8000/health`
-- Check API_BASE_URL in `client/src/config.js` matches your setup
-- For physical devices, ensure same Wi-Fi network
-- For Android emulator, use `http://10.0.2.2:8000`
-- Check firewall allows connections on port 8000
+```bash
+cd server
+pip install pytest
+pytest
+```
+45 tests covering JWT/password logic, the matching engine, CSV ingestion
+validation, work order status transitions, plan-limit enforcement, and
+tenant-isolation of the repository layer. These run without a live
+database (repositories are mocked); the RLS behavior described above was
+additionally verified by hand against a local Postgres instance.
 
-**"Session expired" errors:**
-- JWT tokens expire after 7 days
-- Simply logout and login again
-- Check JWT_SECRET_KEY is set in server/.env
+### Docker
 
-**Metro bundler issues:**
+```bash
+docker compose up --build
+```
+Builds `server/Dockerfile` and serves the API on port 8000, reading
+`server/.env`. (Note: the container image build itself wasn't network-
+reachable to pull `python:3.11-slim` in the sandboxed environment this was
+developed in — the Dockerfile follows standard, well-tested patterns but
+verify the build in your own environment before relying on it.)
+
+### Mobile App Setup
+
 ```bash
 cd client
-npm start -- --reset-cache
+npm install
+npm start
+# in another terminal:
+npm run android   # or: npm run ios
 ```
 
-**iOS build issues:**
+Update `src/config.js` if your backend isn't on `localhost:8000` (Android
+emulator needs `http://10.0.2.2:8000`; physical devices need your
+machine's LAN IP).
+
+## Onboarding a New Organization (RF-06)
+
+There's no shared "register" endpoint anymore — a brand-new company signs
+up via `POST /organizations/onboard`, which creates the organization and
+its first `org_admin` user in a single call and returns tokens
+immediately. Everyone else joins via an emailed invitation
+(`POST /organizations/invitations` → `POST /invitations/accept`, RF-07). In
+the mobile app: "Create Organization" on the login screen for the first
+flow, "Accept Invitation" for the second.
+
+### Demo data
+
+`schema.sql` seeds one demo org (`techsync-demo`) with:
+- **Admin**: `admin@techsync.com` / `password123`
+- **Technician**: `tech@techsync.com` / `password123`
+
+## API Surface
+
+Full interactive docs at `/docs`. Summary:
+
+| Area | Endpoints |
+|---|---|
+| Auth (RF-01, RF-03) | `POST /auth/login`, `POST /auth/refresh`, `POST /auth/forgot-password`, `POST /auth/reset-password`, `GET /auth/me` |
+| Organizations (RF-05, RF-06, RF-08, RNF-13) | `POST /organizations/onboard`, `GET/PATCH /organizations/me`, `POST /organizations/me/api-key/regenerate`, `DELETE /organizations/me` |
+| Invitations (RF-07) | `POST/GET /organizations/invitations`, `POST /invitations/accept` |
+| Users (RF-02) | `GET /users`, `PATCH /users/{id}/role` |
+| Technicians (RF-26, RF-29) | `POST/GET /technicians`, `PATCH /technicians/{id}` |
+| Work Orders (RF-14, RF-15, RF-18..RF-22, RF-24) | `POST/GET /work-orders`, `GET /work-orders/mine`, `GET/PATCH /work-orders/{id}`, `PATCH /work-orders/{id}/status`, `POST /work-orders/{id}/assign`, `GET /work-orders/{id}/events`, `POST/GET /work-orders/{id}/attachments` |
+| Ingestion (RF-09, RF-11, RF-12) | `POST /ingestion/csv` (multipart), `POST /ingestion/webhook` (`X-API-Key` header, per-org key) |
+| Dashboard (RF-25) | `GET /dashboard/metrics` |
+| Billing (RF-27, RF-28, RF-29) | `POST /billing/checkout`, `GET /billing/plan-limits` |
+
+Access token lifetime is 15 minutes, refresh token 7 days (RF-01). Roles are
+`org_admin`, `coordinator`, `technician` (RF-02), enforced per-endpoint via
+`dependencies.require_roles(...)`.
+
+### Quick curl walkthrough
+
 ```bash
-cd client/ios
-pod install
-cd ..
-npm run ios
+# 1. Create an organization + admin
+curl -s -X POST http://localhost:8000/organizations/onboard \
+  -H "Content-Type: application/json" \
+  -d '{"company_name":"Acme Field","admin_full_name":"Jane Admin","admin_email":"jane@acme.com","admin_password":"Password123"}'
+# -> { "organization": {...}, "user": {...}, "tokens": {"access_token": "...", "refresh_token": "..."} }
+
+TOKEN="paste access_token here"
+
+# 2. Create a work order (auto-assigns a technician if one is eligible)
+curl -s -X POST http://localhost:8000/work-orders \
+  -H "Content-Type: application/json" -H "Authorization: Bearer $TOKEN" \
+  -d '{"title":"Fix leak","service_type":"plumbing","priority":"high"}'
+
+# 3. Bulk-ingest via CSV
+curl -s -X POST http://localhost:8000/ingestion/csv \
+  -H "Authorization: Bearer $TOKEN" -F "file=@work_orders.csv"
 ```
 
-**Android build issues:**
-```bash
-cd client/android
-./gradlew clean
-cd ..
-npm run android
-```
+## Spec Coverage
 
-**Database errors:**
-- Verify Supabase credentials in .env
-- Check schema.sql has been executed
-- The app works without Supabase (uses mock data)
+Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
+
+- **Auth & users**: RF-01 (access+refresh JWT), RF-02 (3 roles + middleware),
+  RF-03 (password reset flow), RF-04 partial (see Known Gaps).
+- **Multi-tenancy**: RF-05 (org_id scoping + RLS), RF-06 (self-service
+  onboarding), RF-07 (invitations), RF-08 (org settings: timezone, service
+  types, priorities).
+- **Ingestion**: RF-09 (CSV), RF-11 (webhook, API-key auth), RF-12
+  (Pydantic validation, per-row errors). RF-10 (PDF/web form extraction) and
+  RF-13 (email ingestion) are deferred per the spec's own scope note
+  (Should/Could, not blocking).
+- **Matching**: RF-14 (skills + proximity + workload scoring engine, see
+  `services/matching_service.py`), RF-15 (manual reassignment), RF-16
+  (notification service — logs a structured event; no real push
+  infrastructure, documented in `services/notification_service.py`), RF-17
+  (per-org forced-priority rules).
+- **Work orders**: RF-18 (CRUD + enforced status transitions), RF-19
+  (attachment metadata endpoint — client is expected to upload the file to
+  object storage and pass the URL), RF-20 (audit log), RF-21 (filtered
+  search).
+- **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
+  RF-24 (status update with notes). RF-23 (offline sync) is deferred per
+  spec scope note.
+- **Admin panel**: RF-26 (technician CRUD), RF-25 (dashboard metrics
+  endpoint; polling from a web admin panel is not built in this pass — see
+  Known Gaps).
+- **Billing**: RF-27 (14-day trial default), RF-28 (Stripe Checkout in test
+  mode, or a mock URL when Stripe isn't configured), RF-29 (technician-count
+  plan limit, enforced server-side).
+- **NFRs**: RNF-05 (RLS, verified manually — see Multi-Tenancy Model above),
+  RNF-06 (bcrypt), RNF-09 (modular backend structure), RNF-10 (Alembic),
+  RNF-11 (Dockerfile/compose), RNF-12 (structured JSON logging, toggle via
+  `LOG_FORMAT=json`), RNF-13 (tenant deletion endpoint).
+
+### Known gaps / deferred
+
+- **RF-04 (secure mobile token storage)**: tokens are in AsyncStorage, not
+  OS Keychain/Keystore. Switching to `react-native-keychain` or
+  `expo-secure-store` is the natural next step; it was deferred here since
+  it needs a native rebuild this environment couldn't verify.
+- **No web admin panel** was built (RF-25/RF-26 exist as API endpoints
+  only); the spec's "panel administrativo" is assumed to be a future
+  separate web client consuming this same API.
+- **RF-19 attachments**: the API records attachment metadata (URL,
+  filename); actual binary upload to Supabase Storage or another object
+  store, and the corresponding "take a photo" UI in the mobile app, is not
+  wired up.
+- **RF-23 (offline sync)**, **RF-10/RF-13 (PDF/email ingestion)**: deferred,
+  per the spec's own "Notas de Alcance" — not blocking for a POC.
+- Docker image build wasn't network-testable in the sandbox this was built
+  in (registry pull blocked); the Alembic migration itself *was* run
+  end-to-end against a real local Postgres instance and confirmed to create
+  the correct schema, indexes, and RLS policies, and RLS behavior was
+  hand-verified with a non-superuser role.
 
 ## License
 

@@ -4,17 +4,16 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
   Alert,
   ScrollView,
 } from 'react-native';
-import {API_BASE_URL} from '../config';
 import {useAuth} from '../context/AuthContext';
-import fetchWithTimeout from '../utils/fetchWithTimeout';
 
 // Helper function to get status color
-const getStatusColor = (status) => {
+const getStatusColor = status => {
   switch (status) {
-    case 'pending':
+    case 'open':
       return '#fbbf24'; // yellow
     case 'in_progress':
       return '#38bdf8'; // blue
@@ -27,52 +26,68 @@ const getStatusColor = (status) => {
   }
 };
 
+// RF-18: only these transitions are legal, mirrors server/models/work_order.py
+const ALLOWED_TRANSITIONS = {
+  open: ['in_progress', 'cancelled'],
+  in_progress: ['completed', 'cancelled', 'open'],
+  completed: [],
+  cancelled: [],
+};
+
+const STATUS_LABELS = {
+  open: 'Open',
+  in_progress: 'Start Work',
+  completed: 'Mark Completed',
+  cancelled: 'Cancel',
+};
+
 function WorkOrderDetailsScreen({route, navigation}) {
-  const {token} = useAuth();
-  const {workOrder} = route.params;
-  const [deleting, setDeleting] = useState(false);
+  const {user, authFetch} = useAuth();
+  const [workOrder, setWorkOrder] = useState(route.params.workOrder);
+  const [notes, setNotes] = useState('');
+  const [updating, setUpdating] = useState(false);
+
+  const canEdit = user?.role === 'org_admin' || user?.role === 'coordinator';
+  const nextStatuses = ALLOWED_TRANSITIONS[workOrder.status] || [];
 
   const handleEdit = () => {
     navigation.navigate('WorkOrderForm', {workOrder});
   };
 
-  const handleDelete = () => {
-    Alert.alert(
-      'Delete Work Order',
-      'Are you sure you want to delete this work order?',
-      [
-        {text: 'Cancel', style: 'cancel'},
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setDeleting(true);
-              const res = await fetchWithTimeout(
-                `${API_BASE_URL}/work-orders/${workOrder.id}`,
-                {
-                  method: 'DELETE',
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                },
-              );
+  const handleTransition = async newStatus => {
+    try {
+      setUpdating(true);
+      const res = await authFetch(`/work-orders/${workOrder.id}/status`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({status: newStatus, notes: notes.trim() || null}),
+      });
 
-              if (res.ok || res.status === 204) {
-                navigation.goBack();
-              } else {
-                Alert.alert('Error', 'Failed to delete work order');
-              }
-            } catch (err) {
-              console.error(err);
-              Alert.alert('Error', err.message || 'Failed to delete work order');
-            } finally {
-              setDeleting(false);
-            }
-          },
-        },
-      ],
-    );
+      if (res.ok) {
+        const updated = await res.json();
+        setWorkOrder(updated);
+        setNotes('');
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        Alert.alert('Error', errorData.detail || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Error', err.message || 'Failed to update status');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const confirmTransition = newStatus => {
+    if (newStatus === 'cancelled') {
+      Alert.alert('Cancel work order?', 'This cannot be undone.', [
+        {text: 'No', style: 'cancel'},
+        {text: 'Yes, cancel', style: 'destructive', onPress: () => handleTransition(newStatus)},
+      ]);
+      return;
+    }
+    handleTransition(newStatus);
   };
 
   return (
@@ -89,6 +104,27 @@ function WorkOrderDetailsScreen({route, navigation}) {
           </View>
         </View>
 
+        {workOrder.priority ? (
+          <View style={styles.section}>
+            <Text style={styles.label}>Priority</Text>
+            <Text style={styles.metaText}>{workOrder.priority}</Text>
+          </View>
+        ) : null}
+
+        {workOrder.customer_name ? (
+          <View style={styles.section}>
+            <Text style={styles.label}>Customer</Text>
+            <Text style={styles.metaText}>{workOrder.customer_name}</Text>
+          </View>
+        ) : null}
+
+        {workOrder.address ? (
+          <View style={styles.section}>
+            <Text style={styles.label}>Address</Text>
+            <Text style={styles.metaText}>{workOrder.address}</Text>
+          </View>
+        ) : null}
+
         {workOrder.description ? (
           <View style={styles.section}>
             <Text style={styles.label}>Description</Text>
@@ -101,22 +137,49 @@ function WorkOrderDetailsScreen({route, navigation}) {
           <Text style={styles.metaText}>#{workOrder.id}</Text>
         </View>
 
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={[styles.editButton, deleting && styles.buttonDisabled]}
-            onPress={handleEdit}
-            disabled={deleting}>
-            <Text style={styles.editButtonText}>Edit</Text>
-          </TouchableOpacity>
+        {nextStatuses.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.label}>Notes (optional)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Add notes for this status change..."
+              placeholderTextColor="#6b7280"
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+            />
+          </View>
+        )}
 
-          <TouchableOpacity
-            style={[styles.deleteButton, deleting && styles.buttonDisabled]}
-            onPress={handleDelete}
-            disabled={deleting}>
-            <Text style={styles.deleteButtonText}>
-              {deleting ? 'Deleting...' : 'Delete'}
-            </Text>
-          </TouchableOpacity>
+        <View style={styles.actions}>
+          {canEdit && (
+            <TouchableOpacity
+              style={[styles.editButton, updating && styles.buttonDisabled]}
+              onPress={handleEdit}
+              disabled={updating}>
+              <Text style={styles.editButtonText}>Edit Details</Text>
+            </TouchableOpacity>
+          )}
+
+          {nextStatuses.map(nextStatus => (
+            <TouchableOpacity
+              key={nextStatus}
+              style={[
+                nextStatus === 'cancelled' ? styles.dangerButton : styles.primaryButton,
+                updating && styles.buttonDisabled,
+              ]}
+              onPress={() => confirmTransition(nextStatus)}
+              disabled={updating}>
+              <Text
+                style={
+                  nextStatus === 'cancelled'
+                    ? styles.dangerButtonText
+                    : styles.primaryButtonText
+                }>
+                {updating ? 'Updating...' : STATUS_LABELS[nextStatus]}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -167,22 +230,44 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#e5e7eb',
   },
+  input: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    color: '#e5e7eb',
+    minHeight: 60,
+    textAlignVertical: 'top',
+  },
   actions: {
-    marginTop: 32,
+    marginTop: 12,
     gap: 12,
   },
   editButton: {
-    backgroundColor: '#38bdf8',
+    backgroundColor: '#1f2937',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   editButtonText: {
+    color: '#e5e7eb',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  primaryButton: {
+    backgroundColor: '#38bdf8',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  primaryButtonText: {
     color: '#050816',
     fontWeight: '600',
     fontSize: 16,
   },
-  deleteButton: {
+  dangerButton: {
     backgroundColor: '#1f2937',
     padding: 16,
     borderRadius: 8,
@@ -190,7 +275,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ef4444',
   },
-  deleteButtonText: {
+  dangerButtonText: {
     color: '#ef4444',
     fontWeight: '600',
     fontSize: 16,

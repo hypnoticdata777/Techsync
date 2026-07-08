@@ -87,10 +87,23 @@ function LoginScreen({navigation}) {
             )}
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={styles.forgotPasswordLink}
+            onPress={() => navigation.navigate('ForgotPassword')}>
+            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+          </TouchableOpacity>
+
           <View style={styles.registerSection}>
             <Text style={styles.registerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.registerLink}>Sign Up</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Onboarding')}>
+              <Text style={styles.registerLink}>Create Organization</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.registerSection}>
+            <Text style={styles.registerText}>Have an invite link? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('AcceptInvitation')}>
+              <Text style={styles.registerLink}>Accept Invitation</Text>
             </TouchableOpacity>
           </View>
 
@@ -169,10 +182,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
+  forgotPasswordLink: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  forgotPasswordText: {
+    color: '#9ca3af',
+    fontSize: 13,
+  },
   registerSection: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 24,
+    marginTop: 12,
   },
   registerText: {
     color: '#9ca3af',

@@ -5,4 +5,14 @@ pydantic[email]
 supabase
 python-jose[cryptography]
 passlib[bcrypt]
+# passlib 1.7.4 (latest release) is incompatible with bcrypt>=4.1 -- pin below 4.1
+# to avoid "password cannot be longer than 72 bytes" errors on every hash call.
+bcrypt<4.1
 python-multipart
+alembic
+sqlalchemy
+psycopg2-binary
+
+# Optional: only required if STRIPE_SECRET_KEY is set (RF-28). Without it,
+# billing/checkout falls back to a mock checkout URL.
+stripe
