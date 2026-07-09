@@ -77,10 +77,10 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       your host's built-in health checks against `GET /health`).
 - [ ] **Confirm Supabase automated backups are enabled** on the production
       project (paid tiers include point-in-time recovery — check your plan).
-- [ ] **Add a CI pipeline** (GitHub Actions) that runs `pytest` on every
-      push/PR so a broken auth flow can't merge silently. The suite is
-      already there (`server/tests/`, 45 tests) — it's just not wired to
-      run automatically yet.
+- [x] **Add a CI pipeline** (GitHub Actions) that runs backend pytest and
+      client Jest checks on pushes/PRs. Backend coverage currently includes
+      `server/tests/` (45 tests); client coverage starts with shared validation
+      tests and should grow as mobile flows are hardened.
 
 ## 🟡 Nice-to-have — can trail behind initial launch
 

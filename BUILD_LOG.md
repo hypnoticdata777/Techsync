@@ -76,3 +76,23 @@ local demos simple, but it is unsafe and unusable for a hosted POC.
   secret manager.
 - Replace token-copy mobile flows with first-class deep-link handling when the
   app store/mobile deployment path is ready.
+
+## 2026-07-09 - Add CI Test Pipeline
+
+### Why
+
+A public POC needs a repeatable safety net so auth, tenant isolation, matching,
+and client validation do not regress silently between demos.
+
+### Changed
+
+- Added a GitHub Actions workflow with separate backend and client jobs.
+- Backend CI installs `server/requirements-dev.txt` and runs the 45-test pytest suite.
+- Client CI installs with `npm ci` and runs Jest in CI mode.
+- Added `client/src/utils/validation.test.js` to cover shared email and password validation behavior.
+- Updated README test instructions and marked the CI checklist item complete.
+
+### Remaining Follow-Up
+
+- Expand client tests around authentication and onboarding screens.
+- Address the current npm audit report before a public showcase.
