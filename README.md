@@ -108,10 +108,14 @@ cp .env.example .env
 
 Edit `.env`:
 ```
+APP_ENV=development
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-service-role-key
 DATABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
 JWT_SECRET_KEY=$(openssl rand -hex 32)
+CORS_ORIGINS=http://localhost:8081,http://localhost:19006,http://localhost:3000
+STRIPE_SUCCESS_URL=http://localhost:3000/billing/success
+STRIPE_CANCEL_URL=http://localhost:3000/billing/cancel
 ```
 
 Apply the schema — either paste `schema.sql` into the Supabase SQL editor,
