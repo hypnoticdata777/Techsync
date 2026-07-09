@@ -137,14 +137,17 @@ API docs: `http://localhost:8000/docs`
 
 ```bash
 cd server
-pip install pytest
-pytest
+pip install -r requirements-dev.txt
+pytest -p no:cacheprovider
 ```
-45 tests covering JWT/password logic, the matching engine, CSV ingestion
+45 backend tests covering JWT/password logic, the matching engine, CSV ingestion
 validation, work order status transitions, plan-limit enforcement, and
 tenant-isolation of the repository layer. These run without a live
 database (repositories are mocked); the RLS behavior described above was
 additionally verified by hand against a local Postgres instance.
+
+The GitHub Actions workflow also runs this backend suite plus the client Jest
+checks on pushes to `main` / `agent/**` and pull requests into `main`.
 
 ### Docker
 
