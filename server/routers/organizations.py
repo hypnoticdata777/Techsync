@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from core.rate_limit import ONBOARD_RATE_LIMIT, rate_limit_dependency
 from core.security import get_password_hash
 from dependencies import get_current_organization, require_roles
 from logger import logger
@@ -19,7 +20,12 @@ from services import auth_service
 router = APIRouter(prefix="/organizations", tags=["organizations"])
 
 
-@router.post("/onboard", response_model=OrganizationOnboardResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/onboard",
+    response_model=OrganizationOnboardResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(rate_limit_dependency(ONBOARD_RATE_LIMIT))],
+)
 def onboard(payload: OrganizationOnboard):
     """RF-06: self-service org creation -- company + first admin in a single call."""
     if users_repo.get_by_email(payload.admin_email):

@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from core.rate_limit import INVITATION_ACCEPT_RATE_LIMIT, rate_limit_dependency
 from core.security import generate_opaque_token, get_password_hash, hash_opaque_token
 from dependencies import get_current_organization, require_roles
 from logger import logger
@@ -78,7 +79,10 @@ def list_invitations(
 
 
 @router.post(
-    "/invitations/accept", response_model=OrganizationOnboardResponse, status_code=status.HTTP_201_CREATED
+    "/invitations/accept",
+    response_model=OrganizationOnboardResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(rate_limit_dependency(INVITATION_ACCEPT_RATE_LIMIT))],
 )
 def accept_invitation(payload: InvitationAccept):
     invitation_row = invitations_repo.get_valid_by_token_hash(hash_opaque_token(payload.token))

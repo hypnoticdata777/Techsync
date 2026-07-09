@@ -69,6 +69,17 @@ class Settings:
     SMTP_PASSWORD: str | None = os.getenv("SMTP_PASSWORD")
     SMTP_USE_TLS: bool = _bool_env("SMTP_USE_TLS", True)
 
+    RATE_LIMIT_ENABLED: bool = _bool_env("RATE_LIMIT_ENABLED", True)
+    RATE_LIMIT_TRUST_PROXY_HEADERS: bool = _bool_env("RATE_LIMIT_TRUST_PROXY_HEADERS", False)
+    RATE_LIMIT_LOGIN_MAX: int = int(os.getenv("RATE_LIMIT_LOGIN_MAX", "5"))
+    RATE_LIMIT_LOGIN_WINDOW_SECONDS: int = int(os.getenv("RATE_LIMIT_LOGIN_WINDOW_SECONDS", "60"))
+    RATE_LIMIT_PASSWORD_RESET_MAX: int = int(os.getenv("RATE_LIMIT_PASSWORD_RESET_MAX", "3"))
+    RATE_LIMIT_PASSWORD_RESET_WINDOW_SECONDS: int = int(os.getenv("RATE_LIMIT_PASSWORD_RESET_WINDOW_SECONDS", "300"))
+    RATE_LIMIT_ONBOARD_MAX: int = int(os.getenv("RATE_LIMIT_ONBOARD_MAX", "3"))
+    RATE_LIMIT_ONBOARD_WINDOW_SECONDS: int = int(os.getenv("RATE_LIMIT_ONBOARD_WINDOW_SECONDS", "300"))
+    RATE_LIMIT_INVITATION_ACCEPT_MAX: int = int(os.getenv("RATE_LIMIT_INVITATION_ACCEPT_MAX", "10"))
+    RATE_LIMIT_INVITATION_ACCEPT_WINDOW_SECONDS: int = int(os.getenv("RATE_LIMIT_INVITATION_ACCEPT_WINDOW_SECONDS", "300"))
+
 
 def _validate_public_https_url(name: str, url: str | None) -> None:
     if not url:
