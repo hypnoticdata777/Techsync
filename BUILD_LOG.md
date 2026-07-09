@@ -95,4 +95,25 @@ and client validation do not regress silently between demos.
 ### Remaining Follow-Up
 
 - Expand client tests around authentication and onboarding screens.
-- Address the current npm audit report before a public showcase.
+- Complete the Expo/React Native major upgrade needed to clear the remaining npm audit findings.
+
+## 2026-07-09 - Reduce Client Dependency Audit Findings
+
+### Why
+
+A public showcase should not carry easy-to-fix dependency advisories, but this
+Expo/RN stack also needs framework compatibility respected. The safe path is to
+apply lockfile-level fixes first and keep the framework upgrade as a separate
+planned blocker.
+
+### Changed
+
+- Ran `npm audit fix --package-lock-only` without `--force`.
+- Updated `client/package-lock.json` with patched transitive packages including Babel, minimatch, picomatch, js-yaml, lodash, and React Native's nested `ws`.
+- Reinstalled with `npm ci` and confirmed the remaining audit count is 29 findings, down from 39, with zero critical findings.
+- Documented that the remaining findings require an Expo/React Native framework upgrade rather than forced transitive overrides.
+
+### Remaining Follow-Up
+
+- Plan and test the Expo/RN upgrade path that npm identifies as the supported fix for the remaining audit findings.
+- Re-run mobile/web smoke tests after that upgrade because it is a framework-level change.

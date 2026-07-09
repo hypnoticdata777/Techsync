@@ -276,6 +276,10 @@ Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
   wired up.
 - **RF-23 (offline sync)**, **RF-10/RF-13 (PDF/email ingestion)**: deferred,
   per the spec's own "Notas de Alcance" — not blocking for a POC.
+- **Client dependency audit**: `npm audit fix --package-lock-only` has been
+  applied without forcing framework majors. The remaining npm findings are in
+  Expo 50 / React Native 0.73 transitive tooling and require a planned Expo/RN
+  upgrade before treating the client as public-showcase clean.
 - Docker image build wasn't network-testable in the sandbox this was built
   in (registry pull blocked); the Alembic migration itself *was* run
   end-to-end against a real local Postgres instance and confirmed to create
