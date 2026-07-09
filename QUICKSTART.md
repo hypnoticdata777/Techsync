@@ -57,9 +57,6 @@ cd client && npm run ios      # or: npm run android
 3. Fill in company name + your admin details, submit
 4. You're immediately signed in as `org_admin` for your new org
 
-**Or use the seeded demo org:**
-- Email: `admin@techsync.com` / Password: `password123` (org_admin)
-- Email: `tech@techsync.com` / Password: `password123` (technician)
 
 **Work Order Management:**
 1. View existing work orders with status badges
@@ -82,7 +79,7 @@ curl http://localhost:8000/health
 
 curl -X POST http://localhost:8000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@techsync.com","password":"password123"}'
+  -d '{"email":"YOUR_ADMIN_EMAIL","password":"YOUR_ADMIN_PASSWORD"}'
 # -> {"access_token": "...", "refresh_token": "...", "token_type": "bearer"}
 
 curl http://localhost:8000/work-orders \
@@ -91,18 +88,11 @@ curl http://localhost:8000/work-orders \
 
 ---
 
-## Demo Account Credentials
+## Demo Account Setup
 
-**Admin Account (org_admin):**
-- Email: `admin@techsync.com` / Password: `password123`
-- Can: create/edit work orders, manage technicians, invite users, view
-  dashboard metrics, manage billing
-
-**Technician Account:**
-- Email: `tech@techsync.com` / Password: `password123`
-- Can: view and update status on their own assigned work orders
-  (`GET /work-orders/mine`)
-
+Create a demo organization through the onboarding flow, then invite any
+technician users you need for the walkthrough. The production schema does not
+ship with shared demo credentials.
 ---
 
 ## Key Features to Showcase

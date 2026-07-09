@@ -8,11 +8,10 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
 
 ## 🔴 Critical — do before it's reachable by anyone but you
 
-- [ ] **Rotate/remove the seeded demo accounts.** `admin@techsync.com` /
-      `tech@techsync.com` with password `password123` are sitting in
-      `server/schema.sql`, which is in this public-ish repo history. Before
-      go-live: either delete that seed block from the migration you run in
-      production, or immediately change those passwords in the real DB.
+- [x] **Rotate/remove the seeded demo accounts.** Shared demo accounts are no
+      longer seeded by server/schema.sql or displayed in the mobile login
+      screen. If an environment was already created from the older schema,
+      delete or rotate those users in that DB.
 - [ ] **Generate a real `JWT_SECRET_KEY`** for production (`openssl rand
       -hex 32`) — never reuse the one from local dev, never commit it.
       Store it in your hosting provider's secret manager, not in a
