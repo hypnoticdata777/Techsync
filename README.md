@@ -174,12 +174,6 @@ immediately. Everyone else joins via an emailed invitation
 the mobile app: "Create Organization" on the login screen for the first
 flow, "Accept Invitation" for the second.
 
-### Demo data
-
-`schema.sql` seeds one demo org (`techsync-demo`) with:
-- **Admin**: `admin@techsync.com` / `password123`
-- **Technician**: `tech@techsync.com` / `password123`
-
 ## API Surface
 
 Full interactive docs at `/docs`. Summary:

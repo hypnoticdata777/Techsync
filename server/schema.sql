@@ -283,36 +283,3 @@ ALTER TABLE org_priority_rules ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY org_priority_rules_isolation ON org_priority_rules
     USING (organization_id = techsync_current_org_id());
-
--- =====================================================================
--- Seed data for local/demo use (idempotent)
--- =====================================================================
-INSERT INTO organizations (name, slug, industry, timezone, plan, subscription_status, trial_ends_at, technician_limit)
-VALUES ('TechSync Demo', 'techsync-demo', 'field-services', 'America/New_York', 'trial', 'trialing', TIMEZONE('utc'::text, NOW()) + INTERVAL '14 days', 3)
-ON CONFLICT (slug) DO NOTHING;
-
--- Sample users for testing. Password is 'password123' hashed with bcrypt.
-INSERT INTO users (organization_id, email, password_hash, full_name, role)
-SELECT id, 'admin@techsync.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5lSN.qFi0KdUi', 'Admin User', 'org_admin'
-FROM organizations WHERE slug = 'techsync-demo'
-ON CONFLICT (email) DO NOTHING;
-
-INSERT INTO users (organization_id, email, password_hash, full_name, role)
-SELECT id, 'tech@techsync.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5lSN.qFi0KdUi', 'John Technician', 'technician'
-FROM organizations WHERE slug = 'techsync-demo'
-ON CONFLICT (email) DO NOTHING;
-
-INSERT INTO technicians (organization_id, user_id, skills, zone, availability_status)
-SELECT o.id, u.id, ARRAY['plumbing', 'hvac'], 'north', 'available'
-FROM organizations o JOIN users u ON u.organization_id = o.id
-WHERE o.slug = 'techsync-demo' AND u.email = 'tech@techsync.com'
-ON CONFLICT (user_id) DO NOTHING;
-
-INSERT INTO work_orders (organization_id, title, description, status, priority, service_type, created_by, assigned_technician_id, source)
-SELECT o.id, 'Leak under kitchen sink', 'Tenant reports slow drip. Check pipes and seals.', 'open', 'high', 'plumbing',
-       (SELECT id FROM users WHERE email = 'admin@techsync.com'),
-       (SELECT id FROM technicians WHERE organization_id = o.id LIMIT 1),
-       'manual'
-FROM organizations o
-WHERE o.slug = 'techsync-demo'
-  AND NOT EXISTS (SELECT 1 FROM work_orders WHERE title = 'Leak under kitchen sink');

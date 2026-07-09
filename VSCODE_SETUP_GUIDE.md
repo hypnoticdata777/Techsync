@@ -520,8 +520,8 @@ For mobile app, use terminal method since React Native debugging requires Metro 
    - Body (JSON):
      ```json
      {
-       "email": "admin@techsync.com",
-       "password": "password123"
+       "email": "YOUR_ADMIN_EMAIL",
+       "password": "YOUR_ADMIN_PASSWORD"
      }
      ```
    - Send → Copy token from response

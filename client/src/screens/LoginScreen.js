@@ -106,16 +106,6 @@ function LoginScreen({navigation}) {
               <Text style={styles.registerLink}>Accept Invitation</Text>
             </TouchableOpacity>
           </View>
-
-          <View style={styles.demoSection}>
-            <Text style={styles.demoTitle}>Demo Accounts:</Text>
-            <Text style={styles.demoText}>
-              Admin: admin@techsync.com / password123
-            </Text>
-            <Text style={styles.demoText}>
-              Tech: tech@techsync.com / password123
-            </Text>
-          </View>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -203,25 +193,6 @@ const styles = StyleSheet.create({
     color: '#38bdf8',
     fontSize: 14,
     fontWeight: '600',
-  },
-  demoSection: {
-    marginTop: 32,
-    padding: 16,
-    backgroundColor: '#020617',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#1f2937',
-  },
-  demoTitle: {
-    color: '#e5e7eb',
-    fontSize: 12,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  demoText: {
-    color: '#9ca3af',
-    fontSize: 12,
-    marginTop: 4,
   },
 });
 
