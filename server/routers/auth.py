@@ -12,7 +12,7 @@ from models.user import (
     User,
     UserLogin,
 )
-from services import auth_service
+from services import auth_service, email_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -44,11 +44,20 @@ def refresh(payload: RefreshRequest):
 def forgot_password(payload: ForgotPasswordRequest):
     raw_token = auth_service.request_password_reset(payload.email)
     if raw_token:
-        # In production this would be emailed, not logged. Logging here keeps the
-        # POC demoable without an email provider configured.
+        try:
+            email_service.send_password_reset_email(payload.email, raw_token)
+        except email_service.EmailDeliveryError:
+            logger.exception(
+                "auth.password_reset_email_failed",
+                extra={"event": "password_reset_email_failed", "email": payload.email},
+            )
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Password reset email could not be sent. Please try again later.",
+            )
         logger.info(
-            "auth.password_reset_requested",
-            extra={"event": "password_reset_requested", "email": payload.email, "reset_token": raw_token},
+            "auth.password_reset_email_sent",
+            extra={"event": "password_reset_email_sent", "email": payload.email},
         )
     # Always return a generic success response to avoid leaking which emails are registered.
     return {"detail": "If that email is registered, a reset link has been sent."}

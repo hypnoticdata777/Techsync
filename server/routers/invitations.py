@@ -11,7 +11,7 @@ from models.user import User
 from repositories import invitations as invitations_repo
 from repositories import organizations as organizations_repo
 from repositories import users as users_repo
-from services import auth_service
+from services import auth_service, email_service
 
 router = APIRouter(tags=["invitations"])
 
@@ -36,14 +36,33 @@ def invite_user(
         invited_by=current_user.id,
     )
 
-    # In production this would be emailed, not logged.
+    try:
+        email_service.send_invitation_email(
+            payload.email,
+            raw_token,
+            organization.get("name", "your organization"),
+            payload.role,
+        )
+    except email_service.EmailDeliveryError:
+        logger.exception(
+            "invitation.email_failed",
+            extra={
+                "event": "invitation_email_failed",
+                "organization_id": organization["id"],
+                "email": payload.email,
+            },
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Invitation email could not be sent. Please try again later.",
+        )
+
     logger.info(
-        "invitation.created",
+        "invitation.email_sent",
         extra={
-            "event": "invitation_created",
+            "event": "invitation_email_sent",
             "organization_id": organization["id"],
             "email": payload.email,
-            "invite_token": raw_token,
         },
     )
 

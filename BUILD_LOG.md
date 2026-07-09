@@ -52,3 +52,27 @@ hosted POC fail in confusing ways or accidentally point users at fake domains.
 - Set real values in the hosting provider secret manager before deploying.
 - Use real HTTPS domains for `CORS_ORIGINS`, `STRIPE_SUCCESS_URL`,
   `STRIPE_CANCEL_URL`, and `EXPO_PUBLIC_API_BASE_URL`.
+
+## 2026-07-09 - Send Reset and Invitation Emails
+
+### Why
+
+Password reset and invitation tokens were previously written to logs. That kept
+local demos simple, but it is unsafe and unusable for a hosted POC.
+
+### Changed
+
+- Added `services/email_service.py` with SMTP delivery and explicit local-dev
+  log delivery mode.
+- Password reset requests now send through the email service instead of route-level token logging.
+- Organization invitations now send through the email service instead of route-level token logging.
+- Production startup now requires `APP_BASE_URL`, `EMAIL_FROM`, SMTP settings,
+  and `EMAIL_DELIVERY_METHOD=smtp`.
+- Updated `.env.example`, README, Quick Start, and the pre-launch checklist.
+
+### Remaining Follow-Up
+
+- Choose the production email provider and store SMTP credentials in the host's
+  secret manager.
+- Replace token-copy mobile flows with first-class deep-link handling when the
+  app store/mobile deployment path is ready.

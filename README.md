@@ -116,6 +116,9 @@ JWT_SECRET_KEY=$(openssl rand -hex 32)
 CORS_ORIGINS=http://localhost:8081,http://localhost:19006,http://localhost:3000
 STRIPE_SUCCESS_URL=http://localhost:3000/billing/success
 STRIPE_CANCEL_URL=http://localhost:3000/billing/cancel
+APP_BASE_URL=http://localhost:19006
+EMAIL_DELIVERY_METHOD=log
+EMAIL_FROM=TechSync <no-reply@yourdomain.com>
 ```
 
 Apply the schema — either paste `schema.sql` into the Supabase SQL editor,
