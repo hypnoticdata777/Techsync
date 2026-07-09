@@ -24,9 +24,9 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       exceptions). If you deploy to Render/Fly.io/Railway/Vercel this is
       usually automatic; if you're running the Docker image yourself, put
       it behind a reverse proxy (Caddy/Nginx/Cloudflare) with a real cert.
-- [ ] **Lock down CORS** — `server/core/config.py`'s `CORS_ORIGINS`
-      currently defaults to localhost. Set the `CORS_ORIGINS` env var to
-      your actual production domain(s) only.
+- [ ] **Lock down CORS** - production mode now fails startup if
+      `CORS_ORIGINS` is missing or contains localhost. Set `APP_ENV=production`
+      and configure `CORS_ORIGINS` to your actual production domain(s) only.
 - [ ] **Wire up real password-reset and invitation emails.** Right now
       `POST /auth/forgot-password` and `POST /organizations/invitations`
       just log the token (see `routers/auth.py`, `routers/invitations.py`)

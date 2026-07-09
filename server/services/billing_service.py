@@ -46,6 +46,8 @@ def create_checkout_session(organization: dict) -> CheckoutSessionResponse:
             pass
 
     # Mock mode: no Stripe configured, return a deterministic fake checkout URL.
+    if not settings.STRIPE_SUCCESS_URL:
+        raise RuntimeError("STRIPE_SUCCESS_URL is required for mock checkout mode")
     mock_url = f"{settings.STRIPE_SUCCESS_URL}?mock=true&organization_id={organization['id']}"
     return CheckoutSessionResponse(checkout_url=mock_url, mode="mock")
 

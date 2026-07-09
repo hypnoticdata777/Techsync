@@ -22,9 +22,13 @@ cd server
 pip install -r requirements.txt
 
 cat > .env << EOF
+APP_ENV=development
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-service-role-key
 JWT_SECRET_KEY=$(openssl rand -hex 32)
+CORS_ORIGINS=http://localhost:8081,http://localhost:19006,http://localhost:3000
+STRIPE_SUCCESS_URL=http://localhost:3000/billing/success
+STRIPE_CANCEL_URL=http://localhost:3000/billing/cancel
 EOF
 
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
@@ -45,9 +49,13 @@ npm start
 cd client && npm run ios      # or: npm run android
 ```
 
-**Android Note:** before running on the Android emulator, edit
-`client/src/config.js` so `API_BASE_URL` points at
-`http://10.0.2.2:8000`.
+**API URL note:** local defaults work for iOS simulator, Expo web, and
+Android emulator. For a physical device or hosted API, start Expo with
+`EXPO_PUBLIC_API_BASE_URL`, for example:
+
+```bash
+EXPO_PUBLIC_API_BASE_URL=http://YOUR_COMPUTER_IP:8000 npm start
+```
 
 ### Step 3: Demo the Features (2 minutes)
 
