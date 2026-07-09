@@ -81,6 +81,11 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       client Jest checks on pushes/PRs. Backend coverage currently includes
       `server/tests/` (45 tests); client coverage starts with shared validation
       tests and should grow as mobile flows are hardened.
+- [ ] **Complete the Expo/React Native dependency upgrade.** Safe npm audit
+      fixes reduced the client report from 39 to 29 findings with no criticals,
+      but the remaining high/moderate findings are pinned inside Expo 50 / React
+      Native 0.73 tooling. Clearing them requires a planned Expo/RN upgrade and
+      mobile/web regression pass, not `npm audit fix --force` in-place.
 
 ## 🟡 Nice-to-have — can trail behind initial launch
 
