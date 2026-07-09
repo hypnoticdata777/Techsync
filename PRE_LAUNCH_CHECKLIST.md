@@ -27,12 +27,10 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
 - [ ] **Lock down CORS** - production mode now fails startup if
       `CORS_ORIGINS` is missing or contains localhost. Set `APP_ENV=production`
       and configure `CORS_ORIGINS` to your actual production domain(s) only.
-- [ ] **Wire up real password-reset and invitation emails.** Right now
-      `POST /auth/forgot-password` and `POST /organizations/invitations`
-      just log the token (see `routers/auth.py`, `routers/invitations.py`)
-      instead of emailing it — fine for a demo, not fine for real users.
-      Plug in an email provider (Postmark, SendGrid, SES, Resend) and send
-      the link instead of logging it.
+- [x] **Wire up real password-reset and invitation emails.** The backend
+      now sends reset and invitation emails through `services/email_service.py`.
+      Local development can use `EMAIL_DELIVERY_METHOD=log`; production
+      requires SMTP settings and `APP_BASE_URL` at startup.
 - [ ] **Run a secret scan** over the whole repo history before making it
       public (`git log` + tools like `gitleaks` or `trufflehog`) — confirm
       no real Supabase/Stripe/JWT keys were ever committed, only the

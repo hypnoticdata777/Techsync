@@ -3,6 +3,7 @@ Centralized environment configuration for the TechSync API.
 """
 
 import os
+from urllib.parse import urlparse
 
 
 APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
@@ -24,6 +25,13 @@ def _default_url(path: str) -> str | None:
     if IS_PRODUCTION:
         return None
     return f"http://localhost:3000{path}"
+
+
+def _bool_env(name: str, default: bool) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
 class Settings:
@@ -50,8 +58,32 @@ class Settings:
 
     CORS_ORIGINS: list[str] = _csv_env("CORS_ORIGINS", "" if IS_PRODUCTION else DEV_CORS_ORIGINS)
 
+    APP_BASE_URL: str | None = os.getenv("APP_BASE_URL") or (None if IS_PRODUCTION else "http://localhost:19006")
+    EMAIL_DELIVERY_METHOD: str = os.getenv(
+        "EMAIL_DELIVERY_METHOD", "smtp" if IS_PRODUCTION else "log"
+    ).strip().lower()
+    EMAIL_FROM: str | None = os.getenv("EMAIL_FROM")
+    SMTP_HOST: str | None = os.getenv("SMTP_HOST")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USERNAME: str | None = os.getenv("SMTP_USERNAME")
+    SMTP_PASSWORD: str | None = os.getenv("SMTP_PASSWORD")
+    SMTP_USE_TLS: bool = _bool_env("SMTP_USE_TLS", True)
+
+
+def _validate_public_https_url(name: str, url: str | None) -> None:
+    if not url:
+        return
+    parsed = urlparse(url)
+    if parsed.scheme != "https":
+        raise ValueError(f"{name} must use https when APP_ENV=production")
+    if parsed.hostname in {"localhost", "127.0.0.1"}:
+        raise ValueError(f"{name} must not point to localhost when APP_ENV=production")
+
 
 def _validate_settings(value: Settings) -> None:
+    if value.EMAIL_DELIVERY_METHOD not in {"log", "smtp"}:
+        raise ValueError("EMAIL_DELIVERY_METHOD must be either 'log' or 'smtp'")
+
     if not value.IS_PRODUCTION:
         return
 
@@ -68,6 +100,19 @@ def _validate_settings(value: Settings) -> None:
         missing.append("STRIPE_SUCCESS_URL")
     if not value.STRIPE_CANCEL_URL:
         missing.append("STRIPE_CANCEL_URL")
+    if not value.APP_BASE_URL:
+        missing.append("APP_BASE_URL")
+    if not value.EMAIL_FROM:
+        missing.append("EMAIL_FROM")
+
+    if value.EMAIL_DELIVERY_METHOD != "smtp":
+        missing.append("EMAIL_DELIVERY_METHOD=smtp")
+    if not value.SMTP_HOST:
+        missing.append("SMTP_HOST")
+    if not value.SMTP_USERNAME:
+        missing.append("SMTP_USERNAME")
+    if not value.SMTP_PASSWORD:
+        missing.append("SMTP_PASSWORD")
 
     if missing:
         raise ValueError(
@@ -84,6 +129,10 @@ def _validate_settings(value: Settings) -> None:
             "CORS_ORIGINS must not include localhost values when APP_ENV=production: "
             + ", ".join(local_origins)
         )
+
+    _validate_public_https_url("APP_BASE_URL", value.APP_BASE_URL)
+    _validate_public_https_url("STRIPE_SUCCESS_URL", value.STRIPE_SUCCESS_URL)
+    _validate_public_https_url("STRIPE_CANCEL_URL", value.STRIPE_CANCEL_URL)
 
 
 settings = Settings()
