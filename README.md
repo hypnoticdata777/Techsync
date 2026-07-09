@@ -140,9 +140,9 @@ cd server
 pip install -r requirements-dev.txt
 pytest -p no:cacheprovider
 ```
-45 backend tests covering JWT/password logic, the matching engine, CSV ingestion
+50 backend tests covering JWT/password logic, the matching engine, CSV ingestion
 validation, work order status transitions, plan-limit enforcement, and
-tenant-isolation of the repository layer. These run without a live
+tenant-isolation of the repository layer, and public endpoint rate limiting. These run without a live
 database (repositories are mocked); the RLS behavior described above was
 additionally verified by hand against a local Postgres instance.
 
@@ -203,6 +203,11 @@ Full interactive docs at `/docs`. Summary:
 Access token lifetime is 15 minutes, refresh token 7 days (RF-01). Roles are
 `org_admin`, `coordinator`, `technician` (RF-02), enforced per-endpoint via
 `dependencies.require_roles(...)`.
+
+Public auth-style endpoints also have configurable fixed-window rate limits
+(`RATE_LIMIT_*` environment variables) for single-instance POC hosting. If the
+backend is scaled horizontally, enforce equivalent limits through Redis or the
+edge/reverse proxy so counters are shared across instances.
 
 ### Quick curl walkthrough
 

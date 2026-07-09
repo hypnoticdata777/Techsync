@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from core.rate_limit import LOGIN_RATE_LIMIT, PASSWORD_RESET_RATE_LIMIT, rate_limit_dependency
 from dependencies import get_current_user
 from logger import logger
 from models.user import (
@@ -17,7 +18,11 @@ from services import auth_service, email_service
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/login", response_model=TokenPair)
+@router.post(
+    "/login",
+    response_model=TokenPair,
+    dependencies=[Depends(rate_limit_dependency(LOGIN_RATE_LIMIT))],
+)
 def login(credentials: UserLogin):
     user_row = auth_service.authenticate(credentials.email, credentials.password)
     if not user_row:
@@ -40,7 +45,11 @@ def refresh(payload: RefreshRequest):
     return tokens
 
 
-@router.post("/forgot-password", status_code=status.HTTP_202_ACCEPTED)
+@router.post(
+    "/forgot-password",
+    status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(rate_limit_dependency(PASSWORD_RESET_RATE_LIMIT))],
+)
 def forgot_password(payload: ForgotPasswordRequest):
     raw_token = auth_service.request_password_reset(payload.email)
     if raw_token:
@@ -63,7 +72,10 @@ def forgot_password(payload: ForgotPasswordRequest):
     return {"detail": "If that email is registered, a reset link has been sent."}
 
 
-@router.post("/reset-password")
+@router.post(
+    "/reset-password",
+    dependencies=[Depends(rate_limit_dependency(PASSWORD_RESET_RATE_LIMIT))],
+)
 def reset_password(payload: ResetPasswordRequest):
     success = auth_service.reset_password(payload.token, payload.new_password)
     if not success:

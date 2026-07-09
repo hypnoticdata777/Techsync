@@ -117,3 +117,23 @@ planned blocker.
 
 - Plan and test the Expo/RN upgrade path that npm identifies as the supported fix for the remaining audit findings.
 - Re-run mobile/web smoke tests after that upgrade because it is a framework-level change.
+
+## 2026-07-09 - Rate Limit Public Auth Flows
+
+### Why
+
+Login, password reset, organization onboarding, and invitation acceptance are
+reachable before a user is authenticated. A hosted POC needs basic abuse
+protection before those endpoints are exposed publicly.
+
+### Changed
+
+- Added dependency-free fixed-window rate limiting in `core/rate_limit.py`.
+- Applied configurable limits to `/auth/login`, `/auth/forgot-password`, `/auth/reset-password`, `/organizations/onboard`, and `/invitations/accept`.
+- Added `RATE_LIMIT_*` environment variables to `server/.env.example`.
+- Added unit coverage for window resets, per-client/per-rule scoping, 429 responses, disable mode, and trusted proxy header behavior.
+
+### Remaining Follow-Up
+
+- For multi-instance production hosting, move counters to Redis or enforce equivalent limits at the edge/reverse proxy.
+- Keep `RATE_LIMIT_TRUST_PROXY_HEADERS=false` unless the API only receives traffic from a trusted proxy.
