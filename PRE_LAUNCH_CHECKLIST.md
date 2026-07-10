@@ -38,13 +38,10 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
 
 ## 🟠 Important — do before real customer data / real money touches this
 
-- [ ] **Add Stripe webhook handling.** `services/billing_service.py`
-      creates a Checkout Session, but nothing listens for
-      `checkout.session.completed` / `invoice.payment_failed` to actually
-      flip `organizations.subscription_status` — right now
-      `mark_subscription_active()` exists but nothing calls it
-      automatically. Add a `POST /billing/webhook` endpoint verified with
-      your Stripe webhook signing secret.
+- [x] **Add Stripe webhook handling.** `POST /billing/webhook` now verifies
+      Stripe signatures with `STRIPE_WEBHOOK_SECRET` and handles
+      `checkout.session.completed`, `invoice.payment_failed`, and
+      `customer.subscription.deleted` to update tenant subscription state.
 - [x] **Rate-limit the auth endpoints** (`/auth/login`,
       `/auth/forgot-password`, `/auth/reset-password`, `/organizations/onboard`,
       `/invitations/accept`). The backend now has configurable in-process fixed
@@ -80,7 +77,7 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       project (paid tiers include point-in-time recovery — check your plan).
 - [x] **Add a CI pipeline** (GitHub Actions) that runs backend pytest and
       client Jest checks on pushes/PRs. Backend coverage currently includes
-      `server/tests/` (50 tests); client coverage starts with shared validation
+      `server/tests/` (58 tests); client coverage starts with shared validation
       tests and should grow as mobile flows are hardened.
 - [ ] **Complete the Expo/React Native dependency upgrade.** Safe npm audit
       fixes reduced the client report from 39 to 29 findings with no criticals,

@@ -137,3 +137,24 @@ protection before those endpoints are exposed publicly.
 
 - For multi-instance production hosting, move counters to Redis or enforce equivalent limits at the edge/reverse proxy.
 - Keep `RATE_LIMIT_TRUST_PROXY_HEADERS=false` unless the API only receives traffic from a trusted proxy.
+
+## 2026-07-10 - Handle Stripe Webhooks
+
+### Why
+
+Checkout sessions alone do not update tenant subscription state. A hosted POC
+using real Stripe test mode needs a signed webhook endpoint so payment events
+can activate, mark past-due, or cancel subscriptions automatically.
+
+### Changed
+
+- Added `STRIPE_WEBHOOK_SECRET` config and production validation when Stripe is configured.
+- Added `POST /billing/webhook` with Stripe signature verification.
+- Handles `checkout.session.completed`, `invoice.payment_failed`, and `customer.subscription.deleted`.
+- Stores Stripe customer/subscription IDs and updates plan/subscription status through the organization repository.
+- Expanded backend billing tests for webhook verification and event handling.
+
+### Remaining Follow-Up
+
+- Configure the real Stripe webhook endpoint URL and signing secret in the hosting provider.
+- Use Stripe CLI or dashboard test events against the deployed backend before enabling real customer demos.

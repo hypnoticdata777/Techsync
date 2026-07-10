@@ -74,6 +74,17 @@ def get_by_id(organization_id: int) -> Optional[dict]:
     return response.data[0] if response.data else None
 
 
+def get_by_stripe_customer_id(stripe_customer_id: str) -> Optional[dict]:
+    client = get_supabase_client()
+    response = (
+        client.table("organizations")
+        .select("*")
+        .eq("stripe_customer_id", stripe_customer_id)
+        .execute()
+    )
+    return response.data[0] if response.data else None
+
+
 def update_settings(organization_id: int, settings_patch: dict) -> Optional[dict]:
     client = get_supabase_client()
     current = get_by_id(organization_id)
