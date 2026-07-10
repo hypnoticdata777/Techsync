@@ -1,15 +1,7 @@
 import React, {createContext, useState, useEffect, useContext, useCallback} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {API_BASE_URL} from '../config';
 import fetchWithTimeout from '../utils/fetchWithTimeout';
-
-// NOTE (RF-04): tokens are currently persisted in AsyncStorage, which is not
-// secure storage (no OS Keychain/Keystore backing). Swapping this for
-// react-native-keychain is a recommended follow-up -- it was deferred here to
-// avoid adding a new native dependency that would need a full rebuild/link
-// verification this environment can't perform. See README "Known gaps".
-const ACCESS_TOKEN_KEY = 'authToken';
-const REFRESH_TOKEN_KEY = 'refreshToken';
+import {clearStoredTokens, getStoredTokens, saveTokens} from '../utils/tokenStorage';
 
 const AuthContext = createContext();
 
@@ -35,14 +27,11 @@ export const AuthProvider = ({children}) => {
 
   const loadTokens = async () => {
     try {
-      const [storedToken, storedRefresh] = await Promise.all([
-        AsyncStorage.getItem(ACCESS_TOKEN_KEY),
-        AsyncStorage.getItem(REFRESH_TOKEN_KEY),
-      ]);
-      if (storedToken && storedRefresh) {
-        setToken(storedToken);
-        setRefreshToken(storedRefresh);
-        await fetchUserInfo(storedToken, storedRefresh);
+      const storedTokens = await getStoredTokens();
+      if (storedTokens) {
+        setToken(storedTokens.accessToken);
+        setRefreshToken(storedTokens.refreshToken);
+        await fetchUserInfo(storedTokens.accessToken, storedTokens.refreshToken);
       }
     } catch (error) {
       console.error('Error loading tokens:', error);
@@ -52,8 +41,7 @@ export const AuthProvider = ({children}) => {
   };
 
   const persistTokens = async (accessToken, newRefreshToken) => {
-    await AsyncStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    await AsyncStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken);
+    await saveTokens(accessToken, newRefreshToken);
     setToken(accessToken);
     setRefreshToken(newRefreshToken);
   };
@@ -233,7 +221,7 @@ export const AuthProvider = ({children}) => {
 
   const logout = async () => {
     try {
-      await AsyncStorage.multiRemove([ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY]);
+      await clearStoredTokens();
       setToken(null);
       setRefreshToken(null);
       setUser(null);

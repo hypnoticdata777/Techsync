@@ -158,3 +158,24 @@ can activate, mark past-due, or cancel subscriptions automatically.
 
 - Configure the real Stripe webhook endpoint URL and signing secret in the hosting provider.
 - Use Stripe CLI or dashboard test events against the deployed backend before enabling real customer demos.
+
+## 2026-07-10 - Move Mobile Tokens to Secure Storage
+
+### Why
+
+Auth access and refresh tokens were still stored in AsyncStorage, which is not
+OS-backed secure storage. A public-facing POC should avoid leaving bearer
+tokens in plain app storage on mobile devices.
+
+### Changed
+
+- Added `expo-secure-store` to the Expo client.
+- Added `client/src/utils/tokenStorage.js` as the single token persistence adapter.
+- Updated `AuthContext` to load, save, refresh, and clear tokens through the adapter instead of AsyncStorage.
+- Added Jest coverage for native secure-store save/load/clear behavior.
+- Updated README and the pre-launch checklist to mark RF-04 complete for native mobile builds.
+
+### Remaining Follow-Up
+
+- Re-test a real Android/iOS build after the next native rebuild.
+- Treat Expo web preview auth as demo-only: it falls back to browser session storage or memory because browser JavaScript cannot use the mobile OS Keychain/Keystore.
