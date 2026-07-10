@@ -176,7 +176,9 @@ npm run android   # or: npm run ios
 
 Update `src/config.js` if your backend isn't on `localhost:8000` (Android
 emulator needs `http://10.0.2.2:8000`; physical devices need your
-machine's LAN IP).
+machine's LAN IP). Native builds persist auth tokens with `expo-secure-store`
+(OS Keychain/Keystore-backed storage); Expo web preview uses browser session
+storage or memory because browsers do not expose the same secure store.
 
 ## Onboarding a New Organization (RF-06)
 
@@ -239,7 +241,7 @@ curl -s -X POST http://localhost:8000/ingestion/csv \
 Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
 
 - **Auth & users**: RF-01 (access+refresh JWT), RF-02 (3 roles + middleware),
-  RF-03 (password reset flow), RF-04 partial (see Known Gaps).
+  RF-03 (password reset flow), RF-04 (native token storage via Expo SecureStore).
 - **Multi-tenancy**: RF-05 (org_id scoping + RLS), RF-06 (self-service
   onboarding), RF-07 (invitations), RF-08 (org settings: timezone, service
   types, priorities).
@@ -273,10 +275,6 @@ Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
 
 ### Known gaps / deferred
 
-- **RF-04 (secure mobile token storage)**: tokens are in AsyncStorage, not
-  OS Keychain/Keystore. Switching to `react-native-keychain` or
-  `expo-secure-store` is the natural next step; it was deferred here since
-  it needs a native rebuild this environment couldn't verify.
 - **No web admin panel** was built (RF-25/RF-26 exist as API endpoints
   only); the spec's "panel administrativo" is assumed to be a future
   separate web client consuming this same API.

@@ -63,11 +63,11 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       it — there's no upload endpoint yet. Set up a Supabase Storage
       bucket (or S3) and add the actual "upload a photo" flow in the
       mobile app.
-- [ ] **Move mobile token storage off AsyncStorage** (RF-04). Tokens are
-      currently in plain AsyncStorage, not the OS Keychain/Keystore.
-      Swap in `react-native-keychain` or `expo-secure-store` — this needs
-      a native rebuild, budget time to re-test the Android/iOS build
-      afterward given this repo's build history has been fragile.
+- [x] **Move mobile token storage off AsyncStorage** (RF-04). Native app
+      tokens now persist through `expo-secure-store`, which uses OS-backed
+      secure storage on Android/iOS. Expo web preview falls back to browser
+      session storage or memory because browsers do not expose the mobile
+      Keychain/Keystore API.
 - [ ] **Add error monitoring** (Sentry or similar) on both the FastAPI
       backend and the mobile app — right now failures only show up in
       `LOG_FORMAT=json` logs, which nobody's watching in real time.
