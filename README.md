@@ -122,6 +122,8 @@ STRIPE_CANCEL_URL=http://localhost:3000/billing/cancel
 APP_BASE_URL=http://localhost:19006
 EMAIL_DELIVERY_METHOD=log
 EMAIL_FROM=TechSync <no-reply@yourdomain.com>
+SUPABASE_ATTACHMENTS_BUCKET=work-order-attachments
+ATTACHMENT_MAX_BYTES=10485760
 ```
 
 Apply the schema — either paste `schema.sql` into the Supabase SQL editor,
@@ -143,10 +145,10 @@ cd server
 pip install -r requirements-dev.txt
 pytest -p no:cacheprovider
 ```
-58 backend tests covering JWT/password logic, the matching engine, CSV ingestion
+62 backend tests covering JWT/password logic, the matching engine, CSV ingestion
 validation, work order status transitions, plan-limit enforcement,
 tenant-isolation of the repository layer, public endpoint rate limiting, and
-Stripe webhook handling. These run without a live
+Stripe webhook handling, and attachment upload validation. These run without a live
 database (repositories are mocked); the RLS behavior described above was
 additionally verified by hand against a local Postgres instance.
 
@@ -201,7 +203,7 @@ Full interactive docs at `/docs`. Summary:
 | Invitations (RF-07) | `POST/GET /organizations/invitations`, `POST /invitations/accept` |
 | Users (RF-02) | `GET /users`, `PATCH /users/{id}/role` |
 | Technicians (RF-26, RF-29) | `POST/GET /technicians`, `PATCH /technicians/{id}` |
-| Work Orders (RF-14, RF-15, RF-18..RF-22, RF-24) | `POST/GET /work-orders`, `GET /work-orders/mine`, `GET/PATCH /work-orders/{id}`, `PATCH /work-orders/{id}/status`, `POST /work-orders/{id}/assign`, `GET /work-orders/{id}/events`, `POST/GET /work-orders/{id}/attachments` |
+| Work Orders (RF-14, RF-15, RF-18..RF-22, RF-24) | `POST/GET /work-orders`, `GET /work-orders/mine`, `GET/PATCH /work-orders/{id}`, `PATCH /work-orders/{id}/status`, `POST /work-orders/{id}/assign`, `GET /work-orders/{id}/events`, `POST /work-orders/{id}/attachments/upload`, `POST/GET /work-orders/{id}/attachments` |
 | Ingestion (RF-09, RF-11, RF-12) | `POST /ingestion/csv` (multipart), `POST /ingestion/webhook` (`X-API-Key` header, per-org key) |
 | Dashboard (RF-25) | `GET /dashboard/metrics` |
 | Billing (RF-27, RF-28, RF-29) | `POST /billing/checkout`, `POST /billing/webhook`, `GET /billing/plan-limits` |
@@ -278,10 +280,7 @@ Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
 - **No web admin panel** was built (RF-25/RF-26 exist as API endpoints
   only); the spec's "panel administrativo" is assumed to be a future
   separate web client consuming this same API.
-- **RF-19 attachments**: the API records attachment metadata (URL,
-  filename); actual binary upload to Supabase Storage or another object
-  store, and the corresponding "take a photo" UI in the mobile app, is not
-  wired up.
+
 - **RF-23 (offline sync)**, **RF-10/RF-13 (PDF/email ingestion)**: deferred,
   per the spec's own "Notas de Alcance" — not blocking for a POC.
 - **Client dependency audit**: `npm audit fix --package-lock-only` has been

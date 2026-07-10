@@ -179,3 +179,27 @@ tokens in plain app storage on mobile devices.
 
 - Re-test a real Android/iOS build after the next native rebuild.
 - Treat Expo web preview auth as demo-only: it falls back to browser session storage or memory because browser JavaScript cannot use the mobile OS Keychain/Keystore.
+
+## 2026-07-10 - Upload Work Order Attachments
+
+### Why
+
+RF-19 was still demo-incomplete: the API could store attachment URLs, but the
+app had no real photo upload path and the backend did not place files in object
+storage. For a public POC, attaching field evidence to a work order should work
+end-to-end.
+
+### Changed
+
+- Added configurable Supabase Storage settings for the work-order attachments bucket and max upload size.
+- Added a backend upload service that validates image/PDF content type, size, and filename safety before uploading to Supabase Storage.
+- Added `POST /work-orders/{id}/attachments/upload` while keeping the existing metadata endpoint compatible.
+- Added backend tests for upload path generation, Supabase Storage calls, content-type rejection, size rejection, and extension mismatch rejection.
+- Added `expo-image-picker` plus camera/photo-library permissions to the mobile app.
+- Updated the work order details screen to load attachments, take or choose a photo, upload it, and open existing attachments.
+- Updated README and the pre-launch checklist to mark RF-19 complete for the hosted POC path.
+
+### Remaining Follow-Up
+
+- Create the `work-order-attachments` Supabase Storage bucket in the production project before the hosted demo.
+- Smoke-test photo capture/upload on a real Android/iOS build after the next native rebuild.

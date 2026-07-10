@@ -31,6 +31,13 @@
             "kotlinVersion": "1.9.22"
           }
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow TechSync to attach work order photos from your library.",
+          "cameraPermission": "Allow TechSync to take work order photos."
+        }
       ]
     ]
   }

@@ -40,6 +40,8 @@ class Settings:
 
     SUPABASE_URL: str | None = os.getenv("SUPABASE_URL")
     SUPABASE_KEY: str | None = os.getenv("SUPABASE_KEY")
+    SUPABASE_ATTACHMENTS_BUCKET: str = os.getenv("SUPABASE_ATTACHMENTS_BUCKET", "work-order-attachments")
+    ATTACHMENT_MAX_BYTES: int = int(os.getenv("ATTACHMENT_MAX_BYTES", str(10 * 1024 * 1024)))
 
     JWT_SECRET_KEY: str | None = os.getenv("JWT_SECRET_KEY")
     JWT_ALGORITHM: str = "HS256"
