@@ -114,6 +114,9 @@ SUPABASE_KEY=your-service-role-key
 DATABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
 JWT_SECRET_KEY=$(openssl rand -hex 32)
 CORS_ORIGINS=http://localhost:8081,http://localhost:19006,http://localhost:3000
+STRIPE_SECRET_KEY=
+STRIPE_PRICE_ID=
+STRIPE_WEBHOOK_SECRET=whsec_your_stripe_webhook_secret
 STRIPE_SUCCESS_URL=http://localhost:3000/billing/success
 STRIPE_CANCEL_URL=http://localhost:3000/billing/cancel
 APP_BASE_URL=http://localhost:19006
@@ -140,9 +143,10 @@ cd server
 pip install -r requirements-dev.txt
 pytest -p no:cacheprovider
 ```
-50 backend tests covering JWT/password logic, the matching engine, CSV ingestion
-validation, work order status transitions, plan-limit enforcement, and
-tenant-isolation of the repository layer, and public endpoint rate limiting. These run without a live
+58 backend tests covering JWT/password logic, the matching engine, CSV ingestion
+validation, work order status transitions, plan-limit enforcement,
+tenant-isolation of the repository layer, public endpoint rate limiting, and
+Stripe webhook handling. These run without a live
 database (repositories are mocked); the RLS behavior described above was
 additionally verified by hand against a local Postgres instance.
 
@@ -198,7 +202,7 @@ Full interactive docs at `/docs`. Summary:
 | Work Orders (RF-14, RF-15, RF-18..RF-22, RF-24) | `POST/GET /work-orders`, `GET /work-orders/mine`, `GET/PATCH /work-orders/{id}`, `PATCH /work-orders/{id}/status`, `POST /work-orders/{id}/assign`, `GET /work-orders/{id}/events`, `POST/GET /work-orders/{id}/attachments` |
 | Ingestion (RF-09, RF-11, RF-12) | `POST /ingestion/csv` (multipart), `POST /ingestion/webhook` (`X-API-Key` header, per-org key) |
 | Dashboard (RF-25) | `GET /dashboard/metrics` |
-| Billing (RF-27, RF-28, RF-29) | `POST /billing/checkout`, `GET /billing/plan-limits` |
+| Billing (RF-27, RF-28, RF-29) | `POST /billing/checkout`, `POST /billing/webhook`, `GET /billing/plan-limits` |
 
 Access token lifetime is 15 minutes, refresh token 7 days (RF-01). Roles are
 `org_admin`, `coordinator`, `technician` (RF-02), enforced per-endpoint via
@@ -259,8 +263,9 @@ Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
   endpoint; polling from a web admin panel is not built in this pass — see
   Known Gaps).
 - **Billing**: RF-27 (14-day trial default), RF-28 (Stripe Checkout in test
-  mode, or a mock URL when Stripe isn't configured), RF-29 (technician-count
-  plan limit, enforced server-side).
+  mode, signed Stripe webhook handling for checkout completion/payment
+  failure/subscription cancellation, or a mock URL when Stripe is not
+  configured), RF-29 (technician-count plan limit, enforced server-side).
 - **NFRs**: RNF-05 (RLS, verified manually — see Multi-Tenancy Model above),
   RNF-06 (bcrypt), RNF-09 (modular backend structure), RNF-10 (Alembic),
   RNF-11 (Dockerfile/compose), RNF-12 (structured JSON logging, toggle via

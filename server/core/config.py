@@ -53,6 +53,7 @@ class Settings:
 
     STRIPE_SECRET_KEY: str | None = os.getenv("STRIPE_SECRET_KEY")
     STRIPE_PRICE_ID: str | None = os.getenv("STRIPE_PRICE_ID")
+    STRIPE_WEBHOOK_SECRET: str | None = os.getenv("STRIPE_WEBHOOK_SECRET")
     STRIPE_SUCCESS_URL: str | None = os.getenv("STRIPE_SUCCESS_URL") or _default_url("/billing/success")
     STRIPE_CANCEL_URL: str | None = os.getenv("STRIPE_CANCEL_URL") or _default_url("/billing/cancel")
 
@@ -111,6 +112,8 @@ def _validate_settings(value: Settings) -> None:
         missing.append("STRIPE_SUCCESS_URL")
     if not value.STRIPE_CANCEL_URL:
         missing.append("STRIPE_CANCEL_URL")
+    if (value.STRIPE_SECRET_KEY or value.STRIPE_PRICE_ID) and not value.STRIPE_WEBHOOK_SECRET:
+        missing.append("STRIPE_WEBHOOK_SECRET")
     if not value.APP_BASE_URL:
         missing.append("APP_BASE_URL")
     if not value.EMAIL_FROM:
