@@ -4,7 +4,7 @@ and search/filter (RF-14, RF-15, RF-18, RF-19, RF-20, RF-21, RF-22, RF-24)."""
 from datetime import date
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 
 from dependencies import get_current_organization, get_current_user, require_roles
 from models.user import User
@@ -22,7 +22,7 @@ from repositories import attachments as attachments_repo
 from repositories import technicians as technicians_repo
 from repositories import work_order_events as events_repo
 from repositories import work_orders as work_orders_repo
-from services import work_order_service
+from services import attachment_storage_service, work_order_service
 
 router = APIRouter(prefix="/work-orders", tags=["work-orders"])
 
@@ -231,6 +231,33 @@ def add_attachment(
         event_type="attachment_added",
         actor_user_id=current_user.id,
         notes=payload.file_name,
+    )
+    return WorkOrderAttachment(**row)
+
+
+@router.post(
+    "/{work_order_id}/attachments/upload",
+    response_model=WorkOrderAttachment,
+    status_code=status.HTTP_201_CREATED,
+)
+async def upload_attachment(
+    work_order_id: int,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    organization: dict = Depends(get_current_organization),
+):
+    """RF-19: upload evidence to Supabase Storage and record attachment metadata."""
+    _get_accessible_work_order(work_order_id, current_user, organization)
+    uploaded = await attachment_storage_service.upload_work_order_attachment_file(
+        organization["id"], work_order_id, file
+    )
+    row = attachments_repo.create(organization["id"], work_order_id, current_user.id, uploaded)
+    events_repo.create_event(
+        organization["id"],
+        work_order_id,
+        event_type="attachment_added",
+        actor_user_id=current_user.id,
+        notes=uploaded["file_name"],
     )
     return WorkOrderAttachment(**row)
 

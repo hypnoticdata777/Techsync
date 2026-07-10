@@ -58,11 +58,10 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       PostgREST-compatible JWTs with an `organization_id` claim and switch
       reads to the `anon`/`authenticated` key so RLS is actually live in
       production, not just verified manually in dev.
-- [ ] **Wire up real object storage for attachments (RF-19).** The
-      `/work-orders/{id}/attachments` endpoint only stores a URL you give
-      it — there's no upload endpoint yet. Set up a Supabase Storage
-      bucket (or S3) and add the actual "upload a photo" flow in the
-      mobile app.
+- [x] **Wire up real object storage for attachments (RF-19).** The backend
+      now uploads files through Supabase Storage and records attachment
+      metadata; the mobile work order details screen can take or choose a
+      photo and attach it to the job.
 - [x] **Move mobile token storage off AsyncStorage** (RF-04). Native app
       tokens now persist through `expo-secure-store`, which uses OS-backed
       secure storage on Android/iOS. Expo web preview falls back to browser
