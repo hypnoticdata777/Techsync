@@ -225,3 +225,22 @@ fit for the public demo path.
 - Choose the hosted providers (for example Neon/Render Postgres plus Cloudflare R2) and provision real credentials.
 - Run `alembic upgrade head` against the production/demo Postgres database.
 - Smoke-test attachment upload against the chosen object-storage bucket.
+## 2026-07-10 - Run Local Secret History Scan
+
+### Why
+
+Before the repo can be public or used as a showcase, we need confidence that no
+real production-style secrets were committed anywhere in Git history.
+
+### Changed
+
+- Checked for `gitleaks` and `trufflehog`; neither was installed locally.
+- Ran a local full-history scan across 46 commits for high-signal secret patterns: private keys, AWS/S3 access keys, Stripe keys/webhook secrets, Postgres URLs with embedded passwords, JWT secret assignments, SMTP passwords, storage secret assignments, Supabase service-role markers, and Supabase project URLs.
+- The scan found 36 unique findings, all limited to Supabase-era placeholder/docs markers such as `https://your-project.supabase.co` and `your-service-role-key`; no high-confidence real secrets were found.
+- Updated `VSCODE_SETUP_GUIDE.md` so active setup instructions now reference managed Postgres and S3-compatible storage instead of Supabase placeholders.
+- Marked the critical secret-scan checklist item complete, with a note to run `gitleaks` or `trufflehog` later as an independent second pass if either tool is installed.
+
+### Remaining Follow-Up
+
+- Run an independent scanner (`gitleaks` or `trufflehog`) before making the repository public if one is installed in the deployment/release environment.
+- Refresh the older technical appendix before public showcase; it still describes the historical Supabase architecture rather than the current managed-Postgres/S3-compatible path.
