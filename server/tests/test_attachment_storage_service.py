@@ -19,34 +19,20 @@ class FakeUploadFile:
         return self._content[:size]
 
 
-class FakeBucket:
+class FakeStorageClient:
     def __init__(self):
-        self.upload_calls = []
+        self.put_calls = []
 
-    def upload(self, path, content, file_options=None):
-        self.upload_calls.append((path, content, file_options))
-
-    def get_public_url(self, path):
-        return f"https://cdn.example.com/{path}"
-
-
-class FakeStorage:
-    def __init__(self, bucket):
-        self.bucket = bucket
-        self.bucket_names = []
-
-    def from_(self, bucket_name):
-        self.bucket_names.append(bucket_name)
-        return self.bucket
+    def put_object(self, **kwargs):
+        self.put_calls.append(kwargs)
 
 
 def test_upload_work_order_attachment_file_stores_file_and_returns_metadata(monkeypatch):
-    bucket = FakeBucket()
-    storage = FakeStorage(bucket)
-    fake_client = SimpleNamespace(storage=storage)
+    fake_client = FakeStorageClient()
 
-    monkeypatch.setattr(attachment_storage_service, "get_supabase_client", lambda: fake_client)
-    monkeypatch.setattr(attachment_storage_service.settings, "SUPABASE_ATTACHMENTS_BUCKET", "wo-files")
+    monkeypatch.setattr(attachment_storage_service, "_get_storage_client", lambda: fake_client)
+    monkeypatch.setattr(attachment_storage_service.settings, "STORAGE_BUCKET", "wo-files")
+    monkeypatch.setattr(attachment_storage_service.settings, "STORAGE_PUBLIC_BASE_URL", "https://files.example.com")
     monkeypatch.setattr(attachment_storage_service.settings, "ATTACHMENT_MAX_BYTES", 1024)
     monkeypatch.setattr(attachment_storage_service, "uuid4", lambda: SimpleNamespace(hex="abc123"))
 
@@ -55,17 +41,17 @@ def test_upload_work_order_attachment_file_stores_file_and_returns_metadata(monk
         attachment_storage_service.upload_work_order_attachment_file(42, 99, upload)
     )
 
-    assert storage.bucket_names == ["wo-files"]
-    assert bucket.upload_calls == [
-        (
-            "org-42/work-order-99/abc123-Before-Repair.jpg",
-            b"image-bytes",
-            {"content-type": "image/jpeg", "upsert": "false"},
-        )
+    assert fake_client.put_calls == [
+        {
+            "Bucket": "wo-files",
+            "Key": "org-42/work-order-99/abc123-Before-Repair.jpg",
+            "Body": b"image-bytes",
+            "ContentType": "image/jpeg",
+        }
     ]
     assert result == {
         "file_name": "Before Repair.JPG",
-        "file_url": "https://cdn.example.com/org-42/work-order-99/abc123-Before-Repair.jpg",
+        "file_url": "https://files.example.com/org-42/work-order-99/abc123-Before-Repair.jpg",
         "content_type": "image/jpeg",
     }
 
@@ -100,3 +86,13 @@ def test_upload_rejects_extension_mismatch(monkeypatch):
 
     assert exc.value.status_code == 400
     assert "extension" in exc.value.detail
+
+
+def test_upload_requires_storage_configuration(monkeypatch):
+    monkeypatch.setattr(attachment_storage_service.settings, "STORAGE_BUCKET", None)
+    monkeypatch.setattr(attachment_storage_service.settings, "STORAGE_PUBLIC_BASE_URL", "https://files.example.com")
+    monkeypatch.setattr(attachment_storage_service.settings, "ATTACHMENT_MAX_BYTES", 1024)
+    upload = FakeUploadFile("photo.jpg", "image/jpeg", b"jpg")
+
+    with pytest.raises(attachment_storage_service.StorageNotConfigured):
+        asyncio.run(attachment_storage_service.upload_work_order_attachment_file(1, 2, upload))

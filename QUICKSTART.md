@@ -2,18 +2,13 @@
 
 ## 5-Minute Demo Script
 
-Since TechSync is now multi-tenant, the backend requires a real Supabase
-project (there's no more "run with no DB, get mock data" mode — tenant
-isolation needs a real database). Budget a couple extra minutes the first
-time to create a free Supabase project and run the schema.
+Since TechSync is multi-tenant, the backend requires a real Postgres database for runtime data. Budget a few minutes to create a managed Postgres database (Neon, Render, Railway, Fly, or local Postgres) and run the schema.
 
-### Step 0: One-time Supabase setup
+### Step 0: One-time database setup
 
-1. Create a free project at https://supabase.com
-2. Open the SQL Editor and paste/run the contents of `server/schema.sql`
-   (or run `alembic upgrade head` from `server/` with `DATABASE_URL` set to
-   your project's direct Postgres connection string)
-3. Grab your Project URL and `service_role` key from Project Settings → API
+1. Create a managed Postgres database.
+2. Set `DATABASE_URL` to that database connection string.
+3. Run `alembic upgrade head` from `server/`.
 
 ### Step 1: Start the Backend (1 minute)
 
@@ -23,8 +18,7 @@ pip install -r requirements.txt
 
 cat > .env << EOF
 APP_ENV=development
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-service-role-key
+DATABASE_URL=postgresql://user:password@host:5432/techsync
 JWT_SECRET_KEY=$(openssl rand -hex 32)
 CORS_ORIGINS=http://localhost:8081,http://localhost:19006,http://localhost:3000
 STRIPE_SUCCESS_URL=http://localhost:3000/billing/success
@@ -109,7 +103,7 @@ ship with shared demo credentials.
 ## Key Features to Showcase
 
 1. **Multi-tenant isolation** — every table is scoped by `organization_id`,
-   backed by Postgres RLS (see README "Multi-Tenancy Model")
+   backed by application-layer tenant scoping plus the schema RLS backstop (see README "Multi-Tenancy Model")
 2. **Self-service onboarding** — a brand-new org + admin account in one API
    call, no manual provisioning
 3. **Rule-based auto-assignment** — new work orders are matched to a
@@ -142,9 +136,8 @@ cd client && npm start -- --reset-cache
 - Physical Device: `http://YOUR_COMPUTER_IP:8000`
 
 **"503 Service requires database configuration":**
-- `SUPABASE_URL`/`SUPABASE_KEY` are missing or wrong in `server/.env` — see
-  Step 0 above. There's no mock-data fallback anymore since tenant
-  isolation needs a real database.
+- `DATABASE_URL` is missing or wrong in `server/.env` - see Step 0 above.
+  There's no mock-data fallback anymore since tenant isolation needs a real database.
 
 **Access token expired errors:**
 - The mobile app refreshes automatically. Via curl, call

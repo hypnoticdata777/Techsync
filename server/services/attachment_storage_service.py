@@ -1,13 +1,13 @@
-"""Supabase Storage upload helpers for work order attachments (RF-19)."""
+"""S3-compatible object storage upload helpers for work order attachments (RF-19)."""
 
 from pathlib import Path
 import re
+from urllib.parse import quote
 from uuid import uuid4
 
 from fastapi import HTTPException, UploadFile, status
 
 from core.config import settings
-from supabase_client import get_supabase_client
 
 ALLOWED_ATTACHMENT_CONTENT_TYPES = {
     "image/jpeg": ".jpg",
@@ -16,6 +16,10 @@ ALLOWED_ATTACHMENT_CONTENT_TYPES = {
     "image/webp": ".webp",
     "application/pdf": ".pdf",
 }
+
+
+class StorageNotConfigured(Exception):
+    """Raised when S3-compatible storage settings are missing."""
 
 
 async def upload_work_order_attachment_file(
@@ -28,18 +32,18 @@ async def upload_work_order_attachment_file(
     _validate_upload(file_name, content_type, content)
 
     storage_path = _build_storage_path(organization_id, work_order_id, file_name, content_type)
-    bucket_name = settings.SUPABASE_ATTACHMENTS_BUCKET
-    client = get_supabase_client()
+    bucket_name = _required_setting(settings.STORAGE_BUCKET, "STORAGE_BUCKET")
+    public_base_url = _required_setting(settings.STORAGE_PUBLIC_BASE_URL, "STORAGE_PUBLIC_BASE_URL")
+    client = _get_storage_client()
 
     try:
-        bucket = client.storage.from_(bucket_name)
-        bucket.upload(
-            storage_path,
-            content,
-            file_options={"content-type": content_type, "upsert": "false"},
+        client.put_object(
+            Bucket=bucket_name,
+            Key=storage_path,
+            Body=content,
+            ContentType=content_type,
         )
-        file_url = bucket.get_public_url(storage_path)
-    except Exception as exc:  # pragma: no cover - exact SDK exceptions vary by version.
+    except Exception as exc:  # pragma: no cover - exact SDK exceptions vary by provider/version.
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Attachment upload failed",
@@ -47,9 +51,36 @@ async def upload_work_order_attachment_file(
 
     return {
         "file_name": file_name,
-        "file_url": _normalize_public_url(file_url),
+        "file_url": _public_url(public_base_url, storage_path),
         "content_type": content_type,
     }
+
+
+def _get_storage_client():
+    access_key = _required_setting(settings.STORAGE_ACCESS_KEY_ID, "STORAGE_ACCESS_KEY_ID")
+    secret_key = _required_setting(settings.STORAGE_SECRET_ACCESS_KEY, "STORAGE_SECRET_ACCESS_KEY")
+
+    try:
+        import boto3  # type: ignore
+    except ImportError as exc:  # pragma: no cover - exercised by deployment packaging, not unit tests.
+        raise StorageNotConfigured("boto3 is required for attachment storage") from exc
+
+    client_kwargs = {
+        "service_name": "s3",
+        "aws_access_key_id": access_key,
+        "aws_secret_access_key": secret_key,
+        "region_name": settings.STORAGE_REGION,
+    }
+    if settings.STORAGE_ENDPOINT_URL:
+        client_kwargs["endpoint_url"] = settings.STORAGE_ENDPOINT_URL
+
+    return boto3.client(**client_kwargs)
+
+
+def _required_setting(value: str | None, name: str) -> str:
+    if not value:
+        raise StorageNotConfigured(f"{name} is not configured")
+    return value
 
 
 def _validate_upload(file_name: str, content_type: str, content: bytes) -> None:
@@ -104,10 +135,5 @@ def _slug_file_stem(stem: str) -> str:
     return slug
 
 
-def _normalize_public_url(file_url) -> str:
-    if isinstance(file_url, str):
-        return file_url
-    if isinstance(file_url, dict):
-        return file_url.get("publicUrl") or file_url.get("public_url") or ""
-    public_url = getattr(file_url, "public_url", None) or getattr(file_url, "publicUrl", None)
-    return public_url or str(file_url)
+def _public_url(public_base_url: str, storage_path: str) -> str:
+    return f"{public_base_url.rstrip('/')}/{quote(storage_path, safe='/')}"

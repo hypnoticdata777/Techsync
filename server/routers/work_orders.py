@@ -221,7 +221,7 @@ def add_attachment(
 ):
     """RF-19: attach evidence (photo/document) metadata to a work order. The
     file itself is expected to already be uploaded to object storage
-    (e.g. Supabase Storage) by the client; this endpoint records the resulting
+    (e.g. S3/R2) by the client; this endpoint records the resulting
     URL against the work order."""
     _get_accessible_work_order(work_order_id, current_user, organization)
     row = attachments_repo.create(organization["id"], work_order_id, current_user.id, payload.dict())
@@ -246,7 +246,7 @@ async def upload_attachment(
     current_user: User = Depends(get_current_user),
     organization: dict = Depends(get_current_organization),
 ):
-    """RF-19: upload evidence to Supabase Storage and record attachment metadata."""
+    """RF-19: upload evidence to object storage and record attachment metadata."""
     _get_accessible_work_order(work_order_id, current_user, organization)
     uploaded = await attachment_storage_service.upload_work_order_attachment_file(
         organization["id"], work_order_id, file

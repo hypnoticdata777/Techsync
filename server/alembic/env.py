@@ -1,8 +1,7 @@
 """
 Alembic environment (RNF-10: versioned, reproducible migrations).
 
-Reads the target Postgres connection string from DATABASE_URL, e.g. the
-Supabase project's direct Postgres connection string
+Reads the target Postgres connection string from DATABASE_URL for local or managed Postgres
 (Project Settings -> Database -> Connection string -> URI, "Direct connection"
 or "Session pooler" -- not the PostgREST/REST URL used elsewhere in the app).
 """

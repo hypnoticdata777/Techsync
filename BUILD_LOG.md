@@ -24,8 +24,7 @@ docs also advertised those credentials.
 ### Remaining Follow-Up
 
 - Run a secret/history scan before making the repo public.
-- If any Supabase project was already initialized with the previous schema,
-  manually remove or rotate the former shared demo users there.
+- If any existing database was already initialized with the previous schema,`n  manually remove or rotate the former shared demo users there.
 
 ## 2026-07-09 - Make Production Configuration Explicit
 
@@ -41,8 +40,7 @@ hosted POC fail in confusing ways or accidentally point users at fake domains.
   in production builds when it is missing.
 - Backend settings now support `APP_ENV=production` and validate required
   production values at startup.
-- Production backend startup now requires Supabase settings, JWT secret, CORS
-  origins, and Stripe/mock checkout callback URLs.
+- Production backend startup now requires `DATABASE_URL`, object storage settings,`n  JWT secret, CORS origins, and Stripe/mock checkout callback URLs.
 - Production CORS validation rejects localhost origins.
 - `.env.example`, README, Quick Start, and mobile config docs now describe the
   deployment variables explicitly.
@@ -191,15 +189,39 @@ end-to-end.
 
 ### Changed
 
-- Added configurable Supabase Storage settings for the work-order attachments bucket and max upload size.
-- Added a backend upload service that validates image/PDF content type, size, and filename safety before uploading to Supabase Storage.
+- Added configurable S3-compatible storage settings for the work-order attachments bucket and max upload size.
+- Added a backend upload service that validates image/PDF content type, size, and filename safety before uploading to S3-compatible object storage.
 - Added `POST /work-orders/{id}/attachments/upload` while keeping the existing metadata endpoint compatible.
-- Added backend tests for upload path generation, Supabase Storage calls, content-type rejection, size rejection, and extension mismatch rejection.
+- Added backend tests for upload path generation, S3-compatible storage calls, content-type rejection, size rejection, and extension mismatch rejection.
 - Added `expo-image-picker` plus camera/photo-library permissions to the mobile app.
 - Updated the work order details screen to load attachments, take or choose a photo, upload it, and open existing attachments.
 - Updated README and the pre-launch checklist to mark RF-19 complete for the hosted POC path.
 
 ### Remaining Follow-Up
 
-- Create the `work-order-attachments` Supabase Storage bucket in the production project before the hosted demo.
+- Create the `work-order-attachments` bucket in the chosen object-storage provider before the hosted demo.
 - Smoke-test photo capture/upload on a real Android/iOS build after the next native rebuild.
+## 2026-07-10 - Remove Supabase Runtime Dependency
+
+### Why
+
+Supabase was no longer the chosen foundation for the hosted POC. The backend
+already owned auth, tenant scoping, migrations, and file upload endpoints, so a
+portable managed-Postgres plus S3-compatible storage architecture is a better
+fit for the public demo path.
+
+### Changed
+
+- Added `server/database.py` for direct SQLAlchemy/psycopg2 Postgres access via `DATABASE_URL`.
+- Migrated runtime repositories from `supabase-py` query-builder calls to explicit Postgres SQL/helper calls.
+- Replaced `supabase` with `boto3` in backend requirements.
+- Reworked attachment uploads to use S3-compatible `put_object` storage and public base URLs.
+- Removed the obsolete `server/supabase_client.py` runtime helper.
+- Updated tenant-isolation tests to assert direct SQL/helper scoping by `organization_id`.
+- Updated `.env.example`, README, and the pre-launch checklist for managed Postgres plus S3/R2-style storage.
+
+### Remaining Follow-Up
+
+- Choose the hosted providers (for example Neon/Render Postgres plus Cloudflare R2) and provision real credentials.
+- Run `alembic upgrade head` against the production/demo Postgres database.
+- Smoke-test attachment upload against the chosen object-storage bucket.
