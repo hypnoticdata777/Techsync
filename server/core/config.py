@@ -38,9 +38,13 @@ class Settings:
     APP_ENV: str = APP_ENV
     IS_PRODUCTION: bool = IS_PRODUCTION
 
-    SUPABASE_URL: str | None = os.getenv("SUPABASE_URL")
-    SUPABASE_KEY: str | None = os.getenv("SUPABASE_KEY")
-    SUPABASE_ATTACHMENTS_BUCKET: str = os.getenv("SUPABASE_ATTACHMENTS_BUCKET", "work-order-attachments")
+    DATABASE_URL: str | None = os.getenv("DATABASE_URL")
+    STORAGE_BUCKET: str | None = os.getenv("STORAGE_BUCKET")
+    STORAGE_REGION: str = os.getenv("STORAGE_REGION", "auto")
+    STORAGE_ENDPOINT_URL: str | None = os.getenv("STORAGE_ENDPOINT_URL")
+    STORAGE_ACCESS_KEY_ID: str | None = os.getenv("STORAGE_ACCESS_KEY_ID")
+    STORAGE_SECRET_ACCESS_KEY: str | None = os.getenv("STORAGE_SECRET_ACCESS_KEY")
+    STORAGE_PUBLIC_BASE_URL: str | None = os.getenv("STORAGE_PUBLIC_BASE_URL")
     ATTACHMENT_MAX_BYTES: int = int(os.getenv("ATTACHMENT_MAX_BYTES", str(10 * 1024 * 1024)))
 
     JWT_SECRET_KEY: str | None = os.getenv("JWT_SECRET_KEY")
@@ -102,10 +106,8 @@ def _validate_settings(value: Settings) -> None:
         return
 
     missing = []
-    if not value.SUPABASE_URL:
-        missing.append("SUPABASE_URL")
-    if not value.SUPABASE_KEY:
-        missing.append("SUPABASE_KEY")
+    if not value.DATABASE_URL:
+        missing.append("DATABASE_URL")
     if not value.JWT_SECRET_KEY:
         missing.append("JWT_SECRET_KEY")
     if not value.CORS_ORIGINS:
@@ -120,6 +122,14 @@ def _validate_settings(value: Settings) -> None:
         missing.append("APP_BASE_URL")
     if not value.EMAIL_FROM:
         missing.append("EMAIL_FROM")
+    if not value.STORAGE_BUCKET:
+        missing.append("STORAGE_BUCKET")
+    if not value.STORAGE_ACCESS_KEY_ID:
+        missing.append("STORAGE_ACCESS_KEY_ID")
+    if not value.STORAGE_SECRET_ACCESS_KEY:
+        missing.append("STORAGE_SECRET_ACCESS_KEY")
+    if not value.STORAGE_PUBLIC_BASE_URL:
+        missing.append("STORAGE_PUBLIC_BASE_URL")
 
     if value.EMAIL_DELIVERY_METHOD != "smtp":
         missing.append("EMAIL_DELIVERY_METHOD=smtp")

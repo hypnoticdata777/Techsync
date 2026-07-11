@@ -10,9 +10,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from core.config import settings
+from database import DatabaseNotConfigured
 from logger import logger
 from routers import auth, billing, dashboard, ingestion, invitations, organizations, technicians, users, work_orders
-from supabase_client import SupabaseNotConfigured
+from services.attachment_storage_service import StorageNotConfigured
 
 app = FastAPI(
     title="TechSync API",
@@ -28,12 +29,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.exception_handler(SupabaseNotConfigured)
-async def supabase_not_configured_handler(request: Request, exc: SupabaseNotConfigured):
-    logger.error("supabase.not_configured", extra={"event": "supabase_not_configured", "path": request.url.path})
+@app.exception_handler(DatabaseNotConfigured)
+async def database_not_configured_handler(request: Request, exc: DatabaseNotConfigured):
+    logger.error("database.not_configured", extra={"event": "database_not_configured", "path": request.url.path})
     return JSONResponse(status_code=503, content={"detail": "Service requires database configuration"})
 
+@app.exception_handler(StorageNotConfigured)
+async def storage_not_configured_handler(request: Request, exc: StorageNotConfigured):
+    logger.error("storage.not_configured", extra={"event": "storage_not_configured", "path": request.url.path})
+    return JSONResponse(status_code=503, content={"detail": "Service requires attachment storage configuration"})
 
 @app.get("/health")
 def health_check():

@@ -16,10 +16,7 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       -hex 32`) — never reuse the one from local dev, never commit it.
       Store it in your hosting provider's secret manager, not in a
       committed `.env`.
-- [ ] **Create a production Supabase project** (separate from any dev/test
-      project) and run `alembic upgrade head` (or paste `schema.sql`)
-      against it. Use the `service_role` key only on the backend server,
-      never ship it to the mobile app or a browser.
+- [ ] **Create a production managed Postgres database** (separate from any dev/test database) and run `alembic upgrade head` against it. Keep `DATABASE_URL` only in the backend host secret manager.
 - [ ] **Put the backend behind HTTPS** (RNF-04 requires TLS, no
       exceptions). If you deploy to Render/Fly.io/Railway/Vercel this is
       usually automatic; if you're running the Docker image yourself, put
@@ -33,7 +30,7 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       requires SMTP settings and `APP_BASE_URL` at startup.
 - [ ] **Run a secret scan** over the whole repo history before making it
       public (`git log` + tools like `gitleaks` or `trufflehog`) — confirm
-      no real Supabase/Stripe/JWT keys were ever committed, only the
+      no real database/storage/Stripe/JWT keys were ever committed, only the
       `.env.example` placeholders.
 
 ## 🟠 Important — do before real customer data / real money touches this
@@ -47,19 +44,9 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       `/invitations/accept`). The backend now has configurable in-process fixed
       window limits for single-instance POC hosting. For multi-instance hosting,
       move these limits to Redis or the edge/reverse proxy.
-- [ ] **Decide on the RLS/service-role gap.** The backend currently uses
-      the Supabase `service_role` key, which bypasses Row Level Security —
-      application-layer `organization_id` scoping is the real enforcement
-      today (see README "Multi-Tenancy Model"). Before this holds real
-      customer data, either (a) accept and document that app-layer
-      scoping is your primary control and add automated regression tests
-      that fail loudly if a repository function ever drops its
-      `organization_id` filter, or (b) do the work to issue
-      PostgREST-compatible JWTs with an `organization_id` claim and switch
-      reads to the `anon`/`authenticated` key so RLS is actually live in
-      production, not just verified manually in dev.
+- [x] **Remove the Supabase service-role runtime dependency.** Repositories now use direct Postgres via `DATABASE_URL`, storage uses S3-compatible credentials, and tenant isolation is enforced through app-layer `organization_id` scoping covered by regression tests.
 - [x] **Wire up real object storage for attachments (RF-19).** The backend
-      now uploads files through Supabase Storage and records attachment
+      now uploads files through S3-compatible object storage and records attachment
       metadata; the mobile work order details screen can take or choose a
       photo and attach it to the job.
 - [x] **Move mobile token storage off AsyncStorage** (RF-04). Native app
@@ -72,12 +59,11 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       `LOG_FORMAT=json` logs, which nobody's watching in real time.
 - [ ] **Set up basic uptime monitoring** (UptimeRobot, Better Uptime, or
       your host's built-in health checks against `GET /health`).
-- [ ] **Confirm Supabase automated backups are enabled** on the production
+- [ ] **Confirm managed Postgres automated backups are enabled** on the production
       project (paid tiers include point-in-time recovery — check your plan).
 - [x] **Add a CI pipeline** (GitHub Actions) that runs backend pytest and
       client Jest checks on pushes/PRs. Backend coverage currently includes
-      `server/tests/` (58 tests); client coverage starts with shared validation
-      tests and should grow as mobile flows are hardened.
+      `server/tests/` (63 tests); client coverage starts with shared validation tests and should grow as mobile flows are hardened.
 - [ ] **Complete the Expo/React Native dependency upgrade.** Safe npm audit
       fixes reduced the client report from 39 to 29 findings with no criticals,
       but the remaining high/moderate findings are pinned inside Expo 50 / React

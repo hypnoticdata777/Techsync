@@ -1,5 +1,5 @@
 -- TechSync SaaS Database Schema
--- Run this SQL in your Supabase SQL Editor (or via Alembic migrations, see server/alembic/)
+-- Run this SQL via Alembic migrations or any managed Postgres SQL console.
 --
 -- Multi-tenancy model (RF-05):
 --   Every tenant-scoped table carries an `organization_id` column. The backend
@@ -7,19 +7,13 @@
 --   layer. Row Level Security is additionally enabled on every tenant table as a
 --   database-level backstop (RNF-05).
 --
--- NOTE on RLS + Supabase service_role key:
---   The backend uses the Supabase service_role key for trusted server-side writes
---   (e.g. creating an organization's first admin), and the service_role key
---   bypasses RLS by design. That means, for this POC, application-layer scoping
---   in the repository layer is the PRIMARY enforcement mechanism, and RLS is the
---   secondary/backstop layer, active and ready for the moment any code path uses
---   the anon/authenticated key instead (e.g. a future direct-from-client Supabase
---   access path). To make RLS effective in that scenario, sign the JWT handed to
---   PostgREST with the Supabase project's JWT secret and include an
---   `organization_id` claim, then call `supabase.postgrest.auth(token)` before
---   querying -- PostgREST will expose the claim as
---   current_setting('request.jwt.claims', true)::json->>'organization_id', which
---   is what the policies below read.
+-- NOTE on RLS + direct backend access:
+--   The FastAPI backend connects directly to Postgres through SQLAlchemy and
+--   enforces tenant scoping in the repository layer by filtering every tenant
+--   query on organization_id. RLS remains enabled as a database-level backstop.
+--   For RLS-aware access paths, set request.jwt.claims for the current database
+--   session with an organization_id claim before querying; the policies below
+--   read current_setting('request.jwt.claims', true)::json->>'organization_id'.
 
 -- =====================================================================
 -- Extensions
@@ -27,7 +21,7 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- =====================================================================
--- Helper: read organization_id out of the PostgREST JWT claims
+-- Helper: read organization_id out of the database session claims
 -- =====================================================================
 CREATE OR REPLACE FUNCTION techsync_current_org_id()
 RETURNS BIGINT AS $$

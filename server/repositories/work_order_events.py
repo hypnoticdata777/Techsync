@@ -1,6 +1,6 @@
 """Data access for the work order audit log (RF-20)."""
 
-from supabase_client import get_supabase_client
+from database import fetch_all, insert_row
 
 
 def create_event(
@@ -12,33 +12,27 @@ def create_event(
     to_status: str | None = None,
     notes: str | None = None,
 ) -> dict:
-    client = get_supabase_client()
-    response = (
-        client.table("work_order_events")
-        .insert(
-            {
-                "organization_id": organization_id,
-                "work_order_id": work_order_id,
-                "event_type": event_type,
-                "actor_user_id": actor_user_id,
-                "from_status": from_status,
-                "to_status": to_status,
-                "notes": notes,
-            }
-        )
-        .execute()
+    return insert_row(
+        "work_order_events",
+        {
+            "organization_id": organization_id,
+            "work_order_id": work_order_id,
+            "event_type": event_type,
+            "actor_user_id": actor_user_id,
+            "from_status": from_status,
+            "to_status": to_status,
+            "notes": notes,
+        },
     )
-    return response.data[0]
 
 
 def list_for_work_order(organization_id: int, work_order_id: int) -> list[dict]:
-    client = get_supabase_client()
-    response = (
-        client.table("work_order_events")
-        .select("*")
-        .eq("organization_id", organization_id)
-        .eq("work_order_id", work_order_id)
-        .order("created_at", desc=True)
-        .execute()
+    return fetch_all(
+        """
+        SELECT *
+        FROM work_order_events
+        WHERE organization_id = :organization_id AND work_order_id = :work_order_id
+        ORDER BY created_at DESC
+        """,
+        {"organization_id": organization_id, "work_order_id": work_order_id},
     )
-    return response.data or []

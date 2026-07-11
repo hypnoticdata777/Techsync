@@ -2,61 +2,56 @@
 
 from typing import Optional
 
-from supabase_client import get_supabase_client
+from database import fetch_all, fetch_one, insert_row, update_row
+
+TECHNICIAN_SELECT = """
+    SELECT
+        t.*,
+        u.full_name AS user_full_name,
+        u.email AS user_email,
+        u.is_active AS user_is_active
+    FROM technicians t
+    JOIN users u ON u.id = t.user_id AND u.organization_id = t.organization_id
+"""
 
 
 def create_technician(organization_id: int, user_id: int, patch: dict) -> dict:
-    client = get_supabase_client()
-    response = (
-        client.table("technicians")
-        .insert({"organization_id": organization_id, "user_id": user_id, **patch})
-        .execute()
-    )
-    return response.data[0]
+    return insert_row("technicians", {"organization_id": organization_id, "user_id": user_id, **patch})
 
 
 def get_by_id_in_org(technician_id: int, organization_id: int) -> Optional[dict]:
-    client = get_supabase_client()
-    response = (
-        client.table("technicians")
-        .select("*, users!inner(full_name, email, is_active)")
-        .eq("id", technician_id)
-        .eq("organization_id", organization_id)
-        .execute()
+    row = fetch_one(
+        TECHNICIAN_SELECT + " WHERE t.id = :technician_id AND t.organization_id = :organization_id",
+        {"technician_id": technician_id, "organization_id": organization_id},
     )
-    return response.data[0] if response.data else None
+    return _with_user(row) if row else None
 
 
 def get_by_user_id(user_id: int, organization_id: int) -> Optional[dict]:
-    client = get_supabase_client()
-    response = (
-        client.table("technicians")
-        .select("*, users!inner(full_name, email, is_active)")
-        .eq("user_id", user_id)
-        .eq("organization_id", organization_id)
-        .execute()
+    row = fetch_one(
+        TECHNICIAN_SELECT + " WHERE t.user_id = :user_id AND t.organization_id = :organization_id",
+        {"user_id": user_id, "organization_id": organization_id},
     )
-    return response.data[0] if response.data else None
+    return _with_user(row) if row else None
 
 
 def list_by_org(organization_id: int) -> list[dict]:
-    client = get_supabase_client()
-    response = (
-        client.table("technicians")
-        .select("*, users!inner(full_name, email, is_active)")
-        .eq("organization_id", organization_id)
-        .execute()
+    rows = fetch_all(
+        TECHNICIAN_SELECT + " WHERE t.organization_id = :organization_id ORDER BY t.created_at DESC",
+        {"organization_id": organization_id},
     )
-    return response.data or []
+    return [_with_user(row) for row in rows]
 
 
 def update(technician_id: int, organization_id: int, patch: dict) -> Optional[dict]:
-    client = get_supabase_client()
-    response = (
-        client.table("technicians")
-        .update(patch)
-        .eq("id", technician_id)
-        .eq("organization_id", organization_id)
-        .execute()
-    )
-    return response.data[0] if response.data else None
+    return update_row("technicians", patch, {"id": technician_id, "organization_id": organization_id})
+
+
+def _with_user(row: dict) -> dict:
+    row = dict(row)
+    row["users"] = {
+        "full_name": row.pop("user_full_name", ""),
+        "email": row.pop("user_email", ""),
+        "is_active": row.pop("user_is_active", True),
+    }
+    return row

@@ -2,7 +2,7 @@ fastapi
 uvicorn[standard]
 python-dotenv
 pydantic[email]
-supabase
+boto3
 python-jose[cryptography]
 passlib[bcrypt]
 # passlib 1.7.4 (latest release) is incompatible with bcrypt>=4.1 -- pin below 4.1

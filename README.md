@@ -3,7 +3,7 @@
 A multi-tenant SaaS platform for field service companies to onboard their
 organization, ingest work orders from multiple sources, auto-assign them to
 the right technician, and track them to completion — with a React Native
-mobile app for technicians and a FastAPI + Supabase backend.
+mobile app for technicians and a FastAPI + managed Postgres backend.
 
 This repository implements the POC scope defined in
 `Techsync_SaaS_Requirements.md` (Functional/Non-Functional requirements
@@ -27,8 +27,8 @@ and at the database layer via Postgres Row Level Security.
 
 **Backend**
 - FastAPI + Uvicorn
-- Supabase (PostgreSQL), accessed via `supabase-py` (PostgREST) at runtime
-  and via a direct Postgres connection for Alembic migrations
+- Managed PostgreSQL, accessed directly through SQLAlchemy/psycopg2 repositories
+- S3-compatible object storage for work order attachments (Cloudflare R2, AWS S3, etc.)
 - Pydantic v2 for request/response validation
 - Alembic for versioned migrations
 - JWT (access + refresh) for auth, bcrypt for password hashing
@@ -47,12 +47,12 @@ and at the database layer via Postgres Row Level Security.
     ├── main.py                 # app wiring: routers, CORS, exception handlers
     ├── core/                   # config.py, security.py (JWT, hashing)
     ├── models/                 # Pydantic request/response schemas
-    ├── repositories/           # Supabase data access, always org-scoped
+    ├── repositories/           # direct Postgres data access, always org-scoped
     ├── services/               # business logic (matching, ingestion, billing...)
     ├── routers/                # HTTP endpoints, one file per resource
     ├── dependencies.py         # auth, tenant-scoping, role-check dependencies
     ├── alembic/                # versioned DB migrations (RNF-10)
-    ├── schema.sql              # same schema, for pasting into Supabase SQL editor
+    ├── schema.sql              # same schema, for managed Postgres setup
     ├── tests/                  # pytest suite (auth, matching, tenant isolation...)
     ├── Dockerfile / .dockerignore
     └── requirements.txt
@@ -72,22 +72,13 @@ Two enforcement layers:
    core repositories. `server/dependencies.py::get_current_organization`
    resolves the caller's org from their JWT and every router depends on it.
 2. **Row Level Security (backstop)** — every tenant table has RLS enabled
-   with a policy scoping rows to `techsync_current_org_id()`, which reads an
-   `organization_id` claim off the PostgREST JWT. This was manually verified
+   with a policy scoping rows to `techsync_current_org_id()`, which reads an `organization_id` claim from the database session. This was manually verified
    against a local Postgres instance during development: with RLS on and no
    org claim set, queries return zero rows (fail-closed); with the claim set
    to org A, only org A's rows are visible, even though org B's rows exist
    in the same table.
 
-**Caveat**: the backend currently talks to Supabase using the
-`service_role` key (needed for cross-tenant admin operations like
-onboarding), which bypasses RLS by design in Supabase. That makes the
-application-layer scoping the actual enforcement path today. RLS is fully
-defined and tested so that the moment any code path uses the `anon` key
-with a user-scoped JWT (e.g. a future "mobile app talks to Supabase
-directly" path), it's already protected — see the comment block at the top
-of `server/schema.sql` for how to mint a PostgREST-compatible JWT with an
-`organization_id` claim.
+**Direct runtime model**: the FastAPI backend now talks directly to Postgres with `DATABASE_URL`; there is no Supabase service-role runtime dependency. Application-layer `organization_id` scoping is the primary tenant boundary and is covered by repository regression tests. RLS policies remain in the schema as a database backstop for deployments that intentionally set a per-request `organization_id` claim in the database session.
 
 ## Getting Started
 
@@ -95,7 +86,7 @@ of `server/schema.sql` for how to mint a PostgREST-compatible JWT with an
 
 - Node.js 16+
 - Python 3.11+
-- A Supabase project (or local Postgres for schema/migration testing)
+- A managed Postgres database (Neon, Render, Railway, Fly, local Postgres, etc.)
 - Android Studio or Xcode for mobile development
 
 ### Backend Setup
@@ -109,11 +100,16 @@ cp .env.example .env
 Edit `.env`:
 ```
 APP_ENV=development
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-service-role-key
-DATABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
+DATABASE_URL=postgresql://user:password@host:5432/techsync
 JWT_SECRET_KEY=$(openssl rand -hex 32)
 CORS_ORIGINS=http://localhost:8081,http://localhost:19006,http://localhost:3000
+STORAGE_BUCKET=work-order-attachments
+STORAGE_REGION=auto
+STORAGE_ENDPOINT_URL=https://your-account-id.r2.cloudflarestorage.com
+STORAGE_ACCESS_KEY_ID=your-storage-access-key
+STORAGE_SECRET_ACCESS_KEY=your-storage-secret-key
+STORAGE_PUBLIC_BASE_URL=https://files.yourdomain.com/work-order-attachments
+ATTACHMENT_MAX_BYTES=10485760
 STRIPE_SECRET_KEY=
 STRIPE_PRICE_ID=
 STRIPE_WEBHOOK_SECRET=whsec_your_stripe_webhook_secret
@@ -122,12 +118,9 @@ STRIPE_CANCEL_URL=http://localhost:3000/billing/cancel
 APP_BASE_URL=http://localhost:19006
 EMAIL_DELIVERY_METHOD=log
 EMAIL_FROM=TechSync <no-reply@yourdomain.com>
-SUPABASE_ATTACHMENTS_BUCKET=work-order-attachments
-ATTACHMENT_MAX_BYTES=10485760
 ```
 
-Apply the schema — either paste `schema.sql` into the Supabase SQL editor,
-or run the equivalent migration (RNF-10):
+Apply the schema with Alembic (recommended), or run `schema.sql` in your managed Postgres SQL console (RNF-10):
 ```bash
 alembic upgrade head
 ```
@@ -145,7 +138,7 @@ cd server
 pip install -r requirements-dev.txt
 pytest -p no:cacheprovider
 ```
-62 backend tests covering JWT/password logic, the matching engine, CSV ingestion
+63 backend tests covering JWT/password logic, the matching engine, CSV ingestion
 validation, work order status transitions, plan-limit enforcement,
 tenant-isolation of the repository layer, public endpoint rate limiting, and
 Stripe webhook handling, and attachment upload validation. These run without a live
@@ -270,7 +263,7 @@ Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
   mode, signed Stripe webhook handling for checkout completion/payment
   failure/subscription cancellation, or a mock URL when Stripe is not
   configured), RF-29 (technician-count plan limit, enforced server-side).
-- **NFRs**: RNF-05 (RLS, verified manually — see Multi-Tenancy Model above),
+- **NFRs**: RNF-05 (application-layer tenant isolation with repository regression tests; RLS policies remain as an optional DB backstop),
   RNF-06 (bcrypt), RNF-09 (modular backend structure), RNF-10 (Alembic),
   RNF-11 (Dockerfile/compose), RNF-12 (structured JSON logging, toggle via
   `LOG_FORMAT=json`), RNF-13 (tenant deletion endpoint).
@@ -287,11 +280,7 @@ Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
   applied without forcing framework majors. The remaining npm findings are in
   Expo 50 / React Native 0.73 transitive tooling and require a planned Expo/RN
   upgrade before treating the client as public-showcase clean.
-- Docker image build wasn't network-testable in the sandbox this was built
-  in (registry pull blocked); the Alembic migration itself *was* run
-  end-to-end against a real local Postgres instance and confirmed to create
-  the correct schema, indexes, and RLS policies, and RLS behavior was
-  hand-verified with a non-superuser role.
+- Docker image build was not network-testable in the sandbox this was built in (registry pull blocked); verify the image build in your deployment environment before relying on it.
 
 ## License
 

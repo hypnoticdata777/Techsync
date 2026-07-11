@@ -18,7 +18,7 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 # Single source of truth for the schema lives in server/schema.sql so it can
-# also be pasted directly into the Supabase SQL editor for quick setup.
+# be applied to any managed Postgres database.
 SCHEMA_SQL_PATH = Path(__file__).resolve().parents[2] / "schema.sql"
 
 
