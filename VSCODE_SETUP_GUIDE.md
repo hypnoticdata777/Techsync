@@ -109,12 +109,17 @@ cp .env.example .env
 
 Edit `server/.env`:
 ```env
-# Required: Generate with `openssl rand -hex 32`
+# Required runtime settings
+DATABASE_URL=postgresql://user:password@host:5432/techsync
 JWT_SECRET_KEY=your-generated-secret-key-here
 
-# Optional: For production database
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-anon-key-here
+# Required when testing attachment uploads
+STORAGE_BUCKET=work-order-attachments
+STORAGE_REGION=auto
+STORAGE_ENDPOINT_URL=https://your-account-id.r2.cloudflarestorage.com
+STORAGE_ACCESS_KEY_ID=your-storage-access-key
+STORAGE_SECRET_ACCESS_KEY=your-storage-secret-key
+STORAGE_PUBLIC_BASE_URL=https://files.yourdomain.com/work-order-attachments
 ```
 
 **Frontend Configuration:**
@@ -585,14 +590,13 @@ For mobile app, use terminal method since React Native debugging requires Metro 
    ```
 5. Save - Metro hot-reloads
 
-### Database Changes (Supabase)
+### Database Changes (Managed Postgres)
 
-1. Edit `server/schema.sql`
-2. Go to Supabase SQL Editor
-3. Copy updated SQL
-4. Execute
-5. Update `server/main.py` models if needed
-6. Restart backend
+1. Edit the Alembic migration under `server/alembic/versions/`
+2. Mirror schema-only changes in `server/schema.sql` when the direct SQL setup script should stay current
+3. Run `cd server && alembic upgrade head` against your local/dev Postgres database
+4. Update Pydantic models or repositories if the API shape changed
+5. Restart backend
 
 ### View Logs
 
@@ -607,8 +611,8 @@ For mobile app, use terminal method since React Native debugging requires Metro 
 - Stack traces for crashes
 
 **Database Logs:**
-- Supabase Dashboard → Logs
-- Or use logger in `server/logger.py`
+- Use your managed Postgres provider dashboard or SQL logs
+- Backend application events use `server/logger.py`
 
 ---
 
@@ -752,7 +756,8 @@ Create custom snippets: `Ctrl+Shift+P` → "Preferences: Configure User Snippets
 - **FastAPI Docs:** https://fastapi.tiangolo.com/
 - **React Native Docs:** https://reactnative.dev/
 - **VS Code Docs:** https://code.visualstudio.com/docs
-- **Supabase Docs:** https://supabase.com/docs
+- **PostgreSQL Docs:** https://www.postgresql.org/docs/
+- **SQLAlchemy Docs:** https://docs.sqlalchemy.org/
 
 ---
 

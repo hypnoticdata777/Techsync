@@ -28,11 +28,12 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       now sends reset and invitation emails through `services/email_service.py`.
       Local development can use `EMAIL_DELIVERY_METHOD=log`; production
       requires SMTP settings and `APP_BASE_URL` at startup.
-- [ ] **Run a secret scan** over the whole repo history before making it
-      public (`git log` + tools like `gitleaks` or `trufflehog`) — confirm
-      no real database/storage/Stripe/JWT keys were ever committed, only the
-      `.env.example` placeholders.
-
+- [x] **Run a secret scan** over the whole repo history before making it
+      public. A local full-history scan across 46 commits found no
+      high-confidence real database/storage/Stripe/JWT/SMTP/private-key
+      secrets; findings were limited to placeholder Supabase-era docs. If
+      `gitleaks` or `trufflehog` is installed later, run one as an independent
+      second pass before flipping the repo public.
 ## 🟠 Important — do before real customer data / real money touches this
 
 - [x] **Add Stripe webhook handling.** `POST /billing/webhook` now verifies
