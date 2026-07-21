@@ -3,6 +3,37 @@
 This file tracks hardening and launch-readiness changes as we move TechSync
 from local POC toward a hosted POC.
 
+## 2026-07-21 - Rehydrate Repo and Add Public POC Trackers
+
+### Why
+
+The Desktop `Techsync-main` folder was a GitHub download/zip style folder rather
+than a full development checkout. Before hosting or portfolio integration, the
+project needs a real clone, verified GitHub/CI state, and the same durable
+tracking docs used across the other product POCs.
+
+### Changed
+
+- Cloned the real `hypnoticdata777/Techsync` repo into a working directory with
+  full `.git` history.
+- Confirmed `main` is aligned with `origin/main` at `3c3f0ac`.
+- Confirmed the latest GitHub Actions CI run on `main` completed successfully.
+- Added `PUBLIC_POC_READINESS.md` to summarize public-review readiness,
+  safety-sweep notes, guardrails, and hosted POC next steps.
+- Added `PHASE_STATUS.md` for current phase tracking.
+- Added `COMMAND_LOG.md` for command/evidence history.
+- Added `QA_CHECKLIST.md` for public POC, hosted backend, demo, and portfolio QA.
+- Added `HOSTING_PORTFOLIO_ROADMAP.md` for the host-ready and portfolio-ready
+  path.
+- Removed tracked generated Python bytecode files from `server/__pycache__`.
+
+### Remaining Follow-Up
+
+- Run an independent `gitleaks` or `trufflehog` scan when available.
+- Choose the backend hosting provider and managed Postgres provider.
+- Deploy the backend behind HTTPS with secrets stored in the host secret manager.
+- Connect a synthetic demo or walkthrough to the portfolio.
+
 ## 2026-07-09 - Remove Shared Demo Credentials
 
 ### Why

@@ -1,0 +1,121 @@
+# TechSync Public POC Readiness
+
+Date: July 21, 2026
+
+## Current Status
+
+TechSync is a public-facing proof of concept for a multi-tenant field-service
+SaaS platform. It is suitable for portfolio and investor review as an
+architecture/product POC, but it should not yet be treated as production-ready
+for real customer operations.
+
+The current repo is aligned with GitHub:
+
+```text
+Repository: https://github.com/hypnoticdata777/Techsync
+Branch: main
+Latest verified commit: 3c3f0ac Document secret history scan
+Latest verified CI run: success on main for 3c3f0ac
+```
+
+## What Is Public-Review Ready
+
+- Multi-tenant organization model.
+- Role-based auth and onboarding/invitation flows.
+- Work-order lifecycle APIs and mobile screens.
+- Technician assignment and status-transition flow.
+- CSV and webhook ingestion boundaries.
+- Matching engine based on skill, proximity, workload, and priority.
+- Billing checkout/webhook boundary for Stripe test-mode style demos.
+- Attachment metadata and S3-compatible upload boundary.
+- Application-layer tenant scoping covered by regression tests.
+- Postgres RLS policies included as a database-level backstop.
+- CI workflow for backend pytest and client Jest checks.
+- Launch-hardening docs and pre-launch checklist.
+
+## Safety Sweep Notes
+
+The July 21, 2026 local safety sweep checked the freshly cloned repo, not the
+zip-style Desktop download.
+
+Observed:
+
+- `.git` exists in the working clone.
+- `main` is aligned with `origin/main`.
+- `.gitignore` excludes `.env`, `*.env`, build folders, Node modules, native
+  mobile signing artifacts, generated app packages, logs, and caches.
+- Only `server/.env.example` was found in the env-file scan.
+- High-signal secret strings found in tracked files are placeholder/docs/test
+  values, including example Postgres URLs, placeholder JWT/storage/SMTP values,
+  Stripe webhook placeholders, and test-only `whsec_test` values.
+- No tracked `.env`, database dump, SQLite file, PDF, CSV, zip, APK, AAB, private
+  key, or production key file was found in the local file scan.
+- Tracked Python bytecode files were removed because generated cache files do
+  not belong in the public POC repo.
+
+Notes:
+
+- `client/android/app/debug.keystore` is tracked. This is the standard Android
+  debug keystore pattern, not a production signing key. Do not use it for app
+  store or production release signing.
+- The independent history scan documented in `BUILD_LOG.md` found no
+  high-confidence real secrets, but `gitleaks` or `trufflehog` should still be
+  run later as a second pass when available.
+
+## Not Production Ready Yet
+
+Before real customer data, real money, or public self-serve usage:
+
+- Generate and store a real production `JWT_SECRET_KEY`.
+- Provision a dedicated production/demo managed Postgres database.
+- Run Alembic migrations against that database.
+- Host the backend behind HTTPS.
+- Configure production CORS with real hosted domains only.
+- Store all runtime secrets in the host secret manager.
+- Configure real SMTP delivery.
+- Configure and test Stripe webhook delivery against the hosted backend.
+- Configure object storage and smoke-test attachment upload.
+- Add error monitoring.
+- Add uptime monitoring.
+- Confirm managed Postgres backups and recovery policy.
+- Complete the Expo/React Native dependency upgrade and mobile regression pass.
+- Add privacy policy and terms before real customer data.
+
+## Public Demo Guardrails
+
+- Use synthetic organizations, users, technicians, work orders, and attachments.
+- Do not expose real customer or technician data.
+- Do not publish `.env` files or production secrets.
+- Do not present shared long-lived demo credentials unless the environment is
+  disposable and resettable.
+- Do not claim push notifications, offline sync, PDF/email ingestion, app-store
+  readiness, web admin UI, or production scale until those items are actually
+  completed.
+
+## Recommended Next Step
+
+Proceed to hosted POC setup:
+
+1. Choose the backend host.
+2. Create the managed Postgres demo database.
+3. Configure host secrets.
+4. Deploy the backend behind HTTPS.
+5. Verify `/health`, onboarding, login/refresh, work-order creation, assignment,
+   status transitions, CSV ingestion, dashboard metrics, and attachment flow if
+   storage is configured.
+6. Connect the synthetic demo or walkthrough from the portfolio.
+
+## Stop Point For This Phase
+
+Stop when TechSync is:
+
+- hosted in a controlled POC environment;
+- connected from the portfolio;
+- using synthetic/demo data only;
+- passing CI;
+- smoke-tested through the core journey;
+- documented with production limitations and next steps.
+
+At that point, TechSync is investor-safe as a public POC and should pause before
+production-only work such as app-store release, push notifications, offline
+sync, advanced reporting, or real customer onboarding.
