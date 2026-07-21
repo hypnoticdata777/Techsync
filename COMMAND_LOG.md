@@ -184,3 +184,44 @@ tools\gitleaks-8.30.1\gitleaks.exe git --config .gitleaks.toml --verbose --redac
 Result:
 
 - No leaks found across 38 commits.
+
+## 2026-07-21 - Stale Public-Docs Review
+
+Scan command:
+
+```powershell
+rg -n -i "supabase|single-tenant|single tenant|AsyncStorage|demo credentials|admin@techsync|tech@techsync|password123|React Native 0\.72|React Native \(CLI|Make\.com|outside of Supabase|server/supabase_client" -g "*.md" .
+```
+
+Result:
+
+- Active docs already identified the current direct Postgres runtime in README
+  and pre-launch checklist.
+- `APPENDIX_TECHNICAL_OVERVIEW.md` still contained historical Supabase,
+  AsyncStorage, and single-tenant architecture references.
+- `Techsync_SaaS_Requirements.md` still listed Supabase and React Native CLI in
+  the reference stack.
+- Android build-recovery docs contained useful but old version-specific guidance.
+
+Changes:
+
+- Added a current public POC architecture note to the technical appendix.
+- Marked historical appendix sections explicitly.
+- Updated the SaaS requirements reference stack to React Native/Expo, managed
+  Postgres via SQLAlchemy/psycopg2, S3-compatible attachment storage, and
+  CSV/webhook ingestion with PDF/email/forms deferred.
+- Updated RF-05 and RNF-11 to remove the outdated Supabase runtime assumption.
+- Added a current setup note to `VSCODE_SETUP_GUIDE.md`.
+- Added historical troubleshooting notes to Android/Windows build docs.
+
+Verification:
+
+```powershell
+rg -n -i "supabase|single-tenant|single tenant|AsyncStorage|demo credentials|admin@techsync|tech@techsync|password123|React Native 0\.72|React Native \(CLI|Make\.com|outside of Supabase|server/supabase_client" -g "*.md" .
+```
+
+Result:
+
+- Remaining matches are either active docs saying Supabase is not the runtime
+  dependency, explicit historical labels, test/example values, or tracker
+  evidence.

@@ -1,5 +1,9 @@
 # Android 14 Compatibility Fix - What I Did
 
+> **Historical troubleshooting note:** this file documents one Android
+> compatibility recovery slice. Treat exact version advice as historical unless
+> it matches the current `client/package.json` and native Android files.
+
 ## The Problem I Had
 
 I kept hitting this error when trying to build:

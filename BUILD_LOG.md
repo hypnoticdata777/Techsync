@@ -3,6 +3,33 @@
 This file tracks hardening and launch-readiness changes as we move TechSync
 from local POC toward a hosted POC.
 
+## 2026-07-21 - Review Stale Public Docs
+
+### Why
+
+Several older docs were useful historical notes, but they still contained
+Supabase-era, single-tenant, and Android build-recovery language that could
+confuse a public portfolio reader or future hosting session.
+
+### Changed
+
+- Strengthened the top note in `APPENDIX_TECHNICAL_OVERVIEW.md` so the current
+  managed-Postgres/S3-compatible architecture is clear before any historical
+  Supabase content appears.
+- Marked the old React Native and Supabase appendix sections as historical.
+- Updated `Techsync_SaaS_Requirements.md` with a current-status note and current
+  reference stack.
+- Updated RF-05/RNF-11 language to describe Postgres RLS and managed
+  Postgres/S3-compatible portability rather than Supabase runtime dependency.
+- Added a current-architecture note to `VSCODE_SETUP_GUIDE.md`.
+- Marked Android build recovery docs as historical troubleshooting references.
+- Updated readiness and QA trackers.
+
+### Remaining Follow-Up
+
+- Confirm no generated mobile build artifacts appear after the next local build.
+- Choose the backend hosting provider and managed Postgres provider for Phase 2.
+
 ## 2026-07-21 - Rehydrate Repo and Add Public POC Trackers
 
 ### Why

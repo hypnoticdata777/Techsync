@@ -56,6 +56,10 @@ Observed:
   `.gitleaks.toml`; both configured scans reported no leaks.
 - `.gitleaks.toml` keeps local scanner artifacts ignored and allowlists the
   documented localhost curl token placeholder in `QUICKSTART.md`.
+- Older public-facing docs were reviewed for stale Supabase/single-tenant
+  language. Historical docs now carry explicit historical notices, and the SaaS
+  requirements reference stack now reflects the current managed-Postgres and
+  S3-compatible runtime path.
 
 Notes:
 

@@ -1,5 +1,9 @@
 # Windows Build Fix - serviceOf Error
 
+> **Historical troubleshooting note:** this file records a prior local Windows
+> build fix. Use it as a reference, not as the current production release
+> checklist.
+
 ## The Error I Was Getting
 
 ```

@@ -18,7 +18,7 @@ they have been verified in the relevant environment.
       using `.gitleaks.toml`.
 - [x] Independent Gitleaks `8.30.1` full-history scan completed with no leaks
       using `.gitleaks.toml`.
-- [ ] Older docs reviewed for stale Supabase or single-tenant language before
+- [x] Older docs reviewed for stale Supabase or single-tenant language before
       portfolio launch.
 
 ## Backend Local/CI Quality

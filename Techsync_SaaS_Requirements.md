@@ -5,6 +5,14 @@
 **Autor:** Carlos Sanchez Gonzalez
 **Propósito:** Definir el alcance funcional y las cualidades técnicas del sistema para transformar TechSync (plataforma de gestión de servicio de campo) en un Proof of Concept viable como producto SaaS multi-tenant.
 
+> **Nota de estado actual (21 de julio de 2026):** este documento conserva el
+> alcance funcional original del POC SaaS. La implementacion actual ya no usa
+> Supabase como dependencia runtime; el backend usa Postgres administrado via
+> SQLAlchemy/psycopg2, almacenamiento S3-compatible para adjuntos, Alembic para
+> migraciones y JWT propio para autenticacion. Las menciones a Supabase abajo
+> deben leerse como historicas o como referencia de RLS/Postgres, no como una
+> decision de infraestructura vigente.
+
 ---
 
 ## 1. Contexto y Alcance
@@ -18,13 +26,14 @@ El MVP original fue diseñado para una sola organización (single-tenant), asumi
 **Stack técnico de referencia (ya definido):**
 | Capa | Tecnología |
 |---|---|
-| Cliente móvil | React Native (CLI, no Expo) |
+| Cliente móvil | React Native / Expo |
 | Backend | Python FastAPI + Uvicorn |
-| Base de datos | Supabase (PostgreSQL) |
+| Base de datos | Postgres administrado via SQLAlchemy/psycopg2 |
+| Almacenamiento | S3-compatible para adjuntos |
 | Validación | Pydantic |
 | Migraciones | Alembic |
 | Autenticación | JWT |
-| Ingesta de datos | Make.com (pipeline de parsing) |
+| Ingesta de datos | CSV manual y webhook API; PDF/email/formularios diferidos |
 
 ---
 
@@ -45,7 +54,7 @@ Cada requisito incluye ID, prioridad (MoSCoW: Must/Should/Could/Won't) y criteri
 
 | ID | Requisito | Prioridad | Criterio de aceptación |
 |---|---|---|---|
-| RF-05 | El sistema debe aislar los datos de cada organización (tenant) mediante `organization_id` en cada tabla relevante, reforzado con Row Level Security (RLS) de Supabase. | Must | Una consulta de la Organización A nunca retorna filas de la Organización B, incluso con error de aplicación. |
+| RF-05 | El sistema debe aislar los datos de cada organización (tenant) mediante `organization_id` en cada tabla relevante, reforzado con Row Level Security (RLS) de Postgres cuando el despliegue configure el claim por request. | Must | Una consulta de la Organización A nunca retorna filas de la Organización B, incluso con error de aplicación. |
 | RF-06 | El sistema debe permitir que un nuevo cliente cree su organización mediante un flujo de onboarding self-service (nombre de empresa, industria, primer admin). | Must | Flujo completo toma menos de 5 minutos sin intervención manual. |
 | RF-07 | El sistema debe permitir invitar usuarios adicionales a una organización vía email con rol pre-asignado. | Should | Invitado recibe link único, expira en 48 horas. |
 | RF-08 | El sistema debe permitir configuración básica por organización (zona horaria, tipos de servicio, prioridades personalizadas). | Could | Configuración persiste y afecta lógica de negocio (ej. cálculo de SLA). |
@@ -117,7 +126,7 @@ Cada requisito incluye ID, prioridad (MoSCoW: Must/Should/Could/Won't) y criteri
 | RNF-08 | Usabilidad | La app móvil debe ser utilizable por un técnico de campo sin capacitación previa extensa. | Onboarding de un técnico nuevo en <5 min sin soporte |
 | RNF-09 | Mantenibilidad | El código backend debe seguir una estructura modular clara (routers, services, models separados) para facilitar extensión futura. | Revisión de arquitectura documentada en README |
 | RNF-10 | Mantenibilidad | Las migraciones de base de datos deben ser versionadas y reproducibles. | Alembic aplica migraciones limpiamente en ambiente nuevo |
-| RNF-11 | Portabilidad | El sistema debe poder desplegarse en un entorno de nube estándar sin dependencias de infraestructura propietaria fuera de Supabase. | Deploy documentado y reproducible (Docker + variables de entorno) |
+| RNF-11 | Portabilidad | El sistema debe poder desplegarse en un entorno de nube estandar usando Postgres administrado y almacenamiento S3-compatible, sin dependencia runtime de Supabase. | Deploy documentado y reproducible (Docker + variables de entorno) |
 | RNF-12 | Observabilidad | El sistema debe registrar logs estructurados de errores y eventos clave (ingesta, asignación, fallos de autenticación). | Logs consultables durante demo/debugging |
 | RNF-13 | Cumplimiento de datos | El sistema debe permitir eliminación de datos de una organización a solicitud (alineado a principios básicos de privacidad, sin implicar cumplimiento legal formal en fase POC). | Endpoint de eliminación de tenant disponible para pruebas internas |
 | RNF-14 | Compatibilidad | La app móvil debe funcionar en las versiones actuales de iOS y Android soportadas por React Native CLI. | Probado en al menos un dispositivo real por plataforma |

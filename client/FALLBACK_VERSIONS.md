@@ -1,5 +1,9 @@
 # Emergency Fallback: Stable Versions That Work
 
+> **Historical troubleshooting note:** these fallback versions were useful for a
+> prior Windows/Android build issue. Re-check current package and Android files
+> before using this as release guidance.
+
 ## When to Use This
 
 If I'm getting endless Kotlin/Gradle errors and just want the damn thing to build, use these **proven stable versions** for Windows 11 + Android 14:

@@ -2,6 +2,11 @@
 
 Complete guide for developing TechSync using Visual Studio Code with optimal configuration, extensions, and workflows.
 
+> **Current public POC note:** TechSync now runs on a FastAPI backend with
+> direct managed Postgres access via `DATABASE_URL`, S3-compatible attachment
+> storage, JWT auth, and Alembic migrations. Older Supabase-era notes in
+> historical docs should not be used for current setup.
+
 ---
 
 ## Table of Contents

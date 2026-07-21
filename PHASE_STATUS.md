@@ -57,10 +57,15 @@ Completed:
   variable instead of a bearer-token placeholder.
 - Ran Gitleaks `8.30.1` against the current tree with no leaks found.
 - Ran Gitleaks `8.30.1` against full Git history with no leaks found.
+- Reviewed stale public-facing docs for Supabase, single-tenant, and Android
+  build-history language.
+- Marked historical appendix and Android troubleshooting docs as historical.
+- Updated the SaaS requirements reference stack to managed Postgres,
+  S3-compatible storage, React Native/Expo, and CSV/webhook ingestion.
+- Added current setup note to the VS Code setup guide.
 
 Remaining:
 
-- Review older docs for stale architecture language before portfolio launch.
 - Confirm no generated mobile build artifacts appear after the next local build.
 
 ### Phase 2 - Hosted Backend POC
@@ -126,5 +131,5 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Commit the Gitleaks configuration and scan documentation slice, then continue
-Phase 1 with stale-doc review. After that, choose the backend host for Phase 2.
+Commit the stale-doc review slice, then choose the backend host and managed
+Postgres provider for Phase 2.

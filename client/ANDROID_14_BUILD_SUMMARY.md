@@ -1,5 +1,10 @@
 # TechSync Android 14 Build - My Journey & Notes
 
+> **Historical troubleshooting note:** this file records the January 2026
+> Android build recovery path. Use it as background only; verify current Android
+> build settings against `client/package.json`, `client/android/`, and the
+> latest project docs before making release decisions.
+
 **Date:** January 3, 2026 (Saturday)
 **Time Spent:** ~10 hours (brutal session)
 **Status:** Almost there - one more Gradle cache issue to resolve

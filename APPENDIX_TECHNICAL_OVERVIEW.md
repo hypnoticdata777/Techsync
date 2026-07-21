@@ -6,6 +6,13 @@
 > historical record of the original single-tenant MVP's design rationale;
 > treat anything below about auth, roles, or the data model as describing
 > that earlier version, not the current one.
+>
+> **Current public POC architecture:** React Native/Expo client, FastAPI
+> backend, direct managed Postgres through SQLAlchemy/psycopg2 repositories,
+> S3-compatible object storage, JWT access/refresh auth, Alembic migrations,
+> and application-layer tenant scoping with Postgres RLS policies as a database
+> backstop. Supabase references below are historical unless another current doc
+> explicitly reintroduces them.
 
 ## Overview
 
@@ -29,7 +36,7 @@ This document provides a comprehensive technical overview of TechSync, explainin
 
 ### Frontend - Mobile Application
 
-#### React Native 0.72.0
+#### Historical: React Native 0.72.0
 **Purpose:** Cross-platform mobile development
 **Why This Choice:**
 - **Single Codebase:** Write once, deploy to iOS and Android
@@ -123,7 +130,7 @@ This document provides a comprehensive technical overview of TechSync, explainin
 - Use process manager (systemd, supervisor, or Docker)
 - Configure workers based on CPU cores (workers = 2 * cores + 1)
 
-#### Supabase (PostgreSQL + Auth)
+#### Historical: Supabase (PostgreSQL + Auth)
 **Purpose:** Backend-as-a-Service with PostgreSQL database
 **Why This Choice:**
 - **Managed PostgreSQL:** No database administration overhead
@@ -913,7 +920,7 @@ Content-Security-Policy: default-src 'self'
 
 ---
 
-### Why Supabase over Traditional PostgreSQL?
+### Historical Decision: Why Supabase over Traditional PostgreSQL?
 
 | Factor | Supabase | AWS RDS | Self-Hosted |
 |--------|----------|---------|-------------|
