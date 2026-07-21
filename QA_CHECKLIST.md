@@ -30,8 +30,15 @@ they have been verified in the relevant environment.
 
 ## Hosted Backend POC
 
-- [ ] Backend host chosen.
-- [ ] Managed Postgres demo database created.
+- [x] Preferred database provider documented as Neon Postgres.
+- [x] Cloudflare role documented as DNS/portfolio front door and preferred R2
+      storage candidate.
+- [x] Stripe documented as deferred for first investor POC.
+- [x] Email/storage deferral tradeoffs documented.
+- [ ] Backend host chosen: Vercel, Render, or Railway.
+- [ ] Neon demo database created.
+- [ ] Pooled Neon connection string selected for hosted/serverless runtime.
+- [ ] Demo-mode vs full `APP_ENV=production` decision made.
 - [ ] Host secret manager configured.
 - [ ] Alembic migrations run against hosted/demo database.
 - [ ] `/health` verified over HTTPS.

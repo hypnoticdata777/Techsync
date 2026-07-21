@@ -76,13 +76,20 @@ Before real customer data, real money, or public self-serve usage:
 
 - Generate and store a real production `JWT_SECRET_KEY`.
 - Provision a dedicated production/demo managed Postgres database.
+- Use the Neon pooled connection string if the backend runs on a serverless
+  host such as Vercel.
 - Run Alembic migrations against that database.
 - Host the backend behind HTTPS.
 - Configure production CORS with real hosted domains only.
 - Store all runtime secrets in the host secret manager.
-- Configure real SMTP delivery.
-- Configure and test Stripe webhook delivery against the hosted backend.
-- Configure object storage and smoke-test attachment upload.
+- Configure real SMTP delivery, or explicitly run a hosted demo mode where
+  email delivery is deferred.
+- Configure and test Stripe webhook delivery against the hosted backend before
+  enabling any live billing demo. Stripe is deferred for the first investor POC.
+- Configure object storage and smoke-test attachment upload if attachment upload
+  is part of the hosted demo. Cloudflare R2 is the preferred S3-compatible
+  storage candidate; storage is deferred for the first smoke test unless RF-19
+  must be shown live.
 - Add error monitoring.
 - Add uptime monitoring.
 - Confirm managed Postgres backups and recovery policy.
@@ -104,14 +111,18 @@ Before real customer data, real money, or public self-serve usage:
 
 Proceed to hosted POC setup:
 
-1. Choose the backend host.
-2. Create the managed Postgres demo database.
-3. Configure host secrets.
-4. Deploy the backend behind HTTPS.
-5. Verify `/health`, onboarding, login/refresh, work-order creation, assignment,
+1. Use Neon Postgres for the demo database.
+2. Choose the backend host: Vercel for portfolio alignment, or Render/Railway
+   for a more traditional FastAPI service.
+3. Decide whether to add a demo deployment mode or configure full production
+   requirements for SMTP and object storage.
+4. Configure host secrets.
+5. Deploy the backend behind HTTPS.
+6. Verify `/health`, onboarding, login/refresh, work-order creation, assignment,
    status transitions, CSV ingestion, dashboard metrics, and attachment flow if
    storage is configured.
-6. Connect the synthetic demo or walkthrough from the portfolio.
+7. Connect the synthetic demo or walkthrough from the portfolio once the
+   portfolio URL exists.
 
 ## Stop Point For This Phase
 

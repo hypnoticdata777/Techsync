@@ -67,6 +67,8 @@ Completed:
 Remaining:
 
 - Confirm no generated mobile build artifacts appear after the next local build.
+- Commit the deployment decision that selects Neon plus Cloudflare-aligned
+  infrastructure and records storage/email/Stripe deferral tradeoffs.
 
 ### Phase 2 - Hosted Backend POC
 
@@ -74,8 +76,12 @@ Status: not started
 
 Next:
 
-- Choose hosting provider.
-- Create managed Postgres demo database.
+- Choose hosting provider: Vercel for portfolio alignment, or Render/Railway
+  for a more traditional FastAPI service.
+- Create Neon managed Postgres demo database and use the pooled connection
+  string for hosted/serverless runtime.
+- Decide whether the first hosted POC uses full `APP_ENV=production` config or
+  a documented demo deployment mode that defers storage/email/Stripe.
 - Configure host secrets.
 - Run Alembic migrations.
 - Deploy FastAPI behind HTTPS.
@@ -131,5 +137,6 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Commit the stale-doc review slice, then choose the backend host and managed
-Postgres provider for Phase 2.
+Commit the deployment decision slice, then create the Neon demo database and
+choose whether FastAPI lands first on Vercel or a traditional service host such
+as Render/Railway.

@@ -56,6 +56,40 @@ Result:
 
 - Latest `CI` run on `main` for `3c3f0ac` completed with `success`.
 
+## 2026-07-21 - Provider Decision Research
+
+Official docs reviewed:
+
+- Cloudflare Python Workers:
+  `https://developers.cloudflare.com/workers/languages/python/`
+- Cloudflare R2:
+  `https://developers.cloudflare.com/r2/how-r2-works/`
+- Cloudflare R2 S3 compatibility:
+  `https://developers.cloudflare.com/r2/api/s3/api/`
+- Neon connection pooling:
+  `https://neon.com/docs/connect/connection-pooling`
+- Vercel FastAPI:
+  `https://vercel.com/docs/frameworks/backend/fastapi`
+- Vercel Python runtime:
+  `https://vercel.com/docs/functions/runtimes/python`
+
+Result:
+
+- Neon is the recommended Postgres provider for the first hosted POC.
+- Use Neon's pooled connection string when deploying to serverless-style hosts.
+- Cloudflare is recommended for DNS/portfolio front door and later R2
+  attachment storage.
+- Cloudflare Python Workers can support Python/FastAPI, but Python Workers are
+  beta and should not be the first backend deployment target for this POC.
+- Vercel can host FastAPI, but its Python runtime is beta; choose it if
+  portfolio alignment matters more than traditional service hosting.
+- Render/Railway remain strong fallback options for a traditional FastAPI
+  service.
+- Stripe is deferred for the first investor POC.
+- Email and storage can be deferred only if the first hosted environment is
+  documented as demo mode or the production config is adjusted; current
+  `APP_ENV=production` validation requires SMTP and object storage settings.
+
 ## 2026-07-21 - Phase 1 Initial Safety Sweep
 
 Commands:

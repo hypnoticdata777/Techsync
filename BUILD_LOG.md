@@ -3,6 +3,37 @@
 This file tracks hardening and launch-readiness changes as we move TechSync
 from local POC toward a hosted POC.
 
+## 2026-07-21 - Document Hosting Provider Decision
+
+### Why
+
+Phase 2 needs a clear deployment direction before secrets, database setup, or
+portfolio links are created. The project also needs an honest record of what is
+deferred for the first investor POC.
+
+### Changed
+
+- Added `DEPLOYMENT_DECISION.md`.
+- Documented Neon Postgres as the preferred demo database, using the pooled
+  connection string for hosted/serverless runtime.
+- Documented Cloudflare as the DNS/portfolio front door and preferred later R2
+  storage provider.
+- Captured Vercel versus Render/Railway tradeoffs for the FastAPI backend.
+- Recorded that Cloudflare Python Workers are possible but beta/extra work, so
+  they are not the first recommended backend host.
+- Marked Stripe as deferred for the first investor POC.
+- Documented email and storage deferral tradeoffs, including the current
+  `APP_ENV=production` requirement for SMTP and object storage settings.
+- Clarified that portfolio integration should be prepared now, then hard-linked
+  once the portfolio URL exists.
+
+### Remaining Follow-Up
+
+- Choose Vercel versus Render/Railway for the first FastAPI host.
+- Create the Neon demo database.
+- Decide whether to add a code-supported demo deployment mode or configure full
+  production SMTP and R2 before first deployment.
+
 ## 2026-07-21 - Review Stale Public Docs
 
 ### Why
