@@ -87,8 +87,12 @@ curl -X POST http://localhost:8000/auth/login \
   -d '{"email":"YOUR_ADMIN_EMAIL","password":"YOUR_ADMIN_PASSWORD"}'
 # -> {"access_token": "...", "refresh_token": "...", "token_type": "bearer"}
 
+# Save the returned access token in a local shell variable before calling
+# authenticated endpoints.
+TOKEN="PASTE_RETURNED_ACCESS_TOKEN_HERE"
+
 curl http://localhost:8000/work-orders \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+  -H "Authorization: Bearer ${TOKEN}"
 ```
 
 ---

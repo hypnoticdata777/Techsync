@@ -15,8 +15,8 @@ Current verified repo state:
 ```text
 Repository: https://github.com/hypnoticdata777/Techsync
 Branch: main
-Latest verified commit before this phase: 3c3f0ac Document secret history scan
-Latest verified CI run: success on main for 3c3f0ac
+Latest verified commit before scanner-doc update: 05626ac Document TechSync public POC readiness and tracker docs
+Latest verified CI run before scanner-doc update: success on main for 3c3f0ac
 Working clone: C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync
 ```
 
@@ -52,10 +52,14 @@ Completed:
 - Removed tracked Python bytecode files from `server/__pycache__`.
 - Added execution tracker docs: `PHASE_STATUS.md`, `COMMAND_LOG.md`,
   `QA_CHECKLIST.md`, and `HOSTING_PORTFOLIO_ROADMAP.md`.
+- Added `.gitleaks.toml`.
+- Rewrote the Quick Start authenticated curl example to use a local `TOKEN`
+  variable instead of a bearer-token placeholder.
+- Ran Gitleaks `8.30.1` against the current tree with no leaks found.
+- Ran Gitleaks `8.30.1` against full Git history with no leaks found.
 
 Remaining:
 
-- Run an independent scanner such as `gitleaks` or `trufflehog` when available.
 - Review older docs for stale architecture language before portfolio launch.
 - Confirm no generated mobile build artifacts appear after the next local build.
 
@@ -122,6 +126,5 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Commit the Phase 0/1 documentation and cleanup slice, then continue Phase 1 with
-an independent scanner check if available. After that, choose the backend host
-for Phase 2.
+Commit the Gitleaks configuration and scan documentation slice, then continue
+Phase 1 with stale-doc review. After that, choose the backend host for Phase 2.

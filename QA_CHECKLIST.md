@@ -14,7 +14,10 @@ they have been verified in the relevant environment.
       zip, APK, AAB, private key, or production key file.
 - [x] High-signal secret-pattern scan found placeholder/docs/test values only.
 - [x] Tracked Python bytecode files removed from the repo.
-- [ ] Independent `gitleaks` or `trufflehog` scan completed.
+- [x] Independent Gitleaks `8.30.1` current-tree scan completed with no leaks
+      using `.gitleaks.toml`.
+- [x] Independent Gitleaks `8.30.1` full-history scan completed with no leaks
+      using `.gitleaks.toml`.
 - [ ] Older docs reviewed for stale Supabase or single-tenant language before
       portfolio launch.
 

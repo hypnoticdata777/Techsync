@@ -29,10 +29,40 @@ tracking docs used across the other product POCs.
 
 ### Remaining Follow-Up
 
-- Run an independent `gitleaks` or `trufflehog` scan when available.
+- Run an independent `gitleaks` or `trufflehog` scan when available. Completed
+  with Gitleaks `8.30.1` on July 21, 2026 in the follow-up scanner slice.
 - Choose the backend hosting provider and managed Postgres provider.
 - Deploy the backend behind HTTPS with secrets stored in the host secret manager.
 - Connect a synthetic demo or walkthrough to the portfolio.
+
+## 2026-07-21 - Run Independent Gitleaks Scan
+
+### Why
+
+The manual high-signal secret scan was useful, but the public POC needs an
+independent scanner pass before hosting or portfolio promotion.
+
+### Changed
+
+- Extracted Gitleaks `8.30.1` locally for one-time scanner use.
+- Added `.gitleaks.toml` for TechSync-specific scan configuration.
+- Ignored local scanner binaries and generated redacted reports in `.gitignore`.
+- Rewrote the Quick Start authenticated curl example to use a local `TOKEN`
+  variable instead of a bearer-token placeholder.
+- Ran Gitleaks against the current working tree.
+- Ran Gitleaks against full Git history.
+
+### Result
+
+- Current-tree configured scan: no leaks found.
+- Full-history configured scan: no leaks found across 38 commits.
+- Local `gitleaks*.json` reports and `tools/gitleaks*/` are intentionally
+  ignored and should not be committed.
+
+### Remaining Follow-Up
+
+- Review older docs for stale architecture language before portfolio launch.
+- Choose the backend hosting provider and managed Postgres provider.
 
 ## 2026-07-09 - Remove Shared Demo Credentials
 

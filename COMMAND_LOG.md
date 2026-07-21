@@ -112,3 +112,75 @@ Result:
 - `main` still aligned with `origin/main`.
 - Staged changes are documentation plus bytecode cleanup.
 - `git diff --cached --check` passed.
+
+## 2026-07-21 - Independent Gitleaks Scan
+
+Downloaded scanner:
+
+```text
+C:\Users\hypno\OneDrive\Desktop\gitleaks_8.30.1_windows_x32.zip
+```
+
+Extraction:
+
+```powershell
+Expand-Archive -LiteralPath "C:\Users\hypno\OneDrive\Desktop\gitleaks_8.30.1_windows_x32.zip" -DestinationPath "tools\gitleaks-8.30.1" -Force
+tools\gitleaks-8.30.1\gitleaks.exe version
+```
+
+Result:
+
+- Gitleaks version `8.30.1`.
+
+Initial unconfigured history scan:
+
+```powershell
+tools\gitleaks-8.30.1\gitleaks.exe git --verbose --redact --report-format json --report-path gitleaks-report.json .
+```
+
+Result:
+
+- One finding in historical `QUICKSTART.md` docs: `curl-auth-header` on an
+  example bearer-token placeholder.
+
+Initial unconfigured current-tree scan:
+
+```powershell
+tools\gitleaks-8.30.1\gitleaks.exe dir --verbose --redact --report-format json --report-path gitleaks-dir-report.json .
+```
+
+Result:
+
+- One finding in current `QUICKSTART.md` docs: `curl-auth-header` on
+  `Bearer YOUR_ACCESS_TOKEN`.
+- Two findings inside the downloaded Gitleaks README because the scanner tool
+  was extracted under the repo working folder.
+
+Remediation:
+
+- Added `.gitleaks.toml` to allowlist the documented localhost curl placeholder
+  pattern.
+- Updated `QUICKSTART.md` to use `TOKEN="PASTE_RETURNED_ACCESS_TOKEN_HERE"` and
+  `Authorization: Bearer ${TOKEN}`.
+- Updated `.gitignore` so local scanner binaries and generated redacted reports
+  are not committed.
+
+Configured current-tree scan:
+
+```powershell
+tools\gitleaks-8.30.1\gitleaks.exe dir --config .gitleaks.toml --verbose --redact --report-format json --report-path gitleaks-dir-report.json .
+```
+
+Result:
+
+- No leaks found.
+
+Configured full-history scan:
+
+```powershell
+tools\gitleaks-8.30.1\gitleaks.exe git --config .gitleaks.toml --verbose --redact --report-format json --report-path gitleaks-report.json .
+```
+
+Result:
+
+- No leaks found across 38 commits.

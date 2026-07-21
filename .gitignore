@@ -74,6 +74,10 @@ android/local.properties
 coverage/
 .nyc_output/
 
+# Local security scanner artifacts
+gitleaks*.json
+tools/gitleaks*/
+
 # Misc
 *.log
 .cache/

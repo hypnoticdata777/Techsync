@@ -1,0 +1,17 @@
+title = "TechSync Gitleaks configuration"
+
+[[allowlists]]
+description = "Ignore local scanner tooling and generated redacted reports."
+paths = [
+  '''^tools/gitleaks''',
+  '''^gitleaks-report.*\.json$''',
+]
+
+[[allowlists]]
+description = "Allow documented localhost curl examples that use placeholder tokens."
+paths = [
+  '''^QUICKSTART\.md$''',
+]
+regexes = [
+  '''Authorization: Bearer (YOUR_ACCESS_TOKEN|\$\{TOKEN\}|PASTE_RETURNED_ACCESS_TOKEN_HERE)''',
+]

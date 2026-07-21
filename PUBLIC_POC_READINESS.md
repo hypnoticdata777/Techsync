@@ -14,8 +14,8 @@ The current repo is aligned with GitHub:
 ```text
 Repository: https://github.com/hypnoticdata777/Techsync
 Branch: main
-Latest verified commit: 3c3f0ac Document secret history scan
-Latest verified CI run: success on main for 3c3f0ac
+Latest verified commit: 05626ac Document TechSync public POC readiness and tracker docs
+Latest verified CI run before this scan: success on main for 3c3f0ac
 ```
 
 ## What Is Public-Review Ready
@@ -52,15 +52,19 @@ Observed:
   key, or production key file was found in the local file scan.
 - Tracked Python bytecode files were removed because generated cache files do
   not belong in the public POC repo.
+- Gitleaks `8.30.1` was run against the current tree and full Git history with
+  `.gitleaks.toml`; both configured scans reported no leaks.
+- `.gitleaks.toml` keeps local scanner artifacts ignored and allowlists the
+  documented localhost curl token placeholder in `QUICKSTART.md`.
 
 Notes:
 
 - `client/android/app/debug.keystore` is tracked. This is the standard Android
   debug keystore pattern, not a production signing key. Do not use it for app
   store or production release signing.
-- The independent history scan documented in `BUILD_LOG.md` found no
-  high-confidence real secrets, but `gitleaks` or `trufflehog` should still be
-  run later as a second pass when available.
+- The first unconfigured Gitleaks scan flagged a docs-only curl bearer-token
+  placeholder in `QUICKSTART.md`; the example was rewritten to use a local
+  `TOKEN` variable and the configured Gitleaks scan now passes.
 
 ## Not Production Ready Yet
 
