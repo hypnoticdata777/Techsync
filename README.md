@@ -120,6 +120,12 @@ EMAIL_DELIVERY_METHOD=log
 EMAIL_FROM=TechSync <no-reply@yourdomain.com>
 ```
 
+For the first hosted investor POC, start from `server/.env.demo.example`
+instead. `APP_ENV=demo` still requires hosted HTTPS URLs, a real `DATABASE_URL`,
+`JWT_SECRET_KEY`, and locked-down `CORS_ORIGINS`, but it intentionally permits
+SMTP email, Cloudflare R2/S3 attachment storage, and Stripe keys to stay empty.
+Use `APP_ENV=production` only after SMTP and object storage are configured.
+
 Apply the schema with Alembic (recommended), or run `schema.sql` in your managed Postgres SQL console (RNF-10):
 ```bash
 alembic upgrade head

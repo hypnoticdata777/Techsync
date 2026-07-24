@@ -33,6 +33,12 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 **Verify:** Open http://localhost:8000/docs — you should see the API documentation
 
+**Hosted demo note:** for the first public POC, copy
+`server/.env.demo.example` into the host secret manager values instead of
+using local `development` settings. `APP_ENV=demo` requires Neon/managed
+Postgres, HTTPS URLs, and locked-down CORS, while deferring SMTP, attachment
+storage, and Stripe.
+
 ### Step 2: Start the Mobile App (2 minutes)
 
 ```bash

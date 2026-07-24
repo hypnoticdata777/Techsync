@@ -35,10 +35,12 @@ they have been verified in the relevant environment.
       storage candidate.
 - [x] Stripe documented as deferred for first investor POC.
 - [x] Email/storage deferral tradeoffs documented.
+- [x] Code-supported `APP_ENV=demo` hosted POC mode added.
 - [ ] Backend host chosen: Vercel, Render, or Railway.
 - [ ] Neon demo database created.
 - [ ] Pooled Neon connection string selected for hosted/serverless runtime.
-- [ ] Demo-mode vs full `APP_ENV=production` decision made.
+- [x] Demo-mode vs full `APP_ENV=production` decision made for the first hosted
+      POC.
 - [ ] Host secret manager configured.
 - [ ] Alembic migrations run against hosted/demo database.
 - [ ] `/health` verified over HTTPS.

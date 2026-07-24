@@ -73,8 +73,8 @@ Decision needed:
 
 - Which backend host will run FastAPI: Vercel for portfolio alignment, or
   Render/Railway for a more traditional web service.
-- Whether the first hosted POC uses full `APP_ENV=production` config or a
-  documented demo deployment mode.
+- First hosted POC uses `APP_ENV=demo`; full `APP_ENV=production` waits until
+  SMTP and object storage are configured.
 - Whether attachment upload is part of the first hosted POC, or deferred.
 - Whether real SMTP email is part of the first hosted POC, or deferred.
 - Stripe test-mode checkout is deferred unless a later demo explicitly needs
@@ -89,6 +89,8 @@ Tasks:
 - Configure host secrets:
   - `APP_ENV=production` for full production validation, or a documented demo
     deployment mode if storage/email/Stripe are intentionally deferred
+  - `APP_ENV=demo` for the first investor-safe hosted POC while
+    storage/email/Stripe are deferred
   - `DATABASE_URL`
   - `JWT_SECRET_KEY`
   - `CORS_ORIGINS`
@@ -105,8 +107,8 @@ Exit criteria:
 
 - Backend is live over HTTPS.
 - Database connection works.
-- Production config validation passes, or demo-mode deferrals are explicitly
-  documented and tested.
+- Hosted demo config validation passes with deferred storage/email/Stripe, and
+  production config remains strict for later real-customer readiness.
 - No secrets are committed.
 
 ## Phase 3 - Demo Surface

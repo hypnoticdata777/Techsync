@@ -24,6 +24,10 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
 - [ ] **Lock down CORS** - production mode now fails startup if
       `CORS_ORIGINS` is missing or contains localhost. Set `APP_ENV=production`
       and configure `CORS_ORIGINS` to your actual production domain(s) only.
+- [x] **Add hosted demo config mode.** `APP_ENV=demo` requires real hosted
+      URLs, locked-down CORS, `DATABASE_URL`, and `JWT_SECRET_KEY`, while
+      allowing SMTP, storage, and Stripe to be intentionally deferred for the
+      first investor-safe POC. Use `APP_ENV=production` before real customers.
 - [x] **Wire up real password-reset and invitation emails.** The backend
       now sends reset and invitation emails through `services/email_service.py`.
       Local development can use `EMAIL_DELIVERY_METHOD=log`; production

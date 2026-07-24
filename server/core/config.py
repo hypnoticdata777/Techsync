@@ -8,6 +8,8 @@ from urllib.parse import urlparse
 
 APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
 IS_PRODUCTION = APP_ENV in {"prod", "production"}
+IS_HOSTED_DEMO = APP_ENV in {"demo", "hosted-demo", "poc"}
+IS_HOSTED = IS_PRODUCTION or IS_HOSTED_DEMO
 
 DEV_CORS_ORIGINS = (
     "http://localhost:8081,http://localhost:19000,http://localhost:19001,"
@@ -22,7 +24,7 @@ def _csv_env(name: str, default: str = "") -> list[str]:
 
 
 def _default_url(path: str) -> str | None:
-    if IS_PRODUCTION:
+    if IS_HOSTED:
         return None
     return f"http://localhost:3000{path}"
 
@@ -37,6 +39,8 @@ def _bool_env(name: str, default: bool) -> bool:
 class Settings:
     APP_ENV: str = APP_ENV
     IS_PRODUCTION: bool = IS_PRODUCTION
+    IS_HOSTED_DEMO: bool = IS_HOSTED_DEMO
+    IS_HOSTED: bool = IS_HOSTED
 
     DATABASE_URL: str | None = os.getenv("DATABASE_URL")
     STORAGE_BUCKET: str | None = os.getenv("STORAGE_BUCKET")
@@ -63,9 +67,9 @@ class Settings:
     STRIPE_SUCCESS_URL: str | None = os.getenv("STRIPE_SUCCESS_URL") or _default_url("/billing/success")
     STRIPE_CANCEL_URL: str | None = os.getenv("STRIPE_CANCEL_URL") or _default_url("/billing/cancel")
 
-    CORS_ORIGINS: list[str] = _csv_env("CORS_ORIGINS", "" if IS_PRODUCTION else DEV_CORS_ORIGINS)
+    CORS_ORIGINS: list[str] = _csv_env("CORS_ORIGINS", "" if IS_HOSTED else DEV_CORS_ORIGINS)
 
-    APP_BASE_URL: str | None = os.getenv("APP_BASE_URL") or (None if IS_PRODUCTION else "http://localhost:19006")
+    APP_BASE_URL: str | None = os.getenv("APP_BASE_URL") or (None if IS_HOSTED else "http://localhost:19006")
     EMAIL_DELIVERY_METHOD: str = os.getenv(
         "EMAIL_DELIVERY_METHOD", "smtp" if IS_PRODUCTION else "log"
     ).strip().lower()
@@ -93,16 +97,16 @@ def _validate_public_https_url(name: str, url: str | None) -> None:
         return
     parsed = urlparse(url)
     if parsed.scheme != "https":
-        raise ValueError(f"{name} must use https when APP_ENV=production")
+        raise ValueError(f"{name} must use https when APP_ENV is hosted")
     if parsed.hostname in {"localhost", "127.0.0.1"}:
-        raise ValueError(f"{name} must not point to localhost when APP_ENV=production")
+        raise ValueError(f"{name} must not point to localhost when APP_ENV is hosted")
 
 
 def _validate_settings(value: Settings) -> None:
     if value.EMAIL_DELIVERY_METHOD not in {"log", "smtp"}:
         raise ValueError("EMAIL_DELIVERY_METHOD must be either 'log' or 'smtp'")
 
-    if not value.IS_PRODUCTION:
+    if not value.IS_HOSTED:
         return
 
     missing = []
@@ -120,29 +124,42 @@ def _validate_settings(value: Settings) -> None:
         missing.append("STRIPE_WEBHOOK_SECRET")
     if not value.APP_BASE_URL:
         missing.append("APP_BASE_URL")
-    if not value.EMAIL_FROM:
-        missing.append("EMAIL_FROM")
-    if not value.STORAGE_BUCKET:
-        missing.append("STORAGE_BUCKET")
-    if not value.STORAGE_ACCESS_KEY_ID:
-        missing.append("STORAGE_ACCESS_KEY_ID")
-    if not value.STORAGE_SECRET_ACCESS_KEY:
-        missing.append("STORAGE_SECRET_ACCESS_KEY")
-    if not value.STORAGE_PUBLIC_BASE_URL:
-        missing.append("STORAGE_PUBLIC_BASE_URL")
 
-    if value.EMAIL_DELIVERY_METHOD != "smtp":
+    storage_required = value.IS_PRODUCTION or any(
+        [
+            value.STORAGE_BUCKET,
+            value.STORAGE_ENDPOINT_URL,
+            value.STORAGE_ACCESS_KEY_ID,
+            value.STORAGE_SECRET_ACCESS_KEY,
+            value.STORAGE_PUBLIC_BASE_URL,
+        ]
+    )
+    if storage_required:
+        if not value.STORAGE_BUCKET:
+            missing.append("STORAGE_BUCKET")
+        if not value.STORAGE_ACCESS_KEY_ID:
+            missing.append("STORAGE_ACCESS_KEY_ID")
+        if not value.STORAGE_SECRET_ACCESS_KEY:
+            missing.append("STORAGE_SECRET_ACCESS_KEY")
+        if not value.STORAGE_PUBLIC_BASE_URL:
+            missing.append("STORAGE_PUBLIC_BASE_URL")
+
+    smtp_required = value.IS_PRODUCTION or value.EMAIL_DELIVERY_METHOD == "smtp"
+    if value.IS_PRODUCTION and value.EMAIL_DELIVERY_METHOD != "smtp":
         missing.append("EMAIL_DELIVERY_METHOD=smtp")
-    if not value.SMTP_HOST:
-        missing.append("SMTP_HOST")
-    if not value.SMTP_USERNAME:
-        missing.append("SMTP_USERNAME")
-    if not value.SMTP_PASSWORD:
-        missing.append("SMTP_PASSWORD")
+    if smtp_required:
+        if not value.EMAIL_FROM:
+            missing.append("EMAIL_FROM")
+        if not value.SMTP_HOST:
+            missing.append("SMTP_HOST")
+        if not value.SMTP_USERNAME:
+            missing.append("SMTP_USERNAME")
+        if not value.SMTP_PASSWORD:
+            missing.append("SMTP_PASSWORD")
 
     if missing:
         raise ValueError(
-            "Missing required production settings: " + ", ".join(sorted(missing))
+            "Missing required hosted settings: " + ", ".join(sorted(missing))
         )
 
     local_origins = [
@@ -152,7 +169,7 @@ def _validate_settings(value: Settings) -> None:
     ]
     if local_origins:
         raise ValueError(
-            "CORS_ORIGINS must not include localhost values when APP_ENV=production: "
+            "CORS_ORIGINS must not include localhost values when APP_ENV is hosted: "
             + ", ".join(local_origins)
         )
 

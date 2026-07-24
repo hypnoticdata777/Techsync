@@ -90,6 +90,54 @@ Result:
   documented as demo mode or the production config is adjusted; current
   `APP_ENV=production` validation requires SMTP and object storage settings.
 
+## 2026-07-23 - Hosted Demo Config Mode
+
+Files changed:
+
+- `server/core/config.py`
+- `server/tests/test_config.py`
+- `server/.env.demo.example`
+- `README.md`
+- `QUICKSTART.md`
+- `DEPLOYMENT_DECISION.md`
+- `HOSTING_PORTFOLIO_ROADMAP.md`
+- `PHASE_STATUS.md`
+- `PUBLIC_POC_READINESS.md`
+- `QA_CHECKLIST.md`
+- `PRE_LAUNCH_CHECKLIST.md`
+- `BUILD_LOG.md`
+
+Result:
+
+- `APP_ENV=demo` is now the first hosted POC lane.
+- Demo mode validates hosted basics: `DATABASE_URL`, `JWT_SECRET_KEY`,
+  `CORS_ORIGINS`, `APP_BASE_URL`, `STRIPE_SUCCESS_URL`, and
+  `STRIPE_CANCEL_URL`.
+- Demo mode rejects localhost CORS and non-HTTPS public URLs.
+- Demo mode allows SMTP, object storage, and Stripe keys to remain empty.
+- Production mode still requires SMTP and object storage settings.
+
+Verification:
+
+```powershell
+python -m compileall core tests\test_config.py
+tools\gitleaks-8.30.1\gitleaks.exe dir --config .gitleaks.toml --verbose --redact --report-format json --report-path gitleaks-dir-report.json .
+git diff --check
+```
+
+Result:
+
+- Python compile check passed for `server/core` and `server/tests/test_config.py`.
+- Direct config import checks passed for the intended demo-mode success case.
+- Direct config import checks passed for the intended full-production success
+  case when SMTP and storage settings are complete.
+- Direct config import checks failed as expected for localhost CORS, partial
+  storage config, and incomplete production config.
+- Gitleaks current-tree scan found no leaks.
+- `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
+- `pytest` was not available in the local system or bundled Python runtime, so
+  the pytest suite was not run in this environment.
+
 ## 2026-07-21 - Phase 1 Initial Safety Sweep
 
 Commands:

@@ -63,6 +63,9 @@ Completed:
 - Updated the SaaS requirements reference stack to managed Postgres,
   S3-compatible storage, React Native/Expo, and CSV/webhook ingestion.
 - Added current setup note to the VS Code setup guide.
+- Added `APP_ENV=demo` hosted POC config validation so storage, SMTP, and
+  Stripe can be deferred without weakening full production settings.
+- Added `server/.env.demo.example`.
 
 Remaining:
 
@@ -80,8 +83,8 @@ Next:
   for a more traditional FastAPI service.
 - Create Neon managed Postgres demo database and use the pooled connection
   string for hosted/serverless runtime.
-- Decide whether the first hosted POC uses full `APP_ENV=production` config or
-  a documented demo deployment mode that defers storage/email/Stripe.
+- Use `APP_ENV=demo` for the first hosted POC while storage/email/Stripe are
+  deferred.
 - Configure host secrets.
 - Run Alembic migrations.
 - Deploy FastAPI behind HTTPS.
@@ -137,6 +140,6 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Commit the deployment decision slice, then create the Neon demo database and
+Commit the hosted demo config slice, then create the Neon demo database and
 choose whether FastAPI lands first on Vercel or a traditional service host such
 as Render/Railway.

@@ -122,9 +122,10 @@ Enable Cloudflare R2 now when:
 
 Important current-code note:
 
-- `APP_ENV=production` currently requires object storage settings. If storage is
-  deferred, either run the first hosted POC with an explicit non-production demo
-  environment or add a code-supported demo mode before deployment.
+- `APP_ENV=demo` now permits object storage to be deferred for the first hosted
+  POC. If any storage setting is provided in demo mode, the storage settings
+  must be complete.
+- `APP_ENV=production` still requires object storage settings.
 
 ## Email Decision
 
@@ -142,10 +143,9 @@ Enable SMTP now when:
 
 Important current-code note:
 
-- `APP_ENV=production` currently requires `EMAIL_DELIVERY_METHOD=smtp`,
-  `EMAIL_FROM`, `SMTP_HOST`, `SMTP_USERNAME`, and `SMTP_PASSWORD`. If email is
-  deferred, add or use a demo deployment mode instead of claiming full
-  production mode.
+- `APP_ENV=demo` permits `EMAIL_DELIVERY_METHOD=log` for the first hosted POC.
+- `APP_ENV=production` still requires `EMAIL_DELIVERY_METHOD=smtp`,
+  `EMAIL_FROM`, `SMTP_HOST`, `SMTP_USERNAME`, and `SMTP_PASSWORD`.
 
 ## Stripe Decision
 
@@ -174,8 +174,8 @@ Recommended flow:
 2. Choose backend host: Vercel for portfolio alignment, or Render/Railway for
    a more traditional FastAPI service.
 3. Create Neon demo Postgres and use the pooled connection string.
-4. Decide whether the first hosted environment is full production config or a
-   demo mode with storage/email/Stripe deferred.
+4. Use `APP_ENV=demo` for the first hosted environment while
+   storage/email/Stripe are deferred.
 5. Deploy and smoke-test the backend.
 6. Add the TechSync card/case study to the portfolio.
 7. Connect the live TechSync URL once the portfolio landing page is up.

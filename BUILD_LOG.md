@@ -3,6 +3,34 @@
 This file tracks hardening and launch-readiness changes as we move TechSync
 from local POC toward a hosted POC.
 
+## 2026-07-23 - Add Hosted Demo Config Mode
+
+### Why
+
+The first investor POC should prove the hosted API and Neon database without
+forcing Cloudflare R2, SMTP, or Stripe setup before those demo flows are needed.
+Full production mode should remain strict.
+
+### Changed
+
+- Added `APP_ENV=demo` as a hosted POC mode.
+- Hosted demo mode requires `DATABASE_URL`, `JWT_SECRET_KEY`, HTTPS
+  `APP_BASE_URL`, HTTPS Stripe mock callback URLs, and non-localhost
+  `CORS_ORIGINS`.
+- Hosted demo mode permits `EMAIL_DELIVERY_METHOD=log` and empty storage
+  settings, so email and attachment upload can be deferred honestly.
+- Production mode still requires SMTP and object storage settings.
+- Added `server/.env.demo.example`.
+- Added config tests for demo mode, production strictness, HTTPS URL checks,
+  localhost CORS rejection, and partial storage validation.
+
+### Remaining Follow-Up
+
+- Create the Neon demo database.
+- Choose the first FastAPI host: Vercel for portfolio alignment, or
+  Render/Railway for a more traditional service.
+- Run migrations against Neon.
+
 ## 2026-07-21 - Document Hosting Provider Decision
 
 ### Why

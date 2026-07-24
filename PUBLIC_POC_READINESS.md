@@ -44,7 +44,7 @@ Observed:
 - `main` is aligned with `origin/main`.
 - `.gitignore` excludes `.env`, `*.env`, build folders, Node modules, native
   mobile signing artifacts, generated app packages, logs, and caches.
-- Only `server/.env.example` was found in the env-file scan.
+- Only committed example env templates were found in the env-file scan.
 - High-signal secret strings found in tracked files are placeholder/docs/test
   values, including example Postgres URLs, placeholder JWT/storage/SMTP values,
   Stripe webhook placeholders, and test-only `whsec_test` values.
@@ -82,14 +82,14 @@ Before real customer data, real money, or public self-serve usage:
 - Host the backend behind HTTPS.
 - Configure production CORS with real hosted domains only.
 - Store all runtime secrets in the host secret manager.
-- Configure real SMTP delivery, or explicitly run a hosted demo mode where
-  email delivery is deferred.
+- Configure real SMTP delivery, or run `APP_ENV=demo` where email delivery is
+  intentionally deferred/logged.
 - Configure and test Stripe webhook delivery against the hosted backend before
   enabling any live billing demo. Stripe is deferred for the first investor POC.
 - Configure object storage and smoke-test attachment upload if attachment upload
   is part of the hosted demo. Cloudflare R2 is the preferred S3-compatible
-  storage candidate; storage is deferred for the first smoke test unless RF-19
-  must be shown live.
+  storage candidate; `APP_ENV=demo` permits storage to be deferred for the first
+  smoke test unless RF-19 must be shown live.
 - Add error monitoring.
 - Add uptime monitoring.
 - Confirm managed Postgres backups and recovery policy.
@@ -114,8 +114,8 @@ Proceed to hosted POC setup:
 1. Use Neon Postgres for the demo database.
 2. Choose the backend host: Vercel for portfolio alignment, or Render/Railway
    for a more traditional FastAPI service.
-3. Decide whether to add a demo deployment mode or configure full production
-   requirements for SMTP and object storage.
+3. Use `APP_ENV=demo` for the first hosted POC while SMTP and object storage
+   are deferred.
 4. Configure host secrets.
 5. Deploy the backend behind HTTPS.
 6. Verify `/health`, onboarding, login/refresh, work-order creation, assignment,
