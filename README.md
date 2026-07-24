@@ -144,7 +144,7 @@ cd server
 pip install -r requirements-dev.txt
 pytest -p no:cacheprovider
 ```
-63 backend tests covering JWT/password logic, the matching engine, CSV ingestion
+70 backend tests covering JWT/password logic, configuration validation, the matching engine, CSV ingestion
 validation, work order status transitions, plan-limit enforcement,
 tenant-isolation of the repository layer, public endpoint rate limiting, and
 Stripe webhook handling, and attachment upload validation. These run without a live
@@ -222,7 +222,7 @@ edge/reverse proxy so counters are shared across instances.
 # 1. Create an organization + admin
 curl -s -X POST http://localhost:8000/organizations/onboard \
   -H "Content-Type: application/json" \
-  -d '{"company_name":"Acme Field","admin_full_name":"Jane Admin","admin_email":"jane@acme.com","admin_password":"Password123"}'
+  -d '{"company_name":"Acme Field","admin_full_name":"Jane Admin","admin_email":"jane@acme.com","admin_password":"DemoPass123"}'
 # -> { "organization": {...}, "user": {...}, "tokens": {"access_token": "...", "refresh_token": "..."} }
 
 TOKEN="paste access_token here"
@@ -256,9 +256,8 @@ Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
   infrastructure, documented in `services/notification_service.py`), RF-17
   (per-org forced-priority rules).
 - **Work orders**: RF-18 (CRUD + enforced status transitions), RF-19
-  (attachment metadata endpoint — client is expected to upload the file to
-  object storage and pass the URL), RF-20 (audit log), RF-21 (filtered
-  search).
+  (attachment metadata plus backend upload endpoint for S3-compatible object
+  storage when configured), RF-20 (audit log), RF-21 (filtered search).
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.

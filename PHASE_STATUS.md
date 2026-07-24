@@ -70,8 +70,7 @@ Completed:
 Remaining:
 
 - Confirm no generated mobile build artifacts appear after the next local build.
-- Commit the deployment decision that selects Neon plus Cloudflare-aligned
-  infrastructure and records storage/email/Stripe deferral tradeoffs.
+- Keep public-facing docs aligned as hosted backend/demo work changes.
 
 ### Phase 2 - Hosted Backend POC
 
@@ -152,5 +151,6 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Commit the Neon migration checkpoint, then choose whether FastAPI lands first
-on Vercel or a traditional service host such as Render/Railway.
+Choose the backend host, configure its secret manager with `APP_ENV=demo`, the
+pooled Neon runtime URL, HTTPS app URLs, JWT secret, and locked-down CORS, then
+deploy FastAPI behind HTTPS and run the hosted smoke-test checklist.

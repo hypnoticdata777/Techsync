@@ -179,15 +179,15 @@ Current-code note:
 Do not wait to prepare TechSync for hosting. Do wait to hardwire portfolio links
 until the portfolio domain or deployment URL exists.
 
-Recommended flow:
+Current flow:
 
-1. Add this deployment decision to the repo.
-2. Choose backend host: Vercel for portfolio alignment, or Render/Railway for
+1. Neon demo Postgres is created and migrated to `0001 (head)`.
+2. Use the pooled Neon connection string for hosted/serverless runtime.
+3. Choose backend host: Vercel for portfolio alignment, or Render/Railway for
    a more traditional FastAPI service.
-3. Create Neon demo Postgres and use the pooled connection string.
 4. Use `APP_ENV=demo` for the first hosted environment while
    storage/email/Stripe are deferred.
-5. Deploy and smoke-test the backend.
+5. Configure host secrets, deploy, and smoke-test the backend.
 6. Add the TechSync card/case study to the portfolio.
 7. Connect the live TechSync URL once the portfolio landing page is up.
 
