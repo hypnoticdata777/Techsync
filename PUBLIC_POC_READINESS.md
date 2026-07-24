@@ -75,10 +75,13 @@ Notes:
 Before real customer data, real money, or public self-serve usage:
 
 - Generate and store a real production `JWT_SECRET_KEY`.
-- Provision a dedicated production/demo managed Postgres database.
-- Use the Neon pooled connection string if the backend runs on a serverless
-  host such as Vercel.
-- Run Alembic migrations against that database.
+- Provision a dedicated production/demo managed Postgres database. Completed
+  for the POC with Neon project `techsync-poc`, branch `production`, database
+  `neondb`.
+- Use the Neon pooled connection string for the hosted app runtime if the
+  backend runs on a serverless-style host such as Vercel.
+- Run Alembic migrations against that database. Completed for the POC Neon
+  database; `alembic current` reported `0001 (head)`.
 - Host the backend behind HTTPS.
 - Configure production CORS with real hosted domains only.
 - Store all runtime secrets in the host secret manager.
@@ -111,7 +114,7 @@ Before real customer data, real money, or public self-serve usage:
 
 Proceed to hosted POC setup:
 
-1. Use Neon Postgres for the demo database.
+1. Use Neon Postgres for the demo database. Completed for the POC.
 2. Choose the backend host: Vercel for portfolio alignment, or Render/Railway
    for a more traditional FastAPI service.
 3. Use `APP_ENV=demo` for the first hosted POC while SMTP and object storage

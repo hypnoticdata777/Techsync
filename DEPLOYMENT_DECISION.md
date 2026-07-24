@@ -10,7 +10,7 @@ backend, storage, email, Stripe, and portfolio work stay aligned.
 Use this as the default unless a later implementation pass finds a blocker:
 
 ```text
-Database: Neon Postgres, using the pooled connection string for hosted/serverless runtime
+Database: Neon Postgres, project techsync-poc, using the pooled connection string for hosted/serverless runtime
 Backend: Vercel or Render/Railway for FastAPI
 Cloudflare: DNS, portfolio/static front door, and later R2 object storage
 Storage: deferred for the first hosted smoke test unless attachment upload is in scope
@@ -38,6 +38,17 @@ Portfolio: prepare the TechSync project entry now, connect the live link after t
 ## Provider Tradeoffs
 
 ### Neon Postgres
+
+Current POC state:
+
+- Neon project: `techsync-poc`
+- Region: AWS US East 1 (N. Virginia)
+- Branch: `production`
+- Database: `neondb`
+- Migration status: `0001 (head)`
+- Direct connection string was used for Alembic migration.
+- Pooled connection string is reserved for hosted app runtime.
+- No Neon connection strings or secrets are tracked in this repo.
 
 Pros:
 

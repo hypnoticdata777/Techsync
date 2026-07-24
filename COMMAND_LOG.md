@@ -138,6 +138,62 @@ Result:
 - `pytest` was not available in the local system or bundled Python runtime, so
   the pytest suite was not run in this environment.
 
+## 2026-07-23 - Neon Demo Database Migration
+
+Context:
+
+- Neon project: `techsync-poc`
+- Region: AWS US East 1 (N. Virginia)
+- Branch: `production`
+- Database: `neondb`
+- Direct connection string used for migration.
+- Pooled connection string reserved for hosted app runtime.
+
+Secret handling:
+
+- A Neon connection string became visible during setup, so the database password
+  was reset before continuing.
+- No connection strings or credentials were written to repo files.
+- `DATABASE_URL` was loaded into the local PowerShell session only for the
+  migration.
+- `DATABASE_URL` was removed from the local PowerShell session after migration.
+
+Commands:
+
+```powershell
+python -m venv venv
+venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
+powershell
+$env:DATABASE_URL = (Get-Clipboard).Trim()
+$env:DATABASE_URL.StartsWith("postgresql://")
+$env:DATABASE_URL.Contains("-pooler")
+alembic upgrade head
+alembic current
+Remove-Item Env:DATABASE_URL
+```
+
+Result:
+
+- `alembic upgrade head` applied the initial multi-tenant schema migration.
+- `alembic current` reported `0001 (head)`.
+- Neon now has the TechSync POC schema applied.
+
+Documentation verification:
+
+```powershell
+git diff --check
+rg -n -i "postgresql://|neondb_owner|DATABASE_URL=.*@|password=|npg_|sk_live_|sk_test_|whsec_|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|EC|PRIVATE) KEY" BUILD_LOG.md COMMAND_LOG.md DEPLOYMENT_DECISION.md HOSTING_PORTFOLIO_ROADMAP.md PHASE_STATUS.md PUBLIC_POC_READINESS.md QA_CHECKLIST.md
+```
+
+Result:
+
+- `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
+- Focused secret scan found no real Neon connection string, Neon password,
+  private key, or live service key in the migration checkpoint docs.
+- Matches were limited to placeholder/test values or literal verification
+  commands.
+
 ## 2026-07-21 - Phase 1 Initial Safety Sweep
 
 Commands:

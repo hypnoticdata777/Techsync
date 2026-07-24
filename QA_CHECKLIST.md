@@ -37,12 +37,13 @@ they have been verified in the relevant environment.
 - [x] Email/storage deferral tradeoffs documented.
 - [x] Code-supported `APP_ENV=demo` hosted POC mode added.
 - [ ] Backend host chosen: Vercel, Render, or Railway.
-- [ ] Neon demo database created.
-- [ ] Pooled Neon connection string selected for hosted/serverless runtime.
+- [x] Neon demo database created.
+- [x] Direct Neon connection string used for Alembic migrations.
+- [x] Pooled Neon connection string selected for hosted/serverless runtime.
 - [x] Demo-mode vs full `APP_ENV=production` decision made for the first hosted
       POC.
 - [ ] Host secret manager configured.
-- [ ] Alembic migrations run against hosted/demo database.
+- [x] Alembic migrations run against hosted/demo database.
 - [ ] `/health` verified over HTTPS.
 - [ ] CORS verified against the intended demo client origin.
 - [ ] Onboarding flow verified.

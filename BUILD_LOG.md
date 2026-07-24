@@ -3,6 +3,31 @@
 This file tracks hardening and launch-readiness changes as we move TechSync
 from local POC toward a hosted POC.
 
+## 2026-07-23 - Migrate Neon Demo Database
+
+### Why
+
+Phase 2 needs a real hosted Postgres target before the backend can be deployed
+or smoke-tested behind HTTPS.
+
+### Changed
+
+- Confirmed Neon project `techsync-poc` as the first hosted POC database target.
+- Confirmed branch `production` and database `neondb`.
+- Used the direct Neon connection string for Alembic migrations.
+- Reserved the pooled Neon connection string for hosted app runtime.
+- Ran `alembic upgrade head` against Neon.
+- Confirmed `alembic current` reports `0001 (head)`.
+- Recorded the checkpoint in the deployment, readiness, roadmap, phase, QA, and
+  command-log docs without storing connection strings or secrets.
+
+### Remaining Follow-Up
+
+- Choose the first FastAPI host: Vercel for portfolio alignment, or
+  Render/Railway for a more traditional service.
+- Add hosted app environment variables using `APP_ENV=demo`.
+- Use the pooled Neon URL as the hosted app `DATABASE_URL`.
+
 ## 2026-07-23 - Add Hosted Demo Config Mode
 
 ### Why

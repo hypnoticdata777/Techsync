@@ -54,7 +54,7 @@ Backend candidates:
 
 Database candidates:
 
-- Neon Postgres
+- Neon Postgres, selected for the first hosted POC
 - Render/Railway Postgres as fallback
 
 Object storage candidates:
@@ -85,7 +85,8 @@ Decision needed:
 Tasks:
 
 - Choose backend host.
-- Create managed Postgres demo database.
+- Create managed Postgres demo database. Completed with Neon project
+  `techsync-poc`, branch `production`, database `neondb`.
 - Configure host secrets:
   - `APP_ENV=production` for full production validation, or a documented demo
     deployment mode if storage/email/Stripe are intentionally deferred
@@ -98,7 +99,8 @@ Tasks:
   - email settings if SMTP delivery is enabled
   - storage settings if attachments are enabled
   - Stripe callback/webhook settings if billing demo is enabled
-- Run Alembic migrations.
+- Run Alembic migrations. Completed against Neon; `alembic current` reported
+  `0001 (head)`.
 - Deploy backend behind HTTPS.
 - Verify `/health`.
 - Verify startup logs for missing config.
@@ -106,7 +108,7 @@ Tasks:
 Exit criteria:
 
 - Backend is live over HTTPS.
-- Database connection works.
+- Database connection works and migrations are applied.
 - Hosted demo config validation passes with deferred storage/email/Stripe, and
   production config remains strict for later real-customer readiness.
 - No secrets are committed.

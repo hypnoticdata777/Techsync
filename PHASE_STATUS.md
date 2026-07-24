@@ -1,6 +1,6 @@
 # TechSync Phase Status
 
-Date: July 21, 2026
+Date: July 23, 2026
 
 This file is the current project pulse. Update it after each build, QA, hosting,
 or portfolio-integration slice so future sessions can resume without guessing.
@@ -75,18 +75,30 @@ Remaining:
 
 ### Phase 2 - Hosted Backend POC
 
-Status: not started
+Status: in progress
+
+Completed:
+
+- Confirmed Neon project `techsync-poc` exists in AWS US East 1 (N. Virginia).
+- Confirmed Neon branch `production` and database `neondb` are the current demo
+  database target.
+- Copied and distinguished the direct Neon URL for migrations from the pooled
+  Neon URL for hosted app runtime.
+- Reset the Neon database password after a connection string was visible during
+  setup, then continued with the rotated credentials.
+- Ran `alembic upgrade head` against the Neon demo database using the direct
+  connection string.
+- Confirmed `alembic current` reports `0001 (head)`.
+- Cleared `DATABASE_URL` from the local PowerShell session after migration.
 
 Next:
 
 - Choose hosting provider: Vercel for portfolio alignment, or Render/Railway
   for a more traditional FastAPI service.
-- Create Neon managed Postgres demo database and use the pooled connection
-  string for hosted/serverless runtime.
+- Use the pooled Neon connection string for hosted/serverless runtime.
 - Use `APP_ENV=demo` for the first hosted POC while storage/email/Stripe are
   deferred.
 - Configure host secrets.
-- Run Alembic migrations.
 - Deploy FastAPI behind HTTPS.
 - Smoke-test `/health`, auth, onboarding, work-order lifecycle, ingestion, and
   dashboard metrics.
@@ -140,6 +152,5 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Commit the hosted demo config slice, then create the Neon demo database and
-choose whether FastAPI lands first on Vercel or a traditional service host such
-as Render/Railway.
+Commit the Neon migration checkpoint, then choose whether FastAPI lands first
+on Vercel or a traditional service host such as Render/Railway.
