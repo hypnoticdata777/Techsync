@@ -121,9 +121,22 @@ def test_production_still_requires_smtp_and_storage(monkeypatch):
         _reload_config(monkeypatch, values)
 
     message = str(exc.value)
-    assert "EMAIL_DELIVERY_METHOD=smtp" in message
+    assert "EMAIL_FROM" in message
     assert "SMTP_HOST" in message
+    assert "SMTP_PASSWORD" in message
+    assert "SMTP_USERNAME" in message
+    assert "STORAGE_ACCESS_KEY_ID" in message
     assert "STORAGE_BUCKET" in message
+    assert "STORAGE_PUBLIC_BASE_URL" in message
+    assert "STORAGE_SECRET_ACCESS_KEY" in message
+
+
+def test_production_rejects_non_smtp_email_delivery(monkeypatch):
+    values = production_env()
+    values["EMAIL_DELIVERY_METHOD"] = "log"
+
+    with pytest.raises(ValueError, match="EMAIL_DELIVERY_METHOD=smtp"):
+        _reload_config(monkeypatch, values)
 
 
 def test_production_accepts_full_required_settings(monkeypatch):
