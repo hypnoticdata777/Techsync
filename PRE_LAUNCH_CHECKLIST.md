@@ -28,6 +28,9 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       URLs, locked-down CORS, `DATABASE_URL`, and `JWT_SECRET_KEY`, while
       allowing SMTP, storage, and Stripe to be intentionally deferred for the
       first investor-safe POC. Use `APP_ENV=production` before real customers.
+- [x] **Reposition product docs as TechSync Ops.** Active requirements now live
+      in `TECHSYNC_OPS_REQUIREMENTS.md`, with v1.2/v1.3 planning in
+      `PRODUCT_ROADMAP.md`.
 - [x] **Wire up real password-reset and invitation emails.** The backend
       now sends reset and invitation emails through `services/email_service.py`.
       Local development can use `EMAIL_DELIVERY_METHOD=log`; production
@@ -68,7 +71,7 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       project (paid tiers include point-in-time recovery — check your plan).
 - [x] **Add a CI pipeline** (GitHub Actions) that runs backend pytest and
       client Jest checks on pushes/PRs. Backend coverage currently includes
-      `server/tests/` (63 tests); client coverage starts with shared validation tests and should grow as mobile flows are hardened.
+      `server/tests/` (70 tests); client coverage starts with shared validation tests and should grow as mobile flows are hardened.
 - [ ] **Complete the Expo/React Native dependency upgrade.** Safe npm audit
       fixes reduced the client report from 39 to 29 findings with no criticals,
       but the remaining high/moderate findings are pinned inside Expo 50 / React
@@ -110,4 +113,4 @@ tenant isolation (app-layer + RLS, manually verified against real
 Postgres), JWT access/refresh rotation, bcrypt password hashing, Alembic
 migrations, the matching engine, audit logging, and the pytest suite. See
 `README.md` → "Spec Coverage" for the full implemented-vs-deferred mapping
-against the original requirements doc.
+against the active TechSync Ops requirements.

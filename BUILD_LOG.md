@@ -101,8 +101,10 @@ confuse a public portfolio reader or future hosting session.
   managed-Postgres/S3-compatible architecture is clear before any historical
   Supabase content appears.
 - Marked the old React Native and Supabase appendix sections as historical.
-- Updated `Techsync_SaaS_Requirements.md` with a current-status note and current
-  reference stack.
+- Updated the then-current SaaS requirements doc with a current-status note and
+  current reference stack. That file was later replaced by
+  `TECHSYNC_OPS_REQUIREMENTS.md` when the product positioning moved to
+  TechSync Ops for PMC maintenance operations.
 - Updated RF-05/RNF-11 language to describe Postgres RLS and managed
   Postgres/S3-compatible portability rather than Supabase runtime dependency.
 - Added a current-architecture note to `VSCODE_SETUP_GUIDE.md`.

@@ -1,13 +1,13 @@
-# TechSync Public POC Readiness
+# TechSync Ops Public POC Readiness
 
 Date: July 21, 2026
 
 ## Current Status
 
-TechSync is a public-facing proof of concept for a multi-tenant field-service
-SaaS platform. It is suitable for portfolio and investor review as an
-architecture/product POC, but it should not yet be treated as production-ready
-for real customer operations.
+TechSync Ops is a public-facing proof of concept for a multi-tenant PMC
+maintenance operations platform. It is suitable for portfolio and investor
+review as an architecture/product POC, but it should not yet be treated as
+production-ready for real customer operations.
 
 The current repo is aligned with GitHub:
 
@@ -32,6 +32,8 @@ Latest verified CI run before this scan: success on main for 3c3f0ac
 - Postgres RLS policies included as a database-level backstop.
 - CI workflow for backend pytest and client Jest checks.
 - Launch-hardening docs and pre-launch checklist.
+- Active PMC operations requirements captured in `TECHSYNC_OPS_REQUIREMENTS.md`.
+- v1.2/v1.3 product path captured in `PRODUCT_ROADMAP.md`.
 
 ## Safety Sweep Notes
 
@@ -129,7 +131,7 @@ Proceed to hosted POC setup:
 
 ## Stop Point For This Phase
 
-Stop when TechSync is:
+Stop when TechSync Ops is:
 
 - hosted in a controlled POC environment;
 - connected from the portfolio;
@@ -138,6 +140,6 @@ Stop when TechSync is:
 - smoke-tested through the core journey;
 - documented with production limitations and next steps.
 
-At that point, TechSync is investor-safe as a public POC and should pause before
-production-only work such as app-store release, push notifications, offline
-sync, advanced reporting, or real customer onboarding.
+At that point, TechSync Ops is investor-safe as a public POC and should pause
+before production-only work such as app-store release, push notifications,
+offline sync, advanced reporting, or real customer onboarding.

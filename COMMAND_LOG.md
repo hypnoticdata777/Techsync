@@ -337,8 +337,9 @@ Result:
   and pre-launch checklist.
 - `APPENDIX_TECHNICAL_OVERVIEW.md` still contained historical Supabase,
   AsyncStorage, and single-tenant architecture references.
-- `Techsync_SaaS_Requirements.md` still listed Supabase and React Native CLI in
-  the reference stack.
+- The then-current SaaS requirements document still listed Supabase and React
+  Native CLI in the reference stack. It has since been replaced by
+  `TECHSYNC_OPS_REQUIREMENTS.md`.
 - Android build-recovery docs contained useful but old version-specific guidance.
 
 Changes:

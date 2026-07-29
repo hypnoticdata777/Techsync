@@ -1,23 +1,23 @@
-# TechSync
+# TechSync Ops
 
-A multi-tenant SaaS platform for field service companies to onboard their
-organization, ingest work orders from multiple sources, auto-assign them to
-the right technician, and track them to completion — with a React Native
-mobile app for technicians and a FastAPI + managed Postgres backend.
+TechSync Ops is a multi-tenant maintenance command platform for property
+management companies (PMCs) and field-service teams that need intake,
+dispatch, technician proof, client communication, reporting, and operational
+accountability in one place.
 
 This repository implements the POC scope defined in
-`Techsync_SaaS_Requirements.md` (Functional/Non-Functional requirements
-RF-01..RF-29, RNF-01..RNF-14). See [Spec Coverage](#spec-coverage) below for
-what's implemented vs. deferred.
+`TECHSYNC_OPS_REQUIREMENTS.md` and the v1.2/v1.3 path in
+`PRODUCT_ROADMAP.md`. See [Spec Coverage](#spec-coverage) below for what's
+implemented vs. deferred.
 
 ## Overview
 
-TechSync ingests work orders from any source — CSV upload, an external
-webhook, (PDF/email are deferred, see below) — validates and normalizes
-them, and assigns them to the best-fit technician based on skills,
-proximity, and current workload. Every organization (tenant) that signs up
-gets its own isolated slice of data, enforced both in the application layer
-and at the database layer via Postgres Row Level Security.
+TechSync Ops ingests maintenance work orders from CSV and webhook sources,
+validates and normalizes them, assigns them to the best-fit technician based
+on skills, proximity, priority, and workload, then tracks status, proof, and
+audit history through completion. Every organization (tenant) gets its own
+isolated slice of data, enforced in the application layer and backed by
+Postgres Row Level Security policies.
 
 ## Tech Stack
 
@@ -239,7 +239,7 @@ curl -s -X POST http://localhost:8000/ingestion/csv \
 
 ## Spec Coverage
 
-Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
+Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
 
 - **Auth & users**: RF-01 (access+refresh JWT), RF-02 (3 roles + middleware),
   RF-03 (password reset flow), RF-04 (native token storage via Expo SecureStore).
@@ -278,6 +278,10 @@ Implemented for this POC pass (mapped to `Techsync_SaaS_Requirements.md`):
 - **No web admin panel** was built (RF-25/RF-26 exist as API endpoints
   only); the spec's "panel administrativo" is assumed to be a future
   separate web client consuming this same API.
+- **PMC operations expansion**: first-class properties, clients/homeowners,
+  vendors, approvals, client-visible communication, closeout packages, SLA
+  risk, duplicate detection, calendar/maps, and operational exports are tracked
+  for v1.3+ in `PRODUCT_ROADMAP.md`.
 
 - **RF-23 (offline sync)**, **RF-10/RF-13 (PDF/email ingestion)**: deferred,
   per the spec's own "Notas de Alcance" — not blocking for a POC.

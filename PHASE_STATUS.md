@@ -1,4 +1,4 @@
-# TechSync Phase Status
+# TechSync Ops Phase Status
 
 Date: July 23, 2026
 
@@ -7,8 +7,8 @@ or portfolio-integration slice so future sessions can resume without guessing.
 
 ## Current Position
 
-TechSync is moving from a local/public code POC into a hosted,
-portfolio-connected, investor-safe public POC.
+TechSync Ops is moving from a local/public code POC into a hosted,
+portfolio-connected, investor-safe public POC for PMC maintenance operations.
 
 Current verified repo state:
 
@@ -66,6 +66,10 @@ Completed:
 - Added `APP_ENV=demo` hosted POC config validation so storage, SMTP, and
   Stripe can be deferred without weakening full production settings.
 - Added `server/.env.demo.example`.
+- Replaced the older SaaS requirements file with `TECHSYNC_OPS_REQUIREMENTS.md`
+  and captured all 10 PMC operations requirement batches.
+- Added `PRODUCT_ROADMAP.md` with v1.2 public POC completion and v1.3 PMC
+  operations expansion scope.
 
 Remaining:
 
@@ -119,7 +123,7 @@ Status: not started
 
 Next:
 
-- Add TechSync to the portfolio as a field-service SaaS POC.
+- Add TechSync Ops to the portfolio as a PMC maintenance operations POC.
 - Use synthetic screenshots only.
 - Link the GitHub repo and hosted demo/walkthrough.
 - Label production limitations honestly.

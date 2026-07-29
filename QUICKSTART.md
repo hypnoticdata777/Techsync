@@ -1,4 +1,4 @@
-# TechSync - Quick Start & Demo Script
+# TechSync Ops - Quick Start & Demo Script
 
 ## 5-Minute Demo Script
 
@@ -170,5 +170,5 @@ cd client && npm start -- --reset-cache
 
 - **Full README:** See `README.md` for architecture, multi-tenancy model,
   full API surface, and spec coverage
-- **Spec:** See `Techsync_SaaS_Requirements.md` for the original
-  requirements document this implementation targets
+- **Spec:** See `TECHSYNC_OPS_REQUIREMENTS.md` for the active PMC operations
+  requirements and `PRODUCT_ROADMAP.md` for the v1.2/v1.3 path.

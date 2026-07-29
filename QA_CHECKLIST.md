@@ -1,4 +1,4 @@
-# TechSync QA Checklist
+# TechSync Ops QA Checklist
 
 This checklist tracks evidence for public POC readiness. Mark items only after
 they have been verified in the relevant environment.
@@ -20,6 +20,9 @@ they have been verified in the relevant environment.
       using `.gitleaks.toml`.
 - [x] Older docs reviewed for stale Supabase or single-tenant language before
       portfolio launch.
+- [x] All 10 PMC operations requirement batches captured in
+      `TECHSYNC_OPS_REQUIREMENTS.md`.
+- [x] v1.2/v1.3 roadmap captured in `PRODUCT_ROADMAP.md`.
 
 ## Backend Local/CI Quality
 
@@ -68,7 +71,7 @@ they have been verified in the relevant environment.
 
 ## Portfolio Integration
 
-- [ ] TechSync project card added to portfolio.
+- [ ] TechSync Ops project card added to portfolio.
 - [ ] Problem statement added.
 - [ ] Architecture/proof summary added.
 - [ ] GitHub repo linked.

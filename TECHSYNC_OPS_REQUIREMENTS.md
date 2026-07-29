@@ -1,0 +1,236 @@
+# TechSync Ops Product Requirements
+
+Version: 1.2 planning baseline
+Date: July 28, 2026
+Owner: Carlos Sanchez Gonzalez
+
+## Product Positioning
+
+TechSync Ops is a multi-tenant maintenance command platform for property
+management companies (PMCs) and field-service teams that need intake, dispatch,
+technician proof, client communication, reporting, and operational
+accountability in one place.
+
+The current codebase already proves the backbone: tenant-scoped organizations,
+users, technicians, work orders, matching, ingestion, audit events, attachments,
+and hosted-demo configuration. This document reframes the product around the
+PMC operations workflow and becomes the active requirements source for v1.2 and
+v1.3 planning.
+
+## Requirement Batch Coverage
+
+The attached PMC operations brief contained all 10 requirement batches:
+
+1. Business Requirements
+2. Business Rules
+3. Constraints
+4. External Interface Requirements
+5. Features
+6. Functional Requirements
+7. Nonfunctional Requirements
+8. Quality Attributes
+9. System Requirements
+10. User Requirements
+
+All 10 batches are captured below.
+
+## 1. Business Requirements
+
+- Provide PMCs and field-service teams with one source of truth for maintenance
+  intake, assignment, technician updates, client communication, and closeout
+  proof.
+- Reduce manual follow-up by enforcing structured technician status updates,
+  photos, receipts, and completion notes.
+- Support multi-tenant operations so each PMC/company can manage its own users,
+  properties, clients, vendors, technicians, and work orders.
+- Improve dispatch quality through prioritization, workload visibility, skill
+  matching, proximity, and manual override.
+- Give clients/homeowners controlled visibility into approvals, status, proof,
+  and communication without exposing internal operations.
+- Produce reporting that shows aging work, SLA risk, technician workload,
+  property hotspots, and completion trends.
+
+## 2. Business Rules
+
+- Every work order must belong to exactly one organization/tenant and one
+  property.
+- Users can only view or modify records permitted by organization, role, and
+  assignment.
+- Technicians can update assigned work and upload proof, but cannot edit
+  financial/client fields unless authorized.
+- Client-visible communication must be separated from internal notes.
+- High-priority or emergency work orders must bypass normal queue ordering and
+  trigger escalation notifications.
+- Work orders cannot be closed without required completion proof unless a
+  manager applies a documented override.
+- Assignment recommendations may be automated, but dispatchers must be able to
+  override them.
+- All status, assignment, communication, and proof changes must create audit
+  events.
+
+## 3. Constraints
+
+- The platform must support privacy separation across tenants, clients,
+  technicians, vendors, and internal users.
+- External property-management software integrations may arrive gradually, so
+  CSV/import workflows must remain useful.
+- Mobile technician workflows must work under field conditions with small
+  screens, variable signal, and fast photo-capture needs.
+- Offline sync, advanced routing, PDF/email ingestion, and deep accounting
+  integrations can be staged after MVP.
+- Location tracking must be consent-based and jurisdiction-aware.
+- The system should not attempt to replace accounting, payroll, or legal
+  compliance systems in the first version.
+
+## 4. External Interface Requirements
+
+- CSV import/export for work orders, properties, vendors, technicians, and
+  reports.
+- Webhook/API intake for external portals, forms, or property management
+  systems.
+- Email, SMS, and push notification interfaces for dispatch, client updates,
+  approvals, and escalations.
+- Calendar integration for technician schedules, property visits, and follow-up
+  dates.
+- Maps/routing interface for technician proximity, route planning, and
+  service-area constraints.
+- File storage interface for photos, receipts, invoices, PDFs, and closeout
+  packages.
+- Future accounting/export interface for owner charges, vendor invoices, and
+  billing reconciliation.
+
+## 5. Features
+
+- Central work-order intake with normalized fields, source tracking,
+  duplicates, priority, and property/client context.
+- Dispatch board with technician workload, assignment recommendations, SLA
+  risk, and manual reassignment.
+- Technician mobile workflow for job queue, status updates, notes,
+  before/after photos, receipts, and completion proof.
+- Client/homeowner portal for approval status, updates, messages, proof, and
+  controlled visibility.
+- Communication timeline that separates internal notes from client-facing
+  messages.
+- Vendor/technician profiles with skills, service area, reliability notes,
+  capacity, and affinity history.
+- Operational reporting for aging work orders, workload, cost trends, property
+  hotspots, and completion cycle time.
+
+## 6. Functional Requirements
+
+- The system shall allow an organization admin to create users and assign roles
+  such as admin, coordinator, technician, vendor, client, and viewer.
+- The system shall allow authorized users to create, import, edit, assign, and
+  archive work orders.
+- The system shall detect likely duplicate work orders during import or manual
+  creation.
+- The system shall recommend technicians based on skill, proximity, capacity,
+  workload, priority, and historical affinity.
+- The system shall allow dispatchers to manually assign, reassign, pause,
+  escalate, or cancel work orders.
+- The system shall allow technicians to update status, add notes, upload
+  before/after photos, upload receipts, and request additional approval.
+- The system shall allow clients to approve, decline, comment, or view status
+  only within their authorized scope.
+- The system shall generate closeout packages containing timeline, proof,
+  receipts, notes, cost summary, and completion status.
+- The system shall send notifications based on status changes, approvals
+  needed, SLA risk, assignment, and completion.
+
+## 7. Nonfunctional Requirements
+
+- Tenant data isolation must be enforced at application and
+  database/security-rule levels.
+- Common dashboard views should load within 3 seconds for normal tenant data
+  volumes.
+- Technician status/photo updates should be optimized for mobile networks and
+  retry gracefully after transient failures.
+- The platform should keep an immutable audit trail for sensitive workflow
+  changes.
+- The system should support backup, restore, and export procedures for tenant
+  records.
+- Security logs and operational errors should be observable by administrators.
+- The UI should meet accessibility expectations for role dashboards and client
+  approval views.
+
+## 8. Quality Attributes
+
+- Reliability: dispatch and technician updates must not silently fail.
+- Security: tenant data, client messages, photos, receipts, and access
+  instructions must be protected.
+- Scalability: the platform should support growth from a small PMC to
+  multi-team operations.
+- Usability: coordinators should see what needs action without digging through
+  every work order.
+- Auditability: managers should be able to reconstruct decisions, assignments,
+  approvals, and closeout evidence.
+- Maintainability: integrations and assignment logic should be modular enough
+  to evolve without rewriting the platform.
+
+## 9. System Requirements
+
+- Multi-tenant backend API with organization-scoped data access and role-based
+  permissions.
+- Relational database or equivalent model for organizations, users, roles,
+  properties, clients, vendors, technicians, work orders, assignments, files,
+  messages, approvals, and audit events.
+- Technician mobile app or responsive PWA for field updates, photos, receipts,
+  and route/day views.
+- Web admin dashboard for coordinators, managers, billing/admin users, and
+  reporting.
+- Object storage for photos, receipts, PDFs, and closeout packets.
+- Background job system for notifications, imports, duplicate checks, SLA
+  checks, and report generation.
+- Monitoring, logging, error tracking, backup, and deployment pipeline for
+  production operations.
+
+## 10. User Requirements
+
+- As a maintenance coordinator, I want every request in one queue so I can
+  prioritize the day.
+- As a dispatcher, I want assignment recommendations so I can choose the best
+  technician faster.
+- As a technician, I want a simple mobile queue so I know what to do next and
+  what proof is required.
+- As a PMC admin, I want role permissions and tenant controls so staff and
+  clients only see appropriate data.
+- As a client/homeowner, I want to see approval status and proof without needing
+  to call for updates.
+- As an operations manager, I want reports showing stale work, overloaded
+  technicians, and properties with repeated maintenance problems.
+
+## Current Implementation Fit
+
+Already represented in the codebase:
+
+- Multi-tenant organizations, users, roles, technicians, work orders, audit
+  events, invitations, password reset tokens, priority rules, attachments, and
+  billing boundary tables.
+- FastAPI backend with SQLAlchemy/psycopg2 repositories and Alembic migration
+  `0001`.
+- JWT auth, bcrypt password hashing, role dependencies, tenant-scoped data
+  access, and Postgres RLS policies as a database backstop.
+- Work-order CRUD, status transitions, assignment, technician queue, CSV
+  import, webhook intake, dashboard metrics, S3-compatible attachment upload,
+  and Stripe test-mode boundary.
+- React Native/Expo mobile client for onboarding, auth, work-order list,
+  details, creation, invitation acceptance, and password reset.
+- `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,
+  storage, and Stripe where intentionally configured.
+
+Important gaps for the PMC operations product:
+
+- Property/client/vendor records are not first-class yet.
+- Client/homeowner portal and client-visible communication are not built yet.
+- Closeout packages, approvals, duplicate detection, SLA risk reporting,
+  calendar/maps, background jobs, and export workflows remain roadmap items.
+
+## Version Planning Boundary
+
+- v1.2 is the first checkpoint-complete public POC: hosted, portfolio-connected,
+  safe to show, and clearly positioned as TechSync Ops for PMC maintenance
+  operations.
+- v1.3 is the next productization pass: properties, clients, approvals,
+  communication separation, closeout packages, and richer reporting.
+
+See `PRODUCT_ROADMAP.md` for version scope and exit criteria.

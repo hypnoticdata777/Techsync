@@ -1,8 +1,9 @@
-# TechSync - Technical Appendix
+# TechSync Ops - Technical Appendix
 
 > **Note:** this document predates the multi-tenant SaaS transformation
-> (see `README.md` and `Techsync_SaaS_Requirements.md` for the current
-> architecture, multi-tenancy model, and API surface). It's kept here as a
+> (see `README.md`, `TECHSYNC_OPS_REQUIREMENTS.md`, and `PRODUCT_ROADMAP.md`
+> for the current architecture, multi-tenancy model, API surface, and product
+> roadmap). It's kept here as a
 > historical record of the original single-tenant MVP's design rationale;
 > treat anything below about auth, roles, or the data model as describing
 > that earlier version, not the current one.

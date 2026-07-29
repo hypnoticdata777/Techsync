@@ -1,14 +1,14 @@
-# TechSync Hosting and Portfolio Roadmap
+# TechSync Ops Hosting and Portfolio Roadmap
 
 This file tracks the path from code POC to hosted, portfolio-connected,
 investor-safe public POC.
 
 ## Target End State
 
-TechSync should end this phase as:
+TechSync Ops should end v1.2 as:
 
 ```text
-A hosted, portfolio-connected, investor-safe field-service SaaS POC.
+A hosted, portfolio-connected, investor-safe PMC maintenance operations POC.
 ```
 
 That means:
@@ -20,6 +20,12 @@ That means:
 - CI passing;
 - core user journey smoke-tested;
 - production limitations clear.
+- v1.2 public POC checkpoint documented.
+- v1.3 PMC operations expansion path documented.
+
+Product roadmap:
+
+- See `PRODUCT_ROADMAP.md`.
 
 ## Hosting Decision
 
@@ -136,8 +142,8 @@ Exit criteria:
 
 Tasks:
 
-- Add TechSync to the portfolio.
-- If the portfolio URL is not live yet, prepare the TechSync project entry and
+- Add TechSync Ops to the portfolio.
+- If the portfolio URL is not live yet, prepare the TechSync Ops project entry and
   connect the live link after the portfolio deployment exists.
 - Include:
   - problem solved;
@@ -152,10 +158,11 @@ Tasks:
 Recommended positioning:
 
 ```text
-TechSync is a field-service SaaS POC proving multi-tenant work-order intake,
-technician assignment, mobile execution, billing boundaries, attachments, and
-tenant-safe backend architecture. It is public-demo ready, with production
-security and real-customer deployment work explicitly tracked.
+TechSync Ops is a PMC maintenance operations POC proving multi-tenant work-order
+intake, dispatch, technician execution, proof capture, attachment handling,
+reporting boundaries, and tenant-safe backend architecture. It is public-demo
+ready, with production security and real-customer deployment work explicitly
+tracked.
 ```
 
 Exit criteria:
