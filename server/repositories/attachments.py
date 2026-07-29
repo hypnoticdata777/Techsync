@@ -1,6 +1,6 @@
 """Data access for work order attachments (RF-19)."""
 
-from database import fetch_all, insert_row
+from database import fetch_all, fetch_scalar, insert_row
 
 
 def create(organization_id: int, work_order_id: int, uploaded_by: int, patch: dict) -> dict:
@@ -25,3 +25,15 @@ def list_for_work_order(organization_id: int, work_order_id: int) -> list[dict]:
         """,
         {"organization_id": organization_id, "work_order_id": work_order_id},
     )
+
+
+def has_for_work_order(organization_id: int, work_order_id: int) -> bool:
+    count = fetch_scalar(
+        """
+        SELECT COUNT(*)
+        FROM work_order_attachments
+        WHERE organization_id = :organization_id AND work_order_id = :work_order_id
+        """,
+        {"organization_id": organization_id, "work_order_id": work_order_id},
+    )
+    return int(count or 0) > 0

@@ -125,6 +125,7 @@ Likely scope:
   - manager override reason
   - before/after photos
   - receipts
+  - backend completion gate now started in v1.3
   - closeout package summary
 - Dispatch improvements:
   - workload board
@@ -154,7 +155,8 @@ v1.3 exit criteria:
 - Property/client/vendor concepts exist in the data model and API.
 - Client-visible communication is separated from internal notes at the backend
   API/data layer, with frontend/client portal UX still to complete.
-- A work order cannot be closed without proof unless an override is recorded.
+- A work order cannot be closed without attachment proof unless an org
+  admin/coordinator override reason is recorded.
 - At least one client/homeowner demo flow is showable with synthetic data.
 - Reporting shows stale work, workload, and property hotspot evidence.
 - Vercel hosting and portfolio linking are completed as the final showcase step,

@@ -222,7 +222,13 @@ def update_status(
 
     try:
         updated = work_order_service.transition_status(
-            organization["id"], work_order_id, payload.status, current_user.id, payload.notes
+            organization["id"],
+            work_order_id,
+            payload.status,
+            current_user.id,
+            current_user.role,
+            payload.notes,
+            completion_override_reason=payload.completion_override_reason,
         )
     except LookupError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Work order not found")
@@ -230,6 +236,16 @@ def update_status(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Cannot transition from '{exc.from_status}' to '{exc.to_status}'",
+        )
+    except work_order_service.CompletionProofRequired:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Completion proof is required before closing this work order",
+        )
+    except work_order_service.CompletionOverrideNotAllowed:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only org admins and coordinators can close without proof using an override reason",
         )
 
     return WorkOrder(**updated)

@@ -7,6 +7,7 @@ RF-20).
 from typing import Optional
 
 from models.work_order import ALLOWED_STATUS_TRANSITIONS
+from repositories import attachments as attachments_repo
 from repositories import priority_rules as priority_rules_repo
 from repositories import technicians as technicians_repo
 from repositories import work_order_events as events_repo
@@ -19,6 +20,14 @@ class InvalidStatusTransition(Exception):
         self.from_status = from_status
         self.to_status = to_status
         super().__init__(f"Cannot transition work order from '{from_status}' to '{to_status}'")
+
+
+class CompletionProofRequired(Exception):
+    """Raised when a work order is closed without proof or a manager override."""
+
+
+class CompletionOverrideNotAllowed(Exception):
+    """Raised when a non-manager attempts to bypass completion proof."""
 
 
 def _active_counts(organization_id: int) -> dict[int, int]:
@@ -86,7 +95,13 @@ def reassign(organization_id: int, work_order_id: int, technician_id: int, actor
 
 
 def transition_status(
-    organization_id: int, work_order_id: int, new_status: str, actor_user_id: int, notes: Optional[str]
+    organization_id: int,
+    work_order_id: int,
+    new_status: str,
+    actor_user_id: int,
+    actor_role: str,
+    notes: Optional[str],
+    completion_override_reason: Optional[str] = None,
 ) -> dict:
     work_order = work_orders_repo.get_by_id_in_org(work_order_id, organization_id)
     if not work_order:
@@ -100,11 +115,28 @@ def transition_status(
     if new_status == "completed":
         from datetime import datetime, timezone
 
-        patch["completed_at"] = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(timezone.utc).isoformat()
+        has_completion_proof = attachments_repo.has_for_work_order(organization_id, work_order_id)
+
+        if has_completion_proof:
+            patch["completion_proof_verified_at"] = now
+            patch["completion_override_reason"] = None
+        elif completion_override_reason:
+            if actor_role not in ("org_admin", "coordinator"):
+                raise CompletionOverrideNotAllowed()
+            patch["completion_override_reason"] = completion_override_reason
+            patch["completion_proof_verified_at"] = None
+        else:
+            raise CompletionProofRequired()
+
+        patch["completed_at"] = now
         if notes:
             patch["completion_notes"] = notes
 
     updated = work_orders_repo.update(work_order_id, organization_id, patch)
+    event_notes = notes
+    if new_status == "completed" and completion_override_reason:
+        event_notes = f"Completion override: {completion_override_reason}"
     events_repo.create_event(
         organization_id,
         work_order_id,
@@ -112,6 +144,6 @@ def transition_status(
         actor_user_id=actor_user_id,
         from_status=current_status,
         to_status=new_status,
-        notes=notes,
+        notes=event_notes,
     )
     return updated

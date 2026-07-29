@@ -63,6 +63,14 @@ class WorkOrderUpdate(BaseModel):
 class WorkOrderStatusUpdate(BaseModel):
     status: Status
     notes: Optional[str] = Field(None, max_length=1000)
+    completion_override_reason: Optional[str] = Field(None, max_length=1000)
+
+    @field_validator("completion_override_reason")
+    @classmethod
+    def validate_completion_override_reason(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            raise ValueError("Completion override reason cannot be empty")
+        return v.strip() if v else None
 
 
 class WorkOrderAssign(BaseModel):
@@ -92,6 +100,8 @@ class WorkOrder(BaseModel):
     sla_due_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     completion_notes: Optional[str] = None
+    completion_proof_verified_at: Optional[datetime] = None
+    completion_override_reason: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

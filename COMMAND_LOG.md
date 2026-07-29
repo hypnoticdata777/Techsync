@@ -439,3 +439,44 @@ Result:
 - `git diff --check` passed.
 - Local pytest could not run because `server\venv` does not have pytest
   installed.
+
+## 2026-07-28 - v1.3 Proof-Gated Closeout
+
+Decision:
+
+- A work order cannot be moved to `completed` unless it has attachment proof or
+  an org admin/coordinator records a completion override reason.
+
+Changes:
+
+- Added Alembic migration `0004_completion_proof_gate.py`.
+- Added `completion_proof_verified_at` and `completion_override_reason` to work
+  orders.
+- Added attachment proof lookup helper.
+- Updated status transition service so completion:
+  - succeeds automatically when proof attachments exist;
+  - succeeds without proof only for `org_admin`/`coordinator` with an override
+    reason;
+  - fails for technician override attempts;
+  - fails when no proof and no override reason are present.
+- Updated status route error mapping.
+- Added regression coverage for proof-required, proof-present, manager override,
+  and technician override rejection paths.
+- Updated roadmap, traceability, requirements, QA, and phase-status docs.
+
+Verification:
+
+```powershell
+python -m compileall -q server\alembic\versions\0004_completion_proof_gate.py server\models\work_order.py server\repositories\attachments.py server\services\work_order_service.py server\routers\work_orders.py server\tests\test_work_order_transitions.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+git diff --check
+server\venv\Scripts\python.exe -m pytest server\tests\test_work_order_transitions.py -p no:cacheprovider
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- `git diff --check` passed.
+- Local pytest could not run because `server\venv` does not have pytest
+  installed.

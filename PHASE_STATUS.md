@@ -132,11 +132,15 @@ Completed:
   `client` visibility.
 - Added backend message endpoints under work orders so internal notes and
   client-visible messages are separated structurally.
+- Added Alembic migration `0004` for completion proof metadata and manager
+  override reason.
+- Added backend proof-gated closeout: completed status requires attachment proof
+  or an org admin/coordinator override reason.
 
 Next:
 
-- Add client/homeowner UI visibility, completion proof rules, and reporting
-  improvements.
+- Add reporting improvements, closeout package summaries, and client/homeowner
+  UI visibility.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -189,6 +193,6 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue v1.3 product depth before hosting: move into proof-gated closeout and
-reporting, then add the client/homeowner UI surface. Vercel deployment and
-portfolio sliver linking should happen at the end of v1.3.
+Continue v1.3 product depth before hosting: move into reporting and closeout
+package summaries, then add the client/homeowner UI surface. Vercel deployment
+and portfolio sliver linking should happen at the end of v1.3.

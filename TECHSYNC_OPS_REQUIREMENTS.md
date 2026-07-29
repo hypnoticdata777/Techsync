@@ -216,6 +216,8 @@ Already represented in the codebase:
   and Stripe test-mode boundary.
 - v1.3 backend work-order messages with explicit `internal` versus
   `client-visible` separation.
+- v1.3 backend completion gate that blocks completed status without attachment
+  proof unless an org admin/coordinator records an override reason.
 - React Native/Expo mobile client for onboarding, auth, work-order list,
   details, creation, invitation acceptance, and password reset.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,

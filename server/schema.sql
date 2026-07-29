@@ -300,6 +300,8 @@ CREATE TABLE IF NOT EXISTS work_orders (
     sla_due_at TIMESTAMP WITH TIME ZONE,
     completed_at TIMESTAMP WITH TIME ZONE,
     completion_notes TEXT,
+    completion_proof_verified_at TIMESTAMP WITH TIME ZONE,
+    completion_override_reason TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
