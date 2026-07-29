@@ -1207,3 +1207,32 @@ Result:
 - Backend tests passed: `115 passed`.
 - Compile check passed.
 - Client tests passed: `5 passed suites`, `24 passed tests`.
+
+## 2026-07-29 - v1.3 Role-Aware Navigation Guard
+
+Decision:
+
+- Continue the local role-by-role UX sweep before hosting.
+- Tighten the mobile navigation surface so manager-only screens are not mounted
+  for technician, client, viewer, or vendor roles.
+
+Changes:
+
+- Added tested main-route access helpers to `client/src/utils/roleWorkflows.js`.
+- Updated `client/App.js` so Work Order Form, Operations Report, Dispatch Board,
+  and PMC Directory screens register only for org admin/coordinator roles.
+- Updated role UX, QA, roadmap, and phase-status docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Client tests passed: `5 passed suites`, `25 passed tests`.
+- Backend tests passed: `115 passed`.
+- Compile check passed.

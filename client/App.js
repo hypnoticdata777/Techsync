@@ -15,11 +15,12 @@ import WorkOrderFormScreen from './src/screens/WorkOrderFormScreen';
 import OperationsReportScreen from './src/screens/OperationsReportScreen';
 import DispatchBoardScreen from './src/screens/DispatchBoardScreen';
 import PmcDirectoryScreen from './src/screens/PmcDirectoryScreen';
+import {canAccessMainRoute} from './src/utils/roleWorkflows';
 
 const Stack = createNativeStackNavigator();
 
 function Navigation() {
-  const {isAuthenticated, loading} = useAuth();
+  const {isAuthenticated, loading, user} = useAuth();
 
   if (loading) {
     return (
@@ -101,36 +102,44 @@ function Navigation() {
                 title: 'Work Order Details',
               }}
             />
-            <Stack.Screen
-              name="WorkOrderForm"
-              component={WorkOrderFormScreen}
-              options={({route}) => ({
-                title: route.params?.workOrder
-                  ? 'Edit Work Order'
-                  : 'New Work Order',
-              })}
-            />
-            <Stack.Screen
-              name="OperationsReport"
-              component={OperationsReportScreen}
-              options={{
-                title: 'Operations Report',
-              }}
-            />
-            <Stack.Screen
-              name="DispatchBoard"
-              component={DispatchBoardScreen}
-              options={{
-                title: 'Dispatch Board',
-              }}
-            />
-            <Stack.Screen
-              name="PmcDirectory"
-              component={PmcDirectoryScreen}
-              options={{
-                title: 'PMC Directory',
-              }}
-            />
+            {canAccessMainRoute(user?.role, 'WorkOrderForm') ? (
+              <Stack.Screen
+                name="WorkOrderForm"
+                component={WorkOrderFormScreen}
+                options={({route}) => ({
+                  title: route.params?.workOrder
+                    ? 'Edit Work Order'
+                    : 'New Work Order',
+                })}
+              />
+            ) : null}
+            {canAccessMainRoute(user?.role, 'OperationsReport') ? (
+              <Stack.Screen
+                name="OperationsReport"
+                component={OperationsReportScreen}
+                options={{
+                  title: 'Operations Report',
+                }}
+              />
+            ) : null}
+            {canAccessMainRoute(user?.role, 'DispatchBoard') ? (
+              <Stack.Screen
+                name="DispatchBoard"
+                component={DispatchBoardScreen}
+                options={{
+                  title: 'Dispatch Board',
+                }}
+              />
+            ) : null}
+            {canAccessMainRoute(user?.role, 'PmcDirectory') ? (
+              <Stack.Screen
+                name="PmcDirectory"
+                component={PmcDirectoryScreen}
+                options={{
+                  title: 'PMC Directory',
+                }}
+              />
+            ) : null}
           </>
         )}
       </Stack.Navigator>

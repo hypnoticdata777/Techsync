@@ -242,6 +242,8 @@ Already represented in the codebase:
   client, property, vendor, and address context.
 - v1.3 role-specific mobile work-order landing band for admin, coordinator,
   technician, client, viewer, and vendor states.
+- v1.3 manager-only mobile navigation gating for directory, dispatch,
+  operations report, and work-order creation screens.
 - v1.3 backend dispatch board for unassigned active work, technician lanes,
   workload utilization, and SLA risk.
 - v1.3 mobile dispatch board view for org admins/coordinators to scan

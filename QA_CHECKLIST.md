@@ -129,6 +129,8 @@ they have been verified in the relevant environment.
       added.
 - [x] Role-aware work-order detail command panel added for status, approval,
       proof, and message summary.
+- [x] Manager-only mobile screens are role-gated in navigation for
+      technician/client/viewer/vendor roles.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

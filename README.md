@@ -286,7 +286,7 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   board, clients, properties, and vendors, and a dispatch board for unassigned
   work, technician lanes, utilization, SLA risk, duplicate-warning preflight
   checks, mobile PMC directory management, mobile report chart bars, and
-  work-order entity linking.
+  work-order entity linking, with manager-only mobile screens gated by role.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.

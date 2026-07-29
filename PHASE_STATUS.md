@@ -197,6 +197,8 @@ Completed:
   and message summary.
 - Added mobile work-order form before-save context review for linked/manual/open
   client, property, vendor, and address state.
+- Added tested mobile navigator gating so manager-only screens are mounted only
+  for org admin/coordinator roles.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and

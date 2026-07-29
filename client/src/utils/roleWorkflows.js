@@ -1,6 +1,21 @@
 const MANAGER_ROLES = ['org_admin', 'coordinator'];
+const BASE_MAIN_ROUTES = ['WorkOrdersList', 'WorkOrderDetails'];
+const MANAGER_MAIN_ROUTES = [
+  'WorkOrderForm',
+  'OperationsReport',
+  'DispatchBoard',
+  'PmcDirectory',
+];
 
 export const canManageOperations = role => MANAGER_ROLES.includes(role);
+
+export const getAvailableMainRoutes = role => [
+  ...BASE_MAIN_ROUTES,
+  ...(canManageOperations(role) ? MANAGER_MAIN_ROUTES : []),
+];
+
+export const canAccessMainRoute = (role, routeName) =>
+  getAvailableMainRoutes(role).includes(routeName);
 
 export const getWorkOrdersEndpointForRole = role =>
   role === 'technician' ? '/work-orders/mine' : '/work-orders';
@@ -190,6 +205,8 @@ export const buildDetailSummary = (workOrder = {}, attachments = [], messages = 
 
 export default {
   canManageOperations,
+  getAvailableMainRoutes,
+  canAccessMainRoute,
   getWorkOrdersEndpointForRole,
   getRoleHome,
   getRoleActions,

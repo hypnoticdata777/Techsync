@@ -35,6 +35,8 @@ Implemented:
   proof, and message summary tiles.
 - Added a work-order form review panel that summarizes selected client,
   property, vendor, and address context before save.
+- Added tested role-aware route registration so manager-only screens are not
+  mounted for technician, client, viewer, or vendor roles.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
 
@@ -47,18 +49,18 @@ server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 
 Result:
 
-- Client tests passed: `5 passed suites`, `23 passed tests`.
+- Client tests passed: `5 passed suites`, `25 passed tests`.
 - Backend tests passed: `113 passed`.
 
 ## Role Matrix
 
 | Role | Landing State | Primary Actions | Status |
 |---|---|---|---|
-| org_admin | Admin Workspace | Directory, Dispatch, Report, New Work | Detail panel started |
-| coordinator | Coordinator Queue | Directory, Dispatch, Report, New Work | Detail panel started |
-| technician | Technician Queue | Assigned queue, status/proof from details | Detail panel started |
-| client | Client View | Visible linked work orders, approvals/messages from details | Detail panel started |
-| viewer | Viewer Snapshot | Read-only visible linked work orders | Detail panel started |
+| org_admin | Admin Workspace | Directory, Dispatch, Report, New Work | Manager routes mounted |
+| coordinator | Coordinator Queue | Directory, Dispatch, Report, New Work | Manager routes mounted |
+| technician | Technician Queue | Assigned queue, status/proof from details | Manager routes hidden |
+| client | Client View | Visible linked work orders, approvals/messages from details | Manager routes hidden |
+| viewer | Viewer Snapshot | Read-only visible linked work orders | Manager routes hidden |
 | vendor | Vendor View | Explicit staged/not-enabled state | Documented guardrail |
 
 ## Remaining Sweep Items
@@ -68,6 +70,8 @@ Result:
 - Verify client/viewer cannot see internal messages or unrelated work.
 - Verify technician cannot see unassigned/unrelated work.
 - Verify manager-only actions are absent for technician/client/viewer/vendor.
+  Started with tested navigator route gating; final screenshot proof still
+  needed.
 - Verify all primary screens have clear retry states after API failures.
 - Validate text wrapping and touch target comfort on small mobile widths.
 - Run the final screenshot/walkthrough pass only after local product depth is

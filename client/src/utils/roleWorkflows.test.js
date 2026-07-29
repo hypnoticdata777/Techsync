@@ -1,7 +1,9 @@
 import {
   buildDetailSummary,
   buildQueueSummary,
+  canAccessMainRoute,
   canManageOperations,
+  getAvailableMainRoutes,
   getDetailRoleContext,
   getRoleActions,
   getRoleHome,
@@ -14,6 +16,24 @@ describe('role workflow helpers', () => {
     expect(canManageOperations('coordinator')).toBe(true);
     expect(canManageOperations('technician')).toBe(false);
     expect(canManageOperations('client')).toBe(false);
+  });
+
+  test('keeps manager-only screens out of non-manager navigation', () => {
+    expect(getAvailableMainRoutes('org_admin')).toEqual(
+      expect.arrayContaining([
+        'WorkOrderForm',
+        'OperationsReport',
+        'DispatchBoard',
+        'PmcDirectory',
+      ]),
+    );
+    expect(getAvailableMainRoutes('technician')).toEqual([
+      'WorkOrdersList',
+      'WorkOrderDetails',
+    ]);
+    expect(canAccessMainRoute('client', 'PmcDirectory')).toBe(false);
+    expect(canAccessMainRoute('viewer', 'OperationsReport')).toBe(false);
+    expect(canAccessMainRoute('coordinator', 'DispatchBoard')).toBe(true);
   });
 
   test('routes technicians to their assigned queue endpoint', () => {
