@@ -1304,6 +1304,38 @@ Result:
 - Backend tests passed: `119 passed`.
 - Compile check passed.
 
+## 2026-07-29 - v1.3 Role Empty-State Polish
+
+Decision:
+
+- Improve the pre-hosting screenshot path by making empty queues feel
+  intentional for each role instead of showing bare text.
+- Keep empty actions role-safe: only org admin/coordinator roles get a create
+  work-order action.
+
+Changes:
+
+- Added tested `getRoleEmptyState` helper copy for org admin, coordinator,
+  technician, client, viewer, vendor, and default roles.
+- Replaced the work-order list empty text with a role-aware empty panel.
+- Added manager-only empty-state action routing to `WorkOrderForm`.
+- Updated role UX, QA, roadmap, phase, requirements, traceability, and README
+  docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Client tests passed: `5 passed suites`, `26 passed tests`.
+- Backend tests passed: `119 passed`.
+- Compile check passed.
+
 ## 2026-07-29 - v1.3 Mobile Retry-State Polish
 
 Decision:

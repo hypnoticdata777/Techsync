@@ -249,6 +249,8 @@ Already represented in the codebase:
   boundaries.
 - v1.3 compact mobile touch target and text-wrapping hardening for primary role
   workflow controls before public screenshot capture.
+- v1.3 tested role-specific empty queue panel states for manager, technician,
+  client, viewer, and vendor contexts.
 - v1.3 backend dispatch board for unassigned active work, technician lanes,
   workload utilization, and SLA risk.
 - v1.3 mobile dispatch board view for org admins/coordinators to scan

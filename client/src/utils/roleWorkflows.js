@@ -67,6 +67,57 @@ export const getRoleHome = role => {
   }
 };
 
+export const getRoleEmptyState = role => {
+  switch (role) {
+    case 'org_admin':
+      return {
+        title: 'Queue is ready',
+        message: 'No demo work orders exist yet. Create the first linked request when you are ready to seed the admin story.',
+        detail: 'Use synthetic clients, properties, vendors, and work-order details only.',
+        actionLabel: 'Create Work',
+        actionRoute: 'WorkOrderForm',
+      };
+    case 'coordinator':
+      return {
+        title: 'No coordination work',
+        message: 'There are no open requests needing intake, assignment, or client follow-through right now.',
+        detail: 'Create a linked request when the demo queue needs a coordinator workflow.',
+        actionLabel: 'Create Work',
+        actionRoute: 'WorkOrderForm',
+      };
+    case 'technician':
+      return {
+        title: 'No assigned jobs',
+        message: 'Assigned open or in-progress work orders will appear here in priority order.',
+        detail: 'Status updates, notes, photos, and completion proof start from an assigned job.',
+      };
+    case 'client':
+      return {
+        title: 'No visible client work',
+        message: 'Work orders linked to this client profile will appear here with client-visible updates and approvals.',
+        detail: 'Internal notes and unrelated client work stay hidden.',
+      };
+    case 'viewer':
+      return {
+        title: 'No visible snapshot',
+        message: 'Read-only work orders linked to this viewer profile will appear here.',
+        detail: 'Viewer access is intentionally limited to visible client updates and proof context.',
+      };
+    case 'vendor':
+      return {
+        title: 'Vendor access staged',
+        message: 'Vendor work-order access is documented for later and intentionally disabled in this POC.',
+        detail: 'This prevents accidental vendor-facing exposure before the workflow is ready.',
+      };
+    default:
+      return {
+        title: 'No work orders',
+        message: 'No work orders are available for this account.',
+        detail: 'Refresh or switch users after demo data is seeded.',
+      };
+  }
+};
+
 export const getRoleActions = role => {
   if (!canManageOperations(role)) {
     return [];
@@ -209,6 +260,7 @@ export default {
   canAccessMainRoute,
   getWorkOrdersEndpointForRole,
   getRoleHome,
+  getRoleEmptyState,
   getRoleActions,
   getRoleAccessMessage,
   buildQueueSummary,

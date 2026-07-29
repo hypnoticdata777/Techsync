@@ -16,6 +16,7 @@ import {
   canManageOperations,
   getRoleAccessMessage,
   getRoleActions,
+  getRoleEmptyState,
   getRoleHome,
   getWorkOrdersEndpointForRole,
 } from '../utils/roleWorkflows';
@@ -48,6 +49,7 @@ function WorkOrdersListScreen({navigation}) {
   // client/viewer scoping is enforced by the backend list endpoint (RF-21).
   const endpoint = getWorkOrdersEndpointForRole(user?.role);
   const roleHome = useMemo(() => getRoleHome(user?.role), [user?.role]);
+  const roleEmptyState = useMemo(() => getRoleEmptyState(user?.role), [user?.role]);
   const roleActions = useMemo(() => getRoleActions(user?.role), [user?.role]);
   const queueSummary = useMemo(() => buildQueueSummary(workOrders), [workOrders]);
 
@@ -120,6 +122,12 @@ function WorkOrdersListScreen({navigation}) {
     ]);
   };
 
+  const handleEmptyAction = () => {
+    if (roleEmptyState.actionRoute) {
+      navigation.navigate(roleEmptyState.actionRoute);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.userBar}>
@@ -187,11 +195,15 @@ function WorkOrdersListScreen({navigation}) {
           keyExtractor={item => String(item.id)}
           renderItem={renderWorkOrder}
           ListEmptyComponent={
-            <Text style={styles.emptyState}>
-              {roleHome.emptyState}
-            </Text>
+            <EmptyQueueState
+              state={roleEmptyState}
+              onAction={roleEmptyState.actionRoute ? handleEmptyAction : null}
+            />
           }
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={[
+            styles.listContent,
+            workOrders.length === 0 && styles.emptyListContent,
+          ]}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -205,6 +217,19 @@ function WorkOrdersListScreen({navigation}) {
     </View>
   );
 }
+
+const EmptyQueueState = ({state, onAction}) => (
+  <View style={styles.emptyPanel}>
+    <Text style={styles.emptyTitle}>{state.title}</Text>
+    <Text style={styles.emptyMessage}>{state.message}</Text>
+    <Text style={styles.emptyDetail}>{state.detail}</Text>
+    {onAction ? (
+      <TouchableOpacity style={styles.emptyActionButton} onPress={onAction}>
+        <Text style={styles.emptyActionText}>{state.actionLabel}</Text>
+      </TouchableOpacity>
+    ) : null}
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -327,6 +352,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
+  emptyListContent: {
+    flexGrow: 1,
+  },
   workOrderCard: {
     backgroundColor: '#020617',
     borderRadius: 10,
@@ -351,10 +379,49 @@ const styles = StyleSheet.create({
     color: '#a3e635',
     marginTop: 6,
   },
-  emptyState: {
+  emptyPanel: {
+    backgroundColor: '#020617',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    marginTop: 8,
+    padding: 16,
+  },
+  emptyTitle: {
+    color: '#f9fafb',
+    fontSize: 18,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  emptyMessage: {
+    color: '#cbd5e1',
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  emptyDetail: {
+    color: '#94a3b8',
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  emptyActionButton: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: '#38bdf8',
+    borderRadius: 8,
+    justifyContent: 'center',
+    marginTop: 14,
+    minHeight: 44,
+    minWidth: 132,
+    paddingHorizontal: 18,
+  },
+  emptyActionText: {
+    color: '#050816',
     fontSize: 14,
-    color: '#9ca3af',
-    marginTop: 24,
+    fontWeight: '800',
     textAlign: 'center',
   },
   loader: {

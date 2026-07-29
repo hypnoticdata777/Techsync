@@ -5,6 +5,7 @@ import {
   canManageOperations,
   getAvailableMainRoutes,
   getDetailRoleContext,
+  getRoleEmptyState,
   getRoleActions,
   getRoleHome,
   getWorkOrdersEndpointForRole,
@@ -55,6 +56,19 @@ describe('role workflow helpers', () => {
   test('provides role-specific home copy', () => {
     expect(getRoleHome('technician').title).toBe('Technician Queue');
     expect(getRoleHome('client').emptyState).toContain('linked to this client');
+  });
+
+  test('provides screenshot-ready role empty states', () => {
+    expect(getRoleEmptyState('org_admin')).toEqual(
+      expect.objectContaining({
+        title: 'Queue is ready',
+        actionRoute: 'WorkOrderForm',
+      }),
+    );
+    const technicianState = getRoleEmptyState('technician');
+    expect(technicianState.title).toBe('No assigned jobs');
+    expect(technicianState).not.toHaveProperty('actionRoute');
+    expect(getRoleEmptyState('vendor').message).toContain('intentionally disabled');
   });
 
   test('builds queue summary counts from status and approval state', () => {

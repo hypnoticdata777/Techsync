@@ -290,7 +290,7 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   primary mobile API failures showing visible retry states. Backend regression
   tests cover client/viewer and technician work-order visibility boundaries, and
   compact mobile workflow controls have hardened touch targets before screenshot
-  capture.
+  capture. Role-specific empty queue panels are implemented and tested.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.

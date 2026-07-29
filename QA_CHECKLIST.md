@@ -138,6 +138,8 @@ they have been verified in the relevant environment.
       work/subresource blocking.
 - [x] Compact mobile touch targets and wrapping behavior have been hardened for
       primary role workflow controls before screenshot capture.
+- [x] Role-specific empty queue panels are implemented and tested for manager,
+      technician, client, viewer, and vendor contexts.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

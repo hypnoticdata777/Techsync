@@ -47,6 +47,9 @@ Implemented:
 - Raised compact mobile touch targets and wrapping behavior for report filters,
   directory tabs/options, work-order form selectors/status chips, detail
   visibility tabs/actions, retry buttons, and tappable work-order cards.
+- Added tested role-aware empty queue panel copy for admin, coordinator,
+  technician, client, viewer, and vendor states, with create-work action only
+  for manager roles.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
 
@@ -77,6 +80,7 @@ Result:
 
 - Capture mobile screenshots for each role using synthetic demo data.
 - Verify role-specific empty states with seeded and empty queues.
+  Empty-state code/tests are implemented; final screenshot proof still needed.
 - Verify client/viewer cannot see internal messages or unrelated work.
   Covered by backend regression tests; final screenshot proof still needed.
 - Verify technician cannot see unassigned/unrelated work.

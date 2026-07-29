@@ -206,6 +206,8 @@ Completed:
   unassigned work/subresource blocking.
 - Added compact mobile touch target and wrapping polish across primary role
   workflow controls before screenshot capture.
+- Added tested role-specific empty queue panels with manager-only create-work
+  actions.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and
