@@ -1,6 +1,8 @@
 import {
+  buildDetailSummary,
   buildQueueSummary,
   canManageOperations,
+  getDetailRoleContext,
   getRoleActions,
   getRoleHome,
   getWorkOrdersEndpointForRole,
@@ -48,5 +50,39 @@ describe('role workflow helpers', () => {
       inProgress: 1,
       pendingApproval: 1,
     });
+  });
+
+  test('provides detail role context for clients with pending approval', () => {
+    expect(
+      getDetailRoleContext('client', {client_approval_status: 'pending'}),
+    ).toEqual(
+      expect.objectContaining({
+        title: 'Approval Needed',
+      }),
+    );
+  });
+
+  test('builds detail summary from work order, attachments, and messages', () => {
+    expect(
+      buildDetailSummary(
+        {status: 'in_progress', client_approval_status: 'pending'},
+        [{id: 1}, {id: 2}],
+        [{id: 3}],
+      ),
+    ).toEqual([
+      expect.objectContaining({key: 'status', value: 'in progress'}),
+      expect.objectContaining({key: 'approval', value: 'pending'}),
+      expect.objectContaining({key: 'proof', value: '2 files'}),
+      expect.objectContaining({key: 'messages', value: '1'}),
+    ]);
+  });
+
+  test('marks verified and override proof states clearly', () => {
+    expect(
+      buildDetailSummary({completion_proof_verified_at: '2026-07-29T00:00:00Z'})[2],
+    ).toEqual(expect.objectContaining({value: 'Verified', tone: 'verified'}));
+    expect(
+      buildDetailSummary({completion_override_reason: 'Manager approved'})[2],
+    ).toEqual(expect.objectContaining({value: 'Override', tone: 'override'}));
   });
 });

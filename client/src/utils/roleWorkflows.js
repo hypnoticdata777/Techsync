@@ -106,6 +106,88 @@ export const buildQueueSummary = workOrders => {
   };
 };
 
+export const getDetailRoleContext = (role, workOrder = {}) => {
+  switch (role) {
+    case 'org_admin':
+      return {
+        title: 'Admin Control',
+        subtitle: 'Assignment, approval, closeout readiness, and tenant audit context',
+      };
+    case 'coordinator':
+      return {
+        title: 'Coordinator Control',
+        subtitle: 'Client updates, dispatch follow-through, proof, and closeout readiness',
+      };
+    case 'technician':
+      return {
+        title: 'Field Work',
+        subtitle: 'Assigned status, notes, photos, and completion proof',
+      };
+    case 'client':
+      return {
+        title: workOrder.client_approval_status === 'pending' ? 'Approval Needed' : 'Client Update',
+        subtitle: 'Visible status, client messages, approval state, and closeout proof',
+      };
+    case 'viewer':
+      return {
+        title: 'Read-Only Snapshot',
+        subtitle: 'Visible status, client messages, and proof context',
+      };
+    case 'vendor':
+      return {
+        title: 'Vendor Access Staged',
+        subtitle: 'Vendor-facing workflow is planned after the current POC gate',
+      };
+    default:
+      return {
+        title: 'Work Order',
+        subtitle: 'Status, communication, proof, and audit context',
+      };
+  }
+};
+
+export const buildDetailSummary = (workOrder = {}, attachments = [], messages = []) => {
+  const proofState = workOrder.completion_proof_verified_at
+    ? 'Verified'
+    : workOrder.completion_override_reason
+      ? 'Override'
+      : attachments.length > 0
+        ? `${attachments.length} file${attachments.length === 1 ? '' : 's'}`
+        : 'Missing';
+
+  return [
+    {
+      key: 'status',
+      label: 'Status',
+      value: (workOrder.status || 'unknown').replace(/_/g, ' '),
+      tone: workOrder.status || 'default',
+    },
+    {
+      key: 'approval',
+      label: 'Approval',
+      value: (workOrder.client_approval_status || 'not_required').replace(/_/g, ' '),
+      tone: workOrder.client_approval_status || 'default',
+    },
+    {
+      key: 'proof',
+      label: 'Proof',
+      value: proofState,
+      tone:
+        proofState === 'Missing'
+          ? 'missing'
+          : proofState === 'Override'
+            ? 'override'
+            : 'verified',
+    },
+    {
+      key: 'messages',
+      label: 'Messages',
+      value: String(messages.length),
+      tone: messages.length > 0 ? 'active' : 'default',
+    },
+  ];
+};
+
 export default {
   canManageOperations,
   getWorkOrdersEndpointForRole,
@@ -113,4 +195,6 @@ export default {
   getRoleActions,
   getRoleAccessMessage,
   buildQueueSummary,
+  getDetailRoleContext,
+  buildDetailSummary,
 };

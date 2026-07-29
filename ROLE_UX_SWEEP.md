@@ -31,6 +31,8 @@ Implemented:
   - viewer
   - vendor
 - Added queue summary counts for total, open, active, and pending approval work.
+- Added a role-aware work-order detail command panel with status, approval,
+  proof, and message summary tiles.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
 
@@ -43,18 +45,18 @@ server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 
 Result:
 
-- Client tests passed: `4 passed suites`, `16 passed tests`.
+- Client tests passed: `4 passed suites`, `19 passed tests`.
 - Backend tests passed: `113 passed`.
 
 ## Role Matrix
 
 | Role | Landing State | Primary Actions | Status |
 |---|---|---|---|
-| org_admin | Admin Workspace | Directory, Dispatch, Report, New Work | Started |
-| coordinator | Coordinator Queue | Directory, Dispatch, Report, New Work | Started |
-| technician | Technician Queue | Assigned queue, status/proof from details | Started |
-| client | Client View | Visible linked work orders, approvals/messages from details | Started |
-| viewer | Viewer Snapshot | Read-only visible linked work orders | Started |
+| org_admin | Admin Workspace | Directory, Dispatch, Report, New Work | Detail panel started |
+| coordinator | Coordinator Queue | Directory, Dispatch, Report, New Work | Detail panel started |
+| technician | Technician Queue | Assigned queue, status/proof from details | Detail panel started |
+| client | Client View | Visible linked work orders, approvals/messages from details | Detail panel started |
+| viewer | Viewer Snapshot | Read-only visible linked work orders | Detail panel started |
 | vendor | Vendor View | Explicit staged/not-enabled state | Documented guardrail |
 
 ## Remaining Sweep Items

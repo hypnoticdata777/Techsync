@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import {useAuth} from '../context/AuthContext';
+import {buildDetailSummary, getDetailRoleContext} from '../utils/roleWorkflows';
 
 // Helper function to get status color
 const getStatusColor = status => {
@@ -73,6 +74,29 @@ const getApprovalLabel = status => {
   }
 };
 
+const getSummaryToneColor = tone => {
+  switch (tone) {
+    case 'open':
+    case 'pending':
+    case 'missing':
+      return '#fbbf24';
+    case 'in_progress':
+    case 'active':
+      return '#38bdf8';
+    case 'completed':
+    case 'approved':
+    case 'verified':
+      return '#a3e635';
+    case 'cancelled':
+    case 'declined':
+      return '#fb7185';
+    case 'override':
+      return '#f97316';
+    default:
+      return '#94a3b8';
+  }
+};
+
 function WorkOrderDetailsScreen({route, navigation}) {
   const {user, authFetch} = useAuth();
   const [workOrder, setWorkOrder] = useState(route.params.workOrder);
@@ -97,6 +121,14 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const canDecideApproval =
     user?.role === 'client' && workOrder.client_approval_status === 'pending';
   const nextStatuses = canUpdateStatus ? ALLOWED_TRANSITIONS[workOrder.status] || [] : [];
+  const roleContext = useMemo(
+    () => getDetailRoleContext(user?.role, workOrder),
+    [user?.role, workOrder],
+  );
+  const detailSummary = useMemo(
+    () => buildDetailSummary(workOrder, attachments, messages),
+    [attachments, messages, workOrder],
+  );
 
   const loadAttachments = useCallback(async () => {
     try {
@@ -370,6 +402,28 @@ function WorkOrderDetailsScreen({route, navigation}) {
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>{workOrder.title}</Text>
+
+        <View style={styles.commandPanel}>
+          <View style={styles.commandHeader}>
+            <Text style={styles.commandTitle}>{roleContext.title}</Text>
+            <Text style={styles.commandSubtitle}>{roleContext.subtitle}</Text>
+          </View>
+          <View style={styles.summaryGrid}>
+            {detailSummary.map(item => (
+              <View key={item.key} style={styles.summaryTile}>
+                <Text style={styles.summaryLabel}>{item.label}</Text>
+                <Text
+                  style={[
+                    styles.summaryValue,
+                    {color: getSummaryToneColor(item.tone)},
+                  ]}
+                  numberOfLines={1}>
+                  {item.value}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
 
         <View style={styles.section}>
           <Text style={styles.label}>Status</Text>
@@ -711,7 +765,57 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: '#f9fafb',
-    marginBottom: 24,
+    marginBottom: 14,
+  },
+  commandPanel: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 20,
+  },
+  commandHeader: {
+    marginBottom: 12,
+  },
+  commandTitle: {
+    color: '#f9fafb',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  commandSubtitle: {
+    color: '#94a3b8',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 3,
+  },
+  summaryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  summaryTile: {
+    flexBasis: '47%',
+    flexGrow: 1,
+    minHeight: 58,
+    justifyContent: 'center',
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#1e293b',
+    borderRadius: 7,
+    paddingHorizontal: 10,
+  },
+  summaryLabel: {
+    color: '#94a3b8',
+    fontSize: 10,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+  summaryValue: {
+    fontSize: 15,
+    fontWeight: '800',
+    textTransform: 'capitalize',
+    marginTop: 4,
   },
   section: {
     marginBottom: 20,

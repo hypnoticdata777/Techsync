@@ -123,6 +123,8 @@ they have been verified in the relevant environment.
       provider secrets.
 - [x] Role-specific work-order landing band and tested role workflow helpers
       added.
+- [x] Role-aware work-order detail command panel added for status, approval,
+      proof, and message summary.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

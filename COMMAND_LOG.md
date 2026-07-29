@@ -1078,3 +1078,33 @@ Result:
 
 - Client tests passed: `4 passed suites`, `16 passed tests`.
 - Backend tests passed: `113 passed`.
+
+## 2026-07-29 - v1.3 Role-Aware Detail Screen Polish
+
+Decision:
+
+- Continue polishing UX locally before hosting by improving the work-order
+  detail screen, where every role lands after the queue.
+- Keep the change lightweight and dependency-free.
+
+Changes:
+
+- Extended `client/src/utils/roleWorkflows.js` with detail context and summary
+  helpers.
+- Added regression tests for client pending-approval detail copy, proof state,
+  and detail summary counts.
+- Added a role-aware command panel at the top of work-order details.
+- Added summary tiles for status, client approval, proof, and messages.
+- Updated `ROLE_UX_SWEEP.md`, QA, and phase-status docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+```
+
+Result:
+
+- Client tests passed: `4 passed suites`, `19 passed tests`.
+- Backend tests passed: `113 passed`.

@@ -188,6 +188,8 @@ Completed:
   pressure, and property hotspot activity.
 - Added role-specific mobile work-order landing band and `ROLE_UX_SWEEP.md` to
   start the exhaustive pre-hosting UX sweep.
+- Added role-aware work-order detail command panel for status, approval, proof,
+  and message summary.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and
