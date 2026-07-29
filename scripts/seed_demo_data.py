@@ -440,6 +440,78 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
             },
         )
     )
+    work_orders.append(
+        app.work_orders_repo.create(
+            organization_id,
+            {
+                "title": "Paused cabinet repair waiting on parts",
+                "description": "Synthetic paused work to prove hold-state visibility without capacity pressure.",
+                "property_id": west_townhome["id"],
+                "client_id": west_client["id"],
+                "vendor_id": apex["id"],
+                "customer_name": "Morgan Board",
+                "address": "77 Sample Green Unit 12, Test City, NY",
+                "service_type": "general",
+                "priority": "medium",
+                "status": "paused",
+                "assigned_technician_id": priya["id"],
+                "created_by": coordinator["id"],
+                "source": "manual",
+                "external_ref": "DEMO-WO-006",
+                "sla_due_at": current_time + timedelta(days=3),
+                "created_at": current_time - timedelta(days=6),
+            },
+        )
+    )
+    work_orders.append(
+        app.work_orders_repo.create(
+            organization_id,
+            {
+                "title": "Escalated roof access safety review",
+                "description": "Synthetic escalated work for SLA and coordinator review evidence.",
+                "property_id": riverside_roof["id"],
+                "client_id": riverside_client["id"],
+                "vendor_id": brightline["id"],
+                "customer_name": "Riverside HOA",
+                "address": "1300 Demo Ridge Roof, Test City, NY",
+                "service_type": "general",
+                "priority": "high",
+                "status": "escalated",
+                "assigned_technician_id": marco["id"],
+                "created_by": admin["id"],
+                "source": "manual",
+                "external_ref": "DEMO-WO-007",
+                "sla_due_at": current_time + timedelta(hours=90),
+                "created_at": current_time - timedelta(days=10),
+            },
+        )
+    )
+    work_orders.append(
+        app.work_orders_repo.create(
+            organization_id,
+            {
+                "title": "Archived seasonal gutter check",
+                "description": "Synthetic archived work retained for historical traceability.",
+                "property_id": west_townhome["id"],
+                "client_id": west_client["id"],
+                "vendor_id": apex["id"],
+                "customer_name": "Morgan Board",
+                "address": "77 Sample Green Exterior, Test City, NY",
+                "service_type": "general",
+                "priority": "low",
+                "status": "archived",
+                "assigned_technician_id": lena["id"],
+                "created_by": admin["id"],
+                "source": "manual",
+                "external_ref": "DEMO-WO-008",
+                "completed_at": current_time - timedelta(days=20),
+                "completion_notes": "Synthetic historical closeout retained for archive proof.",
+                "completion_override_reason": "Archived synthetic history for demo evidence.",
+                "client_approval_status": "not_required",
+                "created_at": current_time - timedelta(days=25),
+            },
+        )
+    )
 
     for item in work_orders:
         app.events_repo.create_event(
@@ -467,6 +539,33 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
         from_status="in_progress",
         to_status="completed",
         notes="Synthetic technician completed work with proof.",
+    )
+    app.events_repo.create_event(
+        organization_id,
+        work_orders[5]["id"],
+        "status_changed",
+        actor_user_id=coordinator["id"],
+        from_status="in_progress",
+        to_status="paused",
+        notes="Synthetic coordinator paused work while waiting on parts.",
+    )
+    app.events_repo.create_event(
+        organization_id,
+        work_orders[6]["id"],
+        "status_changed",
+        actor_user_id=admin["id"],
+        from_status="open",
+        to_status="escalated",
+        notes="Synthetic admin escalated for safety review.",
+    )
+    app.events_repo.create_event(
+        organization_id,
+        work_orders[7]["id"],
+        "status_changed",
+        actor_user_id=admin["id"],
+        from_status="completed",
+        to_status="archived",
+        notes="Synthetic completed work archived for historical traceability.",
     )
 
     app.messages_repo.create(

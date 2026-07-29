@@ -23,10 +23,16 @@ const getStatusColor = status => {
       return '#fbbf24'; // yellow
     case 'in_progress':
       return '#38bdf8'; // blue
+    case 'paused':
+      return '#f97316'; // orange
+    case 'escalated':
+      return '#fb7185'; // rose
     case 'completed':
       return '#a3e635'; // green
     case 'cancelled':
       return '#ef4444'; // red
+    case 'archived':
+      return '#94a3b8'; // slate
     default:
       return '#9ca3af'; // gray
   }
@@ -34,17 +40,46 @@ const getStatusColor = status => {
 
 // RF-18: only these transitions are legal, mirrors server/models/work_order.py
 const ALLOWED_TRANSITIONS = {
-  open: ['in_progress', 'cancelled'],
-  in_progress: ['completed', 'cancelled', 'open'],
-  completed: [],
-  cancelled: [],
+  open: ['in_progress', 'paused', 'escalated', 'cancelled', 'archived'],
+  in_progress: ['completed', 'paused', 'escalated', 'cancelled', 'open', 'archived'],
+  paused: ['open', 'in_progress', 'escalated', 'cancelled', 'archived'],
+  escalated: ['in_progress', 'paused', 'completed', 'cancelled', 'archived'],
+  completed: ['archived'],
+  cancelled: ['archived'],
+  archived: [],
 };
 
 const STATUS_LABELS = {
   open: 'Open',
   in_progress: 'Start Work',
+  paused: 'Pause',
+  escalated: 'Escalate',
   completed: 'Mark Completed',
   cancelled: 'Cancel',
+  archived: 'Archive',
+};
+
+const STATUS_CONFIRMATIONS = {
+  cancelled: {
+    title: 'Cancel work order?',
+    message: 'This removes it from active operations and can only be archived afterward.',
+    confirm: 'Yes, cancel',
+  },
+  archived: {
+    title: 'Archive work order?',
+    message: 'Archived work stays in history but leaves the active operating surface.',
+    confirm: 'Archive',
+  },
+  escalated: {
+    title: 'Escalate work order?',
+    message: 'Escalated work remains active and should be reviewed by the coordinator queue.',
+    confirm: 'Escalate',
+  },
+  paused: {
+    title: 'Pause work order?',
+    message: 'Paused work remains visible but is not counted as technician capacity pressure.',
+    confirm: 'Pause',
+  },
 };
 
 const INTERNAL_ROLES = ['org_admin', 'coordinator', 'technician'];
@@ -90,9 +125,13 @@ const getSummaryToneColor = tone => {
       return '#a3e635';
     case 'cancelled':
     case 'declined':
+    case 'escalated':
       return '#fb7185';
+    case 'paused':
     case 'override':
       return '#f97316';
+    case 'archived':
+      return '#94a3b8';
     default:
       return '#94a3b8';
   }
@@ -123,7 +162,11 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const canRequestApproval = canEdit && !!workOrder.client_id;
   const canDecideApproval =
     user?.role === 'client' && workOrder.client_approval_status === 'pending';
-  const nextStatuses = canUpdateStatus ? ALLOWED_TRANSITIONS[workOrder.status] || [] : [];
+  const nextStatuses = canUpdateStatus
+    ? (ALLOWED_TRANSITIONS[workOrder.status] || []).filter(
+        nextStatus => nextStatus !== 'archived' || canEdit,
+      )
+    : [];
   const roleContext = useMemo(
     () => getDetailRoleContext(user?.role, workOrder),
     [user?.role, workOrder],
@@ -219,10 +262,15 @@ function WorkOrderDetailsScreen({route, navigation}) {
   };
 
   const confirmTransition = newStatus => {
-    if (newStatus === 'cancelled') {
-      Alert.alert('Cancel work order?', 'This cannot be undone.', [
+    const confirmation = STATUS_CONFIRMATIONS[newStatus];
+    if (confirmation) {
+      Alert.alert(confirmation.title, confirmation.message, [
         {text: 'No', style: 'cancel'},
-        {text: 'Yes, cancel', style: 'destructive', onPress: () => handleTransition(newStatus)},
+        {
+          text: confirmation.confirm,
+          style: newStatus === 'cancelled' || newStatus === 'archived' ? 'destructive' : 'default',
+          onPress: () => handleTransition(newStatus),
+        },
       ]);
       return;
     }
@@ -721,15 +769,21 @@ function WorkOrderDetailsScreen({route, navigation}) {
             <TouchableOpacity
               key={nextStatus}
               style={[
-                nextStatus === 'cancelled' ? styles.dangerButton : styles.primaryButton,
+                ['cancelled', 'archived'].includes(nextStatus)
+                  ? styles.dangerButton
+                  : nextStatus === 'paused' || nextStatus === 'escalated'
+                    ? styles.secondaryButton
+                    : styles.primaryButton,
                 updating && styles.buttonDisabled,
               ]}
               onPress={() => confirmTransition(nextStatus)}
               disabled={updating}>
               <Text
                 style={
-                  nextStatus === 'cancelled'
+                  ['cancelled', 'archived'].includes(nextStatus)
                     ? styles.dangerButtonText
+                    : nextStatus === 'paused' || nextStatus === 'escalated'
+                      ? styles.secondaryButtonText
                     : styles.primaryButtonText
                 }>
                 {updating ? 'Updating...' : STATUS_LABELS[nextStatus]}

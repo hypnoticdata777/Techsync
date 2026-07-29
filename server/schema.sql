@@ -291,7 +291,7 @@ CREATE TABLE IF NOT EXISTS work_orders (
     priority TEXT NOT NULL DEFAULT 'medium'
         CHECK (priority IN ('low', 'medium', 'high', 'emergency')),
     status TEXT NOT NULL DEFAULT 'open'
-        CHECK (status IN ('open', 'in_progress', 'completed', 'cancelled')),
+        CHECK (status IN ('open', 'in_progress', 'paused', 'escalated', 'completed', 'cancelled', 'archived')),
     assigned_technician_id BIGINT REFERENCES technicians(id) ON DELETE SET NULL,
     created_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
     source TEXT NOT NULL DEFAULT 'manual'

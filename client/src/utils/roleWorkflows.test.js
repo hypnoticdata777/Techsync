@@ -76,12 +76,16 @@ describe('role workflow helpers', () => {
       buildQueueSummary([
         {status: 'open', client_approval_status: 'pending'},
         {status: 'in_progress', client_approval_status: 'not_required'},
+        {status: 'paused', client_approval_status: 'not_required'},
+        {status: 'escalated', client_approval_status: 'not_required'},
         {status: 'completed', client_approval_status: 'approved'},
       ]),
     ).toEqual({
-      total: 3,
+      total: 5,
       open: 1,
       inProgress: 1,
+      paused: 1,
+      escalated: 1,
       pendingApproval: 1,
     });
   });

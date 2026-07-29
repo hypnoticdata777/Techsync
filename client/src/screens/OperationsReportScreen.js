@@ -28,10 +28,16 @@ const getStatusColor = status => {
       return '#fbbf24';
     case 'in_progress':
       return '#38bdf8';
+    case 'paused':
+      return '#f97316';
+    case 'escalated':
+      return '#fb7185';
     case 'completed':
       return '#a3e635';
     case 'cancelled':
       return '#ef4444';
+    case 'archived':
+      return '#94a3b8';
     default:
       return '#9ca3af';
   }

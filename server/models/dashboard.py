@@ -10,8 +10,11 @@ class DashboardMetrics(BaseModel):
     total_work_orders: int
     open_count: int
     in_progress_count: int
+    paused_count: int
+    escalated_count: int
     completed_count: int
     cancelled_count: int
+    archived_count: int
     sla_at_risk_count: int
     active_technicians_count: int
     total_technicians_count: int
@@ -98,6 +101,8 @@ class DispatchBoardTechnicianLane(BaseModel):
 class DispatchBoardSummary(BaseModel):
     open_count: int
     in_progress_count: int
+    paused_count: int
+    escalated_count: int
     unassigned_count: int
     sla_at_risk_count: int
     emergency_count: int

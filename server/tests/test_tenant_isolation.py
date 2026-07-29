@@ -68,7 +68,7 @@ def test_stale_work_order_report_scopes_by_organization_id():
 
     sql, params = mock_fetch.call_args.args
     assert "organization_id = :organization_id" in sql
-    assert "status IN ('open', 'in_progress')" in sql
+    assert "status IN ('open', 'in_progress', 'paused', 'escalated')" in sql
     assert params["organization_id"] == 42
     assert params["limit"] == 5
 
@@ -115,7 +115,7 @@ def test_dispatch_board_work_orders_scope_and_join_by_organization_id():
     assert "p.organization_id = wo.organization_id" in sql
     assert "c.organization_id = wo.organization_id" in sql
     assert "v.organization_id = wo.organization_id" in sql
-    assert "wo.status IN ('open', 'in_progress')" in sql
+    assert "wo.status IN ('open', 'in_progress', 'paused', 'escalated')" in sql
     assert params == {"organization_id": 42}
 
 
@@ -133,7 +133,7 @@ def test_duplicate_warning_query_scopes_and_matches_location_inside_org():
     sql, params = mock_fetch.call_args.args
     assert "WHERE wo.organization_id = :organization_id" in sql
     assert "p.organization_id = wo.organization_id" in sql
-    assert "wo.status IN ('open', 'in_progress', 'completed')" in sql
+    assert "wo.status IN ('open', 'in_progress', 'paused', 'escalated', 'completed')" in sql
     assert "wo.property_id = :property_id" in sql
     assert "wo.address ILIKE :address" in sql
     assert params["organization_id"] == 42

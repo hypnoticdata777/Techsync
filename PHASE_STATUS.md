@@ -210,6 +210,14 @@ Completed:
   actions.
 - Added tested role UX walkthrough manifest, screenshot evidence template, and
   viewer/vendor demo users for final role capture.
+- Added Alembic migration `0006` for paused, escalated, and archived work-order
+  lifecycle states.
+- Added backend/mobile lifecycle handling for pause, escalate, cancel, and
+  manager-only archive actions.
+- Expanded the synthetic demo seed to include paused, escalated, and archived
+  work orders.
+- Added `OPERATIONS_RUNBOOK.md` for local/demo backup, restore, export,
+  lifecycle, and monitoring evidence.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and
@@ -220,7 +228,7 @@ Next:
 - Keep hosting deferred until every non-hosting requirement bucket is locally
   as complete as practical.
 - Continue local-only product depth with the remaining role-by-role UI/UX
-  friction sweep and screenshot-proof preparation.
+  friction sweep, accessibility evidence, and screenshot-proof preparation.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,

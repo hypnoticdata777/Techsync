@@ -284,7 +284,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   exports, operations reporting for stale work, overload, property hotspots,
   and completion cycle time, CSV exports for the operations report, dispatch
   board, clients, properties, and vendors, and a dispatch board for unassigned
-  work, technician lanes, utilization, SLA risk, duplicate-warning preflight
+  work, technician lanes, utilization, SLA risk, pause/escalate/archive
+  lifecycle states, duplicate-warning preflight
   checks, mobile PMC directory management, mobile report chart bars, and
   work-order entity linking, with manager-only mobile screens gated by role and
   primary mobile API failures showing visible retry states. Backend regression
@@ -326,6 +327,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
 - Docker image build was not network-testable in the sandbox this was built in (registry pull blocked); verify the image build in your deployment environment before relying on it.
 - Synthetic demo seed/reset tooling now exists in `scripts/seed_demo_data.py`
   and `DEMO_DATA_RUNBOOK.md`; run it only against local or demo databases.
+- Local/demo operational backup, restore, export, lifecycle, and monitoring
+  evidence is tracked in `OPERATIONS_RUNBOOK.md`.
 
 ## License
 

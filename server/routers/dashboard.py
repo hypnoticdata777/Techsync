@@ -37,8 +37,11 @@ def get_metrics(
         total_work_orders=sum(status_counts.values()),
         open_count=status_counts["open"],
         in_progress_count=status_counts["in_progress"],
+        paused_count=status_counts["paused"],
+        escalated_count=status_counts["escalated"],
         completed_count=status_counts["completed"],
         cancelled_count=status_counts["cancelled"],
+        archived_count=status_counts["archived"],
         sla_at_risk_count=sla_at_risk,
         active_technicians_count=len(active_technicians),
         total_technicians_count=len(technicians),
@@ -184,6 +187,8 @@ def get_dispatch_board(
     summary = DispatchBoardSummary(
         open_count=sum(1 for item in work_orders if item.status == "open"),
         in_progress_count=sum(1 for item in work_orders if item.status == "in_progress"),
+        paused_count=sum(1 for item in work_orders if item.status == "paused"),
+        escalated_count=sum(1 for item in work_orders if item.status == "escalated"),
         unassigned_count=len(unassigned),
         sla_at_risk_count=sum(
             1 for item in work_orders if item.sla_risk_level in {"breached", "due_soon"}

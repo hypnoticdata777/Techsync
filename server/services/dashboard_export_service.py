@@ -154,6 +154,16 @@ def build_dispatch_board_csv(board: DispatchBoard) -> str:
         },
         {
             "section": "summary",
+            "metric": "paused_count",
+            "value": board.summary.paused_count,
+        },
+        {
+            "section": "summary",
+            "metric": "escalated_count",
+            "value": board.summary.escalated_count,
+        },
+        {
+            "section": "summary",
             "metric": "unassigned_count",
             "value": board.summary.unassigned_count,
         },

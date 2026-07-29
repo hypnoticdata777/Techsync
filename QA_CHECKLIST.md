@@ -144,6 +144,10 @@ they have been verified in the relevant environment.
       deterministic synthetic screenshot filenames.
 - [x] Synthetic demo seed includes admin, coordinator, client, viewer, vendor,
       and technician login users for role capture.
+- [x] Work-order lifecycle now covers pause, escalate, cancel, and manager-only
+      archive states with backend/mobile regression evidence.
+- [x] Local/demo operations runbook added for backup, restore, export,
+      lifecycle, and monitoring evidence.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

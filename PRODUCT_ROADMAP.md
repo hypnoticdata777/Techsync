@@ -151,6 +151,8 @@ Likely scope:
   - duplicate-detection warnings now started in v1.3 for manual work-order
     preflight checks
   - manual override tracking
+  - pause/escalate/cancel/archive lifecycle states now started in v1.3, with
+    manager-only archive guardrails
 - Reporting improvements:
   - aging work orders
   - overloaded technicians
@@ -168,6 +170,8 @@ Likely scope:
   - error monitoring
   - uptime monitoring
   - backup/restore documentation
+  - local/demo operations runbook now started for backup, restore, export,
+    lifecycle, and monitoring evidence
   - stricter synthetic demo reset process now started with
     `scripts/seed_demo_data.py` and `DEMO_DATA_RUNBOOK.md`
   - role-by-role UX sweep now started with `ROLE_UX_SWEEP.md` and a

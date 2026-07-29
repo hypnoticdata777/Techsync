@@ -82,7 +82,7 @@ technicians: 3
 clients: 2
 properties: 3
 vendors: 2
-work_orders: 5
+work_orders: 8
 messages: 3
 attachments: 1
 events: 7

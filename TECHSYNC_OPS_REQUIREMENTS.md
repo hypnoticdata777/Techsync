@@ -254,6 +254,11 @@ Already represented in the codebase:
 - v1.3 role walkthrough manifest and evidence template for synthetic
   screenshot capture across admin, coordinator, technician, client, viewer, and
   vendor roles.
+- v1.3 pause, escalate, cancel, and manager-only archive lifecycle states for
+  work orders, with backend/mobile handling, dashboard counts, dispatch
+  visibility, regression tests, and synthetic seed examples.
+- v1.3 local/demo operations runbook for backup, restore, export, lifecycle,
+  and monitoring evidence.
 - v1.3 backend dispatch board for unassigned active work, technician lanes,
   workload utilization, and SLA risk.
 - v1.3 mobile dispatch board view for org admins/coordinators to scan

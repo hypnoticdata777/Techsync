@@ -346,6 +346,11 @@ def update_status(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only org admins and coordinators can close without proof using an override reason",
         )
+    except work_order_service.ArchiveNotAllowed:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only org admins and coordinators can archive work orders",
+        )
 
     return WorkOrder(**updated)
 

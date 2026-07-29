@@ -28,10 +28,16 @@ const getStatusColor = (status) => {
       return '#fbbf24'; // yellow
     case 'in_progress':
       return '#38bdf8'; // blue
+    case 'paused':
+      return '#f97316'; // orange
+    case 'escalated':
+      return '#fb7185'; // rose
     case 'completed':
       return '#a3e635'; // green
     case 'cancelled':
       return '#ef4444'; // red
+    case 'archived':
+      return '#94a3b8'; // slate
     default:
       return '#9ca3af'; // gray
   }

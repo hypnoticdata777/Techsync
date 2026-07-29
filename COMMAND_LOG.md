@@ -1237,6 +1237,46 @@ Result:
 - Backend tests passed: `115 passed`.
 - Compile check passed.
 
+## 2026-07-29 - v1.3 Lifecycle and Operations Runbook Batch
+
+Decision:
+
+- Continue bigger local-only requirement batches before hosting.
+- Close more of the functional, nonfunctional, and system requirements without
+  touching Vercel deployment or portfolio linking.
+
+Changes:
+
+- Added Alembic migration `0006` for explicit work-order lifecycle states:
+  `paused`, `escalated`, and `archived`.
+- Expanded backend status transitions so managers/coordinators/technicians can
+  pause and escalate work while archive remains manager-only.
+- Updated dashboard metrics, dispatch board summary, dispatch CSV exports,
+  active queue filters, SLA/stale/workload semantics, duplicate warnings, and
+  the base schema for the new lifecycle states.
+- Updated mobile work-order detail actions, confirmations, status colors, list
+  colors, report colors, and queue summary helpers for pause/escalate/archive.
+- Expanded the synthetic demo seed to include paused, escalated, and archived
+  work orders, raising the expected demo work-order count to 8.
+- Added `OPERATIONS_RUNBOOK.md` for local/demo backup, restore, export,
+  lifecycle, and monitoring evidence.
+- Updated README, QA, roadmap, phase, requirements, traceability, demo runbook,
+  v1.3 evidence, and pre-launch docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Client tests passed: `6 passed suites`, `31 passed tests`.
+- Backend tests passed: `143 passed`.
+- Compile check passed for `server` and `scripts`.
+
 ## 2026-07-29 - v1.3 Role Scope Regression Evidence
 
 Decision:

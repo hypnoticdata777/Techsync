@@ -30,6 +30,10 @@ class CompletionOverrideNotAllowed(Exception):
     """Raised when a non-manager attempts to bypass completion proof."""
 
 
+class ArchiveNotAllowed(Exception):
+    """Raised when a non-manager attempts to archive a work order."""
+
+
 def _active_counts(organization_id: int) -> dict[int, int]:
     open_orders = work_orders_repo.list_filtered(organization_id, status="open")
     in_progress_orders = work_orders_repo.list_filtered(organization_id, status="in_progress")
@@ -110,6 +114,8 @@ def transition_status(
     current_status = work_order["status"]
     if new_status != current_status and new_status not in ALLOWED_STATUS_TRANSITIONS.get(current_status, set()):
         raise InvalidStatusTransition(current_status, new_status)
+    if new_status == "archived" and actor_role not in ("org_admin", "coordinator"):
+        raise ArchiveNotAllowed()
 
     patch = {"status": new_status}
     if new_status == "completed":

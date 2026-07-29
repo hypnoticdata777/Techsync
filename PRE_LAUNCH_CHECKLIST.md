@@ -82,6 +82,10 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       client Jest checks on pushes/PRs. Backend coverage currently includes
       `server/tests/`; client coverage starts with shared validation tests and
       should grow as mobile flows are hardened.
+- [x] **Document managed Postgres backup/restore evidence path.**
+      `OPERATIONS_RUNBOOK.md` defines Neon backup evidence, disposable restore
+      checks, export proof, lifecycle evidence, and the hosted monitoring plan.
+      Actual provider backup screenshots remain a final hosting-gate task.
 - [ ] **Complete the Expo/React Native dependency upgrade.** Safe npm audit
       fixes reduced the client report from 39 to 29 findings with no criticals,
       but the remaining high/moderate findings are pinned inside Expo 50 / React

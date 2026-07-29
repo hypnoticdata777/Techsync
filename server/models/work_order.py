@@ -6,17 +6,20 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field, field_validator
 
 Priority = Literal["low", "medium", "high", "emergency"]
-Status = Literal["open", "in_progress", "completed", "cancelled"]
+Status = Literal["open", "in_progress", "paused", "escalated", "completed", "cancelled", "archived"]
 Source = Literal["manual", "csv", "webhook", "email", "pdf"]
 ClientApprovalStatus = Literal["not_required", "pending", "approved", "declined"]
 ClientApprovalDecision = Literal["approved", "declined"]
 
 # Only these transitions are legal (RF-18 acceptance criterion).
 ALLOWED_STATUS_TRANSITIONS: dict[Status, set[Status]] = {
-    "open": {"in_progress", "cancelled"},
-    "in_progress": {"completed", "cancelled", "open"},
-    "completed": set(),
-    "cancelled": set(),
+    "open": {"in_progress", "paused", "escalated", "cancelled", "archived"},
+    "in_progress": {"completed", "paused", "escalated", "cancelled", "open", "archived"},
+    "paused": {"open", "in_progress", "escalated", "cancelled", "archived"},
+    "escalated": {"in_progress", "paused", "completed", "cancelled", "archived"},
+    "completed": {"archived"},
+    "cancelled": {"archived"},
+    "archived": set(),
 }
 
 

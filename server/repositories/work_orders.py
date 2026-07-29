@@ -5,6 +5,16 @@ from typing import Optional
 
 from database import fetch_all, fetch_one, fetch_scalar, insert_row, update_row
 
+ALL_WORK_ORDER_STATUSES = (
+    "open",
+    "in_progress",
+    "paused",
+    "escalated",
+    "completed",
+    "cancelled",
+    "archived",
+)
+
 
 def create(organization_id: int, patch: dict) -> dict:
     return insert_row("work_orders", {"organization_id": organization_id, **patch})
@@ -75,7 +85,7 @@ def list_for_technician(organization_id: int, technician_id: int) -> list[dict]:
         FROM work_orders
         WHERE organization_id = :organization_id
           AND assigned_technician_id = :technician_id
-          AND status IN ('open', 'in_progress')
+          AND status IN ('open', 'in_progress', 'paused', 'escalated')
         ORDER BY CASE priority
             WHEN 'emergency' THEN 0
             WHEN 'high' THEN 1
@@ -98,7 +108,7 @@ def counts_by_status(organization_id: int) -> dict[str, int]:
         """,
         {"organization_id": organization_id},
     )
-    counts = {"open": 0, "in_progress": 0, "completed": 0, "cancelled": 0}
+    counts = {status: 0 for status in ALL_WORK_ORDER_STATUSES}
     for row in rows:
         status_value = row.get("status")
         if status_value in counts:
@@ -113,7 +123,7 @@ def count_sla_at_risk(organization_id: int) -> int:
         SELECT COUNT(*)
         FROM work_orders
         WHERE organization_id = :organization_id
-          AND status IN ('open', 'in_progress')
+          AND status IN ('open', 'in_progress', 'escalated')
           AND sla_due_at IS NOT NULL
           AND sla_due_at <= :soon
         """,
@@ -142,7 +152,7 @@ def list_stale_work_orders(
             sla_due_at
         FROM work_orders
         WHERE organization_id = :organization_id
-          AND status IN ('open', 'in_progress')
+          AND status IN ('open', 'in_progress', 'paused', 'escalated')
           AND created_at <= :cutoff
         ORDER BY CASE priority
             WHEN 'emergency' THEN 0
@@ -173,7 +183,7 @@ def list_overloaded_technicians(organization_id: int, limit: int = 20) -> list[d
         LEFT JOIN work_orders wo
             ON wo.assigned_technician_id = t.id
            AND wo.organization_id = t.organization_id
-           AND wo.status IN ('open', 'in_progress')
+           AND wo.status IN ('open', 'in_progress', 'escalated')
         WHERE t.organization_id = :organization_id
         GROUP BY t.id, t.user_id, u.full_name, u.email, t.availability_status, t.max_daily_jobs
         HAVING COUNT(wo.id) > t.max_daily_jobs
@@ -278,7 +288,7 @@ def list_dispatch_board_work_orders(organization_id: int) -> list[dict]:
             ON v.id = wo.vendor_id
            AND v.organization_id = wo.organization_id
         WHERE wo.organization_id = :organization_id
-          AND wo.status IN ('open', 'in_progress')
+          AND wo.status IN ('open', 'in_progress', 'paused', 'escalated')
         ORDER BY
             CASE
                 WHEN wo.sla_due_at IS NOT NULL AND wo.sla_due_at <= NOW() THEN 0
@@ -357,14 +367,16 @@ def list_potential_duplicates(
            AND p.organization_id = wo.organization_id
         WHERE wo.organization_id = :organization_id
           AND wo.created_at >= :cutoff
-          AND wo.status IN ('open', 'in_progress', 'completed')
+          AND wo.status IN ('open', 'in_progress', 'paused', 'escalated', 'completed')
           AND lower(wo.service_type) = lower(:service_type)
           AND ({' OR '.join(location_clauses)})
         ORDER BY
             CASE wo.status
                 WHEN 'open' THEN 0
                 WHEN 'in_progress' THEN 1
-                WHEN 'completed' THEN 2
+                WHEN 'escalated' THEN 2
+                WHEN 'paused' THEN 3
+                WHEN 'completed' THEN 4
                 ELSE 99
             END,
             wo.created_at DESC

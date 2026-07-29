@@ -168,6 +168,8 @@ export const buildQueueSummary = workOrders => {
     total: rows.length,
     open: rows.filter(item => item.status === 'open').length,
     inProgress: rows.filter(item => item.status === 'in_progress').length,
+    paused: rows.filter(item => item.status === 'paused').length,
+    escalated: rows.filter(item => item.status === 'escalated').length,
     pendingApproval: rows.filter(item => item.client_approval_status === 'pending').length,
   };
 };
