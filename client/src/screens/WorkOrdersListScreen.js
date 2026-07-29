@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,14 @@ import {
   RefreshControl,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import {
+  buildQueueSummary,
+  canManageOperations,
+  getRoleAccessMessage,
+  getRoleActions,
+  getRoleHome,
+  getWorkOrdersEndpointForRole,
+} from '../utils/roleWorkflows';
 
 // Helper function to get status color
 const getStatusColor = (status) => {
@@ -33,11 +41,14 @@ function WorkOrdersListScreen({navigation}) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  const canManageWorkOrders = ['org_admin', 'coordinator'].includes(user?.role);
+  const canManageWorkOrders = canManageOperations(user?.role);
 
   // RF-22: technicians see their assigned queue ordered by priority;
-  // admins/coordinators see the org-wide list (RF-21).
-  const endpoint = user?.role === 'technician' ? '/work-orders/mine' : '/work-orders';
+  // client/viewer scoping is enforced by the backend list endpoint (RF-21).
+  const endpoint = getWorkOrdersEndpointForRole(user?.role);
+  const roleHome = useMemo(() => getRoleHome(user?.role), [user?.role]);
+  const roleActions = useMemo(() => getRoleActions(user?.role), [user?.role]);
+  const queueSummary = useMemo(() => buildQueueSummary(workOrders), [workOrders]);
 
   const fetchWorkOrders = useCallback(async () => {
     try {
@@ -51,6 +62,8 @@ function WorkOrdersListScreen({navigation}) {
       } else if (res.status === 401) {
         setError('Session expired. Please login again.');
         await logout();
+      } else if (res.status === 403) {
+        setError(getRoleAccessMessage(user?.role));
       } else {
         setError('Unable to load work orders.');
       }
@@ -60,7 +73,7 @@ function WorkOrdersListScreen({navigation}) {
     } finally {
       setLoading(false);
     }
-  }, [authFetch, endpoint, logout]);
+  }, [authFetch, endpoint, logout, user?.role]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -116,37 +129,51 @@ function WorkOrdersListScreen({navigation}) {
       </View>
 
       <View style={styles.header}>
-        <Text style={styles.sectionTitle}>Work Orders</Text>
-        <View style={styles.headerActions}>
-          {canManageWorkOrders && (
-            <TouchableOpacity
-              style={styles.directoryButton}
-              onPress={() => navigation.navigate('PmcDirectory')}>
-              <Text style={styles.directoryButtonText}>Directory</Text>
-            </TouchableOpacity>
-          )}
-          {canManageWorkOrders && (
-            <TouchableOpacity
-              style={styles.dispatchButton}
-              onPress={() => navigation.navigate('DispatchBoard')}>
-              <Text style={styles.dispatchButtonText}>Dispatch</Text>
-            </TouchableOpacity>
-          )}
-          {canManageWorkOrders && (
-            <TouchableOpacity
-              style={styles.reportButton}
-              onPress={() => navigation.navigate('OperationsReport')}>
-              <Text style={styles.reportButtonText}>Report</Text>
-            </TouchableOpacity>
-          )}
-          {canManageWorkOrders && (
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => navigation.navigate('WorkOrderForm')}>
-              <Text style={styles.addButtonText}>+ Add</Text>
-            </TouchableOpacity>
-          )}
+        <View style={styles.titleBlock}>
+          <Text style={styles.sectionTitle}>{roleHome.title}</Text>
+          <Text style={styles.sectionSubtitle}>{roleHome.subtitle}</Text>
         </View>
+      </View>
+
+      <View style={styles.rolePanel}>
+        <View style={styles.summaryRow}>
+          <View style={styles.summaryPill}>
+            <Text style={styles.summaryValue}>{queueSummary.total}</Text>
+            <Text style={styles.summaryLabel}>Total</Text>
+          </View>
+          <View style={styles.summaryPill}>
+            <Text style={styles.summaryValue}>{queueSummary.open}</Text>
+            <Text style={styles.summaryLabel}>Open</Text>
+          </View>
+          <View style={styles.summaryPill}>
+            <Text style={styles.summaryValue}>{queueSummary.inProgress}</Text>
+            <Text style={styles.summaryLabel}>Active</Text>
+          </View>
+          <View style={styles.summaryPill}>
+            <Text style={styles.summaryValue}>{queueSummary.pendingApproval}</Text>
+            <Text style={styles.summaryLabel}>Approvals</Text>
+          </View>
+        </View>
+
+        {canManageWorkOrders && (
+          <View style={styles.actionGrid}>
+            {roleActions.map(action => (
+              <TouchableOpacity
+                key={action.key}
+                style={[styles.actionCard, styles[`${action.tone}Action`]]}
+                onPress={() => navigation.navigate(action.route)}>
+                <Text
+                  style={[
+                    styles.actionLabel,
+                    action.tone === 'primary' && styles.primaryActionLabel,
+                  ]}>
+                  {action.label}
+                </Text>
+                <Text style={styles.actionDetail}>{action.detail}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
 
       {loading && <ActivityIndicator style={styles.loader} />}
@@ -165,7 +192,7 @@ function WorkOrdersListScreen({navigation}) {
           renderItem={renderWorkOrder}
           ListEmptyComponent={
             <Text style={styles.emptyState}>
-              No work orders yet. Tap "Add" to create one.
+              {roleHome.emptyState}
             </Text>
           }
           contentContainerStyle={styles.listContent}
@@ -206,73 +233,99 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 16,
     paddingTop: 8,
+    paddingBottom: 8,
+  },
+  titleBlock: {
+    gap: 4,
   },
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
     color: '#f9fafb',
   },
-  headerActions: {
+  sectionSubtitle: {
+    color: '#94a3b8',
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  rolePanel: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 12,
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 10,
+  },
+  summaryPill: {
+    flex: 1,
+    minHeight: 54,
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#1e293b',
+    borderRadius: 7,
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  summaryValue: {
+    color: '#38bdf8',
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  summaryLabel: {
+    color: '#cbd5e1',
+    fontSize: 10,
+    fontWeight: '700',
+    marginTop: 2,
+  },
+  actionGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-end',
     gap: 8,
-    flexShrink: 1,
   },
-  directoryButton: {
-    backgroundColor: '#0f172a',
+  actionCard: {
+    flexGrow: 1,
+    flexBasis: '47%',
+    minHeight: 58,
     borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+    justifyContent: 'center',
+    backgroundColor: '#0f172a',
+  },
+  directoryAction: {
     borderColor: '#c084fc',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
   },
-  directoryButtonText: {
-    color: '#d8b4fe',
-    fontWeight: '700',
-    fontSize: 13,
-  },
-  reportButton: {
-    backgroundColor: '#0f172a',
-    borderWidth: 1,
-    borderColor: '#38bdf8',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  reportButtonText: {
-    color: '#38bdf8',
-    fontWeight: '600',
-    fontSize: 13,
-  },
-  dispatchButton: {
-    backgroundColor: '#111827',
-    borderWidth: 1,
+  dispatchAction: {
     borderColor: '#a3e635',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 8,
   },
-  dispatchButtonText: {
-    color: '#a3e635',
-    fontWeight: '700',
-    fontSize: 13,
+  reportAction: {
+    borderColor: '#38bdf8',
   },
-  addButton: {
+  primaryAction: {
     backgroundColor: '#38bdf8',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+    borderColor: '#38bdf8',
   },
-  addButtonText: {
-    color: '#050816',
-    fontWeight: '600',
+  actionLabel: {
+    color: '#f9fafb',
+    fontWeight: '700',
     fontSize: 14,
+  },
+  actionDetail: {
+    color: '#94a3b8',
+    fontSize: 11,
+    marginTop: 3,
+  },
+  primaryActionLabel: {
+    color: '#050816',
   },
   listContent: {
     paddingHorizontal: 16,

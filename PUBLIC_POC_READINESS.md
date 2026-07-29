@@ -146,6 +146,8 @@ Continue v1.3 product depth before hosted public promotion:
    `V13_EVIDENCE_TEMPLATE.md`.
 9. Keep hosting and portfolio linking as the absolute final step after the
    remaining non-hosting requirement buckets and UI/UX friction sweep are done.
+10. Use `ROLE_UX_SWEEP.md` to track role-by-role mobile UX evidence before the
+    final hosted showcase.
 
 ## Stop Point For This Phase
 

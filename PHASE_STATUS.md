@@ -186,6 +186,8 @@ Completed:
 - Added hosted v1.3 smoke coverage for client/property/vendor CSV exports.
 - Added mobile operations report chart bars for risk mix, technician capacity
   pressure, and property hotspot activity.
+- Added role-specific mobile work-order landing band and `ROLE_UX_SWEEP.md` to
+  start the exhaustive pre-hosting UX sweep.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and
@@ -196,7 +198,8 @@ Next:
 - Keep hosting deferred until every non-hosting requirement bucket is locally
   as complete as practical.
 - Continue local-only product depth with binary PDF closeout polish, completion
-  cycle-time/deeper export workflows, or the UI/UX friction sweep.
+  cycle-time/deeper export workflows, or the remaining role-by-role UI/UX
+  friction sweep.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,
@@ -255,7 +258,7 @@ Stop when:
 ## Current Recommended Next Move
 
 Continue local-only v1.3 hardening and leave hosting as the absolute final
-gate. Best next candidates: binary closeout PDF polish, richer reporting
-cycle-time/deeper exports, or a role-by-role UI/UX friction sweep. Only after those
+gate. Best next candidates: final role-by-role UI/UX friction evidence,
+binary closeout PDF polish, or completion cycle-time/deeper exports. Only after those
 non-hosting requirements are complete should the Neon/Vercel/portfolio showcase
 sequence resume.

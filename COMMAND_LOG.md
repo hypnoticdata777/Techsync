@@ -1042,3 +1042,39 @@ Result:
 - Client tests passed: `3 passed suites`, `11 passed tests`.
 - Backend tests passed: `113 passed`.
 - Compile check passed.
+
+## 2026-07-29 - v1.3 Role-Based UX Landing Sweep
+
+Decision:
+
+- Start the exhaustive pre-hosting role UX sweep with a concrete mobile client
+  improvement instead of waiting for final screenshots.
+- Keep hosting deferred and improve role clarity on the first authenticated
+  screen.
+
+Changes:
+
+- Added `client/src/utils/roleWorkflows.js`.
+- Added `client/src/utils/roleWorkflows.test.js`.
+- Added a role-specific work-order landing band for org admin, coordinator,
+  technician, client, viewer, and vendor states.
+- Replaced cramped manager header buttons with action cards for Directory,
+  Dispatch, Report, and New Work.
+- Added queue summary counts for total, open, active, and pending approval
+  work.
+- Added `ROLE_UX_SWEEP.md` to track remaining role walkthrough evidence before
+  hosting.
+- Updated README, roadmap, QA, requirements, traceability, public-readiness,
+  and phase-status docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+```
+
+Result:
+
+- Client tests passed: `4 passed suites`, `16 passed tests`.
+- Backend tests passed: `113 passed`.

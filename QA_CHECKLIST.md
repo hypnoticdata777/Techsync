@@ -121,6 +121,8 @@ they have been verified in the relevant environment.
 - [ ] Synthetic demo walkthrough validated.
 - [ ] Synthetic demo seed/reset run captured without exposing database URLs or
       provider secrets.
+- [x] Role-specific work-order landing band and tested role workflow helpers
+      added.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

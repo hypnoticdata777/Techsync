@@ -167,6 +167,8 @@ Likely scope:
   - backup/restore documentation
   - stricter synthetic demo reset process now started with
     `scripts/seed_demo_data.py` and `DEMO_DATA_RUNBOOK.md`
+  - role-by-role UX sweep now started with `ROLE_UX_SWEEP.md` and a
+    role-specific mobile landing band
 - End-of-v1.3 showcase gate:
   - Vercel backend deployed behind HTTPS
   - `APP_ENV=demo` configured in Vercel
@@ -201,6 +203,8 @@ v1.3 exit criteria:
   not before the product feels robust enough to show.
 - Documentation explains which v1.3 features are prototype-ready versus still
   deferred.
+- Role-specific UX sweep evidence is started locally, with final screenshots
+  and walkthrough evidence still required before hosting.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data, while
   the client invite/accept/approval decision is manually verified from the
   hosted email/log path.

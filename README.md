@@ -10,6 +10,9 @@ This repository implements the POC scope defined in
 `PRODUCT_ROADMAP.md`. See [Spec Coverage](#spec-coverage) below for what's
 implemented vs. deferred.
 
+Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`; hosting remains
+deferred until the local role walkthrough is complete.
+
 ## Overview
 
 TechSync Ops ingests maintenance work orders from CSV and webhook sources,
@@ -304,9 +307,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   only); the spec's "panel administrativo" is assumed to be a future
   separate web client consuming this same API.
 - **PMC operations expansion still remaining**: calendar/maps, completion
-  cycle-time charts, deeper entity exports, binary PDF
-  generation, deeper client/vendor portals, and exhaustive UI/UX friction
-  testing are tracked for v1.3+ / later in `PRODUCT_ROADMAP.md`.
+  cycle-time charts, deeper entity exports, binary PDF generation, deeper
+  client/vendor portals, and final UI/UX screenshot testing are tracked for
+  v1.3+ / later in `PRODUCT_ROADMAP.md`.
 
 - **RF-23 (offline sync)**, **RF-10/RF-13 (PDF/email ingestion)**: deferred,
   per the spec's own "Notas de Alcance" — not blocking for a POC.
