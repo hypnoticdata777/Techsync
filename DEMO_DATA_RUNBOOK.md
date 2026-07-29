@@ -24,7 +24,7 @@ or attachment data.
 The seed creates:
 
 - One PMC organization.
-- Admin, coordinator, client, and technician users.
+- Admin, coordinator, client, viewer, vendor, and technician users.
 - Client records.
 - Property records.
 - Vendor records.
@@ -63,12 +63,21 @@ To see synthetic demo login emails and the shared demo password after seeding:
 python scripts\seed_demo_data.py seed --reset-existing --show-credentials
 ```
 
+Synthetic login emails printed by the seed include:
+
+- `admin.demo@techsync.local`
+- `coordinator.demo@techsync.local`
+- `client.demo@techsync.local`
+- `owner-group.demo@techsync.local`
+- `apex.demo@techsync.local`
+- three technician accounts
+
 ## Expected Seed Counts
 
 Expected approximate counts after a clean seed:
 
 ```text
-users: 6
+users: 8
 technicians: 3
 clients: 2
 properties: 3

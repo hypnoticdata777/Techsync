@@ -140,6 +140,10 @@ they have been verified in the relevant environment.
       primary role workflow controls before screenshot capture.
 - [x] Role-specific empty queue panels are implemented and tested for manager,
       technician, client, viewer, and vendor contexts.
+- [x] Role UX walkthrough manifest and evidence template prepared with
+      deterministic synthetic screenshot filenames.
+- [x] Synthetic demo seed includes admin, coordinator, client, viewer, vendor,
+      and technician login users for role capture.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

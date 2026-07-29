@@ -48,7 +48,7 @@ Expected:
 
 ```text
 Demo org slug: techsync-ops-demo-pmc
-users: 6
+users: 8
 technicians: 3
 clients: 2
 properties: 3
@@ -125,6 +125,7 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Verify client can only see/add client-visible messages.
 - [ ] Verify client can approve or decline a pending approval request.
 - [ ] Capture sanitized screenshots for the portfolio sliver.
+- [ ] Complete `ROLE_UX_EVIDENCE_TEMPLATE.md` using synthetic demo users only.
 
 ## Safe Evidence Notes
 

@@ -37,8 +37,9 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       end-of-v1.3 showcase gate.
 - [x] **Prepare v1.2/v1.3 smoke/evidence harness.** `scripts/smoke_v12.py`,
       `scripts/smoke_v13.py`, `V12_EVIDENCE_TEMPLATE.md`,
-      `V13_EVIDENCE_TEMPLATE.md`, and `PORTFOLIO_TECHSYNC_OPS.md` define the
-      hosted proof path and portfolio source copy.
+      `V13_EVIDENCE_TEMPLATE.md`, `ROLE_UX_EVIDENCE_TEMPLATE.md`, and
+      `PORTFOLIO_TECHSYNC_OPS.md` define the hosted proof path, role screenshot
+      proof path, and portfolio source copy.
 - [x] **Wire up real password-reset and invitation emails.** The backend
       now sends reset and invitation emails through `services/email_service.py`.
       Local development can use `EMAIL_DELIVERY_METHOD=log`; production

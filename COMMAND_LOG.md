@@ -1336,6 +1336,44 @@ Result:
 - Backend tests passed: `119 passed`.
 - Compile check passed.
 
+## 2026-07-29 - v1.3 Role UX Evidence Batch
+
+Decision:
+
+- Move from tiny UX slices to a broader pre-hosting evidence batch.
+- Prepare the final role walkthrough path before hosting by aligning demo data,
+  role manifest tests, and screenshot documentation.
+
+Changes:
+
+- Added viewer and vendor synthetic login users to `scripts/seed_demo_data.py`.
+- Linked the viewer login to the synthetic owner-group client record and the
+  vendor login to the synthetic Apex vendor record.
+- Added `client/src/utils/roleWalkthrough.js` with a role-by-role walkthrough
+  manifest, synthetic login map, screenshot filenames, visibility guardrails,
+  and evidence safety checklist.
+- Added `client/src/utils/roleWalkthrough.test.js` coverage for role order,
+  manager/non-manager controls, privacy expectations, deterministic screenshot
+  names, and safety guardrails.
+- Added `ROLE_UX_EVIDENCE_TEMPLATE.md` for the final screenshot/walkthrough
+  pass.
+- Updated demo data, v1.3 evidence, pre-launch, role UX, QA, roadmap, phase,
+  requirements, traceability, and README docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Client tests passed: `6 passed suites`, `31 passed tests`.
+- Backend tests passed: `119 passed`.
+- Compile check passed for `server` and `scripts`.
+
 ## 2026-07-29 - v1.3 Mobile Retry-State Polish
 
 Decision:

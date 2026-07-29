@@ -138,6 +138,20 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
         "Riley Homeowner",
         "client",
     )
+    viewer_user = app.users_repo.create_user(
+        organization_id,
+        "owner-group.demo@techsync.local",
+        password_hash,
+        "Morgan Board",
+        "viewer",
+    )
+    vendor_user = app.users_repo.create_user(
+        organization_id,
+        "apex.demo@techsync.local",
+        password_hash,
+        "Sam Dispatcher",
+        "vendor",
+    )
 
     tech_user_lena = app.users_repo.create_user(
         organization_id,
@@ -217,7 +231,7 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
         {
             "display_name": "West Garden Owner Group",
             "contact_name": "Morgan Board",
-            "email": "owner-group.demo@techsync.local",
+            "email": viewer_user["email"],
             "phone": "555-0101",
             "client_type": "owner",
             "notes": "Synthetic owner group for property hotspot reporting.",
@@ -278,7 +292,7 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
         {
             "name": "Apex Demo Plumbing",
             "contact_name": "Sam Dispatcher",
-            "email": "apex.demo@techsync.local",
+            "email": vendor_user["email"],
             "phone": "555-0110",
             "service_types": ["plumbing", "general"],
             "coverage_area": "North and central synthetic zones",
@@ -501,6 +515,8 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
             "admin": admin["email"],
             "coordinator": coordinator["email"],
             "client": client_user["email"],
+            "viewer": viewer_user["email"],
+            "vendor": vendor_user["email"],
             "technicians": [tech_user_lena["email"], tech_user_marco["email"], tech_user_priya["email"]],
         },
         "counts": get_demo_status()["counts"],
@@ -550,6 +566,8 @@ def _print_seed_summary(result: dict[str, Any], show_credentials: bool) -> None:
     print(f"- admin: {result['users']['admin']}")
     print(f"- coordinator: {result['users']['coordinator']}")
     print(f"- client: {result['users']['client']}")
+    print(f"- viewer: {result['users']['viewer']}")
+    print(f"- vendor: {result['users']['vendor']}")
     for email in result["users"]["technicians"]:
         print(f"- technician: {email}")
     if show_credentials:

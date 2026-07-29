@@ -208,6 +208,8 @@ Completed:
   workflow controls before screenshot capture.
 - Added tested role-specific empty queue panels with manager-only create-work
   actions.
+- Added tested role UX walkthrough manifest, screenshot evidence template, and
+  viewer/vendor demo users for final role capture.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and

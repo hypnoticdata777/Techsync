@@ -50,6 +50,11 @@ Implemented:
 - Added tested role-aware empty queue panel copy for admin, coordinator,
   technician, client, viewer, and vendor states, with create-work action only
   for manager roles.
+- Added a tested role walkthrough manifest covering synthetic role logins,
+  route/screenshots to capture, expected visible/hidden controls, and public
+  evidence safety checks.
+- Added `ROLE_UX_EVIDENCE_TEMPLATE.md` and expanded the synthetic seed to
+  include viewer/vendor logins for final role screenshots.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
 
@@ -62,7 +67,7 @@ server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 
 Result:
 
-- Client tests passed: `5 passed suites`, `25 passed tests`.
+- Client tests passed: `6 passed suites`, `31 passed tests`.
 - Backend tests passed: `119 passed`.
 
 ## Role Matrix
@@ -79,6 +84,7 @@ Result:
 ## Remaining Sweep Items
 
 - Capture mobile screenshots for each role using synthetic demo data.
+  Walkthrough manifest/template is prepared; final screenshots still needed.
 - Verify role-specific empty states with seeded and empty queues.
   Empty-state code/tests are implemented; final screenshot proof still needed.
 - Verify client/viewer cannot see internal messages or unrelated work.
