@@ -78,6 +78,9 @@ coverage/
 gitleaks*.json
 tools/gitleaks*/
 
+# Local hosted-smoke evidence artifacts
+v12-smoke-evidence*.json
+
 # Misc
 *.log
 .cache/

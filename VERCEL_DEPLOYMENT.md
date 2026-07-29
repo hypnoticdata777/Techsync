@@ -122,7 +122,30 @@ Then verify:
 - status transition
 - CSV ingestion with synthetic data
 - dashboard metrics
+- attachment metadata/proof boundary
 - attachment upload if storage is configured
+
+The repeatable smoke-test script covers the synthetic hosted journey and writes
+a sanitized evidence file:
+
+```powershell
+python scripts/smoke_v12.py --base-url "https://<vercel-url>" --output "v12-smoke-evidence.json"
+```
+
+`v12-smoke-evidence*.json` is ignored by Git because it is local deployment
+evidence, not source code.
+
+Use `V12_EVIDENCE_TEMPLATE.md` to capture the final portfolio-safe v1.2 proof,
+then wire the public copy from `PORTFOLIO_TECHSYNC_OPS.md` into the portfolio
+page.
+
+You can also run the same script from GitHub Actions:
+
+1. Go to Actions.
+2. Select `Hosted v1.2 smoke test`.
+3. Click `Run workflow`.
+4. Paste the hosted Vercel API base URL.
+5. Download the `v12-smoke-evidence` artifact after it passes.
 
 ## Known v1.2 Hosting Limits
 

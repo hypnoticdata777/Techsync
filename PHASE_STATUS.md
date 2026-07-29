@@ -97,6 +97,12 @@ Completed:
 - Added Vercel deployment prep files: `api/index.py`, root `requirements.txt`,
   `.python-version`, `vercel.json`, and `VERCEL_DEPLOYMENT.md`.
 - Updated the FastAPI metadata and health service name to TechSync Ops.
+- Added `scripts/smoke_v12.py` and `V12_EVIDENCE_TEMPLATE.md` so hosted v1.2
+  evidence can be collected repeatably with synthetic data.
+- Added manual GitHub Actions workflow `Hosted v1.2 smoke test` for hosted
+  evidence collection after Vercel deploy.
+- Added `PORTFOLIO_TECHSYNC_OPS.md` as the portfolio case-study source for the
+  v1.2 public POC.
 
 Next:
 

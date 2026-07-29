@@ -112,6 +112,8 @@ Tasks:
 - Deploy backend behind HTTPS.
 - Verify `/health`.
 - Verify startup logs for missing config.
+- Run `scripts/smoke_v12.py` against the hosted URL.
+- Capture v1.2 evidence with `V12_EVIDENCE_TEMPLATE.md`.
 
 Exit criteria:
 
@@ -156,6 +158,7 @@ Tasks:
   - POC status;
   - next production work.
 - Use synthetic screenshots only.
+- Use `PORTFOLIO_TECHSYNC_OPS.md` as the source copy for the case-study page.
 
 Recommended positioning:
 
@@ -179,6 +182,7 @@ Tasks:
 
 - Capture GitHub Actions CI status.
 - Capture hosted `/health` result.
+- Capture `scripts/smoke_v12.py` result.
 - Capture screenshots of:
   - onboarding;
   - login;

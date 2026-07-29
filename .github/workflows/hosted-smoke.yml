@@ -1,0 +1,35 @@
+name: Hosted v1.2 smoke test
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Hosted TechSync Ops API base URL, for example https://techsync-ops.vercel.app"
+        required: true
+        type: string
+
+jobs:
+  smoke:
+    name: Run hosted smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run v1.2 hosted smoke test
+        run: |
+          python scripts/smoke_v12.py \
+            --base-url "${{ inputs.base_url }}" \
+            --output v12-smoke-evidence.json
+
+      - name: Upload smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v12-smoke-evidence
+          path: v12-smoke-evidence.json
+          if-no-files-found: error

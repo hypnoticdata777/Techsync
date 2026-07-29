@@ -41,6 +41,10 @@ they have been verified in the relevant environment.
 - [x] Code-supported `APP_ENV=demo` hosted POC mode added.
 - [x] Backend host chosen: Vercel.
 - [x] Vercel deployment adapter and runbook added.
+- [x] Repeatable v1.2 hosted smoke-test script added.
+- [x] Manual GitHub Actions hosted smoke workflow added.
+- [x] v1.2 evidence template added.
+- [x] Portfolio case-study source copy added.
 - [x] Neon demo database created.
 - [x] Direct Neon connection string used for Alembic migrations.
 - [x] Pooled Neon connection string selected for hosted/serverless runtime.
@@ -72,9 +76,9 @@ they have been verified in the relevant environment.
 
 ## Portfolio Integration
 
-- [ ] TechSync Ops project card added to portfolio.
-- [ ] Problem statement added.
-- [ ] Architecture/proof summary added.
+- [x] TechSync Ops portfolio case-study shell prepared in repo.
+- [x] Problem statement drafted.
+- [x] Architecture/proof summary drafted.
 - [ ] GitHub repo linked.
 - [ ] Hosted demo or walkthrough linked.
 - [ ] POC status label added.

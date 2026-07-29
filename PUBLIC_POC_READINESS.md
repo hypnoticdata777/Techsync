@@ -34,6 +34,9 @@ Latest verified CI run before this scan: success on main for 3c3f0ac
 - Launch-hardening docs and pre-launch checklist.
 - Active PMC operations requirements captured in `TECHSYNC_OPS_REQUIREMENTS.md`.
 - v1.2/v1.3 product path captured in `PRODUCT_ROADMAP.md`.
+- Repeatable hosted smoke-test script added in `scripts/smoke_v12.py`.
+- Portfolio case-study source copy added in `PORTFOLIO_TECHSYNC_OPS.md`.
+- v1.2 evidence capture template added in `V12_EVIDENCE_TEMPLATE.md`.
 
 ## Safety Sweep Notes
 
@@ -126,7 +129,8 @@ Proceed to hosted POC setup:
 6. Verify `/health`, onboarding, login/refresh, work-order creation, assignment,
    status transitions, CSV ingestion, dashboard metrics, and attachment flow if
    storage is configured.
-7. Connect the synthetic demo or walkthrough from the portfolio once the
+7. Run `scripts/smoke_v12.py` and capture sanitized evidence.
+8. Connect the synthetic demo or walkthrough from the portfolio once the
    portfolio URL exists.
 
 ## Stop Point For This Phase

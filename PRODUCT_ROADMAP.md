@@ -36,6 +36,8 @@ Scope:
 - CORS locked to the intended portfolio/demo origins.
 - Synthetic organization, users, technicians, and work orders available for
   demo/evidence.
+- Repeatable hosted smoke-test script and evidence template available.
+- Manual GitHub Actions hosted smoke workflow available.
 - Smoke-test proof for:
   - `/health`
   - organization onboarding
@@ -57,6 +59,7 @@ Scope:
   - GitHub link
   - hosted API/demo/walkthrough link when available
   - known limitations
+- Portfolio case-study source copy available in `PORTFOLIO_TECHSYNC_OPS.md`.
 
 Deferred from v1.2:
 
