@@ -21,6 +21,7 @@ from repositories import work_orders as work_orders_repo
 from routers import dashboard as dashboard_router
 from routers import work_orders as work_orders_router
 from models.user import User
+from models.work_order import WorkOrderApprovalDecision, WorkOrderApprovalRequest
 from models.work_order_message import WorkOrderMessageCreate
 
 
@@ -351,6 +352,208 @@ def test_client_cannot_view_other_client_work_order():
 
     assert exc.value.status_code == 403
     assert exc.value.detail == "Not visible to you"
+
+
+def test_staff_cannot_request_client_approval_without_linked_client():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "client_id": None},
+    ):
+        with pytest.raises(HTTPException) as exc:
+            work_orders_router.request_client_approval(
+                1,
+                WorkOrderApprovalRequest(notes="Please approve the estimate."),
+                current_user=admin_user,
+                organization={"id": 6},
+            )
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "Client approval requires a linked client"
+
+
+def test_staff_request_client_approval_writes_status_message_and_event():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="coordinator",
+        is_active=True,
+    )
+    updated_row = {
+        "id": 1,
+        "organization_id": 6,
+        "title": "Leaking sink",
+        "description": None,
+        "property_id": 3,
+        "client_id": 9,
+        "vendor_id": None,
+        "customer_name": None,
+        "address": None,
+        "latitude": None,
+        "longitude": None,
+        "service_type": "plumbing",
+        "priority": "medium",
+        "status": "open",
+        "assigned_technician_id": None,
+        "created_by": 5,
+        "source": "manual",
+        "external_ref": None,
+        "sla_due_at": None,
+        "completed_at": None,
+        "completion_notes": None,
+        "completion_proof_verified_at": None,
+        "completion_override_reason": None,
+        "client_approval_status": "pending",
+        "client_approval_requested_at": None,
+        "client_approval_requested_by": 5,
+        "client_approval_decision_at": None,
+        "client_approval_decision_by": None,
+        "client_approval_notes": "Please approve the estimate.",
+        "created_at": "2026-07-28T00:00:00Z",
+        "updated_at": "2026-07-28T00:00:00Z",
+    }
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "client_id": 9},
+    ):
+        with patch("routers.work_orders.work_orders_repo.update", return_value=updated_row) as mock_update:
+            with patch("routers.work_orders.events_repo.create_event", return_value={}) as mock_event:
+                with patch("routers.work_orders.messages_repo.create", return_value={}) as mock_message:
+                    row = work_orders_router.request_client_approval(
+                        1,
+                        WorkOrderApprovalRequest(notes="Please approve the estimate."),
+                        current_user=admin_user,
+                        organization={"id": 6},
+                    )
+
+    assert row.client_approval_status == "pending"
+    assert mock_update.call_args.args[0:2] == (1, 6)
+    assert mock_update.call_args.args[2]["client_approval_status"] == "pending"
+    assert mock_update.call_args.args[2]["client_approval_decision_at"] is None
+    assert mock_event.call_args.kwargs["event_type"] == "client_approval_requested"
+    assert mock_message.call_args.args[3]["visibility"] == "client"
+
+
+def test_client_approval_decision_requires_pending_status():
+    client_user = User(
+        id=5,
+        organization_id=6,
+        email="owner@example.com",
+        full_name="Owner",
+        role="client",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={
+            "id": 1,
+            "organization_id": 6,
+            "client_id": 9,
+            "client_approval_status": "not_required",
+        },
+    ):
+        with patch(
+            "routers.work_orders.clients_repo.get_by_email_in_org",
+            return_value={"id": 9, "email": "owner@example.com"},
+        ):
+            with pytest.raises(HTTPException) as exc:
+                work_orders_router.decide_client_approval(
+                    1,
+                    WorkOrderApprovalDecision(decision="approved", notes=None),
+                    current_user=client_user,
+                    organization={"id": 6},
+                )
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "Client approval is not pending for this work order"
+
+
+def test_client_can_decline_pending_approval_for_own_work_order():
+    client_user = User(
+        id=5,
+        organization_id=6,
+        email="owner@example.com",
+        full_name="Owner",
+        role="client",
+        is_active=True,
+    )
+    updated_row = {
+        "id": 1,
+        "organization_id": 6,
+        "title": "Leaking sink",
+        "description": None,
+        "property_id": 3,
+        "client_id": 9,
+        "vendor_id": None,
+        "customer_name": None,
+        "address": None,
+        "latitude": None,
+        "longitude": None,
+        "service_type": "plumbing",
+        "priority": "medium",
+        "status": "open",
+        "assigned_technician_id": None,
+        "created_by": 5,
+        "source": "manual",
+        "external_ref": None,
+        "sla_due_at": None,
+        "completed_at": None,
+        "completion_notes": None,
+        "completion_proof_verified_at": None,
+        "completion_override_reason": None,
+        "client_approval_status": "declined",
+        "client_approval_requested_at": None,
+        "client_approval_requested_by": 5,
+        "client_approval_decision_at": None,
+        "client_approval_decision_by": 5,
+        "client_approval_notes": "Need a lower-cost option.",
+        "created_at": "2026-07-28T00:00:00Z",
+        "updated_at": "2026-07-28T00:00:00Z",
+    }
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={
+            "id": 1,
+            "organization_id": 6,
+            "client_id": 9,
+            "client_approval_status": "pending",
+        },
+    ):
+        with patch(
+            "routers.work_orders.clients_repo.get_by_email_in_org",
+            return_value={"id": 9, "email": "owner@example.com"},
+        ):
+            with patch("routers.work_orders.work_orders_repo.update", return_value=updated_row) as mock_update:
+                with patch("routers.work_orders.events_repo.create_event", return_value={}) as mock_event:
+                    with patch("routers.work_orders.messages_repo.create", return_value={}) as mock_message:
+                        row = work_orders_router.decide_client_approval(
+                            1,
+                            WorkOrderApprovalDecision(
+                                decision="declined",
+                                notes="Need a lower-cost option.",
+                            ),
+                            current_user=client_user,
+                            organization={"id": 6},
+                        )
+
+    assert row.client_approval_status == "declined"
+    assert mock_update.call_args.args[2]["client_approval_status"] == "declined"
+    assert mock_update.call_args.args[2]["client_approval_decision_by"] == 5
+    assert mock_event.call_args.kwargs["event_type"] == "client_approval_declined"
+    assert "declined" in mock_message.call_args.args[3]["body"]
 
 
 def test_operations_report_uses_tenant_scoped_repository_calls():

@@ -47,6 +47,32 @@ const STATUS_LABELS = {
 
 const INTERNAL_ROLES = ['org_admin', 'coordinator', 'technician'];
 
+const getApprovalColor = status => {
+  switch (status) {
+    case 'pending':
+      return '#fbbf24';
+    case 'approved':
+      return '#a3e635';
+    case 'declined':
+      return '#fb7185';
+    default:
+      return '#9ca3af';
+  }
+};
+
+const getApprovalLabel = status => {
+  switch (status) {
+    case 'pending':
+      return 'Pending Client Approval';
+    case 'approved':
+      return 'Approved';
+    case 'declined':
+      return 'Declined';
+    default:
+      return 'Not Requested';
+  }
+};
+
 function WorkOrderDetailsScreen({route, navigation}) {
   const {user, authFetch} = useAuth();
   const [workOrder, setWorkOrder] = useState(route.params.workOrder);
@@ -60,11 +86,16 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const [messageBody, setMessageBody] = useState('');
   const [messageVisibility, setMessageVisibility] = useState('internal');
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [approvalNotes, setApprovalNotes] = useState('');
+  const [updatingApproval, setUpdatingApproval] = useState(false);
 
   const canEdit = user?.role === 'org_admin' || user?.role === 'coordinator';
   const canUseInternalMessages = INTERNAL_ROLES.includes(user?.role);
   const canUpdateStatus = INTERNAL_ROLES.includes(user?.role);
   const canUploadAttachments = INTERNAL_ROLES.includes(user?.role);
+  const canRequestApproval = canEdit && !!workOrder.client_id;
+  const canDecideApproval =
+    user?.role === 'client' && workOrder.client_approval_status === 'pending';
   const nextStatuses = canUpdateStatus ? ALLOWED_TRANSITIONS[workOrder.status] || [] : [];
 
   const loadAttachments = useCallback(async () => {
@@ -183,6 +214,60 @@ function WorkOrderDetailsScreen({route, navigation}) {
       Alert.alert('Message failed', error.message || 'Unable to send message.');
     } finally {
       setSendingMessage(false);
+    }
+  };
+
+  const requestApproval = async () => {
+    try {
+      setUpdatingApproval(true);
+      const res = await authFetch(`/work-orders/${workOrder.id}/approval-request`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({notes: approvalNotes.trim() || null}),
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setWorkOrder(updated);
+        setApprovalNotes('');
+        await loadMessages();
+        return;
+      }
+
+      const errorData = await res.json().catch(() => ({}));
+      Alert.alert('Approval request failed', errorData.detail || 'Unable to request approval.');
+    } catch (error) {
+      console.error('Approval request error:', error);
+      Alert.alert('Approval request failed', error.message || 'Unable to request approval.');
+    } finally {
+      setUpdatingApproval(false);
+    }
+  };
+
+  const decideApproval = async decision => {
+    try {
+      setUpdatingApproval(true);
+      const res = await authFetch(`/work-orders/${workOrder.id}/approval`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({decision, notes: approvalNotes.trim() || null}),
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setWorkOrder(updated);
+        setApprovalNotes('');
+        await loadMessages();
+        return;
+      }
+
+      const errorData = await res.json().catch(() => ({}));
+      Alert.alert('Approval update failed', errorData.detail || 'Unable to update approval.');
+    } catch (error) {
+      console.error('Approval decision error:', error);
+      Alert.alert('Approval update failed', error.message || 'Unable to update approval.');
+    } finally {
+      setUpdatingApproval(false);
     }
   };
 
@@ -326,6 +411,67 @@ function WorkOrderDetailsScreen({route, navigation}) {
         <View style={styles.section}>
           <Text style={styles.label}>Work Order ID</Text>
           <Text style={styles.metaText}>#{workOrder.id}</Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.label}>Client Approval</Text>
+          <View style={styles.approvalPanel}>
+            <Text
+              style={[
+                styles.approvalStatus,
+                {color: getApprovalColor(workOrder.client_approval_status)},
+              ]}>
+              {getApprovalLabel(workOrder.client_approval_status)}
+            </Text>
+            {workOrder.client_approval_notes ? (
+              <Text style={styles.approvalNotes}>{workOrder.client_approval_notes}</Text>
+            ) : null}
+
+            {(canRequestApproval || canDecideApproval) && (
+              <>
+                <TextInput
+                  style={styles.approvalInput}
+                  placeholder={
+                    canDecideApproval
+                      ? 'Decision note (optional)...'
+                      : 'Approval request note (optional)...'
+                  }
+                  placeholderTextColor="#6b7280"
+                  value={approvalNotes}
+                  onChangeText={setApprovalNotes}
+                  multiline
+                />
+
+                {canRequestApproval ? (
+                  <TouchableOpacity
+                    style={[styles.messageButton, updatingApproval && styles.buttonDisabled]}
+                    onPress={requestApproval}
+                    disabled={updatingApproval}>
+                    <Text style={styles.messageButtonText}>
+                      {updatingApproval ? 'Requesting...' : 'Request Approval'}
+                    </Text>
+                  </TouchableOpacity>
+                ) : null}
+
+                {canDecideApproval ? (
+                  <View style={styles.approvalActions}>
+                    <TouchableOpacity
+                      style={[styles.approveButton, updatingApproval && styles.buttonDisabled]}
+                      onPress={() => decideApproval('approved')}
+                      disabled={updatingApproval}>
+                      <Text style={styles.approveButtonText}>Approve</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.declineButton, updatingApproval && styles.buttonDisabled]}
+                      onPress={() => decideApproval('declined')}
+                      disabled={updatingApproval}>
+                      <Text style={styles.declineButtonText}>Decline</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : null}
+              </>
+            )}
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -596,6 +742,67 @@ const styles = StyleSheet.create({
   metaText: {
     fontSize: 14,
     color: '#e5e7eb',
+  },
+  approvalPanel: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+  },
+  approvalStatus: {
+    fontSize: 14,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+  approvalNotes: {
+    color: '#cbd5e1',
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 8,
+  },
+  approvalInput: {
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    color: '#e5e7eb',
+    minHeight: 64,
+    textAlignVertical: 'top',
+    marginTop: 12,
+  },
+  approvalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+  },
+  approveButton: {
+    flex: 1,
+    backgroundColor: '#a3e635',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  approveButtonText: {
+    color: '#052e16',
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  declineButton: {
+    flex: 1,
+    backgroundColor: '#1f2937',
+    borderWidth: 1,
+    borderColor: '#fb7185',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  declineButtonText: {
+    color: '#fb7185',
+    fontWeight: '800',
+    fontSize: 14,
   },
   rowHeader: {
     flexDirection: 'row',

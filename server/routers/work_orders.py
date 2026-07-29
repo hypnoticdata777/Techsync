@@ -1,10 +1,11 @@
 """Work order CRUD, status transitions, assignment, audit log, attachments,
 and search/filter (RF-14, RF-15, RF-18, RF-19, RF-20, RF-21, RF-22, RF-24)."""
 
-from datetime import date
-from typing import Optional
+from datetime import date, datetime, timezone
+from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import HTMLResponse, PlainTextResponse
 
 from dependencies import get_current_organization, get_current_user, require_roles
 from models.closeout_package import WorkOrderCloseoutPackage
@@ -12,6 +13,8 @@ from models.user import User
 from models.work_order import (
     WorkOrder,
     WorkOrderAssign,
+    WorkOrderApprovalDecision,
+    WorkOrderApprovalRequest,
     WorkOrderAttachment,
     WorkOrderAttachmentCreate,
     WorkOrderCreate,
@@ -28,7 +31,7 @@ from repositories import vendors as vendors_repo
 from repositories import work_order_events as events_repo
 from repositories import work_order_messages as messages_repo
 from repositories import work_orders as work_orders_repo
-from services import attachment_storage_service, work_order_service
+from services import attachment_storage_service, closeout_export_service, work_order_service
 
 router = APIRouter(prefix="/work-orders", tags=["work-orders"])
 
@@ -56,6 +59,51 @@ def _ensure_client_can_see_work_order(
     client = _load_caller_client(current_user, organization_id)
     if not client or work_order.get("client_id") != client["id"]:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not visible to you")
+
+
+def _create_client_visible_message(
+    organization_id: int,
+    work_order_id: int,
+    actor_user_id: int,
+    body: str,
+) -> None:
+    messages_repo.create(
+        organization_id,
+        work_order_id,
+        actor_user_id,
+        {"visibility": "client", "body": body.strip()},
+    )
+
+
+def _build_closeout_package(
+    work_order_id: int,
+    current_user: User,
+    organization: dict,
+) -> WorkOrderCloseoutPackage:
+    work_order = _get_accessible_work_order(work_order_id, current_user, organization)
+    attachments = attachments_repo.list_for_work_order(organization["id"], work_order_id)
+    client_messages = messages_repo.list_for_work_order(
+        organization["id"], work_order_id, visibility="client"
+    )
+    internal_messages = messages_repo.list_for_work_order(
+        organization["id"], work_order_id, visibility="internal"
+    )
+    events = events_repo.list_for_work_order(organization["id"], work_order_id)
+
+    proof_status = "missing"
+    if work_order.get("completion_proof_verified_at"):
+        proof_status = "verified"
+    elif work_order.get("completion_override_reason"):
+        proof_status = "override"
+
+    return WorkOrderCloseoutPackage(
+        work_order=WorkOrder(**work_order),
+        proof_status=proof_status,
+        attachments=[WorkOrderAttachment(**row) for row in attachments],
+        client_messages=[WorkOrderMessage(**row) for row in client_messages],
+        internal_messages=[WorkOrderMessage(**row) for row in internal_messages],
+        audit_events=[WorkOrderEvent(**row) for row in events],
+    )
 
 
 def _validate_entity_links(organization_id: int, patch: dict) -> None:
@@ -298,6 +346,96 @@ def assign_work_order(
     return WorkOrder(**updated)
 
 
+@router.post("/{work_order_id}/approval-request", response_model=WorkOrder)
+def request_client_approval(
+    work_order_id: int,
+    payload: WorkOrderApprovalRequest,
+    current_user: User = Depends(require_roles("org_admin", "coordinator")),
+    organization: dict = Depends(get_current_organization),
+):
+    """v1.3 client approval gate: staff can request approval on a client-linked
+    work order without changing the field execution status."""
+    work_order = _get_accessible_work_order(work_order_id, current_user, organization)
+    if not work_order.get("client_id"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Client approval requires a linked client",
+        )
+
+    now = datetime.now(timezone.utc)
+    updated = work_orders_repo.update(
+        work_order_id,
+        organization["id"],
+        {
+            "client_approval_status": "pending",
+            "client_approval_requested_at": now,
+            "client_approval_requested_by": current_user.id,
+            "client_approval_decision_at": None,
+            "client_approval_decision_by": None,
+            "client_approval_notes": payload.notes,
+        },
+    )
+    events_repo.create_event(
+        organization["id"],
+        work_order_id,
+        event_type="client_approval_requested",
+        actor_user_id=current_user.id,
+        notes=payload.notes,
+    )
+    _create_client_visible_message(
+        organization["id"],
+        work_order_id,
+        current_user.id,
+        payload.notes or "Approval requested.",
+    )
+    return WorkOrder(**updated)
+
+
+@router.patch("/{work_order_id}/approval", response_model=WorkOrder)
+def decide_client_approval(
+    work_order_id: int,
+    payload: WorkOrderApprovalDecision,
+    current_user: User = Depends(require_roles("client")),
+    organization: dict = Depends(get_current_organization),
+):
+    """v1.3 client/homeowner approval action. The caller must match the work
+    order's linked active client record by email."""
+    work_order = _get_message_accessible_work_order(work_order_id, current_user, organization)
+    if work_order.get("client_approval_status") != "pending":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Client approval is not pending for this work order",
+        )
+
+    now = datetime.now(timezone.utc)
+    updated = work_orders_repo.update(
+        work_order_id,
+        organization["id"],
+        {
+            "client_approval_status": payload.decision,
+            "client_approval_decision_at": now,
+            "client_approval_decision_by": current_user.id,
+            "client_approval_notes": payload.notes,
+        },
+    )
+    event_type = f"client_approval_{payload.decision}"
+    events_repo.create_event(
+        organization["id"],
+        work_order_id,
+        event_type=event_type,
+        actor_user_id=current_user.id,
+        notes=payload.notes,
+    )
+    _create_client_visible_message(
+        organization["id"],
+        work_order_id,
+        current_user.id,
+        f"Client {payload.decision} this work order."
+        + (f" {payload.notes}" if payload.notes else ""),
+    )
+    return WorkOrder(**updated)
+
+
 @router.get("/{work_order_id}/events", response_model=list[WorkOrderEvent])
 def list_events(
     work_order_id: int,
@@ -317,30 +455,33 @@ def get_closeout_package(
     organization: dict = Depends(get_current_organization),
 ):
     """v1.3 closeout summary: timeline, proof, messages, and audit context.
-    PDF/package file generation remains a later export step."""
-    work_order = _get_accessible_work_order(work_order_id, current_user, organization)
-    attachments = attachments_repo.list_for_work_order(organization["id"], work_order_id)
-    client_messages = messages_repo.list_for_work_order(
-        organization["id"], work_order_id, visibility="client"
-    )
-    internal_messages = messages_repo.list_for_work_order(
-        organization["id"], work_order_id, visibility="internal"
-    )
-    events = events_repo.list_for_work_order(organization["id"], work_order_id)
+    Export rendering is available under `/closeout-package/export`."""
+    return _build_closeout_package(work_order_id, current_user, organization)
 
-    proof_status = "missing"
-    if work_order.get("completion_proof_verified_at"):
-        proof_status = "verified"
-    elif work_order.get("completion_override_reason"):
-        proof_status = "override"
 
-    return WorkOrderCloseoutPackage(
-        work_order=WorkOrder(**work_order),
-        proof_status=proof_status,
-        attachments=[WorkOrderAttachment(**row) for row in attachments],
-        client_messages=[WorkOrderMessage(**row) for row in client_messages],
-        internal_messages=[WorkOrderMessage(**row) for row in internal_messages],
-        audit_events=[WorkOrderEvent(**row) for row in events],
+@router.get("/{work_order_id}/closeout-package/export")
+def export_closeout_package(
+    work_order_id: int,
+    format: Literal["html", "text"] = Query("html"),
+    current_user: User = Depends(require_roles("org_admin", "coordinator", "technician")),
+    organization: dict = Depends(get_current_organization),
+):
+    """v1.3 printable closeout package export. The HTML response is designed to
+    be saved or printed as PDF from the browser or hosting layer."""
+    package = _build_closeout_package(work_order_id, current_user, organization)
+    extension = "txt" if format == "text" else "html"
+    filename = f"techsync-closeout-wo-{package.work_order.id}.{extension}"
+    headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
+
+    if format == "text":
+        return PlainTextResponse(
+            closeout_export_service.build_closeout_text(package),
+            headers=headers,
+        )
+
+    return HTMLResponse(
+        closeout_export_service.build_closeout_html(package),
+        headers=headers,
     )
 
 

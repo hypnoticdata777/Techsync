@@ -220,6 +220,8 @@ Already represented in the codebase:
   internal notes for staff, and client/viewer users limited to client-visible
   communication.
 - v1.3 client/viewer work-order visibility scoped by active client email.
+- v1.3 client approval state, staff approval request endpoint, client
+  approve/decline endpoint, and mobile approval controls.
 - v1.3 backend completion gate that blocks completed status without attachment
   proof unless an org admin/coordinator records an override reason.
 - v1.3 backend operations report for stale work, overloaded technicians, and
@@ -228,6 +230,8 @@ Already represented in the codebase:
   work, overloaded technicians, and property hotspots.
 - v1.3 backend closeout package summary for work-order status, proof,
   attachments, messages, and audit events.
+- v1.3 printable HTML/text closeout export endpoint for work-order summary,
+  proof, attachments, communication, and audit history.
 - React Native/Expo mobile client for onboarding, auth, work-order list,
   details, creation, invitation acceptance, and password reset.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,
@@ -237,12 +241,12 @@ Important gaps for the PMC operations product:
 
 - Property/client/vendor backend records are being promoted to first-class v1.3
   entities; frontend workflows and richer operations logic remain.
-- Full client/homeowner portal UI is not built yet; scoped work-order visibility
-  and client-visible comments have started in v1.3, while approval/decline
-  actions remain.
-- Closeout PDF/export generation, approvals, duplicate detection, richer report
-  charts/export, calendar/maps, background jobs, and export workflows remain
-  roadmap items.
+- Full client/homeowner portal UI is not built yet; scoped work-order
+  visibility, client-visible comments, and approval/decline actions have
+  started in v1.3.
+- Binary closeout PDF rendering, duplicate detection, richer report
+  charts/export, calendar/maps, background jobs, and broader export workflows
+  remain roadmap items.
 
 ## Version Planning Boundary
 

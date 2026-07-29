@@ -428,6 +428,7 @@ Verification:
 ```powershell
 python -m compileall -q server\alembic\versions\0003_work_order_messages.py server\models\work_order_message.py server\repositories\work_order_messages.py server\routers\work_orders.py server\tests\test_tenant_isolation.py
 $env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); from models.work_order import WorkOrder; row={'id':1,'organization_id':1,'title':'Test','service_type':'general','priority':'medium','status':'open','source':'manual','created_at':'2026-07-28T00:00:00Z','updated_at':'2026-07-28T00:00:00Z','client_approval_status':'pending'}; print(WorkOrder(**row).client_approval_status)"
 git diff --check
 server\venv\Scripts\python.exe -m pytest server\tests\test_tenant_isolation.py -p no:cacheprovider
 ```
@@ -436,6 +437,7 @@ Result:
 
 - Compile passed.
 - FastAPI app imported successfully and printed `TechSync Ops API`.
+- WorkOrder model smoke parsed `client_approval_status` and printed `pending`.
 - `git diff --check` passed.
 - Local pytest could not run because `server\venv` does not have pytest
   installed.
@@ -598,6 +600,89 @@ Result:
 - `git diff --check` passed.
 - Local pytest could not run because neither `server\venv` nor system Python has
   pytest installed.
+
+## 2026-07-28 - v1.3 Client Approval Workflow
+
+Decision:
+
+- Add client approval as its own work-order approval state instead of overloading
+  field execution status, so client decisions can be shown without confusing
+  technician workflow.
+
+Changes:
+
+- Added Alembic migration `0005_client_approvals.py`.
+- Added `client_approval_status`, request metadata, decision metadata, and notes
+  to work orders.
+- Added staff `POST /work-orders/{work_order_id}/approval-request`.
+- Added client `PATCH /work-orders/{work_order_id}/approval` for approved or
+  declined decisions.
+- Approval requests and decisions create audit events and client-visible
+  timeline messages.
+- Added mobile approval panel in work-order details:
+  - admin/coordinator users can request or re-request approval;
+  - client users can approve or decline pending approvals;
+  - viewer users can observe approval status without taking action.
+- Added regression coverage for linked-client requirement, pending-decision
+  guardrail, and approval event/message writes.
+- Updated roadmap, traceability, requirements, QA, and phase-status docs.
+
+Verification:
+
+```powershell
+python -m compileall -q server\alembic\versions\0005_client_approvals.py server\models\work_order.py server\repositories\clients.py server\routers\work_orders.py server\tests\test_tenant_isolation.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+git diff --check
+server\venv\Scripts\python.exe -m pytest server\tests\test_tenant_isolation.py -p no:cacheprovider
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- `git diff --check` passed.
+- Local pytest could not run because `server\venv` does not have pytest
+  installed.
+
+## 2026-07-28 - v1.3 Printable Closeout Export
+
+Decision:
+
+- Add a real closeout export path without introducing a heavy PDF-rendering
+  dependency before hosting. Printable HTML can be saved or printed as PDF by
+  the browser or hosting layer, and text export provides a simple fallback.
+
+Changes:
+
+- Added `services/closeout_export_service.py`.
+- Added `GET /work-orders/{work_order_id}/closeout-package/export`.
+- Supports `format=html` and `format=text`.
+- Export includes work-order summary, proof status, client approval status,
+  completion notes, attachments, client messages, internal notes, and audit
+  events.
+- Reused the same closeout package assembly path for JSON and exports.
+- Added closeout export tests for HTML/text rendering and downloadable response
+  headers.
+- Updated roadmap, traceability, requirements, QA, and phase-status docs.
+
+Verification:
+
+```powershell
+python -m compileall -q server\services\closeout_export_service.py server\routers\work_orders.py server\tests\test_closeout_package.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); sys.path.insert(0, 'server/tests'); from test_closeout_package import _sample_package; from services.closeout_export_service import build_closeout_html; print('Closeout Package' in build_closeout_html(_sample_package()))"; Remove-Item Env:JWT_SECRET_KEY
+git diff --check
+server\venv\Scripts\python.exe -m pytest server\tests\test_closeout_package.py -p no:cacheprovider
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- Closeout export render smoke returned `True`.
+- `git diff --check` passed.
+- Local pytest could not run because `server\venv` does not have pytest
+  installed.
 
 ## 2026-07-28 - v1.3 Proof-Gated Closeout
 

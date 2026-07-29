@@ -302,6 +302,13 @@ CREATE TABLE IF NOT EXISTS work_orders (
     completion_notes TEXT,
     completion_proof_verified_at TIMESTAMP WITH TIME ZONE,
     completion_override_reason TEXT,
+    client_approval_status TEXT NOT NULL DEFAULT 'not_required'
+        CHECK (client_approval_status IN ('not_required', 'pending', 'approved', 'declined')),
+    client_approval_requested_at TIMESTAMP WITH TIME ZONE,
+    client_approval_requested_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    client_approval_decision_at TIMESTAMP WITH TIME ZONE,
+    client_approval_decision_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    client_approval_notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -312,6 +319,7 @@ CREATE INDEX IF NOT EXISTS idx_work_orders_org_tech ON work_orders(organization_
 CREATE INDEX IF NOT EXISTS idx_work_orders_org_property ON work_orders(organization_id, property_id);
 CREATE INDEX IF NOT EXISTS idx_work_orders_org_client ON work_orders(organization_id, client_id);
 CREATE INDEX IF NOT EXISTS idx_work_orders_org_vendor ON work_orders(organization_id, vendor_id);
+CREATE INDEX IF NOT EXISTS idx_work_orders_org_client_approval ON work_orders(organization_id, client_approval_status);
 CREATE INDEX IF NOT EXISTS idx_work_orders_created_at ON work_orders(created_at DESC);
 
 CREATE TRIGGER update_work_orders_updated_at

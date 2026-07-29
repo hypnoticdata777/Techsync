@@ -8,6 +8,8 @@ from pydantic import BaseModel, Field, field_validator
 Priority = Literal["low", "medium", "high", "emergency"]
 Status = Literal["open", "in_progress", "completed", "cancelled"]
 Source = Literal["manual", "csv", "webhook", "email", "pdf"]
+ClientApprovalStatus = Literal["not_required", "pending", "approved", "declined"]
+ClientApprovalDecision = Literal["approved", "declined"]
 
 # Only these transitions are legal (RF-18 acceptance criterion).
 ALLOWED_STATUS_TRANSITIONS: dict[Status, set[Status]] = {
@@ -78,6 +80,25 @@ class WorkOrderAssign(BaseModel):
     notes: Optional[str] = Field(None, max_length=500)
 
 
+class WorkOrderApprovalRequest(BaseModel):
+    notes: Optional[str] = Field(None, max_length=1000)
+
+    @field_validator("notes")
+    @classmethod
+    def validate_notes(cls, v: Optional[str]) -> Optional[str]:
+        return v.strip() if v and v.strip() else None
+
+
+class WorkOrderApprovalDecision(BaseModel):
+    decision: ClientApprovalDecision
+    notes: Optional[str] = Field(None, max_length=1000)
+
+    @field_validator("notes")
+    @classmethod
+    def validate_decision_notes(cls, v: Optional[str]) -> Optional[str]:
+        return v.strip() if v and v.strip() else None
+
+
 class WorkOrder(BaseModel):
     id: int
     organization_id: int
@@ -102,6 +123,12 @@ class WorkOrder(BaseModel):
     completion_notes: Optional[str] = None
     completion_proof_verified_at: Optional[datetime] = None
     completion_override_reason: Optional[str] = None
+    client_approval_status: ClientApprovalStatus = "not_required"
+    client_approval_requested_at: Optional[datetime] = None
+    client_approval_requested_by: Optional[int] = None
+    client_approval_decision_at: Optional[datetime] = None
+    client_approval_decision_by: Optional[int] = None
+    client_approval_notes: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

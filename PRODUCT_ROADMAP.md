@@ -113,7 +113,7 @@ Likely scope:
   - client/viewer role
   - scoped work-order visibility
   - backend and mobile client-visible comment flow now started in v1.3
-  - approval/comment actions
+  - approval/comment actions now started in v1.3
   - client-safe status/proof view
 - Communication timeline:
   - internal notes
@@ -129,7 +129,8 @@ Likely scope:
   - receipts
   - backend completion gate now started in v1.3
   - backend closeout package summary now started in v1.3
-  - closeout PDF/export generation
+  - printable HTML/text closeout export now started in v1.3
+  - binary PDF rendering remains optional later polish
 - Dispatch improvements:
   - workload board
   - SLA-risk flags
@@ -163,8 +164,8 @@ v1.3 exit criteria:
 - A work order cannot be closed without attachment proof unless an org
   admin/coordinator override reason is recorded.
 - At least one client/homeowner demo flow is showable with synthetic data:
-  scoped work-order visibility and client-visible comments are now started;
-  approval/decline actions remain to complete.
+  scoped work-order visibility, client-visible comments, and approval/decline
+  actions are now started.
 - Backend and mobile reporting show stale work, overloaded technicians, and
   property hotspot evidence, with richer charts/export still to complete.
 - Vercel hosting and portfolio linking are completed as the final showcase step,
@@ -176,8 +177,8 @@ v1.3 exit criteria:
 
 Candidate later versions:
 
-- v1.4: background jobs, notifications, PDF/email ingestion, exports, and
-  closeout PDF generation.
+- v1.4: background jobs, notifications, PDF/email ingestion, richer exports, and
+  optional binary closeout PDF generation.
 - v1.5: offline mobile sync, maps/routing, calendar integration, and stronger
   technician field UX.
 - v2.0: paid pilots, production-grade monitoring/backups, legal docs, billing,

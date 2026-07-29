@@ -148,11 +148,17 @@ Completed:
 - Added mobile work-order communication timeline with internal versus
   client-visible messages, and kept client/viewer users on client-visible
   comments only.
+- Added Alembic migration `0005` for client approval state on work orders.
+- Added staff approval requests and client approve/decline actions, with audit
+  events and client-visible timeline messages.
+- Added mobile approval UI inside work-order details.
+- Added printable HTML/text closeout export endpoint under
+  `/work-orders/{work_order_id}/closeout-package/export`.
 
 Next:
 
-- Add client approval/decline workflow and later closeout PDF/export
-  generation.
+- Migrate/smoke-test the demo database through the latest v1.3 migrations, then
+  decide whether binary PDF rendering is needed before the portfolio showcase.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -205,6 +211,7 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue v1.3 product depth before hosting: move into client approval/decline
-workflow and then closeout PDF/export planning. Vercel deployment and portfolio
-sliver linking should happen at the end of v1.3.
+Continue v1.3 product depth before hosting: migrate/smoke-test the demo
+database through the latest v1.3 migrations, then decide whether binary PDF
+rendering is needed before the portfolio showcase. Vercel deployment and
+portfolio sliver linking should happen at the end of v1.3.

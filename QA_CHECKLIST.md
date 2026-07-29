@@ -74,11 +74,13 @@ they have been verified in the relevant environment.
 - [x] Work orders can reference property, client, and vendor records.
 - [x] Backend client-visible communication separated from internal notes.
 - [x] Client/homeowner UI for client-visible communication implemented.
-- [ ] Client approval/decline workflow implemented.
+- [x] Client approval/decline workflow implemented.
+- [ ] Client approval workflow smoke-tested against a migrated demo database.
 - [x] Backend closeout proof requirement and manager override reason
       implemented.
 - [x] Backend closeout package summary implemented.
-- [ ] Closeout PDF/export generation implemented.
+- [x] Closeout printable HTML/text export generation implemented.
+- [ ] Binary closeout PDF renderer implemented if needed after hosted demo.
 - [x] Backend operations report added for stale work, overloaded technicians, and
       property hotspots.
 - [x] Mobile operations report view added for stale work, overloaded technicians,
