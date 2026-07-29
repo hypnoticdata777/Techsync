@@ -27,6 +27,25 @@ def list_for_work_order(organization_id: int, work_order_id: int) -> list[dict]:
     )
 
 
+def list_metadata_by_org(organization_id: int) -> list[dict]:
+    return fetch_all(
+        """
+        SELECT
+            id,
+            work_order_id,
+            uploaded_by,
+            file_name,
+            content_type,
+            size_bytes,
+            created_at
+        FROM work_order_attachments
+        WHERE organization_id = :organization_id
+        ORDER BY work_order_id ASC, created_at ASC
+        """,
+        {"organization_id": organization_id},
+    )
+
+
 def has_for_work_order(organization_id: int, work_order_id: int) -> bool:
     count = fetch_scalar(
         """

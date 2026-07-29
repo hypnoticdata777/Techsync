@@ -91,7 +91,7 @@ Before real customer data, real money, or public self-serve usage:
 - Use the Neon pooled connection string for the hosted app runtime if the
   backend runs on a serverless-style host such as Vercel.
 - Run Alembic migrations against that database. Completed for the initial POC
-  Neon database at `0001`; latest v1.3 migrations `0002` through `0005` still
+  Neon database at `0001`; latest v1.3 migrations `0002` through `0006` still
   need hosted/demo verification before the showcase gate.
 - Host the backend behind HTTPS.
 - Configure production CORS with real hosted domains only.
@@ -133,8 +133,8 @@ Continue v1.3 product depth before hosted public promotion:
    plus work-order form linking and before-save context review.
 4. Add client-visible communication separation, proof-gated closeout, and richer
    reporting. Completed as v1.3 API/mobile foundation with dashboard/entity CSV
-   exports, closeout HTML/text/PDF evidence, and mobile chart bars including
-   completion cycle-time evidence.
+   exports, tenant JSON export, closeout HTML/text/PDF evidence, and mobile
+   chart bars including completion cycle-time evidence.
 5. Use `scripts/seed_demo_data.py` to refresh the synthetic demo tenant after
    v1.3 migrations are applied.
 6. Use `APP_ENV=demo` and host-managed secrets when the end-of-v1.3 Vercel

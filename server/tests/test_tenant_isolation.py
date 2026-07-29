@@ -10,6 +10,7 @@ from unittest.mock import patch
 import pytest
 
 from fastapi import HTTPException
+from repositories import attachments as attachments_repo
 from repositories import clients as clients_repo
 from repositories import properties as properties_repo
 from repositories import technicians as technicians_repo
@@ -20,9 +21,11 @@ from repositories import work_order_messages as messages_repo
 from repositories import work_orders as work_orders_repo
 from routers import clients as clients_router
 from routers import dashboard as dashboard_router
+from routers import organizations as organizations_router
 from routers import properties as properties_router
 from routers import vendors as vendors_router
 from routers import work_orders as work_orders_router
+from services import tenant_export_service
 from models.client import ClientUpdate
 from models.property import PropertyUpdate
 from models.user import User
@@ -1316,3 +1319,125 @@ def test_work_order_update_can_clear_entity_links_for_frontend_form():
     assert result.property_id is None
     assert result.client_id is None
     assert result.vendor_id is None
+
+
+def test_org_wide_event_message_and_attachment_export_reads_are_scoped():
+    with patch("repositories.work_order_events.fetch_all", return_value=[]) as events_fetch:
+        events_repo.list_by_org(organization_id=42)
+    with patch("repositories.work_order_messages.fetch_all", return_value=[]) as messages_fetch:
+        messages_repo.list_by_org(organization_id=42)
+    with patch("repositories.attachments.fetch_all", return_value=[]) as attachments_fetch:
+        attachments_repo.list_metadata_by_org(organization_id=42)
+
+    events_sql, events_params = events_fetch.call_args.args
+    messages_sql, messages_params = messages_fetch.call_args.args
+    attachments_sql, attachments_params = attachments_fetch.call_args.args
+
+    assert "WHERE organization_id = :organization_id" in events_sql
+    assert events_params == {"organization_id": 42}
+    assert "WHERE organization_id = :organization_id" in messages_sql
+    assert messages_params == {"organization_id": 42}
+    assert "WHERE organization_id = :organization_id" in attachments_sql
+    assert "storage_path" not in attachments_sql
+    assert attachments_params == {"organization_id": 42}
+
+
+def test_tenant_export_bundle_uses_scoped_repositories_and_omits_secrets():
+    organization = {
+        "id": 6,
+        "name": "Riverside Demo",
+        "slug": "riverside-demo",
+        "industry": "property_management",
+        "timezone": "America/New_York",
+        "settings": {"service_types": ["plumbing"]},
+        "plan": "demo",
+        "subscription_status": "trialing",
+        "trial_ends_at": None,
+        "technician_limit": 5,
+        "api_key": "do-not-export",
+        "stripe_customer_id": "cus_secret",
+    }
+    users = [
+        {
+            "id": 5,
+            "organization_id": 6,
+            "email": "admin@example.com",
+            "full_name": "Admin",
+            "role": "org_admin",
+            "is_active": True,
+            "password_hash": "hash-secret",
+        }
+    ]
+    attachments = [
+        {
+            "id": 99,
+            "organization_id": 6,
+            "work_order_id": 1,
+            "uploaded_by": 5,
+            "file_name": "proof.jpg",
+            "content_type": "image/jpeg",
+            "size_bytes": 2048,
+            "storage_path": "org-6/work-order-1/private-proof.jpg",
+        }
+    ]
+
+    with patch("services.tenant_export_service.users_repo.list_by_org", return_value=users) as users_list:
+        with patch("services.tenant_export_service.technicians_repo.list_by_org", return_value=[]) as tech_list:
+            with patch("services.tenant_export_service.clients_repo.list_by_org", return_value=[]) as clients_list:
+                with patch("services.tenant_export_service.properties_repo.list_by_org", return_value=[]) as props_list:
+                    with patch("services.tenant_export_service.vendors_repo.list_by_org", return_value=[]) as vendors_list:
+                        with patch("services.tenant_export_service.work_orders_repo.list_filtered", return_value=[]) as work_list:
+                            with patch("services.tenant_export_service.messages_repo.list_by_org", return_value=[]) as msg_list:
+                                with patch("services.tenant_export_service.events_repo.list_by_org", return_value=[]) as event_list:
+                                    with patch(
+                                        "services.tenant_export_service.attachments_repo.list_metadata_by_org",
+                                        return_value=attachments,
+                                    ) as attachment_list:
+                                        bundle = tenant_export_service.build_tenant_export(organization)
+
+    assert users_list.call_args.args == (6,)
+    assert tech_list.call_args.args == (6,)
+    assert clients_list.call_args.args == (6,)
+    assert props_list.call_args.args == (6,)
+    assert vendors_list.call_args.args == (6,)
+    assert work_list.call_args.args == (6,)
+    assert msg_list.call_args.args == (6,)
+    assert event_list.call_args.args == (6,)
+    assert attachment_list.call_args.args == (6,)
+
+    assert bundle["schema_version"] == "techsync_ops_tenant_export.v1"
+    assert bundle["record_counts"]["users"] == 1
+    assert bundle["record_counts"]["attachment_metadata"] == 1
+    assert "api_key" not in bundle["organization"]
+    assert "stripe_customer_id" not in bundle["organization"]
+    assert "password_hash" not in bundle["data"]["users"][0]
+    assert "storage_path" not in bundle["data"]["attachment_metadata"][0]
+    assert "storage_path" in bundle["omitted_sensitive_fields"]
+
+
+def test_tenant_export_route_returns_downloadable_json():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    bundle = {
+        "schema_version": "techsync_ops_tenant_export.v1",
+        "organization": {"id": 6, "name": "Riverside Demo"},
+        "record_counts": {},
+        "data": {},
+        "omitted_sensitive_fields": [],
+    }
+
+    with patch("routers.organizations.tenant_export_service.build_tenant_export", return_value=bundle) as build:
+        response = organizations_router.export_my_organization(
+            current_user=admin_user,
+            organization={"id": 6, "name": "Riverside Demo"},
+        )
+
+    assert build.call_args.args == ({"id": 6, "name": "Riverside Demo"},)
+    assert response.media_type == "application/json"
+    assert "techsync-tenant-export.json" in response.headers["content-disposition"]

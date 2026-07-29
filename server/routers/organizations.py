@@ -1,6 +1,8 @@
 """Organization onboarding, settings, and tenant lifecycle (RF-05, RF-06, RF-08, RNF-13)."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from core.rate_limit import ONBOARD_RATE_LIMIT, rate_limit_dependency
 from core.security import get_password_hash
@@ -15,7 +17,7 @@ from models.organization import (
 from models.user import User
 from repositories import organizations as organizations_repo
 from repositories import users as users_repo
-from services import auth_service
+from services import auth_service, tenant_export_service
 
 router = APIRouter(prefix="/organizations", tags=["organizations"])
 
@@ -102,6 +104,18 @@ def regenerate_api_key(
     """RF-11: rotate the API key used to authenticate inbound webhook ingestion."""
     updated = organizations_repo.regenerate_api_key(organization["id"])
     return {"api_key": updated["api_key"]}
+
+
+@router.get("/me/export")
+def export_my_organization(
+    current_user: User = Depends(require_roles("org_admin")),
+    organization: dict = Depends(get_current_organization),
+):
+    """RNF-13/RNF backup-export: tenant-owned JSON export without secrets."""
+    return JSONResponse(
+        jsonable_encoder(tenant_export_service.build_tenant_export(organization)),
+        headers={"Content-Disposition": 'attachment; filename="techsync-tenant-export.json"'},
+    )
 
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)

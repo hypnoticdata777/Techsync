@@ -109,7 +109,7 @@ Tasks:
   - Stripe callback/webhook settings if billing demo is enabled
 - Run Alembic migrations. Completed against Neon; `alembic current` reported
   `0001 (head)` during the first pass. Latest v1.3 migrations now need
-  hosted/demo verification through `0005 (head)`.
+  hosted/demo verification through `0006 (head)`.
 - Keep actual Vercel deployment deferred until the v1.3 product workflows are
   robust enough to show.
 
@@ -137,7 +137,7 @@ Tasks:
 - Add repeatable v1.3 hosted smoke coverage for the above. Completed with
   `scripts/smoke_v13.py`, the `Hosted v1.3 smoke test` workflow, and
   `V13_EVIDENCE_TEMPLATE.md`, now including client/property/vendor CSV export
-  checks.
+  checks and tenant JSON export checks.
 - Add repeatable synthetic demo seed/reset tooling. Completed with
   `scripts/seed_demo_data.py` and `DEMO_DATA_RUNBOOK.md`.
 - Apply v1.3 migrations and run hosted smoke evidence after deployment.

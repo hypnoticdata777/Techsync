@@ -46,7 +46,7 @@ Current POC state:
 - Branch: `production`
 - Database: `neondb`
 - Migration status: initial hosted-readiness pass reached `0001 (head)`;
-  v1.3 migrations now need hosted/demo verification through `0005 (head)`.
+  v1.3 migrations now need hosted/demo verification through `0006 (head)`.
 - Direct connection string was used for Alembic migration.
 - Pooled connection string is reserved for hosted app runtime.
 - No Neon connection strings or secrets are tracked in this repo.
@@ -185,7 +185,7 @@ until the portfolio domain or deployment URL exists.
 Current flow:
 
 1. Neon demo Postgres is created and initially migrated to `0001 (head)`;
-   apply latest v1.3 migrations through `0005 (head)` before showcase smoke
+   apply latest v1.3 migrations through `0006 (head)` before showcase smoke
    evidence.
 2. Use the pooled Neon connection string for hosted/serverless runtime.
 3. Deploy the backend on Vercel for portfolio alignment.

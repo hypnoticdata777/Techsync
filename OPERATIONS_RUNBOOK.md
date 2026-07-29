@@ -83,6 +83,8 @@ Minimum restore checks:
 
 Already implemented local/demo exports:
 
+- Tenant-owned JSON export from `GET /organizations/me/export`, excluding
+  credential/provider fields and embedding only attachment metadata.
 - Operations report CSV.
 - Dispatch board CSV.
 - Client CSV.
@@ -94,7 +96,8 @@ Before hosting, capture one export from synthetic data and confirm:
 
 - Filename is demo-safe.
 - Rows belong to the synthetic tenant only.
-- No provider secrets, terminal windows, or real customer data are visible.
+- No provider secrets, password hashes, API keys, attachment storage paths,
+  terminal windows, or real customer data are visible.
 
 ## Monitoring Evidence
 
@@ -123,4 +126,5 @@ Deferred production monitoring:
 - [ ] Backup setting evidence captured without secrets.
 - [ ] Restore procedure dry-run documented or intentionally deferred.
 - [ ] Export evidence captured with synthetic data.
+- [ ] Tenant JSON export reviewed for omitted sensitive fields.
 - [ ] Monitoring plan documented for the hosted demo.

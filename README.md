@@ -165,8 +165,9 @@ plan-limit enforcement, tenant-isolation of the repository layer, public
 endpoint rate limiting, Stripe webhook handling, attachment upload validation,
 v1.3 communication/approval guardrails, operations reporting, and closeout
 package/export behavior, dispatch-board composition, and dashboard CSV export
-behavior including completion cycle-time export evidence. These run without a
-live database (repositories are mocked); the RLS
+behavior including completion cycle-time export evidence, plus tenant JSON
+export scoping and sensitive-field omission. These run without a live database
+(repositories are mocked); the RLS
 behavior described above was additionally verified by hand against a local
 Postgres instance.
 
@@ -217,7 +218,7 @@ Full interactive docs at `/docs`. Summary:
 | Area | Endpoints |
 |---|---|
 | Auth (RF-01, RF-03) | `POST /auth/login`, `POST /auth/refresh`, `POST /auth/forgot-password`, `POST /auth/reset-password`, `GET /auth/me` |
-| Organizations (RF-05, RF-06, RF-08, RNF-13) | `POST /organizations/onboard`, `GET/PATCH /organizations/me`, `POST /organizations/me/api-key/regenerate`, `DELETE /organizations/me` |
+| Organizations (RF-05, RF-06, RF-08, RNF-13) | `POST /organizations/onboard`, `GET/PATCH /organizations/me`, `GET /organizations/me/export`, `POST /organizations/me/api-key/regenerate`, `DELETE /organizations/me` |
 | Invitations (RF-07) | `POST/GET /organizations/invitations`, `POST /invitations/accept` |
 | Users (RF-02) | `GET /users`, `PATCH /users/{id}/role` |
 | Technicians (RF-26, RF-29) | `POST/GET /technicians`, `PATCH /technicians/{id}` |
@@ -283,7 +284,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   proof-gated closeout, closeout package summary, HTML/text/PDF closeout
   exports, operations reporting for stale work, overload, property hotspots,
   and completion cycle time, CSV exports for the operations report, dispatch
-  board, clients, properties, and vendors, and a dispatch board for unassigned
+  board, clients, properties, and vendors, tenant JSON export for
+  admin-controlled data portability, and a dispatch board for unassigned
   work, technician lanes, utilization, SLA risk, pause/escalate/archive
   lifecycle states, duplicate-warning preflight
   checks, mobile PMC directory management, mobile report chart bars, and
@@ -329,6 +331,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   and `DEMO_DATA_RUNBOOK.md`; run it only against local or demo databases.
 - Local/demo operational backup, restore, export, lifecycle, and monitoring
   evidence is tracked in `OPERATIONS_RUNBOOK.md`.
+- Tenant JSON export is available at `GET /organizations/me/export` for org
+  admins and omits password hashes, API keys, Stripe provider IDs, token hashes,
+  and attachment storage paths.
 - Local/mobile accessibility evidence is tracked in `ACCESSIBILITY_EVIDENCE.md`;
   helper coverage now labels primary role dashboard, form, dispatch, approval,
   attachment, message, and lifecycle controls before the final manual

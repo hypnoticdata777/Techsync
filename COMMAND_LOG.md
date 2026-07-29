@@ -1237,6 +1237,42 @@ Result:
 - Backend tests passed: `115 passed`.
 - Compile check passed.
 
+## 2026-07-29 - v1.3 Tenant Data Export Bundle
+
+Decision:
+
+- Make the backup/restore/export requirement more than a runbook by adding an
+  org-admin tenant JSON export endpoint before any hosting work.
+- Keep the export safe for demo evidence by omitting credentials, provider
+  identifiers, token hashes, and attachment storage paths.
+
+Changes:
+
+- Added `server/services/tenant_export_service.py`.
+- Added `GET /organizations/me/export`.
+- Added org-wide, tenant-scoped repository reads for work-order messages,
+  work-order audit events, and attachment metadata.
+- Kept attachment export to metadata only; binary files and private storage
+  paths remain out of the JSON bundle.
+- Extended `scripts/smoke_v13.py` to verify tenant JSON export shape and
+  sensitive-field omission.
+- Updated requirements, traceability, roadmap, QA, runbook, README, phase, and
+  v1.3 evidence docs.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_tenant_isolation.py server\tests\test_security.py -p no:cacheprovider
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Tenant/security slice passed: `60 passed`.
+- Backend tests passed: `146 passed`.
+- Compile check passed for `server` and `scripts`.
+
 ## 2026-07-29 - v1.3 Lifecycle and Operations Runbook Batch
 
 Decision:

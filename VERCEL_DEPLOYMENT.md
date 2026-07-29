@@ -89,7 +89,7 @@ STRIPE_WEBHOOK_SECRET=<stripe webhook signing secret>
 
 ## Pre-Deploy Checklist
 
-- [ ] Neon migration is current: `alembic current` reports `0005 (head)` or
+- [ ] Neon migration is current: `alembic current` reports `0006 (head)` or
       later.
 - [ ] Synthetic demo tenant has been seeded/reset with
       `scripts/seed_demo_data.py` using the direct Neon URL from a local
@@ -134,6 +134,8 @@ Then verify:
 - dashboard metrics, operations report, and operations report CSV export
 - dispatch board summary, unassigned queue, technician lanes, and SLA risk
 - dispatch board CSV export
+- tenant JSON export without password hashes, API keys, Stripe provider IDs,
+  token hashes, or attachment storage paths
 - CSV ingestion with synthetic data
 - attachment metadata/proof boundary
 - attachment upload if storage is configured

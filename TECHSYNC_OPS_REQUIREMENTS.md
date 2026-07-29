@@ -228,6 +228,9 @@ Already represented in the codebase:
   property hotspots.
 - v1.3 dashboard CSV exports for the operations report and dispatch board.
 - v1.3 client/property/vendor CSV exports for tenant-owned PMC directory data.
+- v1.3 tenant-owned JSON export bundle for organization, users, technicians,
+  clients, properties, vendors, work orders, messages, audit events, and
+  attachment metadata, excluding credentials and provider secrets.
 - v1.3 mobile operations report view for org admins/coordinators to scan stale
   work, overloaded technicians, and property hotspots.
 - v1.3 mobile operations report chart bars for risk mix, technician capacity
@@ -289,9 +292,8 @@ Important gaps for the PMC operations product:
 - Full client/homeowner portal UI is not built yet; scoped work-order
   visibility, client-visible comments, and approval/decline actions have
   started in v1.3.
-- Binary closeout PDF rendering, completion cycle-time charts, calendar/maps,
-  background jobs, final role screenshot evidence, and deeper export workflows
-  remain roadmap items.
+- Calendar/maps, background jobs, final role screenshot evidence, cost/export
+  enrichment, and binary attachment export workflows remain roadmap items.
 
 ## Version Planning Boundary
 

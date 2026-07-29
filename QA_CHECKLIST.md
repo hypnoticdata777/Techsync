@@ -111,6 +111,8 @@ they have been verified in the relevant environment.
 - [x] Mobile duplicate-warning confirmation added before manual work-order
       creation.
 - [x] Client/property/vendor CSV exports implemented.
+- [x] Tenant-owned JSON export implemented without password hashes, API keys,
+      Stripe provider IDs, or attachment storage paths.
 - [x] Mobile operations report chart bars implemented for risk mix,
       technician capacity pressure, and property hotspot activity.
 - [x] Completion cycle-time reporting, mobile chart bars, and operations-report

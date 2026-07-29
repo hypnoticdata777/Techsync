@@ -59,6 +59,7 @@ Scope:
   - closeout package JSON and printable exports
   - operations reporting
   - dashboard CSV exports
+  - tenant JSON export without credential/provider fields
 - Portfolio TechSync Ops page prepared with:
   - problem statement
   - architecture summary
@@ -162,6 +163,8 @@ Likely scope:
   - completion cycle-time reporting now started in v1.3
   - operations report and dispatch board CSV exports now started in v1.3
   - client/property/vendor CSV exports now started in v1.3
+  - tenant JSON export now started in v1.3 for admin-controlled data
+    portability evidence
   - mobile risk/capacity/hotspot chart bars now started in v1.3
   - mobile completion cycle-time chart bars and operations-report CSV evidence
     now started in v1.3
@@ -205,8 +208,9 @@ v1.3 exit criteria:
   actions are now started.
 - Backend and mobile reporting show stale work, overloaded technicians, and
   property hotspot evidence, with dashboard CSV export and client/property/vendor
-  CSV export plus mobile risk/capacity/hotspot/completion cycle-time chart bars
-  started; deeper cost/export workflows still remain later polish.
+  CSV export plus tenant JSON export and mobile
+  risk/capacity/hotspot/completion cycle-time chart bars started; deeper cost
+  and binary attachment export workflows still remain later polish.
 - Backend and mobile dispatch board show unassigned active work, technician
   lanes, workload utilization, and SLA risk.
 - Manual work-order creation warns coordinators about likely duplicates before

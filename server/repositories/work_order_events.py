@@ -36,3 +36,15 @@ def list_for_work_order(organization_id: int, work_order_id: int) -> list[dict]:
         """,
         {"organization_id": organization_id, "work_order_id": work_order_id},
     )
+
+
+def list_by_org(organization_id: int) -> list[dict]:
+    return fetch_all(
+        """
+        SELECT *
+        FROM work_order_events
+        WHERE organization_id = :organization_id
+        ORDER BY work_order_id ASC, created_at ASC
+        """,
+        {"organization_id": organization_id},
+    )

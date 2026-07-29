@@ -26,7 +26,7 @@ alembic current
 Expected:
 
 ```text
-0005 (head)
+0006 (head)
 ```
 
 Observed:
@@ -116,6 +116,8 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Dispatch board endpoint returned summary, unassigned queue, and
       technician lanes.
 - [ ] Dispatch board CSV export rendered.
+- [ ] Tenant JSON export rendered and omitted password hashes, API keys, Stripe
+      provider IDs, token hashes, and attachment storage paths.
 
 ## Manual Hosted Follow-Up
 

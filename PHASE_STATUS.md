@@ -119,7 +119,7 @@ Next:
 
 - Apply and smoke-test the newer v1.3 migrations on the Neon demo database:
   `0002` PMC entities, `0003` messages, `0004` proof gate, and `0005` client
-  approvals.
+  approvals, plus `0006` lifecycle states.
 - Keep Vercel secrets/deployment work parked until the end-of-v1.3 showcase
   gate.
 - Smoke-test auth, onboarding, work-order lifecycle, ingestion, dashboard
@@ -186,6 +186,12 @@ Completed:
 - Added hosted v1.3 smoke coverage for both dashboard CSV exports.
 - Added CSV export endpoints for clients, properties, and vendors.
 - Added hosted v1.3 smoke coverage for client/property/vendor CSV exports.
+- Added admin tenant JSON export under `/organizations/me/export` with
+  organization, user, technician, client, property, vendor, work-order,
+  message, audit-event, and attachment-metadata sections while omitting
+  credential/provider fields.
+- Added hosted v1.3 smoke coverage for tenant JSON export shape and sensitive
+  field omission.
 - Added mobile operations report chart bars for risk mix, technician capacity
   pressure, and property hotspot activity.
 - Added completion cycle-time reporting by service type to the backend
@@ -293,6 +299,6 @@ Stop when:
 
 Continue local-only v1.3 hardening and leave hosting as the absolute final
 gate. Best next candidates: final role-by-role UI/UX friction evidence,
-binary closeout PDF polish, or completion cycle-time/deeper exports. Only after those
-non-hosting requirements are complete should the Neon/Vercel/portfolio showcase
-sequence resume.
+binary attachment export planning, cost/export enrichment, or remaining
+client/vendor portal polish. Only after those non-hosting requirements are
+complete should the Neon/Vercel/portfolio showcase sequence resume.

@@ -105,7 +105,7 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         "checks": [],
         "manual_follow_up": [
             "Accept a synthetic client invitation from hosted email/log output, then verify client approve/decline with a real client token.",
-            "Run Alembic current against the direct Neon URL and confirm the hosted/demo database is at 0005 or later.",
+            "Run Alembic current against the direct Neon URL and confirm the hosted/demo database is at 0006 or later.",
         ],
     }
 
@@ -573,6 +573,25 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         "dispatch_board_csv_export",
         dispatch_board_export,
         {"contains_summary_rows": True},
+    )
+
+    tenant_export = request(base_url, "GET", "/organizations/me/export", token=admin_token)
+    assert_detail(
+        "tenant_export",
+        tenant_export.data.get("schema_version") == "techsync_ops_tenant_export.v1"
+        and tenant_export.data.get("record_counts", {}).get("work_orders", 0) >= 1
+        and "api_key" not in tenant_export.data.get("organization", {})
+        and "password_hash" not in json.dumps(tenant_export.data.get("data", {}).get("users", [])),
+        tenant_export.data,
+    )
+    record(
+        "tenant_json_export",
+        tenant_export,
+        {
+            "schema_version": tenant_export.data.get("schema_version"),
+            "work_order_count": tenant_export.data.get("record_counts", {}).get("work_orders"),
+            "omits_sensitive_fields": True,
+        },
     )
 
     evidence["run_finished_at"] = datetime.now(timezone.utc).isoformat()
