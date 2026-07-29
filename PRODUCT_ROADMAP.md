@@ -112,6 +112,7 @@ Likely scope:
 - Client/homeowner access model:
   - client/viewer role
   - scoped work-order visibility
+  - backend and mobile client-visible comment flow now started in v1.3
   - approval/comment actions
   - client-safe status/proof view
 - Communication timeline:
@@ -120,6 +121,7 @@ Likely scope:
   - status and proof events
   - audit/event separation
   - backend message visibility guardrail now started in v1.3
+  - mobile communication timeline now started in v1.3
 - Completion proof and closeout:
   - required proof rules
   - manager override reason
@@ -160,7 +162,9 @@ v1.3 exit criteria:
   API/data layer, with frontend/client portal UX still to complete.
 - A work order cannot be closed without attachment proof unless an org
   admin/coordinator override reason is recorded.
-- At least one client/homeowner demo flow is showable with synthetic data.
+- At least one client/homeowner demo flow is showable with synthetic data:
+  scoped work-order visibility and client-visible comments are now started;
+  approval/decline actions remain to complete.
 - Backend and mobile reporting show stale work, overloaded technicians, and
   property hotspot evidence, with richer charts/export still to complete.
 - Vercel hosting and portfolio linking are completed as the final showcase step,

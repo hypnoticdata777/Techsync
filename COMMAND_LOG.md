@@ -557,6 +557,48 @@ Result:
   `client/node_modules` is not installed in this checkout (`@babel/core` and
   `jest` were unavailable).
 
+## 2026-07-28 - v1.3 Client-Visible Work Order Communication
+
+Decision:
+
+- Move the client/homeowner surface from backend-only guardrails into the mobile
+  work-order detail experience while tightening client/viewer work-order
+  visibility before public demo work.
+
+Changes:
+
+- Added active-client lookup by email in the client repository.
+- Scoped `client` and `viewer` users to their matching active client record when
+  listing or opening work orders.
+- Kept vendor work-order access disabled until the vendor workflow is
+  intentionally designed.
+- Restricted status transitions and audit-event access to
+  org-admin/coordinator/technician roles.
+- Added mobile work-order communication timeline:
+  - staff can send internal or client-visible messages;
+  - client/viewer users can only send client-visible comments;
+  - messages render inside work-order details.
+- Hid status actions and attachment upload actions from client/viewer users in
+  the mobile detail view.
+- Updated roadmap, traceability, requirements, QA, and phase-status docs.
+
+Verification:
+
+```powershell
+python -m compileall -q server\repositories\clients.py server\routers\work_orders.py server\tests\test_tenant_isolation.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+git diff --check
+server\venv\Scripts\python.exe -m pytest server\tests\test_tenant_isolation.py -p no:cacheprovider
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- `git diff --check` passed.
+- Local pytest could not run because neither `server\venv` nor system Python has
+  pytest installed.
+
 ## 2026-07-28 - v1.3 Proof-Gated Closeout
 
 Decision:

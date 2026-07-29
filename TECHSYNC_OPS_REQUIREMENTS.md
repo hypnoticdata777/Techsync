@@ -216,6 +216,10 @@ Already represented in the codebase:
   and Stripe test-mode boundary.
 - v1.3 backend work-order messages with explicit `internal` versus
   `client-visible` separation.
+- v1.3 mobile work-order communication timeline with client-visible comments,
+  internal notes for staff, and client/viewer users limited to client-visible
+  communication.
+- v1.3 client/viewer work-order visibility scoped by active client email.
 - v1.3 backend completion gate that blocks completed status without attachment
   proof unless an org admin/coordinator records an override reason.
 - v1.3 backend operations report for stale work, overloaded technicians, and
@@ -233,8 +237,9 @@ Important gaps for the PMC operations product:
 
 - Property/client/vendor backend records are being promoted to first-class v1.3
   entities; frontend workflows and richer operations logic remain.
-- Client/homeowner portal UI is not built yet; backend message visibility
-  separation has started in v1.3.
+- Full client/homeowner portal UI is not built yet; scoped work-order visibility
+  and client-visible comments have started in v1.3, while approval/decline
+  actions remain.
 - Closeout PDF/export generation, approvals, duplicate detection, richer report
   charts/export, calendar/maps, background jobs, and export workflows remain
   roadmap items.

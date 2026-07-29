@@ -136,6 +136,17 @@ def test_clients_get_by_id_scoped_to_org():
     assert params == {"client_id": 8, "organization_id": 2}
 
 
+def test_clients_get_by_email_scoped_to_org_and_active():
+    with patch("repositories.clients.fetch_one", return_value=None) as mock_fetch:
+        clients_repo.get_by_email_in_org(email="owner@example.com", organization_id=2)
+
+    sql, params = mock_fetch.call_args.args
+    assert "organization_id = :organization_id" in sql
+    assert "lower(email) = lower(:email)" in sql
+    assert "is_active = true" in sql
+    assert params == {"email": "owner@example.com", "organization_id": 2}
+
+
 def test_properties_get_by_id_scoped_to_org():
     with patch("repositories.properties.fetch_one", return_value=None) as mock_fetch:
         properties_repo.get_by_id_in_org(property_id=8, organization_id=2)
@@ -222,7 +233,7 @@ def test_client_message_list_forces_client_visibility():
         return_value={"id": 1, "organization_id": 6, "client_id": 9},
     ):
         with patch(
-            "routers.work_orders.clients_repo.get_by_id_in_org",
+            "routers.work_orders.clients_repo.get_by_email_in_org",
             return_value={"id": 9, "email": "owner@example.com"},
         ):
             with patch("routers.work_orders.messages_repo.list_for_work_order", return_value=[]) as mock_list:
@@ -252,7 +263,7 @@ def test_client_cannot_add_internal_message():
         return_value={"id": 1, "organization_id": 6, "client_id": 9},
     ):
         with patch(
-            "routers.work_orders.clients_repo.get_by_id_in_org",
+            "routers.work_orders.clients_repo.get_by_email_in_org",
             return_value={"id": 9, "email": "owner@example.com"},
         ):
             with pytest.raises(HTTPException) as exc:
@@ -265,6 +276,81 @@ def test_client_cannot_add_internal_message():
 
     assert exc.value.status_code == 403
     assert exc.value.detail == "Client users can only add client-visible messages"
+
+
+def test_client_work_order_list_forces_own_client_id():
+    client_user = User(
+        id=5,
+        organization_id=6,
+        email="owner@example.com",
+        full_name="Owner",
+        role="client",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.clients_repo.get_by_email_in_org",
+        return_value={"id": 9, "email": "owner@example.com"},
+    ):
+        with patch("routers.work_orders.work_orders_repo.list_filtered", return_value=[]) as mock_list:
+            rows = work_orders_router.list_work_orders(
+                client_id=999,
+                current_user=client_user,
+                organization={"id": 6},
+            )
+
+    assert rows == []
+    assert mock_list.call_args.kwargs["client_id"] == 9
+
+
+def test_client_without_matching_record_sees_no_work_orders():
+    client_user = User(
+        id=5,
+        organization_id=6,
+        email="owner@example.com",
+        full_name="Owner",
+        role="viewer",
+        is_active=True,
+    )
+
+    with patch("routers.work_orders.clients_repo.get_by_email_in_org", return_value=None):
+        with patch("routers.work_orders.work_orders_repo.list_filtered", return_value=[]) as mock_list:
+            rows = work_orders_router.list_work_orders(
+                current_user=client_user,
+                organization={"id": 6},
+            )
+
+    assert rows == []
+    assert mock_list.call_args.kwargs["client_id"] == -1
+
+
+def test_client_cannot_view_other_client_work_order():
+    client_user = User(
+        id=5,
+        organization_id=6,
+        email="owner@example.com",
+        full_name="Owner",
+        role="client",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "client_id": 10},
+    ):
+        with patch(
+            "routers.work_orders.clients_repo.get_by_email_in_org",
+            return_value={"id": 9, "email": "owner@example.com"},
+        ):
+            with pytest.raises(HTTPException) as exc:
+                work_orders_router.get_work_order(
+                    1,
+                    current_user=client_user,
+                    organization={"id": 6},
+                )
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "Not visible to you"
 
 
 def test_operations_report_uses_tenant_scoped_repository_calls():

@@ -143,10 +143,16 @@ Completed:
 - Added mobile operations report screen for org admins/coordinators, showing
   stale work, overloaded technicians, and property hotspots from the backend
   report endpoint.
+- Added client/viewer work-order scoping by active client email, so client
+  users only list/view their own work orders.
+- Added mobile work-order communication timeline with internal versus
+  client-visible messages, and kept client/viewer users on client-visible
+  comments only.
 
 Next:
 
-- Add client/homeowner UI visibility and later closeout PDF/export generation.
+- Add client approval/decline workflow and later closeout PDF/export
+  generation.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -199,6 +205,6 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue v1.3 product depth before hosting: move into the client/homeowner UI
-surface and then closeout PDF/export planning. Vercel deployment and portfolio
+Continue v1.3 product depth before hosting: move into client approval/decline
+workflow and then closeout PDF/export planning. Vercel deployment and portfolio
 sliver linking should happen at the end of v1.3.

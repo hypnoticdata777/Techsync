@@ -73,7 +73,8 @@ they have been verified in the relevant environment.
       properties, and vendors.
 - [x] Work orders can reference property, client, and vendor records.
 - [x] Backend client-visible communication separated from internal notes.
-- [ ] Client/homeowner UI for visible communication implemented.
+- [x] Client/homeowner UI for client-visible communication implemented.
+- [ ] Client approval/decline workflow implemented.
 - [x] Backend closeout proof requirement and manager override reason
       implemented.
 - [x] Backend closeout package summary implemented.

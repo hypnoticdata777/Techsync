@@ -45,6 +45,8 @@ const STATUS_LABELS = {
   cancelled: 'Cancel',
 };
 
+const INTERNAL_ROLES = ['org_admin', 'coordinator', 'technician'];
+
 function WorkOrderDetailsScreen({route, navigation}) {
   const {user, authFetch} = useAuth();
   const [workOrder, setWorkOrder] = useState(route.params.workOrder);
@@ -53,9 +55,17 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const [attachments, setAttachments] = useState([]);
   const [attachmentsLoading, setAttachmentsLoading] = useState(true);
   const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [messagesLoading, setMessagesLoading] = useState(true);
+  const [messageBody, setMessageBody] = useState('');
+  const [messageVisibility, setMessageVisibility] = useState('internal');
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   const canEdit = user?.role === 'org_admin' || user?.role === 'coordinator';
-  const nextStatuses = ALLOWED_TRANSITIONS[workOrder.status] || [];
+  const canUseInternalMessages = INTERNAL_ROLES.includes(user?.role);
+  const canUpdateStatus = INTERNAL_ROLES.includes(user?.role);
+  const canUploadAttachments = INTERNAL_ROLES.includes(user?.role);
+  const nextStatuses = canUpdateStatus ? ALLOWED_TRANSITIONS[workOrder.status] || [] : [];
 
   const loadAttachments = useCallback(async () => {
     try {
@@ -75,6 +85,31 @@ function WorkOrderDetailsScreen({route, navigation}) {
   useEffect(() => {
     loadAttachments();
   }, [loadAttachments]);
+
+  const loadMessages = useCallback(async () => {
+    try {
+      setMessagesLoading(true);
+      const res = await authFetch(`/work-orders/${workOrder.id}/messages`);
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data);
+      }
+    } catch (error) {
+      console.error('Message load error:', error);
+    } finally {
+      setMessagesLoading(false);
+    }
+  }, [authFetch, workOrder.id]);
+
+  useEffect(() => {
+    loadMessages();
+  }, [loadMessages]);
+
+  useEffect(() => {
+    if (!canUseInternalMessages) {
+      setMessageVisibility('client');
+    }
+  }, [canUseInternalMessages]);
 
   const handleEdit = () => {
     navigation.navigate('WorkOrderForm', {workOrder});
@@ -114,6 +149,41 @@ function WorkOrderDetailsScreen({route, navigation}) {
       return;
     }
     handleTransition(newStatus);
+  };
+
+  const sendMessage = async () => {
+    const trimmed = messageBody.trim();
+    if (!trimmed) {
+      Alert.alert('Message needed', 'Add a message before sending.');
+      return;
+    }
+
+    try {
+      setSendingMessage(true);
+      const res = await authFetch(`/work-orders/${workOrder.id}/messages`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          body: trimmed,
+          visibility: canUseInternalMessages ? messageVisibility : 'client',
+        }),
+      });
+
+      if (res.ok) {
+        const created = await res.json();
+        setMessages(current => [created, ...current]);
+        setMessageBody('');
+        return;
+      }
+
+      const errorData = await res.json().catch(() => ({}));
+      Alert.alert('Message failed', errorData.detail || 'Unable to send message.');
+    } catch (error) {
+      console.error('Message send error:', error);
+      Alert.alert('Message failed', error.message || 'Unable to send message.');
+    } finally {
+      setSendingMessage(false);
+    }
   };
 
   const ensureImagePermission = async source => {
@@ -259,27 +329,106 @@ function WorkOrderDetailsScreen({route, navigation}) {
         </View>
 
         <View style={styles.section}>
-          <View style={styles.attachmentHeader}>
+          <View style={styles.rowHeader}>
+            <Text style={styles.label}>Communication</Text>
+            {messagesLoading ? <ActivityIndicator color="#38bdf8" size="small" /> : null}
+          </View>
+
+          {canUseInternalMessages ? (
+            <View style={styles.visibilityTabs}>
+              <TouchableOpacity
+                style={[
+                  styles.visibilityTab,
+                  messageVisibility === 'internal' && styles.visibilityTabActive,
+                ]}
+                onPress={() => setMessageVisibility('internal')}>
+                <Text
+                  style={[
+                    styles.visibilityTabText,
+                    messageVisibility === 'internal' && styles.visibilityTabTextActive,
+                  ]}>
+                  Internal
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.visibilityTab,
+                  messageVisibility === 'client' && styles.visibilityTabActive,
+                ]}
+                onPress={() => setMessageVisibility('client')}>
+                <Text
+                  style={[
+                    styles.visibilityTabText,
+                    messageVisibility === 'client' && styles.visibilityTabTextActive,
+                  ]}>
+                  Client
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+
+          <TextInput
+            style={styles.messageInput}
+            placeholder="Add a message..."
+            placeholderTextColor="#6b7280"
+            value={messageBody}
+            onChangeText={setMessageBody}
+            multiline
+          />
+          <TouchableOpacity
+            style={[styles.messageButton, sendingMessage && styles.buttonDisabled]}
+            onPress={sendMessage}
+            disabled={sendingMessage}>
+            <Text style={styles.messageButtonText}>
+              {sendingMessage ? 'Sending...' : 'Send Message'}
+            </Text>
+          </TouchableOpacity>
+
+          {!messagesLoading && messages.length === 0 ? (
+            <Text style={styles.emptyAttachments}>No messages yet.</Text>
+          ) : null}
+
+          {messages.map(message => (
+            <View key={message.id} style={styles.messageItem}>
+              <View style={styles.messageHeader}>
+                <Text
+                  style={[
+                    styles.messageBadge,
+                    message.visibility === 'client' && styles.messageBadgeClient,
+                  ]}>
+                  {message.visibility === 'client' ? 'Client-visible' : 'Internal'}
+                </Text>
+                <Text style={styles.messageDate}>{formatDate(message.created_at)}</Text>
+              </View>
+              <Text style={styles.messageBody}>{message.body}</Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.rowHeader}>
             <Text style={styles.label}>Attachments</Text>
             {attachmentsLoading ? <ActivityIndicator color="#38bdf8" size="small" /> : null}
           </View>
 
-          <View style={styles.attachmentActions}>
-            <TouchableOpacity
-              style={[styles.secondaryButton, uploadingAttachment && styles.buttonDisabled]}
-              onPress={() => pickAttachment('camera')}
-              disabled={uploadingAttachment}>
-              <Text style={styles.secondaryButtonText}>
-                {uploadingAttachment ? 'Uploading...' : 'Take Photo'}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.secondaryButton, uploadingAttachment && styles.buttonDisabled]}
-              onPress={() => pickAttachment('library')}
-              disabled={uploadingAttachment}>
-              <Text style={styles.secondaryButtonText}>Choose Photo</Text>
-            </TouchableOpacity>
-          </View>
+          {canUploadAttachments ? (
+            <View style={styles.attachmentActions}>
+              <TouchableOpacity
+                style={[styles.secondaryButton, uploadingAttachment && styles.buttonDisabled]}
+                onPress={() => pickAttachment('camera')}
+                disabled={uploadingAttachment}>
+                <Text style={styles.secondaryButtonText}>
+                  {uploadingAttachment ? 'Uploading...' : 'Take Photo'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.secondaryButton, uploadingAttachment && styles.buttonDisabled]}
+                onPress={() => pickAttachment('library')}
+                disabled={uploadingAttachment}>
+                <Text style={styles.secondaryButtonText}>Choose Photo</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
 
           {!attachmentsLoading && attachments.length === 0 ? (
             <Text style={styles.emptyAttachments}>No attachments yet.</Text>
@@ -391,6 +540,19 @@ function isImageAttachment(attachment) {
   return (attachment.content_type || '').startsWith('image/');
 }
 
+function formatDate(value) {
+  if (!value) return 'No date';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'No date';
+
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -435,10 +597,94 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#e5e7eb',
   },
-  attachmentHeader: {
+  rowHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  visibilityTabs: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 10,
+  },
+  visibilityTab: {
+    minHeight: 34,
+    minWidth: 92,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 8,
+  },
+  visibilityTabActive: {
+    backgroundColor: '#38bdf8',
+    borderColor: '#38bdf8',
+  },
+  visibilityTabText: {
+    color: '#cbd5e1',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  visibilityTabTextActive: {
+    color: '#050816',
+  },
+  messageInput: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    color: '#e5e7eb',
+    minHeight: 72,
+    textAlignVertical: 'top',
+  },
+  messageButton: {
+    backgroundColor: '#38bdf8',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  messageButtonText: {
+    color: '#050816',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  messageItem: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 8,
+  },
+  messageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
+  messageBadge: {
+    color: '#fbbf24',
+    fontSize: 11,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+  messageBadgeClient: {
+    color: '#38bdf8',
+  },
+  messageDate: {
+    color: '#64748b',
+    fontSize: 11,
+  },
+  messageBody: {
+    color: '#e5e7eb',
+    fontSize: 14,
+    lineHeight: 20,
   },
   attachmentActions: {
     flexDirection: 'row',

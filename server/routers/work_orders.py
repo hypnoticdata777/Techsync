@@ -39,6 +39,25 @@ def _load_caller_technician(current_user: User, organization_id: int) -> Optiona
     return technicians_repo.get_by_user_id(current_user.id, organization_id)
 
 
+def _load_caller_client(current_user: User, organization_id: int) -> Optional[dict]:
+    if current_user.role not in ("client", "viewer"):
+        return None
+    return clients_repo.get_by_email_in_org(current_user.email, organization_id)
+
+
+def _ensure_client_can_see_work_order(
+    work_order: dict,
+    current_user: User,
+    organization_id: int,
+) -> None:
+    if current_user.role not in ("client", "viewer"):
+        return
+
+    client = _load_caller_client(current_user, organization_id)
+    if not client or work_order.get("client_id") != client["id"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not visible to you")
+
+
 def _validate_entity_links(organization_id: int, patch: dict) -> None:
     if patch.get("client_id") and not clients_repo.get_by_id_in_org(patch["client_id"], organization_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Client not found")
@@ -65,6 +84,11 @@ def _get_accessible_work_order(work_order_id: int, current_user: User, organizat
         if not technician or work_order.get("assigned_technician_id") != technician["id"]:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not assigned to you")
 
+    _ensure_client_can_see_work_order(work_order, current_user, organization["id"])
+
+    if current_user.role == "vendor":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vendor access is not enabled yet")
+
     return work_order
 
 
@@ -82,11 +106,7 @@ def _get_message_accessible_work_order(
         if not technician or work_order.get("assigned_technician_id") != technician["id"]:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not assigned to you")
 
-    if current_user.role in ("client", "viewer"):
-        client_id = work_order.get("client_id")
-        client = clients_repo.get_by_id_in_org(client_id, organization["id"]) if client_id else None
-        if not client or (client.get("email") or "").lower() != current_user.email.lower():
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not visible to you")
+    _ensure_client_can_see_work_order(work_order, current_user, organization["id"])
 
     if current_user.role == "vendor":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vendor access is not enabled yet")
@@ -153,6 +173,11 @@ def list_work_orders(
     if current_user.role == "technician":
         technician = _load_caller_technician(current_user, organization["id"])
         technician_id = technician["id"] if technician else -1
+    elif current_user.role in ("client", "viewer"):
+        client = _load_caller_client(current_user, organization["id"])
+        client_id = client["id"] if client else -1
+    elif current_user.role == "vendor":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vendor access is not enabled yet")
 
     rows = work_orders_repo.list_filtered(
         organization["id"],
@@ -214,7 +239,7 @@ def update_work_order(
 def update_status(
     work_order_id: int,
     payload: WorkOrderStatusUpdate,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_roles("org_admin", "coordinator", "technician")),
     organization: dict = Depends(get_current_organization),
 ):
     """RF-18/RF-24: transition status. Technicians may only update their own
@@ -276,7 +301,7 @@ def assign_work_order(
 @router.get("/{work_order_id}/events", response_model=list[WorkOrderEvent])
 def list_events(
     work_order_id: int,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_roles("org_admin", "coordinator", "technician")),
     organization: dict = Depends(get_current_organization),
 ):
     """RF-20: audit log for a work order."""
