@@ -1008,3 +1008,37 @@ Result:
 - Client tests passed: `2 passed suites`, `7 passed tests`.
 - `npm ci` completed locally, but reported dependency audit findings that
   should be triaged separately instead of force-fixed.
+
+## 2026-07-29 - v1.3 Mobile Operations Report Charts
+
+Decision:
+
+- Continue local-only v1.3 hardening and improve reporting usability before
+  any hosting work.
+- Add simple chart bars without introducing a chart dependency so the mobile
+  operations report is easier to scan for coordinators and operators.
+
+Changes:
+
+- Added `client/src/utils/reportMetrics.js` for report chart row calculations.
+- Added `client/src/utils/reportMetrics.test.js`.
+- Added Operations Report chart sections:
+  - Risk Snapshot for stale/overloaded/hotspot mix.
+  - Capacity Pressure for highest overloaded technician utilization.
+  - Hotspot Activity for repeated-property volume.
+- Updated README, roadmap, QA, requirements, traceability, public-readiness,
+  and phase-status docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Client tests passed: `3 passed suites`, `11 passed tests`.
+- Backend tests passed: `113 passed`.
+- Compile check passed.

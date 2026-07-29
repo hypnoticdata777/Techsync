@@ -1,0 +1,68 @@
+const clampPercent = value => Math.max(0, Math.min(100, Math.round(value)));
+
+const safeNumber = value => {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : 0;
+};
+
+export const buildRiskBreakdown = report => {
+  const stale = report?.stale_work_orders?.length || 0;
+  const overloaded = report?.overloaded_technicians?.length || 0;
+  const hotspots = report?.property_hotspots?.length || 0;
+  const total = stale + overloaded + hotspots;
+
+  return [
+    {key: 'stale', label: 'Stale work', value: stale, color: '#fbbf24'},
+    {key: 'overloaded', label: 'Overloaded techs', value: overloaded, color: '#fb7185'},
+    {key: 'hotspots', label: 'Property hotspots', value: hotspots, color: '#38bdf8'},
+  ].map(item => ({
+    ...item,
+    percent: total > 0 ? clampPercent((item.value / total) * 100) : 0,
+  }));
+};
+
+export const buildTechnicianLoadRows = technicians =>
+  [...(technicians || [])]
+    .map(item => {
+      const active = safeNumber(item.active_work_order_count);
+      const maxDaily = Math.max(safeNumber(item.max_daily_jobs), 1);
+      const loadPercent = Math.round((active / maxDaily) * 100);
+      return {
+        id: item.technician_id,
+        label: item.full_name || item.email || `Technician ${item.technician_id}`,
+        detail: `${active} active / max ${maxDaily}`,
+        value: active,
+        loadPercent,
+        percent: clampPercent(loadPercent),
+        color: loadPercent >= 125 ? '#fb7185' : '#f97316',
+      };
+    })
+    .sort((a, b) => b.loadPercent - a.loadPercent)
+    .slice(0, 5);
+
+export const buildPropertyHotspotRows = hotspots => {
+  const rows = [...(hotspots || [])];
+  const maxTotal = Math.max(...rows.map(item => safeNumber(item.total_work_orders)), 0);
+
+  return rows
+    .map(item => {
+      const total = safeNumber(item.total_work_orders);
+      return {
+        id: item.property_id,
+        label: item.property_name || `Property ${item.property_id}`,
+        detail: `${total} total | ${safeNumber(item.open_count)} open | ${safeNumber(
+          item.in_progress_count,
+        )} active`,
+        value: total,
+        percent: maxTotal > 0 ? clampPercent((total / maxTotal) * 100) : 0,
+        color: '#a3e635',
+      };
+    })
+    .slice(0, 5);
+};
+
+export default {
+  buildRiskBreakdown,
+  buildTechnicianLoadRows,
+  buildPropertyHotspotRows,
+};

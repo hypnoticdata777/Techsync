@@ -133,7 +133,8 @@ Continue v1.3 product depth before hosted public promotion:
    plus work-order form linking.
 4. Add client-visible communication separation, proof-gated closeout, and richer
    reporting. Completed as v1.3 API/mobile foundation with dashboard/entity CSV
-   exports, while richer charts and binary PDF remain optional later polish.
+   exports and mobile chart bars, while completion cycle-time charts and binary
+   PDF remain optional later polish.
 5. Use `scripts/seed_demo_data.py` to refresh the synthetic demo tenant after
    v1.3 migrations are applied.
 6. Use `APP_ENV=demo` and host-managed secrets when the end-of-v1.3 Vercel

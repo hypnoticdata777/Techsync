@@ -281,7 +281,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   hotspots, CSV exports for the operations report, dispatch board, clients,
   properties, and vendors, and a dispatch board for unassigned work, technician
   lanes, utilization, SLA risk, duplicate-warning preflight checks, mobile PMC
-  directory management, and work-order entity linking.
+  directory management, mobile report chart bars, and work-order entity
+  linking.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.
@@ -303,7 +304,7 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   only); the spec's "panel administrativo" is assumed to be a future
   separate web client consuming this same API.
 - **PMC operations expansion still remaining**: calendar/maps, completion
-  cycle-time charts, richer charting, deeper entity exports, binary PDF
+  cycle-time charts, deeper entity exports, binary PDF
   generation, deeper client/vendor portals, and exhaustive UI/UX friction
   testing are tracked for v1.3+ / later in `PRODUCT_ROADMAP.md`.
 

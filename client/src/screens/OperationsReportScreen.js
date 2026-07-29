@@ -9,6 +9,11 @@ import {
   View,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import {
+  buildPropertyHotspotRows,
+  buildRiskBreakdown,
+  buildTechnicianLoadRows,
+} from '../utils/reportMetrics';
 
 const STALE_DAY_OPTIONS = [7, 14, 30];
 const HOTSPOT_DAY_OPTIONS = [30, 90, 180];
@@ -95,6 +100,44 @@ const EmptyState = ({message}) => (
   </View>
 );
 
+const ChartBlock = ({title, subtitle, rows, emptyMessage}) => (
+  <View style={styles.chartBlock}>
+    <View style={styles.chartHeader}>
+      <Text style={styles.chartTitle}>{title}</Text>
+      {subtitle ? <Text style={styles.chartSubtitle}>{subtitle}</Text> : null}
+    </View>
+    {rows.length === 0 || rows.every(row => row.value === 0) ? (
+      <EmptyState message={emptyMessage} />
+    ) : (
+      rows.map(row => (
+        <View key={row.key || row.id || row.label} style={styles.barRow}>
+          <View style={styles.barTextRow}>
+            <Text style={styles.barLabel} numberOfLines={1}>
+              {row.label}
+            </Text>
+            <Text style={styles.barValue}>{row.value}</Text>
+          </View>
+          {row.detail ? <Text style={styles.barDetail}>{row.detail}</Text> : null}
+          <View style={styles.barTrack}>
+            <View
+              style={[
+                styles.barFill,
+                {
+                  width: `${row.percent}%`,
+                  backgroundColor: row.color,
+                },
+              ]}
+            />
+          </View>
+          {row.loadPercent ? (
+            <Text style={styles.barDetail}>{row.loadPercent}% utilization</Text>
+          ) : null}
+        </View>
+      ))
+    )}
+  </View>
+);
+
 function OperationsReportScreen() {
   const {authFetch, logout} = useAuth();
   const [report, setReport] = useState(null);
@@ -147,6 +190,16 @@ function OperationsReportScreen() {
       overloaded: report?.overloaded_technicians?.length || 0,
       hotspots: report?.property_hotspots?.length || 0,
     }),
+    [report],
+  );
+
+  const riskBreakdown = useMemo(() => buildRiskBreakdown(report), [report]);
+  const technicianLoadRows = useMemo(
+    () => buildTechnicianLoadRows(report?.overloaded_technicians),
+    [report],
+  );
+  const propertyHotspotRows = useMemo(
+    () => buildPropertyHotspotRows(report?.property_hotspots),
     [report],
   );
 
@@ -211,6 +264,27 @@ function OperationsReportScreen() {
               <Text style={styles.summaryLabel}>Hotspots</Text>
             </View>
           </View>
+
+          <ChartBlock
+            title="Risk Snapshot"
+            subtitle="Share of visible report risk in this window"
+            rows={riskBreakdown}
+            emptyMessage="No report risk to chart in this window."
+          />
+
+          <ChartBlock
+            title="Capacity Pressure"
+            subtitle="Highest technician workload in this report"
+            rows={technicianLoadRows}
+            emptyMessage="No overloaded technician load to chart."
+          />
+
+          <ChartBlock
+            title="Hotspot Activity"
+            subtitle="Top repeated-property activity by total work orders"
+            rows={propertyHotspotRows}
+            emptyMessage="No repeated property activity to chart."
+          />
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Stale Work</Text>
@@ -401,6 +475,64 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     marginTop: 4,
+  },
+  chartBlock: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  chartHeader: {
+    marginBottom: 10,
+  },
+  chartTitle: {
+    color: '#f9fafb',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  chartSubtitle: {
+    color: '#94a3b8',
+    fontSize: 12,
+    marginTop: 3,
+  },
+  barRow: {
+    marginBottom: 12,
+  },
+  barTextRow: {
+    minHeight: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  barLabel: {
+    flex: 1,
+    color: '#e5e7eb',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  barValue: {
+    color: '#f9fafb',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  barDetail: {
+    color: '#94a3b8',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  barTrack: {
+    height: 10,
+    overflow: 'hidden',
+    backgroundColor: '#0f172a',
+    borderRadius: 5,
+    marginTop: 6,
+  },
+  barFill: {
+    height: 10,
+    borderRadius: 5,
   },
   section: {
     marginBottom: 18,

@@ -108,7 +108,9 @@ they have been verified in the relevant environment.
 - [x] Mobile duplicate-warning confirmation added before manual work-order
       creation.
 - [x] Client/property/vendor CSV exports implemented.
-- [ ] Richer reporting charts and deeper export workflows implemented.
+- [x] Mobile operations report chart bars implemented for risk mix,
+      technician capacity pressure, and property hotspot activity.
+- [ ] Completion cycle-time charts and deeper export workflows implemented.
 
 ## Client / Demo Surface
 

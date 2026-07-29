@@ -230,6 +230,8 @@ Already represented in the codebase:
 - v1.3 client/property/vendor CSV exports for tenant-owned PMC directory data.
 - v1.3 mobile operations report view for org admins/coordinators to scan stale
   work, overloaded technicians, and property hotspots.
+- v1.3 mobile operations report chart bars for risk mix, technician capacity
+  pressure, and property hotspot activity.
 - v1.3 mobile PMC directory workflow for org admins/coordinators to create and
   edit clients, properties, and vendors.
 - v1.3 mobile work-order form selectors for linking client, property, and
@@ -261,7 +263,7 @@ Important gaps for the PMC operations product:
 - Full client/homeowner portal UI is not built yet; scoped work-order
   visibility, client-visible comments, and approval/decline actions have
   started in v1.3.
-- Binary closeout PDF rendering, richer report charts, calendar/maps,
+- Binary closeout PDF rendering, completion cycle-time charts, calendar/maps,
   background jobs, and deeper export workflows remain roadmap items.
 
 ## Version Planning Boundary
