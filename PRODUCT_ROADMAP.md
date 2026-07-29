@@ -126,7 +126,8 @@ Likely scope:
   - before/after photos
   - receipts
   - backend completion gate now started in v1.3
-  - closeout package summary
+  - backend closeout package summary now started in v1.3
+  - closeout PDF/export generation
 - Dispatch improvements:
   - workload board
   - SLA-risk flags
@@ -171,7 +172,7 @@ v1.3 exit criteria:
 Candidate later versions:
 
 - v1.4: background jobs, notifications, PDF/email ingestion, exports, and
-  closeout package generation.
+  closeout PDF generation.
 - v1.5: offline mobile sync, maps/routing, calendar integration, and stronger
   technician field UX.
 - v2.0: paid pilots, production-grade monitoring/backups, legal docs, billing,

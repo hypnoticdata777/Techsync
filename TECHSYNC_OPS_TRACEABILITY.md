@@ -33,7 +33,7 @@ showcase gate.
 | 3 | Constraints | Captured as guardrails: tenant privacy, synthetic data, CSV remains useful, offline/deep integrations deferred. | Consent-aware location, offline sync, advanced routing, PDF/email ingestion, accounting integrations staged later. |
 | 4 | External Interfaces | Partially proven: CSV import, webhook intake, attachment storage boundary, Stripe/email boundaries. | CSV export, SMS/push, calendar/maps, accounting/export, closeout PDFs, and deeper storage workflows expand later. |
 | 5 | Features | Partially proven: central work-order intake, assignment, technician queue/status, attachment proof boundary, dashboard metrics. | Client/property/vendor CRUD, backend communication visibility, and operations reporting begin in v1.3; dispatch board, client/homeowner portal, cost trends, and richer hotspot UX expand through v1.3+. |
-| 6 | Functional Requirements | Partially proven: admin onboarding, role-scoped users, work orders, technician recommendation/assignment, technician status, CSV/webhook ingestion. | Proof-gated closeout begins in v1.3; admin-created non-technician roles, archive/pause/escalate/cancel depth, duplicate detection, client approvals/comments, closeout packages, and real notifications expand in v1.3+. |
+| 6 | Functional Requirements | Partially proven: admin onboarding, role-scoped users, work orders, technician recommendation/assignment, technician status, CSV/webhook ingestion. | Proof-gated closeout and backend closeout summaries begin in v1.3; admin-created non-technician roles, archive/pause/escalate/cancel depth, duplicate detection, client approvals/comments, closeout PDF/export, and real notifications expand in v1.3+. |
 | 7 | Nonfunctional Requirements | Partially proven: app-layer tenant isolation, RLS policies, audit trail, structured logs, hosted-demo config. | Performance targets, retry/offline resilience, backup/restore/export, monitoring, and accessibility evidence remain v1.2/v1.3 operational work. |
 | 8 | Quality Attributes | Partially proven: security, auditability, maintainability, and core reliability boundaries. | Scalability, operational observability, and field usability evidence mature through hosted smoke tests and v1.3 workflows. |
 | 9 | System Requirements | Partially proven: multi-tenant backend API, relational model for current core entities, mobile client, object storage boundary, deployment pipeline. | Properties, clients, vendors, and work-order messages are v1.3 foundation work; approvals, background jobs, monitoring, backups, and web admin dashboard expand in v1.3+. |
@@ -63,7 +63,7 @@ These are requirements captured by the product, but not required to finish v1.2:
 - Real push notifications.
 - Full client/homeowner portal.
 - Approval workflow.
-- Closeout PDF/package generation.
+- Closeout PDF/export generation.
 - Duplicate detection.
 - Calendar/maps/routing.
 - Background jobs.

@@ -220,6 +220,8 @@ Already represented in the codebase:
   proof unless an org admin/coordinator records an override reason.
 - v1.3 backend operations report for stale work, overloaded technicians, and
   property hotspots.
+- v1.3 backend closeout package summary for work-order status, proof,
+  attachments, messages, and audit events.
 - React Native/Expo mobile client for onboarding, auth, work-order list,
   details, creation, invitation acceptance, and password reset.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,
@@ -231,7 +233,7 @@ Important gaps for the PMC operations product:
   entities; frontend workflows and richer operations logic remain.
 - Client/homeowner portal UI is not built yet; backend message visibility
   separation has started in v1.3.
-- Closeout packages, approvals, duplicate detection, reporting UI,
+- Closeout PDF/export generation, approvals, duplicate detection, reporting UI,
   calendar/maps, background jobs, and export workflows remain roadmap items.
 
 ## Version Planning Boundary

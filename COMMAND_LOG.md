@@ -440,6 +440,47 @@ Result:
 - Local pytest could not run because `server\venv` does not have pytest
   installed.
 
+## 2026-07-28 - v1.3 Closeout Package Summary
+
+Decision:
+
+- Add a structured closeout package summary before PDF/export generation so the
+  API can already show completion status, proof, attachments, communication,
+  and audit context.
+
+Changes:
+
+- Added `WorkOrderCloseoutPackage` response model.
+- Added `GET /work-orders/{work_order_id}/closeout-package`.
+- The closeout summary includes:
+  - work order status and completion metadata;
+  - proof status: `verified`, `override`, or `missing`;
+  - attachment/proof records;
+  - client-visible messages;
+  - internal messages;
+  - audit events.
+- Added regression coverage for closeout package composition and tenant-scoped
+  repository calls.
+- Updated roadmap, traceability, requirements, QA, and phase-status docs while
+  keeping PDF/export generation deferred.
+
+Verification:
+
+```powershell
+python -m compileall -q server\models\closeout_package.py server\routers\work_orders.py server\tests\test_closeout_package.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+git diff --check
+server\venv\Scripts\python.exe -m pytest server\tests\test_closeout_package.py -p no:cacheprovider
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- `git diff --check` passed.
+- Local pytest could not run because `server\venv` does not have pytest
+  installed.
+
 ## 2026-07-28 - v1.3 Operations Reporting
 
 Decision:

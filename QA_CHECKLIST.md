@@ -76,7 +76,8 @@ they have been verified in the relevant environment.
 - [ ] Client/homeowner UI for visible communication implemented.
 - [x] Backend closeout proof requirement and manager override reason
       implemented.
-- [ ] Closeout package summary/PDF generation implemented.
+- [x] Backend closeout package summary implemented.
+- [ ] Closeout PDF/export generation implemented.
 - [x] Backend operations report added for stale work, overloaded technicians, and
       property hotspots.
 - [ ] UI reporting view expanded for stale work, overloaded technicians, and property

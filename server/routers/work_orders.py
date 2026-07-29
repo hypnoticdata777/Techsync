@@ -7,6 +7,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 
 from dependencies import get_current_organization, get_current_user, require_roles
+from models.closeout_package import WorkOrderCloseoutPackage
 from models.user import User
 from models.work_order import (
     WorkOrder,
@@ -282,6 +283,40 @@ def list_events(
     _get_accessible_work_order(work_order_id, current_user, organization)
     rows = events_repo.list_for_work_order(organization["id"], work_order_id)
     return [WorkOrderEvent(**row) for row in rows]
+
+
+@router.get("/{work_order_id}/closeout-package", response_model=WorkOrderCloseoutPackage)
+def get_closeout_package(
+    work_order_id: int,
+    current_user: User = Depends(require_roles("org_admin", "coordinator", "technician")),
+    organization: dict = Depends(get_current_organization),
+):
+    """v1.3 closeout summary: timeline, proof, messages, and audit context.
+    PDF/package file generation remains a later export step."""
+    work_order = _get_accessible_work_order(work_order_id, current_user, organization)
+    attachments = attachments_repo.list_for_work_order(organization["id"], work_order_id)
+    client_messages = messages_repo.list_for_work_order(
+        organization["id"], work_order_id, visibility="client"
+    )
+    internal_messages = messages_repo.list_for_work_order(
+        organization["id"], work_order_id, visibility="internal"
+    )
+    events = events_repo.list_for_work_order(organization["id"], work_order_id)
+
+    proof_status = "missing"
+    if work_order.get("completion_proof_verified_at"):
+        proof_status = "verified"
+    elif work_order.get("completion_override_reason"):
+        proof_status = "override"
+
+    return WorkOrderCloseoutPackage(
+        work_order=WorkOrder(**work_order),
+        proof_status=proof_status,
+        attachments=[WorkOrderAttachment(**row) for row in attachments],
+        client_messages=[WorkOrderMessage(**row) for row in client_messages],
+        internal_messages=[WorkOrderMessage(**row) for row in internal_messages],
+        audit_events=[WorkOrderEvent(**row) for row in events],
+    )
 
 
 @router.post(
