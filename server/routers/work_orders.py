@@ -18,6 +18,7 @@ from models.work_order import (
     WorkOrderAttachment,
     WorkOrderAttachmentCreate,
     WorkOrderCreate,
+    WorkOrderDuplicateWarning,
     WorkOrderEvent,
     WorkOrderStatusUpdate,
     WorkOrderUpdate,
@@ -252,6 +253,30 @@ def list_my_work_orders(
         return []
     rows = work_orders_repo.list_for_technician(organization["id"], technician["id"])
     return [WorkOrder(**row) for row in rows]
+
+
+@router.post("/duplicate-warnings", response_model=list[WorkOrderDuplicateWarning])
+def check_duplicate_warnings(
+    payload: WorkOrderCreate,
+    current_user: User = Depends(require_roles("org_admin", "coordinator")),
+    organization: dict = Depends(get_current_organization),
+):
+    """v1.3 duplicate-detection preflight: warn coordinators about recent
+    matching work at the same property/address and service type. This is
+    advisory, not a hard block."""
+    patch = {
+        "property_id": payload.property_id,
+        "client_id": payload.client_id,
+        "vendor_id": payload.vendor_id,
+    }
+    _validate_entity_links(organization["id"], patch)
+    rows = work_orders_repo.list_potential_duplicates(
+        organization["id"],
+        property_id=payload.property_id,
+        address=payload.address,
+        service_type=payload.service_type,
+    )
+    return [WorkOrderDuplicateWarning(**row) for row in rows]
 
 
 @router.get("/{work_order_id}", response_model=WorkOrder)

@@ -21,7 +21,7 @@ from repositories import work_orders as work_orders_repo
 from routers import dashboard as dashboard_router
 from routers import work_orders as work_orders_router
 from models.user import User
-from models.work_order import WorkOrderApprovalDecision, WorkOrderApprovalRequest
+from models.work_order import WorkOrderApprovalDecision, WorkOrderApprovalRequest, WorkOrderCreate
 from models.work_order_message import WorkOrderMessageCreate
 
 
@@ -99,6 +99,43 @@ def test_dispatch_board_work_orders_scope_and_join_by_organization_id():
     assert "v.organization_id = wo.organization_id" in sql
     assert "wo.status IN ('open', 'in_progress')" in sql
     assert params == {"organization_id": 42}
+
+
+def test_duplicate_warning_query_scopes_and_matches_location_inside_org():
+    with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
+        work_orders_repo.list_potential_duplicates(
+            organization_id=42,
+            property_id=9,
+            address="100 Demo Way",
+            service_type="plumbing",
+            window_days=14,
+            limit=3,
+        )
+
+    sql, params = mock_fetch.call_args.args
+    assert "WHERE wo.organization_id = :organization_id" in sql
+    assert "p.organization_id = wo.organization_id" in sql
+    assert "wo.status IN ('open', 'in_progress', 'completed')" in sql
+    assert "wo.property_id = :property_id" in sql
+    assert "wo.address ILIKE :address" in sql
+    assert params["organization_id"] == 42
+    assert params["property_id"] == 9
+    assert params["address"] == "%100 Demo Way%"
+    assert params["service_type"] == "plumbing"
+    assert params["limit"] == 3
+
+
+def test_duplicate_warning_query_returns_empty_without_location_signal():
+    with patch("repositories.work_orders.fetch_all") as mock_fetch:
+        rows = work_orders_repo.list_potential_duplicates(
+            organization_id=42,
+            property_id=None,
+            address=None,
+            service_type="plumbing",
+        )
+
+    assert rows == []
+    mock_fetch.assert_not_called()
 
 
 def test_get_by_id_in_org_always_filters_by_caller_org_not_just_row_id():
@@ -491,6 +528,58 @@ def test_client_approval_decision_requires_pending_status():
 
     assert exc.value.status_code == 400
     assert exc.value.detail == "Client approval is not pending for this work order"
+
+
+def test_duplicate_warning_route_validates_links_and_returns_warnings():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="coordinator",
+        is_active=True,
+    )
+    payload = WorkOrderCreate(
+        title="Kitchen leak",
+        property_id=3,
+        client_id=9,
+        address="100 Demo Way",
+        service_type="plumbing",
+        auto_assign=True,
+    )
+    duplicate_rows = [
+        {
+            "id": 1,
+            "title": "Kitchen leak follow-up",
+            "status": "open",
+            "priority": "high",
+            "property_id": 3,
+            "property_name": "Demo Property",
+            "customer_name": "Synthetic Resident",
+            "address": "100 Demo Way",
+            "service_type": "plumbing",
+            "created_at": "2026-07-28T00:00:00Z",
+            "similarity_reason": "same property and service type",
+        }
+    ]
+
+    with patch("routers.work_orders.clients_repo.get_by_id_in_org", return_value={"id": 9}):
+        with patch(
+            "routers.work_orders.properties_repo.get_by_id_in_org",
+            return_value={"id": 3, "client_id": 9},
+        ):
+            with patch("routers.work_orders.work_orders_repo.list_potential_duplicates", return_value=duplicate_rows) as mock_list:
+                warnings = work_orders_router.check_duplicate_warnings(
+                    payload,
+                    current_user=admin_user,
+                    organization={"id": 6},
+                )
+
+    assert warnings[0].id == 1
+    assert warnings[0].similarity_reason == "same property and service type"
+    assert mock_list.call_args.kwargs["property_id"] == 3
+    assert mock_list.call_args.kwargs["address"] == "100 Demo Way"
+    assert mock_list.call_args.kwargs["service_type"] == "plumbing"
 
 
 def test_client_can_decline_pending_approval_for_own_work_order():

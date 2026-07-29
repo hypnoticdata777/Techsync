@@ -263,3 +263,79 @@ def list_dispatch_board_work_orders(organization_id: int) -> list[dict]:
         """,
         {"organization_id": organization_id},
     )
+
+
+def list_potential_duplicates(
+    organization_id: int,
+    *,
+    property_id: Optional[int] = None,
+    address: Optional[str] = None,
+    service_type: str = "general",
+    window_days: int = 30,
+    limit: int = 5,
+) -> list[dict]:
+    """v1.3 duplicate warning: recent active/recent work matching location and service."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=window_days)
+    normalized_address = address.strip() if address else None
+    if not property_id and not normalized_address:
+        return []
+
+    location_clauses = []
+    params = {
+        "organization_id": organization_id,
+        "property_id": property_id,
+        "address": f"%{normalized_address}%" if normalized_address else None,
+        "service_type": service_type,
+        "cutoff": cutoff,
+        "limit": limit,
+    }
+    if property_id:
+        location_clauses.append("wo.property_id = :property_id")
+    if normalized_address:
+        location_clauses.append("wo.address ILIKE :address")
+
+    return fetch_all(
+        f"""
+        SELECT
+            wo.id,
+            wo.title,
+            wo.status,
+            wo.priority,
+            wo.property_id,
+            p.name AS property_name,
+            wo.customer_name,
+            wo.address,
+            wo.service_type,
+            wo.created_at,
+            CASE
+                WHEN wo.property_id IS NOT NULL
+                 AND wo.property_id = :property_id
+                 AND lower(wo.service_type) = lower(:service_type)
+                    THEN 'same property and service type'
+                WHEN wo.address IS NOT NULL
+                 AND wo.address ILIKE :address
+                 AND lower(wo.service_type) = lower(:service_type)
+                    THEN 'similar address and service type'
+                ELSE 'similar active or recent work'
+            END AS similarity_reason
+        FROM work_orders wo
+        LEFT JOIN properties p
+            ON p.id = wo.property_id
+           AND p.organization_id = wo.organization_id
+        WHERE wo.organization_id = :organization_id
+          AND wo.created_at >= :cutoff
+          AND wo.status IN ('open', 'in_progress', 'completed')
+          AND lower(wo.service_type) = lower(:service_type)
+          AND ({' OR '.join(location_clauses)})
+        ORDER BY
+            CASE wo.status
+                WHEN 'open' THEN 0
+                WHEN 'in_progress' THEN 1
+                WHEN 'completed' THEN 2
+                ELSE 99
+            END,
+            wo.created_at DESC
+        LIMIT :limit
+        """,
+        params,
+    )

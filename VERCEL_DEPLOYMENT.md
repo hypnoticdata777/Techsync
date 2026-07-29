@@ -123,6 +123,7 @@ Then verify:
 - technician queue
 - status transition
 - client/property/vendor links
+- duplicate-warning preflight
 - internal versus client-visible messages
 - approval request state
 - proof-gated closeout

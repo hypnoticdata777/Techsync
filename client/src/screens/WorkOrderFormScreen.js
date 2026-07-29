@@ -12,6 +12,30 @@ import {useAuth} from '../context/AuthContext';
 
 const PRIORITY_OPTIONS = ['low', 'medium', 'high', 'emergency'];
 
+const formatLabel = value => (value || '').replace(/_/g, ' ');
+
+const confirmDuplicateWarnings = warnings =>
+  new Promise(resolve => {
+    if (!warnings.length) {
+      resolve(true);
+      return;
+    }
+
+    const preview = warnings
+      .slice(0, 3)
+      .map(item => `#${item.id} ${item.title} (${formatLabel(item.status)})`)
+      .join('\n');
+
+    Alert.alert(
+      'Possible duplicate work',
+      `${preview}\n\nCreate a new work order anyway?`,
+      [
+        {text: 'Review First', style: 'cancel', onPress: () => resolve(false)},
+        {text: 'Create Anyway', onPress: () => resolve(true)},
+      ],
+    );
+  });
+
 function WorkOrderFormScreen({route, navigation}) {
   const {authFetch} = useAuth();
   const existingWorkOrder = route.params?.workOrder;
@@ -25,6 +49,38 @@ function WorkOrderFormScreen({route, navigation}) {
   const [priority, setPriority] = useState(existingWorkOrder?.priority || 'medium');
   const [saving, setSaving] = useState(false);
 
+  const buildPayload = () => {
+    const basePayload = {
+      title: title.trim(),
+      description: description.trim() || null,
+      customer_name: customerName.trim() || null,
+      address: address.trim() || null,
+      service_type: serviceType,
+      priority,
+    };
+
+    return isEditing ? basePayload : {...basePayload, auto_assign: true};
+  };
+
+  const checkDuplicateWarnings = async payload => {
+    if (isEditing) {
+      return true;
+    }
+
+    const res = await authFetch('/work-orders/duplicate-warnings', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      return true;
+    }
+
+    const warnings = await res.json();
+    return confirmDuplicateWarnings(warnings);
+  };
+
   const handleSave = async () => {
     if (!title.trim()) {
       Alert.alert('Error', 'Please enter a title');
@@ -36,24 +92,12 @@ function WorkOrderFormScreen({route, navigation}) {
 
       const path = isEditing ? `/work-orders/${existingWorkOrder.id}` : '/work-orders';
       const method = isEditing ? 'PATCH' : 'POST';
-      const payload = isEditing
-        ? {
-            title: title.trim(),
-            description: description.trim() || null,
-            customer_name: customerName.trim() || null,
-            address: address.trim() || null,
-            service_type: serviceType,
-            priority,
-          }
-        : {
-            title: title.trim(),
-            description: description.trim() || null,
-            customer_name: customerName.trim() || null,
-            address: address.trim() || null,
-            service_type: serviceType,
-            priority,
-            auto_assign: true,
-          };
+      const payload = buildPayload();
+      const shouldContinue = await checkDuplicateWarnings(payload);
+      if (!shouldContinue) {
+        setSaving(false);
+        return;
+      }
 
       const res = await authFetch(path, {
         method,

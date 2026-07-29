@@ -232,6 +232,8 @@ Already represented in the codebase:
   workload utilization, and SLA risk.
 - v1.3 mobile dispatch board view for org admins/coordinators to scan
   unassigned work, technician load, and SLA risk.
+- v1.3 duplicate-warning preflight for manual work-order creation using
+  property/address plus service type, with mobile coordinator confirmation.
 - v1.3 backend closeout package summary for work-order status, proof,
   attachments, messages, and audit events.
 - v1.3 printable HTML/text closeout export endpoint for work-order summary,
@@ -248,9 +250,8 @@ Important gaps for the PMC operations product:
 - Full client/homeowner portal UI is not built yet; scoped work-order
   visibility, client-visible comments, and approval/decline actions have
   started in v1.3.
-- Binary closeout PDF rendering, duplicate detection, richer report
-  charts/export, calendar/maps, background jobs, and broader export workflows
-  remain roadmap items.
+- Binary closeout PDF rendering, richer report charts/export, calendar/maps,
+  background jobs, and broader export workflows remain roadmap items.
 
 ## Version Planning Boundary
 

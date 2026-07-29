@@ -133,6 +133,20 @@ class WorkOrder(BaseModel):
     updated_at: datetime
 
 
+class WorkOrderDuplicateWarning(BaseModel):
+    id: int
+    title: str
+    status: Status
+    priority: Priority
+    property_id: Optional[int] = None
+    property_name: Optional[str] = None
+    customer_name: Optional[str] = None
+    address: Optional[str] = None
+    service_type: str
+    created_at: datetime
+    similarity_reason: str
+
+
 class WorkOrderEvent(BaseModel):
     id: int
     work_order_id: int

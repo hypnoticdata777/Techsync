@@ -231,24 +231,25 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
     technician_id = technician.data["id"]
     record("technician_creation", technician, {"technician_id": technician_id})
 
+    work_order_payload = {
+        "title": f"V1.3 smoke disposal leak {suffix}",
+        "description": "Synthetic v1.3 hosted smoke-test work order. No real customer data.",
+        "property_id": property_id,
+        "client_id": client_id,
+        "vendor_id": vendor_id,
+        "customer_name": "Synthetic Resident",
+        "address": "1300 Demo Ridge Unit 4B, Test City, NY",
+        "latitude": 40.7130,
+        "longitude": -74.0062,
+        "service_type": "plumbing",
+        "priority": "high",
+        "auto_assign": False,
+    }
     work_order = request(
         base_url,
         "POST",
         "/work-orders",
-        {
-            "title": f"V1.3 smoke disposal leak {suffix}",
-            "description": "Synthetic v1.3 hosted smoke-test work order. No real customer data.",
-            "property_id": property_id,
-            "client_id": client_id,
-            "vendor_id": vendor_id,
-            "customer_name": "Synthetic Resident",
-            "address": "1300 Demo Ridge Unit 4B, Test City, NY",
-            "latitude": 40.7130,
-            "longitude": -74.0062,
-            "service_type": "plumbing",
-            "priority": "high",
-            "auto_assign": False,
-        },
+        work_order_payload,
         admin_token,
         expected=(201,),
     )
@@ -264,6 +265,24 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         "work_order_creation_with_pmc_links",
         work_order,
         {"work_order_id": work_order_id, "client_id": client_id, "property_id": property_id, "vendor_id": vendor_id},
+    )
+
+    duplicate_warnings = request(
+        base_url,
+        "POST",
+        "/work-orders/duplicate-warnings",
+        work_order_payload,
+        admin_token,
+    )
+    assert_detail(
+        "duplicate_warnings",
+        any(item.get("id") == work_order_id for item in duplicate_warnings.data),
+        duplicate_warnings.data,
+    )
+    record(
+        "duplicate_warning_preflight",
+        duplicate_warnings,
+        {"warning_count": len(duplicate_warnings.data), "matched_work_order_id": work_order_id},
     )
 
     assignment = request(

@@ -801,3 +801,45 @@ Result:
   installed.
 - Client Babel transform could not run because `client\node_modules` is not
   installed in this checkout.
+
+## 2026-07-29 - v1.3 Duplicate Warnings
+
+Decision:
+
+- Add advisory duplicate detection before hosting so coordinators get a warning
+  before creating likely repeated work at the same property/address and service
+  type.
+- Keep duplicate detection non-blocking because similar maintenance tickets can
+  be legitimate follow-up work.
+
+Changes:
+
+- Added `WorkOrderDuplicateWarning` schema.
+- Added tenant-scoped duplicate-warning query in
+  `server/repositories/work_orders.py`.
+- Added `POST /work-orders/duplicate-warnings` for org admins/coordinators.
+- Added mobile duplicate-warning confirmation before manual work-order create.
+- Added hosted v1.3 smoke coverage for duplicate-warning preflight.
+- Updated README, requirements, roadmap, traceability, QA, phase status, Vercel
+  runbook, and v1.3 evidence template.
+
+Verification:
+
+```powershell
+python -m compileall -q server\models\work_order.py server\repositories\work_orders.py server\routers\work_orders.py server\tests\test_tenant_isolation.py scripts\smoke_v13.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+server\venv\Scripts\python.exe -c "import os, sys; from unittest.mock import patch; os.environ['JWT_SECRET_KEY']='test-secret-key-for-import-check-only'; sys.path.insert(0, 'server'); from models.user import User; from models.work_order import WorkOrderCreate; from routers.work_orders import check_duplicate_warnings; user=User(id=1, organization_id=6, email='admin@example.com', full_name='Admin', role='coordinator', is_active=True); payload=WorkOrderCreate(title='Kitchen leak', property_id=3, client_id=9, address='100 Demo Way', service_type='plumbing', auto_assign=True); rows=[{'id':2,'title':'Kitchen leak follow-up','status':'open','priority':'high','property_id':3,'property_name':'Demo Property','customer_name':'Synthetic Resident','address':'100 Demo Way','service_type':'plumbing','created_at':'2026-07-28T00:00:00Z','similarity_reason':'same property and service type'}]; p1=patch('routers.work_orders.clients_repo.get_by_id_in_org', return_value={'id':9}); p2=patch('routers.work_orders.properties_repo.get_by_id_in_org', return_value={'id':3,'client_id':9}); p3=patch('routers.work_orders.work_orders_repo.list_potential_duplicates', return_value=rows); p1.start(); p2.start(); p3.start(); warnings=check_duplicate_warnings(payload, current_user=user, organization={'id':6}); p1.stop(); p2.stop(); p3.stop(); print(len(warnings), warnings[0].similarity_reason)"
+git diff --check
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- Direct duplicate-warning route smoke printed `1 same property and service
+  type`.
+- `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
+- Focused pytest could not run because `server\venv` does not have pytest
+  installed.
+- Client Babel transform could not run because `client\node_modules` is not
+  installed in this checkout.

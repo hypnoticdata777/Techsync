@@ -147,6 +147,9 @@ Completed:
   work, overloaded technicians, and property hotspots.
 - Added backend dispatch board under `/dashboard/dispatch-board` for unassigned
   active work, technician lanes, workload utilization, and SLA risk.
+- Added backend duplicate-warning preflight under
+  `/work-orders/duplicate-warnings` for likely repeated work at the same
+  property/address and service type.
 - Added backend closeout package summary under
   `/work-orders/{work_order_id}/closeout-package`.
 - Added mobile operations report screen for org admins/coordinators, showing
@@ -154,6 +157,8 @@ Completed:
   report endpoint.
 - Added mobile dispatch board screen for org admins/coordinators, showing
   unassigned work, technician load, active lane work, and SLA risk.
+- Added mobile duplicate-warning confirmation before manual work-order
+  creation.
 - Added client/viewer work-order scoping by active client email, so client
   users only list/view their own work orders.
 - Added mobile work-order communication timeline with internal versus
@@ -170,6 +175,7 @@ Completed:
   request state, proof-gated completion, closeout package JSON, HTML/text
   exports, and operations reporting.
 - Added hosted v1.3 smoke coverage for the dispatch board shape and summary.
+- Added hosted v1.3 smoke coverage for duplicate-warning preflight.
 
 Next:
 
@@ -180,8 +186,8 @@ Next:
   hosted email/log path because invite tokens are intentionally not echoed by
   the API response.
 - Decide whether binary PDF rendering is needed before the portfolio showcase.
-- Continue local-only product depth with duplicate-detection warnings or richer
-  report exports before hosting.
+- Continue local-only product depth with richer report exports, synthetic demo
+  seed/reset tooling, or binary PDF closeout polish before hosting.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 

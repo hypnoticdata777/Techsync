@@ -95,6 +95,10 @@ they have been verified in the relevant environment.
 - [x] Backend dispatch board added for unassigned work, technician lanes,
       workload utilization, and SLA risk.
 - [x] Mobile dispatch board view added for org admins/coordinators.
+- [x] Backend duplicate-warning preflight added for likely same-property/address
+      and service-type work.
+- [x] Mobile duplicate-warning confirmation added before manual work-order
+      creation.
 - [ ] Richer reporting charts/export implemented.
 
 ## Client / Demo Surface

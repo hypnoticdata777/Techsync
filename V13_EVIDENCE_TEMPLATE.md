@@ -66,6 +66,7 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Synthetic vendor record created.
 - [ ] Synthetic technician record created.
 - [ ] Work order created with client/property/vendor links.
+- [ ] Duplicate-warning preflight detected likely repeated work.
 - [ ] Manual technician assignment succeeded.
 - [ ] Internal work-order message created.
 - [ ] Client-visible work-order message created.

@@ -142,7 +142,8 @@ Likely scope:
 - Dispatch improvements:
   - workload board now started in v1.3 with backend/mobile dispatch view
   - SLA-risk flags now started in v1.3 dispatch board
-  - duplicate-detection warnings
+  - duplicate-detection warnings now started in v1.3 for manual work-order
+    preflight checks
   - manual override tracking
 - Reporting improvements:
   - aging work orders
@@ -181,6 +182,8 @@ v1.3 exit criteria:
   property hotspot evidence, with richer charts/export still to complete.
 - Backend and mobile dispatch board show unassigned active work, technician
   lanes, workload utilization, and SLA risk.
+- Manual work-order creation warns coordinators about likely duplicates before
+  creating another active/recent job.
 - Vercel hosting and portfolio linking are completed as the final showcase step,
   not before the product feels robust enough to show.
 - Documentation explains which v1.3 features are prototype-ready versus still
