@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
   },
   tabButton: {
     flex: 1,
-    minHeight: 40,
+    minHeight: 44,
     borderWidth: 1,
     borderColor: '#334155',
     borderRadius: 8,
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   optionButton: {
-    minHeight: 36,
+    minHeight: 44,
     borderWidth: 1,
     borderColor: '#334155',
     borderRadius: 8,
@@ -679,6 +679,7 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     fontSize: 12,
     fontWeight: '800',
+    textAlign: 'center',
   },
   optionButtonTextActive: {
     color: '#052e16',

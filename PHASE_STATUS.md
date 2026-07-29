@@ -204,6 +204,8 @@ Completed:
 - Added backend role-scope regression evidence for client/viewer unrelated-work
   blocking, viewer client-visible message enforcement, and technician
   unassigned work/subresource blocking.
+- Added compact mobile touch target and wrapping polish across primary role
+  workflow controls before screenshot capture.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and

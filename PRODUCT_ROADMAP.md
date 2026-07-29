@@ -214,6 +214,8 @@ v1.3 exit criteria:
   gating is now covered by client tests, and primary mobile API failure states
   now expose retry actions. Backend role-scope regressions now cover
   client/viewer unrelated-work blocking and technician unassigned-work blocking.
+  Compact mobile touch targets and wrapping behavior are now hardened before
+  screenshot capture.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data, while
   the client invite/accept/approval decision is manually verified from the
   hosted email/log path.

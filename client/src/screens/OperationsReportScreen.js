@@ -447,11 +447,12 @@ const styles = StyleSheet.create({
   },
   segmentRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   segmentButton: {
-    minWidth: 58,
-    minHeight: 36,
+    minWidth: 64,
+    minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
@@ -467,6 +468,7 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     fontSize: 13,
     fontWeight: '700',
+    textAlign: 'center',
   },
   segmentButtonTextActive: {
     color: '#050816',

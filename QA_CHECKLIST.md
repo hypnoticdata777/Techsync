@@ -136,6 +136,8 @@ they have been verified in the relevant environment.
 - [x] Backend regression tests cover client/viewer unrelated-work blocking,
       viewer client-visible message enforcement, and technician unassigned
       work/subresource blocking.
+- [x] Compact mobile touch targets and wrapping behavior have been hardened for
+      primary role workflow controls before screenshot capture.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

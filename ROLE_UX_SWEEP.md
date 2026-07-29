@@ -44,6 +44,9 @@ Implemented:
   unrelated client-linked work orders by ID, viewer message requests are forced
   to client-visible messages, and technicians cannot open unassigned
   work-order details or attachment subresources.
+- Raised compact mobile touch targets and wrapping behavior for report filters,
+  directory tabs/options, work-order form selectors/status chips, detail
+  visibility tabs/actions, retry buttons, and tappable work-order cards.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
 
@@ -84,5 +87,7 @@ Result:
 - Verify all primary screens have clear retry states after API failures.
   Implemented in code; final screenshot proof still needed.
 - Validate text wrapping and touch target comfort on small mobile widths.
+  Touch target polish is implemented in code; final screenshot proof still
+  needed.
 - Run the final screenshot/walkthrough pass only after local product depth is
   otherwise complete.

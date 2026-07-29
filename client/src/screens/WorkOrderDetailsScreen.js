@@ -950,11 +950,12 @@ const styles = StyleSheet.create({
   },
   visibilityTabs: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
     marginBottom: 10,
   },
   visibilityTab: {
-    minHeight: 34,
+    minHeight: 44,
     minWidth: 92,
     alignItems: 'center',
     justifyContent: 'center',
@@ -971,6 +972,7 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     fontSize: 13,
     fontWeight: '700',
+    textAlign: 'center',
   },
   visibilityTabTextActive: {
     color: '#050816',
@@ -988,9 +990,11 @@ const styles = StyleSheet.create({
   },
   messageButton: {
     backgroundColor: '#38bdf8',
+    minHeight: 44,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
     marginBottom: 10,
   },
@@ -1040,9 +1044,11 @@ const styles = StyleSheet.create({
   secondaryButton: {
     flex: 1,
     backgroundColor: '#1f2937',
+    minHeight: 44,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#334155',
   },
@@ -1050,6 +1056,7 @@ const styles = StyleSheet.create({
     color: '#e5e7eb',
     fontWeight: '600',
     fontSize: 14,
+    textAlign: 'center',
   },
   emptyAttachments: {
     color: '#9ca3af',

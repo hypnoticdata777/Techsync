@@ -1272,6 +1272,38 @@ Result:
 - Client tests passed: `5 passed suites`, `25 passed tests`.
 - Compile check passed.
 
+## 2026-07-29 - v1.3 Mobile Touch Target Polish
+
+Decision:
+
+- Continue the pre-hosting role UX sweep by tightening small-screen touch
+  comfort before screenshot evidence.
+- Keep the work local-only and avoid changing route/API behavior.
+
+Changes:
+
+- Raised retry, segment, tab, selector, visibility, and secondary action touch
+  targets to stable mobile-friendly minimum heights.
+- Allowed report segments and detail visibility tabs to wrap on narrow screens.
+- Added text centering for compact chip/button labels that can wrap.
+- Added explicit minimum heights for tappable work-order cards/chips.
+- Updated role UX, QA, roadmap, phase, requirements, traceability, and README
+  docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Client tests passed: `5 passed suites`, `25 passed tests`.
+- Backend tests passed: `119 passed`.
+- Compile check passed.
+
 ## 2026-07-29 - v1.3 Mobile Retry-State Polish
 
 Decision:

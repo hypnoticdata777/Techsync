@@ -330,6 +330,7 @@ const styles = StyleSheet.create({
   workOrderCard: {
     backgroundColor: '#020617',
     borderRadius: 10,
+    minHeight: 72,
     padding: 12,
     marginBottom: 10,
     borderWidth: 1,
