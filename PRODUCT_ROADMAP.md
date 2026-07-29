@@ -119,6 +119,7 @@ Likely scope:
   - client-visible messages
   - status and proof events
   - audit/event separation
+  - backend message visibility guardrail now started in v1.3
 - Completion proof and closeout:
   - required proof rules
   - manager override reason
@@ -151,7 +152,8 @@ Likely scope:
 v1.3 exit criteria:
 
 - Property/client/vendor concepts exist in the data model and API.
-- Client-visible communication is separated from internal notes.
+- Client-visible communication is separated from internal notes at the backend
+  API/data layer, with frontend/client portal UX still to complete.
 - A work order cannot be closed without proof unless an override is recorded.
 - At least one client/homeowner demo flow is showable with synthetic data.
 - Reporting shows stale work, workload, and property hotspot evidence.

@@ -401,3 +401,41 @@ Result:
 - `git diff --check` passed.
 - Local pytest could not run because neither `server\venv` nor system Python has
   pytest installed in this checkout.
+
+## 2026-07-28 - v1.3 Work-Order Communication Separation
+
+Decision:
+
+- Add backend support for client-visible communication without exposing internal
+  operational notes.
+
+Changes:
+
+- Added Alembic migration `0003_work_order_messages.py`.
+- Added `work_order_messages` schema with `internal` versus `client`
+  visibility.
+- Added `WorkOrderMessage` schemas and tenant-scoped message repository.
+- Added work-order message endpoints:
+  - `POST /work-orders/{work_order_id}/messages`
+  - `GET /work-orders/{work_order_id}/messages`
+- Client/viewer users are forced to client-visible messages only and are
+  matched to a work order through the work order's client email.
+- Internal roles can filter messages by visibility for operations review.
+- Updated roadmap, traceability, requirements, QA, and phase-status docs.
+
+Verification:
+
+```powershell
+python -m compileall -q server\alembic\versions\0003_work_order_messages.py server\models\work_order_message.py server\repositories\work_order_messages.py server\routers\work_orders.py server\tests\test_tenant_isolation.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+git diff --check
+server\venv\Scripts\python.exe -m pytest server\tests\test_tenant_isolation.py -p no:cacheprovider
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- `git diff --check` passed.
+- Local pytest could not run because `server\venv` does not have pytest
+  installed.

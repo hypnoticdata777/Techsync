@@ -18,12 +18,14 @@ from models.work_order import (
     WorkOrderStatusUpdate,
     WorkOrderUpdate,
 )
+from models.work_order_message import MessageVisibility, WorkOrderMessage, WorkOrderMessageCreate
 from repositories import attachments as attachments_repo
 from repositories import clients as clients_repo
 from repositories import properties as properties_repo
 from repositories import technicians as technicians_repo
 from repositories import vendors as vendors_repo
 from repositories import work_order_events as events_repo
+from repositories import work_order_messages as messages_repo
 from repositories import work_orders as work_orders_repo
 from services import attachment_storage_service, work_order_service
 
@@ -61,6 +63,32 @@ def _get_accessible_work_order(work_order_id: int, current_user: User, organizat
         technician = _load_caller_technician(current_user, organization["id"])
         if not technician or work_order.get("assigned_technician_id") != technician["id"]:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not assigned to you")
+
+    return work_order
+
+
+def _get_message_accessible_work_order(
+    work_order_id: int,
+    current_user: User,
+    organization: dict,
+) -> dict:
+    work_order = work_orders_repo.get_by_id_in_org(work_order_id, organization["id"])
+    if not work_order:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Work order not found")
+
+    if current_user.role == "technician":
+        technician = _load_caller_technician(current_user, organization["id"])
+        if not technician or work_order.get("assigned_technician_id") != technician["id"]:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not assigned to you")
+
+    if current_user.role in ("client", "viewer"):
+        client_id = work_order.get("client_id")
+        client = clients_repo.get_by_id_in_org(client_id, organization["id"]) if client_id else None
+        if not client or (client.get("email") or "").lower() != current_user.email.lower():
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not visible to you")
+
+    if current_user.role == "vendor":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vendor access is not enabled yet")
 
     return work_order
 
@@ -238,6 +266,61 @@ def list_events(
     _get_accessible_work_order(work_order_id, current_user, organization)
     rows = events_repo.list_for_work_order(organization["id"], work_order_id)
     return [WorkOrderEvent(**row) for row in rows]
+
+
+@router.post(
+    "/{work_order_id}/messages",
+    response_model=WorkOrderMessage,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_message(
+    work_order_id: int,
+    payload: WorkOrderMessageCreate,
+    current_user: User = Depends(get_current_user),
+    organization: dict = Depends(get_current_organization),
+):
+    """v1.3 communication timeline: internal notes are structurally separated
+    from client-visible messages."""
+    _get_message_accessible_work_order(work_order_id, current_user, organization)
+
+    if current_user.role in ("client", "viewer") and payload.visibility != "client":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Client users can only add client-visible messages",
+        )
+
+    row = messages_repo.create(
+        organization["id"],
+        work_order_id,
+        current_user.id,
+        payload.dict(),
+    )
+    events_repo.create_event(
+        organization["id"],
+        work_order_id,
+        event_type="message_added",
+        actor_user_id=current_user.id,
+        notes=f"{payload.visibility} message",
+    )
+    return WorkOrderMessage(**row)
+
+
+@router.get("/{work_order_id}/messages", response_model=list[WorkOrderMessage])
+def list_messages(
+    work_order_id: int,
+    visibility: Optional[MessageVisibility] = None,
+    current_user: User = Depends(get_current_user),
+    organization: dict = Depends(get_current_organization),
+):
+    _get_message_accessible_work_order(work_order_id, current_user, organization)
+
+    if current_user.role in ("client", "viewer"):
+        visibility = "client"
+
+    rows = messages_repo.list_for_work_order(
+        organization["id"], work_order_id, visibility=visibility
+    )
+    return [WorkOrderMessage(**row) for row in rows]
 
 
 @router.post(

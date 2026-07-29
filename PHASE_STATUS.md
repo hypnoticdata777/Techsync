@@ -128,11 +128,15 @@ Completed:
   roles, and work-order links.
 - Started tenant-scoped API/repository/model work for client, property, and
   vendor records.
+- Added Alembic migration `0003` for work-order messages with `internal` versus
+  `client` visibility.
+- Added backend message endpoints under work orders so internal notes and
+  client-visible messages are separated structurally.
 
 Next:
 
-- Add client/homeowner visibility, communication separation, completion proof
-  rules, and reporting improvements.
+- Add client/homeowner UI visibility, completion proof rules, and reporting
+  improvements.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -185,7 +189,6 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue v1.3 product depth before hosting: finish the tenant-scoped
-property/client/vendor foundation, then move into client-visible communication,
-proof-gated closeout, and reporting. Vercel deployment and portfolio sliver
-linking should happen at the end of v1.3.
+Continue v1.3 product depth before hosting: move into proof-gated closeout and
+reporting, then add the client/homeowner UI surface. Vercel deployment and
+portfolio sliver linking should happen at the end of v1.3.

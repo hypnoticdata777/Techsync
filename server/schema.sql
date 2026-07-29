@@ -323,13 +323,36 @@ CREATE POLICY work_orders_isolation ON work_orders
     USING (organization_id = techsync_current_org_id());
 
 -- =====================================================================
+-- work_order_messages: internal notes vs client-visible communication
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS work_order_messages (
+    id BIGSERIAL PRIMARY KEY,
+    organization_id BIGINT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    work_order_id BIGINT NOT NULL REFERENCES work_orders(id) ON DELETE CASCADE,
+    author_user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    visibility TEXT NOT NULL DEFAULT 'internal'
+        CHECK (visibility IN ('internal', 'client')),
+    body TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_wo_messages_org ON work_order_messages(organization_id);
+CREATE INDEX IF NOT EXISTS idx_wo_messages_work_order ON work_order_messages(work_order_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_wo_messages_org_visibility ON work_order_messages(organization_id, visibility);
+
+ALTER TABLE work_order_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY work_order_messages_isolation ON work_order_messages
+    USING (organization_id = techsync_current_org_id());
+
+-- =====================================================================
 -- work_order_events: audit log (RF-20)
 -- =====================================================================
 CREATE TABLE IF NOT EXISTS work_order_events (
     id BIGSERIAL PRIMARY KEY,
     organization_id BIGINT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     work_order_id BIGINT NOT NULL REFERENCES work_orders(id) ON DELETE CASCADE,
-    event_type TEXT NOT NULL,  -- created, status_changed, assigned, reassigned, attachment_added
+    event_type TEXT NOT NULL,  -- created, status_changed, assigned, reassigned, message_added, attachment_added
     from_status TEXT,
     to_status TEXT,
     actor_user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,

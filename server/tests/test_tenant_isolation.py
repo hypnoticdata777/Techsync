@@ -15,9 +15,12 @@ from repositories import properties as properties_repo
 from repositories import technicians as technicians_repo
 from repositories import users as users_repo
 from repositories import vendors as vendors_repo
-from routers import work_orders as work_orders_router
 from repositories import work_order_events as events_repo
+from repositories import work_order_messages as messages_repo
 from repositories import work_orders as work_orders_repo
+from routers import work_orders as work_orders_router
+from models.user import User
+from models.work_order_message import WorkOrderMessageCreate
 
 
 def test_list_filtered_scopes_by_organization_id():
@@ -158,3 +161,74 @@ def test_events_are_written_with_org_id():
     assert payload["organization_id"] == 6
     assert payload["work_order_id"] == 1
     assert event["organization_id"] == 6
+
+
+def test_messages_list_for_work_order_scopes_by_org_and_work_order():
+    with patch("repositories.work_order_messages.fetch_all", return_value=[]) as mock_fetch:
+        messages_repo.list_for_work_order(organization_id=6, work_order_id=1, visibility="client")
+
+    sql, params = mock_fetch.call_args.args
+    assert "organization_id = :organization_id" in sql
+    assert "work_order_id = :work_order_id" in sql
+    assert "visibility = :visibility" in sql
+    assert params == {"organization_id": 6, "work_order_id": 1, "visibility": "client"}
+
+
+def test_client_message_list_forces_client_visibility():
+    client_user = User(
+        id=5,
+        organization_id=6,
+        email="owner@example.com",
+        full_name="Owner",
+        role="client",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "client_id": 9},
+    ):
+        with patch(
+            "routers.work_orders.clients_repo.get_by_id_in_org",
+            return_value={"id": 9, "email": "owner@example.com"},
+        ):
+            with patch("routers.work_orders.messages_repo.list_for_work_order", return_value=[]) as mock_list:
+                rows = work_orders_router.list_messages(
+                    1,
+                    visibility="internal",
+                    current_user=client_user,
+                    organization={"id": 6},
+                )
+
+    assert rows == []
+    assert mock_list.call_args.kwargs["visibility"] == "client"
+
+
+def test_client_cannot_add_internal_message():
+    client_user = User(
+        id=5,
+        organization_id=6,
+        email="owner@example.com",
+        full_name="Owner",
+        role="client",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "client_id": 9},
+    ):
+        with patch(
+            "routers.work_orders.clients_repo.get_by_id_in_org",
+            return_value={"id": 9, "email": "owner@example.com"},
+        ):
+            with pytest.raises(HTTPException) as exc:
+                work_orders_router.add_message(
+                    1,
+                    WorkOrderMessageCreate(body="Private note", visibility="internal"),
+                    current_user=client_user,
+                    organization={"id": 6},
+                )
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "Client users can only add client-visible messages"

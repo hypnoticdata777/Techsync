@@ -214,6 +214,8 @@ Already represented in the codebase:
 - Work-order CRUD, status transitions, assignment, technician queue, CSV
   import, webhook intake, dashboard metrics, S3-compatible attachment upload,
   and Stripe test-mode boundary.
+- v1.3 backend work-order messages with explicit `internal` versus
+  `client-visible` separation.
 - React Native/Expo mobile client for onboarding, auth, work-order list,
   details, creation, invitation acceptance, and password reset.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,
@@ -223,7 +225,8 @@ Important gaps for the PMC operations product:
 
 - Property/client/vendor backend records are being promoted to first-class v1.3
   entities; frontend workflows and richer operations logic remain.
-- Client/homeowner portal and client-visible communication are not built yet.
+- Client/homeowner portal UI is not built yet; backend message visibility
+  separation has started in v1.3.
 - Closeout packages, approvals, duplicate detection, SLA risk reporting,
   calendar/maps, background jobs, and export workflows remain roadmap items.
 

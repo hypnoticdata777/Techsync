@@ -33,6 +33,7 @@ def downgrade() -> None:
         DROP TABLE IF EXISTS org_priority_rules CASCADE;
         DROP TABLE IF EXISTS work_order_attachments CASCADE;
         DROP TABLE IF EXISTS work_order_events CASCADE;
+        DROP TABLE IF EXISTS work_order_messages CASCADE;
         DROP TABLE IF EXISTS work_orders CASCADE;
         DROP TABLE IF EXISTS vendors CASCADE;
         DROP TABLE IF EXISTS properties CASCADE;

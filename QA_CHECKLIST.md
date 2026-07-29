@@ -72,7 +72,8 @@ they have been verified in the relevant environment.
 - [x] Tenant-scoped API/repository/model foundation added for clients,
       properties, and vendors.
 - [x] Work orders can reference property, client, and vendor records.
-- [ ] Client-visible communication separated from internal notes.
+- [x] Backend client-visible communication separated from internal notes.
+- [ ] Client/homeowner UI for visible communication implemented.
 - [ ] Closeout proof requirement and manager override reason implemented.
 - [ ] Reporting expanded for stale work, overloaded technicians, and property
       hotspots.
