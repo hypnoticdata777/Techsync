@@ -159,6 +159,10 @@ Completed:
   unassigned work, technician load, active lane work, and SLA risk.
 - Added mobile duplicate-warning confirmation before manual work-order
   creation.
+- Added mobile PMC directory workflow for org admins/coordinators to create and
+  edit clients, properties, and vendors.
+- Added client/property/vendor selectors to the mobile work-order form so
+  manual work can be linked to PMC records.
 - Added client/viewer work-order scoping by active client email, so client
   users only list/view their own work orders.
 - Added mobile work-order communication timeline with internal versus
@@ -178,6 +182,8 @@ Completed:
 - Added hosted v1.3 smoke coverage for duplicate-warning preflight.
 - Added CSV export endpoints for the operations report and dispatch board.
 - Added hosted v1.3 smoke coverage for both dashboard CSV exports.
+- Added CSV export endpoints for clients, properties, and vendors.
+- Added hosted v1.3 smoke coverage for client/property/vendor CSV exports.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and
@@ -185,16 +191,15 @@ Completed:
 
 Next:
 
-- Migrate/smoke-test the demo database through the latest v1.3 migrations, then
-- seed/reset the synthetic demo tenant with `scripts/seed_demo_data.py`, then
-- run `scripts/smoke_v13.py` against the hosted API and capture
-  `V13_EVIDENCE_TEMPLATE.md`.
-- Manually verify a synthetic client invite/accept/approval decision from the
-  hosted email/log path because invite tokens are intentionally not echoed by
-  the API response.
-- Decide whether binary PDF rendering is needed before the portfolio showcase.
-- Continue local-only product depth with richer charts, broader entity exports,
-  binary PDF closeout polish, or the UI/UX friction sweep before hosting.
+- Keep hosting deferred until every non-hosting requirement bucket is locally
+  as complete as practical.
+- Continue local-only product depth with binary PDF closeout polish, richer
+  charts/deeper export workflows, or the UI/UX friction sweep.
+- Later, after the local product surface is complete, migrate/smoke-test the
+  demo database through the latest v1.3 migrations, seed/reset the synthetic
+  demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,
+  manually verify client invite/accept/approval from the hosted email/log path,
+  run `scripts/smoke_v13.py`, and capture `V13_EVIDENCE_TEMPLATE.md`.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -247,9 +252,8 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue local-only v1.3 hardening before the showcase gate: consider binary
-PDF closeout polish or a role-by-role UI/UX friction sweep, then apply the
-latest migrations to the Neon demo database, seed/reset the synthetic demo
-tenant, deploy to Vercel when ready, run `scripts/smoke_v13.py`, capture
-`V13_EVIDENCE_TEMPLATE.md`, and connect the portfolio sliver only after the
-product surface feels robust enough to show.
+Continue local-only v1.3 hardening and leave hosting as the absolute final
+gate. Best next candidates: binary closeout PDF polish, richer reporting
+charts/deeper exports, or a role-by-role UI/UX friction sweep. Only after those
+non-hosting requirements are complete should the Neon/Vercel/portfolio showcase
+sequence resume.

@@ -14,6 +14,7 @@ import WorkOrderDetailsScreen from './src/screens/WorkOrderDetailsScreen';
 import WorkOrderFormScreen from './src/screens/WorkOrderFormScreen';
 import OperationsReportScreen from './src/screens/OperationsReportScreen';
 import DispatchBoardScreen from './src/screens/DispatchBoardScreen';
+import PmcDirectoryScreen from './src/screens/PmcDirectoryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -121,6 +122,13 @@ function Navigation() {
               component={DispatchBoardScreen}
               options={{
                 title: 'Dispatch Board',
+              }}
+            />
+            <Stack.Screen
+              name="PmcDirectory"
+              component={PmcDirectoryScreen}
+              options={{
+                title: 'PMC Directory',
               }}
             />
           </>

@@ -217,7 +217,7 @@ Full interactive docs at `/docs`. Summary:
 | Invitations (RF-07) | `POST/GET /organizations/invitations`, `POST /invitations/accept` |
 | Users (RF-02) | `GET /users`, `PATCH /users/{id}/role` |
 | Technicians (RF-26, RF-29) | `POST/GET /technicians`, `PATCH /technicians/{id}` |
-| Clients / Properties / Vendors (v1.3 PMC context) | `POST/GET/PATCH /clients`, `POST/GET/PATCH /properties`, `POST/GET/PATCH /vendors` |
+| Clients / Properties / Vendors (v1.3 PMC context) | `POST/GET/PATCH /clients`, `GET /clients/export`, `POST/GET/PATCH /properties`, `GET /properties/export`, `POST/GET/PATCH /vendors`, `GET /vendors/export` |
 | Work Orders (RF-14, RF-15, RF-18..RF-22, RF-24) | `POST/GET /work-orders`, `GET /work-orders/mine`, `POST /work-orders/duplicate-warnings`, `GET/PATCH /work-orders/{id}`, `PATCH /work-orders/{id}/status`, `POST /work-orders/{id}/assign`, `POST /work-orders/{id}/approval-request`, `PATCH /work-orders/{id}/approval`, `POST/GET /work-orders/{id}/messages`, `GET /work-orders/{id}/events`, `GET /work-orders/{id}/closeout-package`, `GET /work-orders/{id}/closeout-package/export`, `POST /work-orders/{id}/attachments/upload`, `POST/GET /work-orders/{id}/attachments` |
 | Ingestion (RF-09, RF-11, RF-12) | `POST /ingestion/csv` (multipart), `POST /ingestion/webhook` (`X-API-Key` header, per-org key) |
 | Dashboard (RF-25) | `GET /dashboard/metrics`, `GET /dashboard/operations-report`, `GET /dashboard/operations-report/export`, `GET /dashboard/dispatch-board`, `GET /dashboard/dispatch-board/export` |
@@ -278,9 +278,10 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   client-visible versus internal messages, client approval requests/decisions,
   proof-gated closeout, closeout package summary, printable HTML/text closeout
   exports, operations reporting for stale work, overload, and property
-  hotspots, CSV exports for the operations report and dispatch board, and a
-  dispatch board for unassigned work, technician lanes, utilization, SLA risk,
-  and duplicate-warning preflight checks.
+  hotspots, CSV exports for the operations report, dispatch board, clients,
+  properties, and vendors, and a dispatch board for unassigned work, technician
+  lanes, utilization, SLA risk, duplicate-warning preflight checks, mobile PMC
+  directory management, and work-order entity linking.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.
@@ -302,9 +303,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   only); the spec's "panel administrativo" is assumed to be a future
   separate web client consuming this same API.
 - **PMC operations expansion still remaining**: calendar/maps, completion
-  cycle-time charts, richer charting, broader entity exports, binary PDF
-  generation, and fuller client/vendor portals are tracked for v1.3+ / later
-  in `PRODUCT_ROADMAP.md`.
+  cycle-time charts, richer charting, deeper entity exports, binary PDF
+  generation, deeper client/vendor portals, and exhaustive UI/UX friction
+  testing are tracked for v1.3+ / later in `PRODUCT_ROADMAP.md`.
 
 - **RF-23 (offline sync)**, **RF-10/RF-13 (PDF/email ingestion)**: deferred,
   per the spec's own "Notas de Alcance" — not blocking for a POC.

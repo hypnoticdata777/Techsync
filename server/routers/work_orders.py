@@ -299,7 +299,7 @@ def update_work_order(
     if not existing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Work order not found")
 
-    patch = {k: v for k, v in payload.dict().items() if v is not None}
+    patch = payload.model_dump(exclude_unset=True)
     if not patch:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No fields to update")
 

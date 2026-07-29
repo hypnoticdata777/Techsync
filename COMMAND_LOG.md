@@ -918,3 +918,93 @@ Result:
 - `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
 - Database seed/reset was not run in this slice because no local
   `DATABASE_URL` was provided to this environment.
+
+## 2026-07-29 - v1.3 Mobile PMC Directory
+
+Decision:
+
+- Keep hosting deferred as the absolute final gate and continue closing local
+  product requirements first.
+- Add the missing coordinator/admin mobile workflow for first-class clients,
+  properties, and vendors so the PMC entity model is usable from the app, not
+  only through the backend API.
+
+Changes:
+
+- Added `client/src/screens/PmcDirectoryScreen.js` with tabs for clients,
+  properties, and vendors.
+- Added create/edit forms for client, property, and vendor records, including
+  active/inactive state, client type, property-client linking, and vendor
+  service types.
+- Added `PmcDirectory` navigation route.
+- Added a `Directory` action to the work-order list for org admins and
+  coordinators.
+- Added client/property/vendor selectors to the work-order form so manual work
+  orders can be linked to PMC records.
+- Updated client/property/vendor/work-order PATCH routes to preserve
+  explicitly-sent `null` fields with `model_dump(exclude_unset=True)`, allowing
+  frontend edit forms to clear optional links and values.
+- Added regression coverage for clearing client, property, vendor, and
+  work-order optional fields/links.
+- Updated README, roadmap, QA, traceability, requirements, phase status,
+  public-readiness, and hosting/portfolio docs.
+
+Verification:
+
+```powershell
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+python -m compileall -q server\routers\clients.py server\routers\properties.py server\routers\vendors.py server\routers\work_orders.py server\tests\test_tenant_isolation.py
+server\venv\Scripts\python.exe -c "import os, sys; from unittest.mock import patch; os.environ['JWT_SECRET_KEY']='test-secret-key-for-import-check-only'; sys.path.insert(0, 'server'); from models.client import ClientUpdate; from models.property import PropertyUpdate; from models.user import User; from models.work_order import WorkOrderUpdate; from routers.clients import update_client; from routers.properties import update_property; from routers.work_orders import update_work_order; user=User(id=5, organization_id=6, email='admin@example.com', full_name='Admin', role='org_admin', is_active=True); client_row={'id':9,'organization_id':6,'display_name':'Client','contact_name':None,'email':None,'phone':None,'client_type':'homeowner','notes':None,'is_active':True,'created_at':'2026-07-28T00:00:00Z','updated_at':'2026-07-28T00:00:00Z'}; prop_row={'id':3,'organization_id':6,'client_id':None,'name':'Property','address_line1':'1300 Demo Ridge','address_line2':None,'city':None,'state':None,'postal_code':None,'country':'US','unit':None,'access_notes':None,'latitude':None,'longitude':None,'is_active':True,'created_at':'2026-07-28T00:00:00Z','updated_at':'2026-07-28T00:00:00Z'}; wo_row={'id':1,'organization_id':6,'title':'Leak','description':None,'property_id':None,'client_id':None,'vendor_id':None,'customer_name':None,'address':None,'latitude':None,'longitude':None,'service_type':'plumbing','priority':'high','status':'open','assigned_technician_id':None,'created_by':5,'source':'manual','external_ref':None,'sla_due_at':None,'completed_at':None,'completion_notes':None,'completion_proof_verified_at':None,'completion_override_reason':None,'client_approval_status':'not_required','client_approval_requested_at':None,'client_approval_requested_by':None,'client_approval_decision_at':None,'client_approval_decision_by':None,'client_approval_notes':None,'created_at':'2026-07-28T00:00:00Z','updated_at':'2026-07-28T00:00:00Z'}; p1=patch('routers.clients.clients_repo.get_by_id_in_org', return_value={'id':9}); p2=patch('routers.clients.clients_repo.update', return_value=client_row); p3=patch('routers.properties.properties_repo.get_by_id_in_org', return_value={'id':3}); p4=patch('routers.properties.properties_repo.update', return_value=prop_row); p5=patch('routers.work_orders.work_orders_repo.get_by_id_in_org', return_value={'id':1}); p6=patch('routers.work_orders.work_orders_repo.update', return_value=wo_row); patches=[p1,p2,p3,p4,p5,p6]; [p.start() for p in patches]; c=update_client(9, ClientUpdate(contact_name=None, email=None), current_user=user, organization={'id':6}); pr=update_property(3, PropertyUpdate(client_id=None), current_user=user, organization={'id':6}); wo=update_work_order(1, WorkOrderUpdate(property_id=None, client_id=None, vendor_id=None), current_user=user, organization={'id':6}); print(c.contact_name is None, pr.client_id is None, wo.property_id is None); [p.stop() for p in patches]"
+git diff --check
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- Direct PATCH/null route smoke printed `True True True`.
+- `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
+- Focused pytest was attempted but could not run because the current local
+  `server\venv` still does not have pytest installed.
+- Client Babel/Jest checks could not run because `client\node_modules` is not
+  installed in this checkout.
+
+## 2026-07-29 - v1.3 PMC Directory CSV Exports
+
+Decision:
+
+- Continue closing non-hosting requirement buckets before any Vercel/portfolio
+  showcase work.
+- Add tenant-owned export paths for clients, properties, and vendors so PMC
+  directory data is not trapped inside the tool.
+
+Changes:
+
+- Added `server/services/entity_export_service.py`.
+- Added downloadable CSV endpoints:
+  - `GET /clients/export`
+  - `GET /properties/export`
+  - `GET /vendors/export`
+- Preserved existing tenant-scoped repository filters, including
+  `active_only` and property `client_id` filtering.
+- Added route tests covering organization scoping, CSV response headers, and
+  vendor service-type flattening.
+- Updated `scripts/smoke_v13.py` and `V13_EVIDENCE_TEMPLATE.md` to capture
+  client/property/vendor CSV export evidence during the final hosted smoke
+  gate.
+- Updated README, roadmap, requirements, traceability, QA, public-readiness,
+  and phase-status docs.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+npm.cmd run test:ci
+```
+
+Result:
+
+- Backend tests passed: `113 passed`.
+- Client tests passed: `2 passed suites`, `7 passed tests`.
+- `npm ci` completed locally, but reported dependency audit findings that
+  should be triaged separately instead of force-fixed.

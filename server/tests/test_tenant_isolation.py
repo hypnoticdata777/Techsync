@@ -18,10 +18,16 @@ from repositories import vendors as vendors_repo
 from repositories import work_order_events as events_repo
 from repositories import work_order_messages as messages_repo
 from repositories import work_orders as work_orders_repo
+from routers import clients as clients_router
 from routers import dashboard as dashboard_router
+from routers import properties as properties_router
+from routers import vendors as vendors_router
 from routers import work_orders as work_orders_router
+from models.client import ClientUpdate
+from models.property import PropertyUpdate
 from models.user import User
-from models.work_order import WorkOrderApprovalDecision, WorkOrderApprovalRequest, WorkOrderCreate
+from models.vendor import VendorUpdate
+from models.work_order import WorkOrderApprovalDecision, WorkOrderApprovalRequest, WorkOrderCreate, WorkOrderUpdate
 from models.work_order_message import WorkOrderMessageCreate
 
 
@@ -850,3 +856,313 @@ def test_dispatch_board_export_returns_summary_and_lane_csv():
     assert "summary,open_count,1" in body
     assert "unassigned_work_order" in body
     assert "technician_lane" in body
+
+
+def test_client_update_preserves_explicit_null_fields_for_frontend_crud():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    updated_row = {
+        "id": 9,
+        "organization_id": 6,
+        "display_name": "Riverside HOA",
+        "contact_name": None,
+        "email": None,
+        "phone": "555-0100",
+        "client_type": "homeowner",
+        "notes": None,
+        "is_active": True,
+        "created_at": "2026-07-28T00:00:00Z",
+        "updated_at": "2026-07-28T00:00:00Z",
+    }
+
+    with patch("routers.clients.clients_repo.get_by_id_in_org", return_value={"id": 9}):
+        with patch("routers.clients.clients_repo.update", return_value=updated_row) as update:
+            result = clients_router.update_client(
+                9,
+                ClientUpdate(contact_name=None, email=None),
+                current_user=admin_user,
+                organization={"id": 6},
+            )
+
+    assert update.call_args.args == (9, 6, {"contact_name": None, "email": None})
+    assert result.contact_name is None
+    assert result.email is None
+
+
+def test_property_update_can_unlink_client_for_frontend_crud():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    updated_row = {
+        "id": 3,
+        "organization_id": 6,
+        "client_id": None,
+        "name": "Riverside Tower",
+        "address_line1": "1300 Demo Ridge",
+        "address_line2": None,
+        "city": "Test City",
+        "state": "NY",
+        "postal_code": "10001",
+        "country": "US",
+        "unit": "4B",
+        "access_notes": None,
+        "latitude": None,
+        "longitude": None,
+        "is_active": True,
+        "created_at": "2026-07-28T00:00:00Z",
+        "updated_at": "2026-07-28T00:00:00Z",
+    }
+
+    with patch("routers.properties.properties_repo.get_by_id_in_org", return_value={"id": 3}):
+        with patch("routers.properties.properties_repo.update", return_value=updated_row) as update:
+            result = properties_router.update_property(
+                3,
+                PropertyUpdate(client_id=None),
+                current_user=admin_user,
+                organization={"id": 6},
+            )
+
+    assert update.call_args.args == (3, 6, {"client_id": None})
+    assert result.client_id is None
+
+
+def test_vendor_update_preserves_empty_service_types_for_frontend_crud():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    updated_row = {
+        "id": 11,
+        "organization_id": 6,
+        "name": "Apex Demo Plumbing",
+        "contact_name": None,
+        "email": None,
+        "phone": None,
+        "service_types": [],
+        "coverage_area": None,
+        "notes": None,
+        "is_active": True,
+        "created_at": "2026-07-28T00:00:00Z",
+        "updated_at": "2026-07-28T00:00:00Z",
+    }
+
+    with patch("routers.vendors.vendors_repo.get_by_id_in_org", return_value={"id": 11}):
+        with patch("routers.vendors.vendors_repo.update", return_value=updated_row) as update:
+            result = vendors_router.update_vendor(
+                11,
+                VendorUpdate(service_types=[]),
+                current_user=admin_user,
+                organization={"id": 6},
+            )
+
+    assert update.call_args.args == (11, 6, {"service_types": []})
+    assert result.service_types == []
+
+
+def test_clients_export_returns_tenant_scoped_csv():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    rows = [
+        {
+            "id": 9,
+            "organization_id": 6,
+            "display_name": "Riverside HOA",
+            "contact_name": "Casey Owner",
+            "email": "owner@example.com",
+            "phone": "555-0100",
+            "client_type": "homeowner",
+            "notes": "Prefers email",
+            "is_active": True,
+            "created_at": "2026-07-28T00:00:00Z",
+            "updated_at": "2026-07-28T00:00:00Z",
+        }
+    ]
+
+    with patch("routers.clients.clients_repo.list_by_org", return_value=rows) as list_by_org:
+        response = clients_router.export_clients(
+            active_only=True,
+            current_user=admin_user,
+            organization={"id": 6},
+        )
+
+    assert list_by_org.call_args.args == (6,)
+    assert list_by_org.call_args.kwargs == {"active_only": True}
+    assert response.media_type == "text/csv"
+    assert "techsync-clients.csv" in response.headers["content-disposition"]
+    body = response.body.decode("utf-8")
+    assert "id,display_name,contact_name,email" in body
+    assert "9,Riverside HOA,Casey Owner,owner@example.com" in body
+
+
+def test_properties_export_returns_tenant_scoped_csv_with_client_filter():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    rows = [
+        {
+            "id": 3,
+            "organization_id": 6,
+            "client_id": 9,
+            "name": "Riverside Tower",
+            "address_line1": "1300 Demo Ridge",
+            "address_line2": "",
+            "city": "Test City",
+            "state": "NY",
+            "postal_code": "10001",
+            "country": "US",
+            "unit": "4B",
+            "access_notes": "Gate code is synthetic",
+            "latitude": None,
+            "longitude": None,
+            "is_active": True,
+            "created_at": "2026-07-28T00:00:00Z",
+            "updated_at": "2026-07-28T00:00:00Z",
+        }
+    ]
+
+    with patch("routers.properties.properties_repo.list_by_org", return_value=rows) as list_by_org:
+        response = properties_router.export_properties(
+            client_id=9,
+            active_only=True,
+            current_user=admin_user,
+            organization={"id": 6},
+        )
+
+    assert list_by_org.call_args.args == (6,)
+    assert list_by_org.call_args.kwargs == {"client_id": 9, "active_only": True}
+    assert response.media_type == "text/csv"
+    assert "techsync-properties.csv" in response.headers["content-disposition"]
+    body = response.body.decode("utf-8")
+    assert "id,client_id,name,address_line1" in body
+    assert "3,9,Riverside Tower,1300 Demo Ridge" in body
+
+
+def test_vendors_export_returns_tenant_scoped_csv_and_flattens_services():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    rows = [
+        {
+            "id": 11,
+            "organization_id": 6,
+            "name": "Apex Demo Plumbing",
+            "contact_name": "Jordan Vendor",
+            "email": "vendor@example.com",
+            "phone": "555-0120",
+            "service_types": ["plumbing", "emergency"],
+            "coverage_area": "Downtown",
+            "notes": "Synthetic partner",
+            "is_active": True,
+            "created_at": "2026-07-28T00:00:00Z",
+            "updated_at": "2026-07-28T00:00:00Z",
+        }
+    ]
+
+    with patch("routers.vendors.vendors_repo.list_by_org", return_value=rows) as list_by_org:
+        response = vendors_router.export_vendors(
+            active_only=True,
+            current_user=admin_user,
+            organization={"id": 6},
+        )
+
+    assert list_by_org.call_args.args == (6,)
+    assert list_by_org.call_args.kwargs == {"active_only": True}
+    assert response.media_type == "text/csv"
+    assert "techsync-vendors.csv" in response.headers["content-disposition"]
+    body = response.body.decode("utf-8")
+    assert "id,name,contact_name,email" in body
+    assert "11,Apex Demo Plumbing,Jordan Vendor,vendor@example.com" in body
+    assert "plumbing; emergency" in body
+
+
+def test_work_order_update_can_clear_entity_links_for_frontend_form():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    updated_row = {
+        "id": 1,
+        "organization_id": 6,
+        "title": "Kitchen leak",
+        "description": None,
+        "property_id": None,
+        "client_id": None,
+        "vendor_id": None,
+        "customer_name": None,
+        "address": None,
+        "latitude": None,
+        "longitude": None,
+        "service_type": "plumbing",
+        "priority": "high",
+        "status": "open",
+        "assigned_technician_id": None,
+        "created_by": 5,
+        "source": "manual",
+        "external_ref": None,
+        "sla_due_at": None,
+        "completed_at": None,
+        "completion_notes": None,
+        "completion_proof_verified_at": None,
+        "completion_override_reason": None,
+        "client_approval_status": "not_required",
+        "client_approval_requested_at": None,
+        "client_approval_requested_by": None,
+        "client_approval_decision_at": None,
+        "client_approval_decision_by": None,
+        "client_approval_notes": None,
+        "created_at": "2026-07-28T00:00:00Z",
+        "updated_at": "2026-07-28T00:00:00Z",
+    }
+
+    with patch("routers.work_orders.work_orders_repo.get_by_id_in_org", return_value={"id": 1}):
+        with patch("routers.work_orders.work_orders_repo.update", return_value=updated_row) as update:
+            result = work_orders_router.update_work_order(
+                1,
+                WorkOrderUpdate(property_id=None, client_id=None, vendor_id=None),
+                current_user=admin_user,
+                organization={"id": 6},
+            )
+
+    assert update.call_args.args == (
+        1,
+        6,
+        {"property_id": None, "client_id": None, "vendor_id": None},
+    )
+    assert result.property_id is None
+    assert result.client_id is None
+    assert result.vendor_id is None

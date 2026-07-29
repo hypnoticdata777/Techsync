@@ -227,8 +227,13 @@ Already represented in the codebase:
 - v1.3 backend operations report for stale work, overloaded technicians, and
   property hotspots.
 - v1.3 dashboard CSV exports for the operations report and dispatch board.
+- v1.3 client/property/vendor CSV exports for tenant-owned PMC directory data.
 - v1.3 mobile operations report view for org admins/coordinators to scan stale
   work, overloaded technicians, and property hotspots.
+- v1.3 mobile PMC directory workflow for org admins/coordinators to create and
+  edit clients, properties, and vendors.
+- v1.3 mobile work-order form selectors for linking client, property, and
+  vendor context during manual work-order creation/editing.
 - v1.3 backend dispatch board for unassigned active work, technician lanes,
   workload utilization, and SLA risk.
 - v1.3 mobile dispatch board view for org admins/coordinators to scan
@@ -250,14 +255,14 @@ Already represented in the codebase:
 
 Important gaps for the PMC operations product:
 
-- Property/client/vendor backend records are first-class v1.3 entities;
-  dedicated frontend CRUD workflows remain.
+- Property/client/vendor records are now first-class v1.3 entities with
+  backend APIs and a mobile directory workflow; deeper role-specific list
+  filtering, bulk import/export, and richer relationship views remain.
 - Full client/homeowner portal UI is not built yet; scoped work-order
   visibility, client-visible comments, and approval/decline actions have
   started in v1.3.
-- Binary closeout PDF rendering, richer report charts, broader entity exports,
-  calendar/maps, background jobs, and deeper export workflows remain roadmap
-  items.
+- Binary closeout PDF rendering, richer report charts, calendar/maps,
+  background jobs, and deeper export workflows remain roadmap items.
 
 ## Version Planning Boundary
 

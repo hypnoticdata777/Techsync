@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
 
@@ -36,6 +37,46 @@ const confirmDuplicateWarnings = warnings =>
     );
   });
 
+const SelectorSection = ({label, emptyLabel, records, selectedId, getLabel, onSelect}) => (
+  <View style={styles.selectorBlock}>
+    <Text style={styles.label}>{label}</Text>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.selectorScroller}>
+      <TouchableOpacity
+        style={[styles.selectorChip, !selectedId && styles.selectorChipActive]}
+        onPress={() => onSelect(null)}>
+        <Text
+          style={[
+            styles.selectorChipText,
+            !selectedId && styles.selectorChipTextActive,
+          ]}>
+          {emptyLabel}
+        </Text>
+      </TouchableOpacity>
+      {records.map(item => {
+        const isSelected = selectedId === item.id;
+        return (
+          <TouchableOpacity
+            key={item.id}
+            style={[styles.selectorChip, isSelected && styles.selectorChipActive]}
+            onPress={() => onSelect(item.id)}>
+            <Text
+              style={[
+                styles.selectorChipText,
+                isSelected && styles.selectorChipTextActive,
+              ]}
+              numberOfLines={1}>
+              {getLabel(item)}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+  </View>
+);
+
 function WorkOrderFormScreen({route, navigation}) {
   const {authFetch} = useAuth();
   const existingWorkOrder = route.params?.workOrder;
@@ -47,12 +88,112 @@ function WorkOrderFormScreen({route, navigation}) {
   const [address, setAddress] = useState(existingWorkOrder?.address || '');
   const [serviceType, setServiceType] = useState(existingWorkOrder?.service_type || 'general');
   const [priority, setPriority] = useState(existingWorkOrder?.priority || 'medium');
+  const [clientId, setClientId] = useState(existingWorkOrder?.client_id || null);
+  const [propertyId, setPropertyId] = useState(existingWorkOrder?.property_id || null);
+  const [vendorId, setVendorId] = useState(existingWorkOrder?.vendor_id || null);
+  const [directory, setDirectory] = useState({clients: [], properties: [], vendors: []});
+  const [directoryLoading, setDirectoryLoading] = useState(false);
+  const [directoryError, setDirectoryError] = useState(null);
   const [saving, setSaving] = useState(false);
+
+  const clientsById = useMemo(() => {
+    const map = {};
+    directory.clients.forEach(client => {
+      map[client.id] = client;
+    });
+    return map;
+  }, [directory.clients]);
+
+  const selectedClientProperties = useMemo(
+    () =>
+      directory.properties.filter(
+        property => !clientId || !property.client_id || property.client_id === clientId,
+      ),
+    [clientId, directory.properties],
+  );
+
+  const loadDirectory = useCallback(async () => {
+    try {
+      setDirectoryLoading(true);
+      const [clientsRes, propertiesRes, vendorsRes] = await Promise.all([
+        authFetch('/clients?active_only=true'),
+        authFetch('/properties?active_only=true'),
+        authFetch('/vendors?active_only=true'),
+      ]);
+
+      if (![clientsRes, propertiesRes, vendorsRes].every(res => res.ok)) {
+        setDirectoryError('Linked records are unavailable. You can still create a manual work order.');
+        return;
+      }
+
+      setDirectory({
+        clients: await clientsRes.json(),
+        properties: await propertiesRes.json(),
+        vendors: await vendorsRes.json(),
+      });
+      setDirectoryError(null);
+    } catch (err) {
+      console.error(err);
+      setDirectoryError('Linked records are unavailable. You can still create a manual work order.');
+    } finally {
+      setDirectoryLoading(false);
+    }
+  }, [authFetch]);
+
+  useEffect(() => {
+    loadDirectory();
+  }, [loadDirectory]);
+
+  const selectClient = selectedClientId => {
+    setClientId(selectedClientId);
+    if (selectedClientId && propertyId) {
+      const selectedProperty = directory.properties.find(item => item.id === propertyId);
+      if (selectedProperty?.client_id && selectedProperty.client_id !== selectedClientId) {
+        setPropertyId(null);
+      }
+    }
+    const selectedClient = selectedClientId ? clientsById[selectedClientId] : null;
+    if (selectedClient && !customerName.trim()) {
+      setCustomerName(selectedClient.contact_name || selectedClient.display_name);
+    }
+  };
+
+  const selectProperty = selectedPropertyId => {
+    setPropertyId(selectedPropertyId);
+    const selectedProperty = directory.properties.find(item => item.id === selectedPropertyId);
+    if (!selectedProperty) {
+      return;
+    }
+    if (selectedProperty.client_id) {
+      setClientId(selectedProperty.client_id);
+    }
+    setAddress(
+      [
+        selectedProperty.address_line1,
+        selectedProperty.unit ? `Unit ${selectedProperty.unit}` : null,
+        selectedProperty.city,
+        selectedProperty.state,
+      ]
+        .filter(Boolean)
+        .join(', '),
+    );
+  };
+
+  const selectVendor = selectedVendorId => {
+    setVendorId(selectedVendorId);
+    const selectedVendor = directory.vendors.find(item => item.id === selectedVendorId);
+    if (selectedVendor?.service_types?.length && serviceType === 'general') {
+      setServiceType(selectedVendor.service_types[0]);
+    }
+  };
 
   const buildPayload = () => {
     const basePayload = {
       title: title.trim(),
       description: description.trim() || null,
+      property_id: propertyId || null,
+      client_id: clientId || null,
+      vendor_id: vendorId || null,
       customer_name: customerName.trim() || null,
       address: address.trim() || null,
       service_type: serviceType,
@@ -150,6 +291,55 @@ function WorkOrderFormScreen({route, navigation}) {
             onChangeText={setDescription}
             multiline
             numberOfLines={4}
+          />
+        </View>
+
+        <View style={styles.directoryPanel}>
+          <View style={styles.directoryPanelHeader}>
+            <View>
+              <Text style={styles.directoryTitle}>PMC Links</Text>
+              <Text style={styles.directorySubtitle}>Client, property, and vendor context</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.directoryManageButton}
+              onPress={() => navigation.navigate('PmcDirectory')}>
+              <Text style={styles.directoryManageButtonText}>Manage</Text>
+            </TouchableOpacity>
+          </View>
+
+          {directoryLoading ? (
+            <ActivityIndicator color="#38bdf8" style={styles.directoryLoader} />
+          ) : null}
+
+          {directoryError ? (
+            <Text style={styles.directoryError}>{directoryError}</Text>
+          ) : null}
+
+          <SelectorSection
+            label="Client"
+            emptyLabel="No client"
+            records={directory.clients}
+            selectedId={clientId}
+            getLabel={item => item.display_name}
+            onSelect={selectClient}
+          />
+
+          <SelectorSection
+            label="Property"
+            emptyLabel="No property"
+            records={selectedClientProperties}
+            selectedId={propertyId}
+            getLabel={item => item.unit ? `${item.name} ${item.unit}` : item.name}
+            onSelect={selectProperty}
+          />
+
+          <SelectorSection
+            label="Vendor"
+            emptyLabel="No vendor"
+            records={directory.vendors}
+            selectedId={vendorId}
+            getLabel={item => item.name}
+            onSelect={selectVendor}
           />
         </View>
 
@@ -266,6 +456,84 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 100,
     textAlignVertical: 'top',
+  },
+  directoryPanel: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 20,
+  },
+  directoryPanelHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: 12,
+  },
+  directoryTitle: {
+    color: '#f9fafb',
+    fontSize: 17,
+    fontWeight: '800',
+  },
+  directorySubtitle: {
+    color: '#94a3b8',
+    fontSize: 12,
+    marginTop: 3,
+  },
+  directoryManageButton: {
+    minHeight: 36,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#c084fc',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    backgroundColor: '#0f172a',
+  },
+  directoryManageButtonText: {
+    color: '#d8b4fe',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  directoryLoader: {
+    marginBottom: 8,
+  },
+  directoryError: {
+    color: '#f97373',
+    fontSize: 12,
+    marginBottom: 10,
+  },
+  selectorBlock: {
+    marginBottom: 12,
+  },
+  selectorScroller: {
+    gap: 8,
+    paddingRight: 8,
+  },
+  selectorChip: {
+    maxWidth: 190,
+    minHeight: 38,
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 8,
+    backgroundColor: '#0f172a',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  selectorChipActive: {
+    backgroundColor: '#a3e635',
+    borderColor: '#a3e635',
+  },
+  selectorChipText: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  selectorChipTextActive: {
+    color: '#052e16',
   },
   statusOptions: {
     flexDirection: 'row',

@@ -91,6 +91,9 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Synthetic client record created.
 - [ ] Synthetic property record created and linked to client.
 - [ ] Synthetic vendor record created.
+- [ ] Client CSV export rendered.
+- [ ] Property CSV export rendered.
+- [ ] Vendor CSV export rendered.
 - [ ] Synthetic technician record created.
 - [ ] Work order created with client/property/vendor links.
 - [ ] Duplicate-warning preflight detected likely repeated work.

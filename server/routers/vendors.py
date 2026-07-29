@@ -1,11 +1,13 @@
 """Vendor management for PMC operations."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import PlainTextResponse
 
 from dependencies import get_current_organization, require_roles
 from models.user import User
 from models.vendor import Vendor, VendorCreate, VendorUpdate
 from repositories import vendors as vendors_repo
+from services import entity_export_service
 
 router = APIRouter(prefix="/vendors", tags=["vendors"])
 
@@ -28,6 +30,20 @@ def list_vendors(
 ):
     rows = vendors_repo.list_by_org(organization["id"], active_only=active_only)
     return [Vendor(**row) for row in rows]
+
+
+@router.get("/export")
+def export_vendors(
+    active_only: bool = Query(False),
+    current_user: User = Depends(require_roles("org_admin", "coordinator")),
+    organization: dict = Depends(get_current_organization),
+):
+    rows = vendors_repo.list_by_org(organization["id"], active_only=active_only)
+    return PlainTextResponse(
+        entity_export_service.build_vendors_csv(rows),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="techsync-vendors.csv"'},
+    )
 
 
 @router.get("/{vendor_id}", response_model=Vendor)
@@ -53,7 +69,7 @@ def update_vendor(
     if not existing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Vendor not found")
 
-    patch = {k: v for k, v in payload.dict().items() if v is not None}
+    patch = payload.model_dump(exclude_unset=True)
     if not patch:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No fields to update")
 

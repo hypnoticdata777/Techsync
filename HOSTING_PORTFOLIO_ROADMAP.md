@@ -126,15 +126,18 @@ Exit criteria:
 Tasks:
 
 - Build first-class client, property, and vendor workflows. Completed in the
-  v1.3 API foundation.
+  v1.3 API foundation and started in the mobile PMC directory.
 - Link work orders to property/client/vendor context. Completed.
+- Link work orders to property/client/vendor context from the mobile form.
+  Completed.
 - Add client-visible communication separation. Completed at API/mobile level.
 - Add proof-gated closeout and manager override path. Completed.
 - Add stale work, workload, and property hotspot reporting. Completed at
   API/mobile level.
 - Add repeatable v1.3 hosted smoke coverage for the above. Completed with
   `scripts/smoke_v13.py`, the `Hosted v1.3 smoke test` workflow, and
-  `V13_EVIDENCE_TEMPLATE.md`.
+  `V13_EVIDENCE_TEMPLATE.md`, now including client/property/vendor CSV export
+  checks.
 - Add repeatable synthetic demo seed/reset tooling. Completed with
   `scripts/seed_demo_data.py` and `DEMO_DATA_RUNBOOK.md`.
 - Apply v1.3 migrations and run hosted smoke evidence after deployment.
@@ -143,6 +146,8 @@ Exit criteria:
 
 - The product tells a stronger PMC operations story before any public live link.
 - Demo data can show property/client/vendor workflows without manual narration.
+- Hosting remains deferred until the non-hosting requirement buckets and the
+  UI/UX friction sweep are complete.
 
 ## Phase 4 - Demo Surface
 

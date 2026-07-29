@@ -120,6 +120,13 @@ function WorkOrdersListScreen({navigation}) {
         <View style={styles.headerActions}>
           {canManageWorkOrders && (
             <TouchableOpacity
+              style={styles.directoryButton}
+              onPress={() => navigation.navigate('PmcDirectory')}>
+              <Text style={styles.directoryButtonText}>Directory</Text>
+            </TouchableOpacity>
+          )}
+          {canManageWorkOrders && (
+            <TouchableOpacity
               style={styles.dispatchButton}
               onPress={() => navigation.navigate('DispatchBoard')}>
               <Text style={styles.dispatchButtonText}>Dispatch</Text>
@@ -212,37 +219,53 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
     gap: 8,
+    flexShrink: 1,
+  },
+  directoryButton: {
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#c084fc',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  directoryButtonText: {
+    color: '#d8b4fe',
+    fontWeight: '700',
+    fontSize: 13,
   },
   reportButton: {
     backgroundColor: '#0f172a',
     borderWidth: 1,
     borderColor: '#38bdf8',
-    paddingHorizontal: 14,
+    paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
   },
   reportButtonText: {
     color: '#38bdf8',
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 13,
   },
   dispatchButton: {
     backgroundColor: '#111827',
     borderWidth: 1,
     borderColor: '#a3e635',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
   },
   dispatchButtonText: {
     color: '#a3e635',
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 13,
   },
   addButton: {
     backgroundColor: '#38bdf8',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
   },

@@ -120,6 +120,8 @@ Likely scope:
   - unit/building identifiers
   - owner/client association
   - repeated issue history
+  - mobile PMC directory create/edit workflow now started in v1.3
+  - mobile work-order form entity linking now started in v1.3
 - Client/homeowner access model:
   - client/viewer role
   - scoped work-order visibility
@@ -156,7 +158,8 @@ Likely scope:
   - mobile operations report view now started in v1.3
   - completion cycle time
   - operations report and dispatch board CSV exports now started in v1.3
-  - richer charts and broader entity exports
+  - client/property/vendor CSV exports now started in v1.3
+  - richer charts and deeper export workflows
 - Operational hardening:
   - error monitoring
   - uptime monitoring
@@ -175,6 +178,8 @@ Likely scope:
 v1.3 exit criteria:
 
 - Property/client/vendor concepts exist in the data model and API.
+- Org admins/coordinators can manage client/property/vendor records from the
+  mobile app and link them while creating/editing work orders.
 - Client-visible communication is separated from internal notes at the backend
   API/data layer, with mobile communication and approval UX started; a fuller
   client portal remains later work.
@@ -184,8 +189,8 @@ v1.3 exit criteria:
   scoped work-order visibility, client-visible comments, and approval/decline
   actions are now started.
 - Backend and mobile reporting show stale work, overloaded technicians, and
-  property hotspot evidence, with dashboard CSV export started and richer
-  charts/broader exports still to complete.
+  property hotspot evidence, with dashboard CSV export and client/property/vendor
+  CSV export started and richer charts/deeper exports still to complete.
 - Backend and mobile dispatch board show unassigned active work, technician
   lanes, workload utilization, and SLA risk.
 - Manual work-order creation warns coordinators about likely duplicates before

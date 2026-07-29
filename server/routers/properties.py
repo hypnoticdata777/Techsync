@@ -3,12 +3,14 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import PlainTextResponse
 
 from dependencies import get_current_organization, require_roles
 from models.property import Property, PropertyCreate, PropertyUpdate
 from models.user import User
 from repositories import clients as clients_repo
 from repositories import properties as properties_repo
+from services import entity_export_service
 
 router = APIRouter(prefix="/properties", tags=["properties"])
 
@@ -44,6 +46,23 @@ def list_properties(
     return [Property(**row) for row in rows]
 
 
+@router.get("/export")
+def export_properties(
+    client_id: Optional[int] = None,
+    active_only: bool = Query(False),
+    current_user: User = Depends(require_roles("org_admin", "coordinator")),
+    organization: dict = Depends(get_current_organization),
+):
+    rows = properties_repo.list_by_org(
+        organization["id"], client_id=client_id, active_only=active_only
+    )
+    return PlainTextResponse(
+        entity_export_service.build_properties_csv(rows),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="techsync-properties.csv"'},
+    )
+
+
 @router.get("/{property_id}", response_model=Property)
 def get_property(
     property_id: int,
@@ -67,7 +86,7 @@ def update_property(
     if not existing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Property not found")
 
-    patch = {k: v for k, v in payload.dict().items() if v is not None}
+    patch = payload.model_dump(exclude_unset=True)
     if not patch:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No fields to update")
 

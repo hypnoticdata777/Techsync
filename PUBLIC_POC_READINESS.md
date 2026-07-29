@@ -129,10 +129,11 @@ Continue v1.3 product depth before hosted public promotion:
 2. Keep Vercel as the selected showcase host, but defer public deployment until
    v1.3 product depth is ready.
 3. Build first-class clients, properties, vendors, and work-order links.
-   Completed in the v1.3 API foundation.
+   Completed in the v1.3 API foundation and started in the mobile PMC directory
+   plus work-order form linking.
 4. Add client-visible communication separation, proof-gated closeout, and richer
-   reporting. Completed as v1.3 API/mobile foundation, with richer charts and
-   binary PDF still optional later polish.
+   reporting. Completed as v1.3 API/mobile foundation with dashboard/entity CSV
+   exports, while richer charts and binary PDF remain optional later polish.
 5. Use `scripts/seed_demo_data.py` to refresh the synthetic demo tenant after
    v1.3 migrations are applied.
 6. Use `APP_ENV=demo` and host-managed secrets when the end-of-v1.3 Vercel
@@ -142,8 +143,8 @@ Continue v1.3 product depth before hosted public promotion:
    storage is configured.
 8. Run `scripts/smoke_v13.py` and capture sanitized evidence in
    `V13_EVIDENCE_TEMPLATE.md`.
-9. Connect the synthetic demo or walkthrough from the portfolio only after the
-   portfolio URL exists and the v1.3 showcase gate passes.
+9. Keep hosting and portfolio linking as the absolute final step after the
+   remaining non-hosting requirement buckets and UI/UX friction sweep are done.
 
 ## Stop Point For This Phase
 

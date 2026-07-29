@@ -79,7 +79,10 @@ they have been verified in the relevant environment.
 - [x] Clients, properties, and vendors added to the database migration path.
 - [x] Tenant-scoped API/repository/model foundation added for clients,
       properties, and vendors.
+- [x] Mobile PMC directory workflow added for client/property/vendor create and
+      edit flows.
 - [x] Work orders can reference property, client, and vendor records.
+- [x] Mobile work-order form can link client, property, and vendor records.
 - [x] Backend client-visible communication separated from internal notes.
 - [x] Client/homeowner UI for client-visible communication implemented.
 - [x] Client approval/decline workflow implemented.
@@ -104,7 +107,8 @@ they have been verified in the relevant environment.
       and service-type work.
 - [x] Mobile duplicate-warning confirmation added before manual work-order
       creation.
-- [ ] Richer reporting charts and broader entity exports implemented.
+- [x] Client/property/vendor CSV exports implemented.
+- [ ] Richer reporting charts and deeper export workflows implemented.
 
 ## Client / Demo Surface
 
@@ -115,6 +119,7 @@ they have been verified in the relevant environment.
 - [ ] Synthetic demo walkthrough validated.
 - [ ] Synthetic demo seed/reset run captured without exposing database URLs or
       provider secrets.
+- [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.
 - [ ] Mobile/desktop screenshots captured for portfolio.

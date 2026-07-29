@@ -210,6 +210,38 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
     vendor_id = vendor.data["id"]
     record("vendor_creation", vendor, {"vendor_id": vendor_id})
 
+    client_export = request(base_url, "GET", "/clients/export", token=admin_token)
+    assert_detail(
+        "client_csv_export",
+        isinstance(client_export.data, str)
+        and "id,display_name,contact_name,email" in client_export.data
+        and str(client_id) in client_export.data,
+        client_export.data[:200] if isinstance(client_export.data, str) else client_export.data,
+    )
+    record("client_csv_export", client_export, {"contains_created_client": True})
+
+    property_export = request(base_url, "GET", "/properties/export", token=admin_token)
+    assert_detail(
+        "property_csv_export",
+        isinstance(property_export.data, str)
+        and "id,client_id,name,address_line1" in property_export.data
+        and str(property_id) in property_export.data,
+        property_export.data[:200]
+        if isinstance(property_export.data, str)
+        else property_export.data,
+    )
+    record("property_csv_export", property_export, {"contains_created_property": True})
+
+    vendor_export = request(base_url, "GET", "/vendors/export", token=admin_token)
+    assert_detail(
+        "vendor_csv_export",
+        isinstance(vendor_export.data, str)
+        and "id,name,contact_name,email" in vendor_export.data
+        and str(vendor_id) in vendor_export.data,
+        vendor_export.data[:200] if isinstance(vendor_export.data, str) else vendor_export.data,
+    )
+    record("vendor_csv_export", vendor_export, {"contains_created_vendor": True})
+
     technician = request(
         base_url,
         "POST",

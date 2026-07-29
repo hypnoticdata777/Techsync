@@ -1,11 +1,13 @@
 """Client management for PMC operations."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import PlainTextResponse
 
 from dependencies import get_current_organization, require_roles
 from models.client import Client, ClientCreate, ClientUpdate
 from models.user import User
 from repositories import clients as clients_repo
+from services import entity_export_service
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -28,6 +30,20 @@ def list_clients(
 ):
     rows = clients_repo.list_by_org(organization["id"], active_only=active_only)
     return [Client(**row) for row in rows]
+
+
+@router.get("/export")
+def export_clients(
+    active_only: bool = Query(False),
+    current_user: User = Depends(require_roles("org_admin", "coordinator")),
+    organization: dict = Depends(get_current_organization),
+):
+    rows = clients_repo.list_by_org(organization["id"], active_only=active_only)
+    return PlainTextResponse(
+        entity_export_service.build_clients_csv(rows),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="techsync-clients.csv"'},
+    )
 
 
 @router.get("/{client_id}", response_model=Client)
@@ -53,7 +69,7 @@ def update_client(
     if not existing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
 
-    patch = {k: v for k, v in payload.dict().items() if v is not None}
+    patch = payload.model_dump(exclude_unset=True)
     if not patch:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No fields to update")
 
