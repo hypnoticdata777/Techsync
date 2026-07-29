@@ -1108,3 +1108,33 @@ Result:
 
 - Client tests passed: `4 passed suites`, `19 passed tests`.
 - Backend tests passed: `113 passed`.
+
+## 2026-07-29 - v1.3 Work-Order Form Context Review
+
+Decision:
+
+- Continue local-only UX polishing before hosting by improving the manual
+  work-order creation surface.
+- Make client/property/vendor/address state visible before save so coordinators
+  can catch incomplete or manual context sooner.
+
+Changes:
+
+- Added `client/src/utils/workOrderContextSummary.js`.
+- Added `client/src/utils/workOrderContextSummary.test.js`.
+- Added a compact "Review Before Save" panel to the mobile work-order form with
+  linked/manual/open pills for client, property, vendor, and address context.
+- Updated role UX, QA, roadmap, requirements, public-readiness, and phase-status
+  docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+```
+
+Result:
+
+- Client tests passed: `5 passed suites`, `23 passed tests`.
+- Backend tests passed: `113 passed`.

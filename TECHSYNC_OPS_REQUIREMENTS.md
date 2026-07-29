@@ -236,6 +236,8 @@ Already represented in the codebase:
   edit clients, properties, and vendors.
 - v1.3 mobile work-order form selectors for linking client, property, and
   vendor context during manual work-order creation/editing.
+- v1.3 mobile work-order form before-save review summary for linked/manual/open
+  client, property, vendor, and address context.
 - v1.3 role-specific mobile work-order landing band for admin, coordinator,
   technician, client, viewer, and vendor states.
 - v1.3 backend dispatch board for unassigned active work, technician lanes,

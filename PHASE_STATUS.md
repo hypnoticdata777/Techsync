@@ -190,6 +190,8 @@ Completed:
   start the exhaustive pre-hosting UX sweep.
 - Added role-aware work-order detail command panel for status, approval, proof,
   and message summary.
+- Added mobile work-order form before-save context review for linked/manual/open
+  client, property, vendor, and address state.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and

@@ -122,6 +122,7 @@ Likely scope:
   - repeated issue history
   - mobile PMC directory create/edit workflow now started in v1.3
   - mobile work-order form entity linking now started in v1.3
+  - mobile work-order form before-save context review now started in v1.3
 - Client/homeowner access model:
   - client/viewer role
   - scoped work-order visibility
@@ -183,6 +184,8 @@ v1.3 exit criteria:
 - Property/client/vendor concepts exist in the data model and API.
 - Org admins/coordinators can manage client/property/vendor records from the
   mobile app and link them while creating/editing work orders.
+- Org admins/coordinators can review selected client, property, vendor, and
+  address context before saving a work order.
 - Client-visible communication is separated from internal notes at the backend
   API/data layer, with mobile communication and approval UX started; a fuller
   client portal remains later work.

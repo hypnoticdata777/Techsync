@@ -33,6 +33,8 @@ Implemented:
 - Added queue summary counts for total, open, active, and pending approval work.
 - Added a role-aware work-order detail command panel with status, approval,
   proof, and message summary tiles.
+- Added a work-order form review panel that summarizes selected client,
+  property, vendor, and address context before save.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
 
@@ -45,7 +47,7 @@ server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 
 Result:
 
-- Client tests passed: `4 passed suites`, `19 passed tests`.
+- Client tests passed: `5 passed suites`, `23 passed tests`.
 - Backend tests passed: `113 passed`.
 
 ## Role Matrix

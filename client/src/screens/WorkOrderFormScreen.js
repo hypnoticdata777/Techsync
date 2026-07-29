@@ -10,6 +10,10 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import {
+  buildWorkOrderContextSummary,
+  summarizeContextStates,
+} from '../utils/workOrderContextSummary';
 
 const PRIORITY_OPTIONS = ['low', 'medium', 'high', 'emergency'];
 
@@ -77,6 +81,35 @@ const SelectorSection = ({label, emptyLabel, records, selectedId, getLabel, onSe
   </View>
 );
 
+const ContextSummaryRow = ({row}) => (
+  <View style={styles.contextSummaryRow}>
+    <View style={styles.contextSummaryText}>
+      <Text style={styles.contextSummaryLabel}>{row.label}</Text>
+      <Text style={styles.contextSummaryValue} numberOfLines={1}>
+        {row.value}
+      </Text>
+      <Text style={styles.contextSummaryDetail} numberOfLines={1}>
+        {row.detail}
+      </Text>
+    </View>
+    <View
+      style={[
+        styles.contextStatePill,
+        row.state === 'linked' && styles.contextStateLinked,
+        row.state === 'manual' && styles.contextStateManual,
+      ]}>
+      <Text
+        style={[
+          styles.contextStateText,
+          row.state === 'linked' && styles.contextStateTextLinked,
+          row.state === 'manual' && styles.contextStateTextManual,
+        ]}>
+        {row.state === 'missing' ? 'open' : row.state}
+      </Text>
+    </View>
+  </View>
+);
+
 function WorkOrderFormScreen({route, navigation}) {
   const {authFetch} = useAuth();
   const existingWorkOrder = route.params?.workOrder;
@@ -110,6 +143,24 @@ function WorkOrderFormScreen({route, navigation}) {
         property => !clientId || !property.client_id || property.client_id === clientId,
       ),
     [clientId, directory.properties],
+  );
+
+  const contextSummaryRows = useMemo(
+    () =>
+      buildWorkOrderContextSummary({
+        clientId,
+        propertyId,
+        vendorId,
+        directory,
+        manualCustomerName: customerName,
+        manualAddress: address,
+      }),
+    [address, clientId, customerName, directory, propertyId, vendorId],
+  );
+
+  const contextStateSummary = useMemo(
+    () => summarizeContextStates(contextSummaryRows),
+    [contextSummaryRows],
   );
 
   const loadDirectory = useCallback(async () => {
@@ -341,6 +392,18 @@ function WorkOrderFormScreen({route, navigation}) {
             getLabel={item => item.name}
             onSelect={selectVendor}
           />
+
+          <View style={styles.contextSummaryPanel}>
+            <View style={styles.contextSummaryHeader}>
+              <Text style={styles.contextSummaryTitle}>Review Before Save</Text>
+              <Text style={styles.contextSummaryCount} numberOfLines={1}>
+                {contextStateSummary.label}
+              </Text>
+            </View>
+            {contextSummaryRows.map(row => (
+              <ContextSummaryRow key={row.key} row={row} />
+            ))}
+          </View>
         </View>
 
         <View style={styles.field}>
@@ -534,6 +597,98 @@ const styles = StyleSheet.create({
   },
   selectorChipTextActive: {
     color: '#052e16',
+  },
+  contextSummaryPanel: {
+    marginTop: 4,
+    borderWidth: 1,
+    borderColor: '#233044',
+    borderRadius: 8,
+    backgroundColor: '#0b1120',
+    padding: 10,
+    gap: 8,
+  },
+  contextSummaryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 2,
+  },
+  contextSummaryTitle: {
+    flex: 1,
+    color: '#e2e8f0',
+    fontSize: 13,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+  contextSummaryCount: {
+    maxWidth: 150,
+    color: '#94a3b8',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  contextSummaryRow: {
+    minHeight: 58,
+    borderWidth: 1,
+    borderColor: '#1e293b',
+    borderRadius: 8,
+    backgroundColor: '#020617',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  contextSummaryText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  contextSummaryLabel: {
+    color: '#94a3b8',
+    fontSize: 10,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+  contextSummaryValue: {
+    color: '#f8fafc',
+    fontSize: 14,
+    fontWeight: '800',
+    marginTop: 2,
+  },
+  contextSummaryDetail: {
+    color: '#94a3b8',
+    fontSize: 11,
+    marginTop: 2,
+  },
+  contextStatePill: {
+    width: 58,
+    minHeight: 28,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#334155',
+    backgroundColor: '#111827',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contextStateLinked: {
+    backgroundColor: '#dcfce7',
+    borderColor: '#86efac',
+  },
+  contextStateManual: {
+    backgroundColor: '#fef3c7',
+    borderColor: '#facc15',
+  },
+  contextStateText: {
+    color: '#cbd5e1',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  contextStateTextLinked: {
+    color: '#14532d',
+  },
+  contextStateTextManual: {
+    color: '#713f12',
   },
   statusOptions: {
     flexDirection: 'row',

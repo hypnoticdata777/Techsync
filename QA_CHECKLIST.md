@@ -83,6 +83,8 @@ they have been verified in the relevant environment.
       edit flows.
 - [x] Work orders can reference property, client, and vendor records.
 - [x] Mobile work-order form can link client, property, and vendor records.
+- [x] Mobile work-order form includes a before-save context review for linked
+      client, property, vendor, and address state.
 - [x] Backend client-visible communication separated from internal notes.
 - [x] Client/homeowner UI for client-visible communication implemented.
 - [x] Client approval/decline workflow implemented.

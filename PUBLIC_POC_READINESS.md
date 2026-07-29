@@ -130,7 +130,7 @@ Continue v1.3 product depth before hosted public promotion:
    v1.3 product depth is ready.
 3. Build first-class clients, properties, vendors, and work-order links.
    Completed in the v1.3 API foundation and started in the mobile PMC directory
-   plus work-order form linking.
+   plus work-order form linking and before-save context review.
 4. Add client-visible communication separation, proof-gated closeout, and richer
    reporting. Completed as v1.3 API/mobile foundation with dashboard/entity CSV
    exports and mobile chart bars, while completion cycle-time charts and binary
