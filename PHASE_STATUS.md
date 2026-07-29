@@ -1,6 +1,6 @@
 # TechSync Ops Phase Status
 
-Date: July 28, 2026
+Date: July 29, 2026
 
 This file is the current project pulse. Update it after each build, QA, hosting,
 or portfolio-integration slice so future sessions can resume without guessing.
@@ -17,7 +17,7 @@ Current verified repo state:
 ```text
 Repository: https://github.com/hypnoticdata777/Techsync
 Branch: main
-Latest local HEAD during this review: 1b3b02f Add TechSync Ops client approvals and closeout exports
+Latest local HEAD before this v1.3 smoke-harness pass: 550d24a Refresh TechSync Ops phase handoff docs
 Latest known CI evidence in this tracker: success on main for 3c3f0ac
 Working clone: C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync
 ```
@@ -108,6 +108,12 @@ Completed:
   evidence collection after Vercel deploy.
 - Added `PORTFOLIO_TECHSYNC_OPS.md` as the portfolio case-study source for the
   v1.2 public POC.
+- Added `scripts/smoke_v13.py`, `V13_EVIDENCE_TEMPLATE.md`, and updated the
+  manual hosted-smoke workflow so the v1.3 API surface can be tested
+  repeatably after deployment.
+- Updated `scripts/smoke_v12.py` so proof metadata is attached before a
+  completed status transition, keeping the older smoke path compatible with the
+  v1.3 proof gate.
 
 Next:
 
@@ -155,11 +161,20 @@ Completed:
 - Added mobile approval UI inside work-order details.
 - Added printable HTML/text closeout export endpoint under
   `/work-orders/{work_order_id}/closeout-package/export`.
+- Added hosted v1.3 smoke coverage for client/property/vendor creation,
+  work-order entity links, internal/client-visible messages, staff approval
+  request state, proof-gated completion, closeout package JSON, HTML/text
+  exports, and operations reporting.
 
 Next:
 
 - Migrate/smoke-test the demo database through the latest v1.3 migrations, then
-  decide whether binary PDF rendering is needed before the portfolio showcase.
+- run `scripts/smoke_v13.py` against the hosted API and capture
+  `V13_EVIDENCE_TEMPLATE.md`.
+- Manually verify a synthetic client invite/accept/approval decision from the
+  hosted email/log path because invite tokens are intentionally not echoed by
+  the API response.
+- Decide whether binary PDF rendering is needed before the portfolio showcase.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -212,7 +227,8 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue v1.3 product depth before hosting: migrate/smoke-test the demo
-database through the latest v1.3 migrations, then decide whether binary PDF
-rendering is needed before the portfolio showcase. Vercel deployment and
-portfolio sliver linking should happen at the end of v1.3.
+Continue toward the end-of-v1.3 showcase gate: apply the latest migrations to
+the Neon demo database, deploy to the selected Vercel backend when ready, run
+`scripts/smoke_v13.py`, capture `V13_EVIDENCE_TEMPLATE.md`, then decide whether
+binary PDF rendering or a screenshot/walkthrough demo surface is the better
+final portfolio proof.

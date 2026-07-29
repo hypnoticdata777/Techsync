@@ -239,15 +239,6 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
     )
     record("status_in_progress", in_progress, {"status": in_progress.data.get("status")})
 
-    completed = request_json(
-        base_url,
-        "PATCH",
-        f"/work-orders/{work_order_id}/status",
-        {"status": "completed", "notes": "Synthetic technician completed work with proof."},
-        tech_token,
-    )
-    record("status_completed", completed, {"status": completed.data.get("status")})
-
     attachment = request_json(
         base_url,
         "POST",
@@ -261,6 +252,15 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         expected=(201,),
     )
     record("attachment_metadata", attachment, {"attachment_id": attachment.data.get("id")})
+
+    completed = request_json(
+        base_url,
+        "PATCH",
+        f"/work-orders/{work_order_id}/status",
+        {"status": "completed", "notes": "Synthetic technician completed work with proof."},
+        tech_token,
+    )
+    record("status_completed", completed, {"status": completed.data.get("status")})
 
     events = request_json(base_url, "GET", f"/work-orders/{work_order_id}/events", token=admin_token)
     assert_detail("audit_events", len(events.data) >= 4, {"event_count": len(events.data)})

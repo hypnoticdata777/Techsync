@@ -1,6 +1,6 @@
 # TechSync Deployment Decision
 
-Date: July 21, 2026
+Date: July 29, 2026
 
 This file records the current hosting decision path for the public POC so
 backend, storage, email, Stripe, and portfolio work stay aligned.
@@ -11,10 +11,10 @@ Use this as the default unless a later implementation pass finds a blocker:
 
 ```text
 Database: Neon Postgres, project techsync-poc, using the pooled connection string for hosted/serverless runtime
-Backend: Vercel for the v1.2 FastAPI public POC
+Backend: Vercel for the end-of-v1.3 FastAPI showcase POC
 Cloudflare: DNS, portfolio/static front door, and later R2 object storage
 Storage: deferred for the first hosted smoke test unless attachment upload is in scope
-Email: deferred/logged for the first hosted smoke test unless invitation/reset email is in scope
+Email: deferred/logged for the first hosted smoke test; real client invite/approval evidence can be captured manually from the hosted email/log path
 Stripe: deferred; document as a supported billing boundary for later test-mode enablement
 Portfolio: prepare the TechSync Ops project entry now, connect the live link after the portfolio URL exists
 ```
@@ -29,9 +29,9 @@ Portfolio: prepare the TechSync Ops project entry now, connect the live link aft
 - Cloudflare Workers can run Python/FastAPI, but Python Workers are still beta
   and require a different deployment shape. Keep that as a later optimization,
   not the first investor POC backend.
-- Vercel is selected for v1.2 because the portfolio is expected to land there
-  too. Its Python runtime is beta, so the hosted API must be smoke-tested
-  carefully before the live link is promoted.
+- Vercel is selected for the end-of-v1.3 showcase because the portfolio is
+  expected to land there too. Its Python runtime is beta, so the hosted API must
+  be smoke-tested carefully before the live link is promoted.
 - Render or Railway remain fallback options if Vercel's Python/serverless
   constraints create blockers.
 
@@ -45,7 +45,8 @@ Current POC state:
 - Region: AWS US East 1 (N. Virginia)
 - Branch: `production`
 - Database: `neondb`
-- Migration status: `0001 (head)`
+- Migration status: initial hosted-readiness pass reached `0001 (head)`;
+  v1.3 migrations now need hosted/demo verification through `0005 (head)`.
 - Direct connection string was used for Alembic migration.
 - Pooled connection string is reserved for hosted app runtime.
 - No Neon connection strings or secrets are tracked in this repo.
@@ -89,7 +90,8 @@ Pros:
 - Easy to connect to a portfolio or project landing page.
 - Supports FastAPI through the Python runtime.
 - Good preview deployment workflow.
-- Selected for v1.2 because the portfolio path is expected to use Vercel.
+- Selected for the end-of-v1.3 showcase because the portfolio path is expected
+  to use Vercel.
 
 Tradeoffs:
 
@@ -182,12 +184,15 @@ until the portfolio domain or deployment URL exists.
 
 Current flow:
 
-1. Neon demo Postgres is created and migrated to `0001 (head)`.
+1. Neon demo Postgres is created and initially migrated to `0001 (head)`;
+   apply latest v1.3 migrations through `0005 (head)` before showcase smoke
+   evidence.
 2. Use the pooled Neon connection string for hosted/serverless runtime.
 3. Deploy the backend on Vercel for portfolio alignment.
 4. Use `APP_ENV=demo` for the first hosted environment while
    storage/email/Stripe are deferred.
-5. Configure host secrets, deploy, and smoke-test the backend.
+5. Configure host secrets, deploy, and smoke-test the backend with
+   `scripts/smoke_v13.py`.
 6. Add the TechSync Ops card/case study to the portfolio.
 7. Connect the live TechSync Ops URL once the portfolio landing page is up.
 

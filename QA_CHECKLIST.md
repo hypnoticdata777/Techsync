@@ -44,8 +44,10 @@ they have been verified in the relevant environment.
 - [x] Vercel deployment adapter and runbook added, with deployment deferred to
       the end of v1.3.
 - [x] Repeatable v1.2 hosted smoke-test script added.
-- [x] Manual GitHub Actions hosted smoke workflow added.
+- [x] Repeatable v1.3 hosted smoke-test script added.
+- [x] Manual GitHub Actions hosted smoke workflow updated for v1.3.
 - [x] v1.2 evidence template added.
+- [x] v1.3 evidence template added.
 - [x] Portfolio case-study source copy added.
 - [x] Neon demo database created.
 - [x] Direct Neon connection string used for Alembic migrations.
@@ -66,6 +68,8 @@ they have been verified in the relevant environment.
 - [ ] Dashboard metrics verified.
 - [ ] Attachment upload verified if object storage is configured.
 - [ ] Stripe webhook verified if Stripe test-mode demo is enabled.
+- [ ] `scripts/smoke_v13.py` run against hosted API and sanitized evidence
+      captured.
 
 ## v1.3 PMC Product Foundation
 
@@ -76,7 +80,9 @@ they have been verified in the relevant environment.
 - [x] Backend client-visible communication separated from internal notes.
 - [x] Client/homeowner UI for client-visible communication implemented.
 - [x] Client approval/decline workflow implemented.
-- [ ] Client approval workflow smoke-tested against a migrated demo database.
+- [x] Staff-side client approval request covered by v1.3 hosted smoke harness.
+- [ ] Client invite/accept plus client-side approve/decline workflow
+      smoke-tested against a migrated hosted/demo database.
 - [x] Backend closeout proof requirement and manager override reason
       implemented.
 - [x] Backend closeout package summary implemented.

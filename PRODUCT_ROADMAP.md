@@ -1,6 +1,6 @@
 # TechSync Ops Product Roadmap
 
-Date: July 28, 2026
+Date: July 29, 2026
 
 ## Roadmap Principle
 
@@ -48,6 +48,14 @@ Scope:
   - CSV ingestion
   - dashboard metrics
   - attachment upload if storage is configured
+- v1.3 hosted smoke harness available for:
+  - client, property, and vendor records
+  - linked work-order creation
+  - internal versus client-visible communication
+  - approval request state
+  - proof-gated closeout
+  - closeout package JSON and printable exports
+  - operations reporting
 - Portfolio TechSync Ops page prepared with:
   - problem statement
   - architecture summary
@@ -154,6 +162,8 @@ Likely scope:
   - `APP_ENV=demo` configured in Vercel
   - CORS locked to the intended portfolio/demo origins
   - hosted smoke-test evidence captured
+  - v1.3 smoke evidence captured with `scripts/smoke_v13.py` and
+    `V13_EVIDENCE_TEMPLATE.md`
   - portfolio sliver/showcase link connected only after the portfolio is live
 
 v1.3 exit criteria:
@@ -173,6 +183,9 @@ v1.3 exit criteria:
   not before the product feels robust enough to show.
 - Documentation explains which v1.3 features are prototype-ready versus still
   deferred.
+- Hosted evidence shows the v1.3 API surface passes with synthetic data, while
+  the client invite/accept/approval decision is manually verified from the
+  hosted email/log path.
 
 ## Beyond v1.3
 

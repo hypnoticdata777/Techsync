@@ -1,4 +1,4 @@
-name: Hosted v1.2 smoke test
+name: Hosted v1.3 smoke test
 
 on:
   workflow_dispatch:
@@ -21,15 +21,15 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run v1.2 hosted smoke test
+      - name: Run v1.3 hosted smoke test
         run: |
-          python scripts/smoke_v12.py \
+          python scripts/smoke_v13.py \
             --base-url "${{ inputs.base_url }}" \
-            --output v12-smoke-evidence.json
+            --output v13-smoke-evidence.json
 
       - name: Upload smoke evidence
         uses: actions/upload-artifact@v4
         with:
-          name: v12-smoke-evidence
-          path: v12-smoke-evidence.json
+          name: v13-smoke-evidence
+          path: v13-smoke-evidence.json
           if-no-files-found: error

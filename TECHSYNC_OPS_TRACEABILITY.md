@@ -1,6 +1,6 @@
 # TechSync Ops Requirements Traceability
 
-Date: July 28, 2026
+Date: July 29, 2026
 
 ## Purpose
 
@@ -82,7 +82,10 @@ v1.3 should focus on the highest-value PMC product gaps:
 6. Duplicate-detection warnings.
 7. Reporting for stale work, overloaded technicians, property hotspots, and
    completion cycle time, with the first mobile report view now started.
-8. End-of-v1.3 Vercel deployment, hosted smoke evidence, and portfolio sliver
+8. v1.3 hosted smoke evidence for PMC entity links, communication visibility,
+   approval request state, proof-gated closeout, closeout exports, and
+   operations reporting.
+9. End-of-v1.3 Vercel deployment, hosted smoke evidence, and portfolio sliver
    link after the product feels robust enough to show.
 
 ## Confidence Statement
@@ -90,5 +93,6 @@ v1.3 should focus on the highest-value PMC product gaps:
 The requirement set is complete as an input and roadmap baseline. The v1.2 scope
 is intentionally narrower than the full product: it proves the tenant-safe
 command-platform backbone and creates portfolio/investor-safe evidence. The
-remaining PMC operations depth is captured for v1.3+, with Vercel hosting held
-until the end of v1.3 instead of driving the product sequence too early.
+remaining PMC operations depth is captured for v1.3+, with a v1.3 hosted smoke
+harness now available and Vercel hosting held until the end of v1.3 instead of
+driving the product sequence too early.

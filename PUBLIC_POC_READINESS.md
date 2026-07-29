@@ -1,6 +1,6 @@
 # TechSync Ops Public POC Readiness
 
-Date: July 21, 2026
+Date: July 29, 2026
 
 ## Current Status
 
@@ -14,7 +14,7 @@ The current repo is aligned with GitHub:
 ```text
 Repository: https://github.com/hypnoticdata777/Techsync
 Branch: main
-Latest verified commit: 05626ac Document TechSync public POC readiness and tracker docs
+Latest verified commit before this v1.3 smoke-harness pass: 550d24a Refresh TechSync Ops phase handoff docs
 Latest verified CI run before this scan: success on main for 3c3f0ac
 ```
 
@@ -35,9 +35,11 @@ Latest verified CI run before this scan: success on main for 3c3f0ac
 - Active PMC operations requirements captured in `TECHSYNC_OPS_REQUIREMENTS.md`.
 - v1.2/v1.3 product path captured in `PRODUCT_ROADMAP.md`, with Vercel hosting
   held until the end-of-v1.3 showcase gate.
-- Repeatable hosted smoke-test script added in `scripts/smoke_v12.py`.
+- Repeatable hosted smoke-test scripts added in `scripts/smoke_v12.py` and
+  `scripts/smoke_v13.py`.
 - Portfolio case-study source copy added in `PORTFOLIO_TECHSYNC_OPS.md`.
-- v1.2 evidence capture template added in `V12_EVIDENCE_TEMPLATE.md`.
+- v1.2 and v1.3 evidence capture templates added in
+  `V12_EVIDENCE_TEMPLATE.md` and `V13_EVIDENCE_TEMPLATE.md`.
 
 ## Safety Sweep Notes
 
@@ -86,8 +88,9 @@ Before real customer data, real money, or public self-serve usage:
   `neondb`.
 - Use the Neon pooled connection string for the hosted app runtime if the
   backend runs on a serverless-style host such as Vercel.
-- Run Alembic migrations against that database. Completed for the POC Neon
-  database; `alembic current` reported `0001 (head)`.
+- Run Alembic migrations against that database. Completed for the initial POC
+  Neon database at `0001`; latest v1.3 migrations `0002` through `0005` still
+  need hosted/demo verification before the showcase gate.
 - Host the backend behind HTTPS.
 - Configure production CORS with real hosted domains only.
 - Store all runtime secrets in the host secret manager.
@@ -124,15 +127,17 @@ Continue v1.3 product depth before hosted public promotion:
 2. Keep Vercel as the selected showcase host, but defer public deployment until
    v1.3 product depth is ready.
 3. Build first-class clients, properties, vendors, and work-order links.
+   Completed in the v1.3 API foundation.
 4. Add client-visible communication separation, proof-gated closeout, and richer
-   reporting.
+   reporting. Completed as v1.3 API/mobile foundation, with richer charts and
+   binary PDF still optional later polish.
 5. Use `APP_ENV=demo` and host-managed secrets when the end-of-v1.3 Vercel
    deployment begins.
 6. Verify `/health`, onboarding, login/refresh, work-order creation, assignment,
    status transitions, CSV ingestion, dashboard metrics, and attachment flow if
    storage is configured.
-7. Run `scripts/smoke_v12.py` or its v1.3 successor and capture sanitized
-   evidence.
+7. Run `scripts/smoke_v13.py` and capture sanitized evidence in
+   `V13_EVIDENCE_TEMPLATE.md`.
 8. Connect the synthetic demo or walkthrough from the portfolio only after the
    portfolio URL exists and the v1.3 showcase gate passes.
 

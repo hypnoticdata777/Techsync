@@ -724,3 +724,39 @@ Result:
 - `git diff --check` passed.
 - Local pytest could not run because `server\venv` does not have pytest
   installed.
+
+## 2026-07-29 - v1.3 Hosted Smoke Harness
+
+Decision:
+
+- Add a repeatable v1.3 hosted smoke path before Vercel/portfolio promotion so
+  the final showcase gate can prove the new PMC operations surface with
+  synthetic data.
+- Keep client invite/accept/approval decision as a manual hosted evidence step
+  because invitation tokens are intentionally delivered by email/log and are not
+  returned by the public API response.
+
+Changes:
+
+- Added `scripts/smoke_v13.py`.
+- Updated `.github/workflows/hosted-smoke.yml` to run the v1.3 smoke script and
+  upload `v13-smoke-evidence.json`.
+- Added `V13_EVIDENCE_TEMPLATE.md`.
+- Updated `scripts/smoke_v12.py` so synthetic proof metadata is attached before
+  completed status, keeping it compatible with the v1.3 proof gate.
+- Updated readiness, roadmap, QA, traceability, deployment, hosting, and README
+  docs to reflect the v1.3 smoke/evidence path.
+
+Verification:
+
+```powershell
+python -m compileall -q scripts\smoke_v12.py scripts\smoke_v13.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+git diff --check
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- `git diff --check` passed with normal Windows LF-to-CRLF warnings only.

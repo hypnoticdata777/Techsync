@@ -35,8 +35,9 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       `requirements.txt`, `.python-version`, `vercel.json`, and
       `VERCEL_DEPLOYMENT.md` define the Vercel backend path, now deferred to the
       end-of-v1.3 showcase gate.
-- [x] **Prepare v1.2 smoke/evidence harness.** `scripts/smoke_v12.py`,
-      `V12_EVIDENCE_TEMPLATE.md`, and `PORTFOLIO_TECHSYNC_OPS.md` define the
+- [x] **Prepare v1.2/v1.3 smoke/evidence harness.** `scripts/smoke_v12.py`,
+      `scripts/smoke_v13.py`, `V12_EVIDENCE_TEMPLATE.md`,
+      `V13_EVIDENCE_TEMPLATE.md`, and `PORTFOLIO_TECHSYNC_OPS.md` define the
       hosted proof path and portfolio source copy.
 - [x] **Wire up real password-reset and invitation emails.** The backend
       now sends reset and invitation emails through `services/email_service.py`.
@@ -78,7 +79,8 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       project (paid tiers include point-in-time recovery — check your plan).
 - [x] **Add a CI pipeline** (GitHub Actions) that runs backend pytest and
       client Jest checks on pushes/PRs. Backend coverage currently includes
-      `server/tests/` (70 tests); client coverage starts with shared validation tests and should grow as mobile flows are hardened.
+      `server/tests/`; client coverage starts with shared validation tests and
+      should grow as mobile flows are hardened.
 - [ ] **Complete the Expo/React Native dependency upgrade.** Safe npm audit
       fixes reduced the client report from 39 to 29 findings with no criticals,
       but the remaining high/moderate findings are pinned inside Expo 50 / React

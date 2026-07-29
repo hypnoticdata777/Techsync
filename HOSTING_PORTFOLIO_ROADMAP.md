@@ -108,7 +108,8 @@ Tasks:
   - storage settings if attachments are enabled
   - Stripe callback/webhook settings if billing demo is enabled
 - Run Alembic migrations. Completed against Neon; `alembic current` reported
-  `0001 (head)`.
+  `0001 (head)` during the first pass. Latest v1.3 migrations now need
+  hosted/demo verification through `0005 (head)`.
 - Keep actual Vercel deployment deferred until the v1.3 product workflows are
   robust enough to show.
 
@@ -124,11 +125,17 @@ Exit criteria:
 
 Tasks:
 
-- Build first-class client, property, and vendor workflows.
-- Link work orders to property/client/vendor context.
-- Add client-visible communication separation.
-- Add proof-gated closeout and manager override path.
-- Add stale work, workload, and property hotspot reporting.
+- Build first-class client, property, and vendor workflows. Completed in the
+  v1.3 API foundation.
+- Link work orders to property/client/vendor context. Completed.
+- Add client-visible communication separation. Completed at API/mobile level.
+- Add proof-gated closeout and manager override path. Completed.
+- Add stale work, workload, and property hotspot reporting. Completed at
+  API/mobile level.
+- Add repeatable v1.3 hosted smoke coverage for the above. Completed with
+  `scripts/smoke_v13.py`, the `Hosted v1.3 smoke test` workflow, and
+  `V13_EVIDENCE_TEMPLATE.md`.
+- Apply v1.3 migrations and run hosted smoke evidence after deployment.
 
 Exit criteria:
 
@@ -194,8 +201,7 @@ Tasks:
 
 - Capture GitHub Actions CI status.
 - Capture hosted `/health` result after the end-of-v1.3 deploy.
-- Capture `scripts/smoke_v12.py` or successor result after the end-of-v1.3
-  deploy.
+- Capture `scripts/smoke_v13.py` result after the end-of-v1.3 deploy.
 - Capture screenshots of:
   - onboarding;
   - login;
