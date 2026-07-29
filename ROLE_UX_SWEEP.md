@@ -40,6 +40,10 @@ Implemented:
 - Added a reusable retry/error panel for primary mobile API failures, including
   work-order list, dispatch board, operations report, PMC directory, and
   work-order detail message/attachment subloads.
+- Added backend regression coverage proving client/viewer users cannot open
+  unrelated client-linked work orders by ID, viewer message requests are forced
+  to client-visible messages, and technicians cannot open unassigned
+  work-order details or attachment subresources.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
 
@@ -53,7 +57,7 @@ server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 Result:
 
 - Client tests passed: `5 passed suites`, `25 passed tests`.
-- Backend tests passed: `115 passed`.
+- Backend tests passed: `119 passed`.
 
 ## Role Matrix
 
@@ -71,7 +75,9 @@ Result:
 - Capture mobile screenshots for each role using synthetic demo data.
 - Verify role-specific empty states with seeded and empty queues.
 - Verify client/viewer cannot see internal messages or unrelated work.
+  Covered by backend regression tests; final screenshot proof still needed.
 - Verify technician cannot see unassigned/unrelated work.
+  Covered by backend regression tests; final screenshot proof still needed.
 - Verify manager-only actions are absent for technician/client/viewer/vendor.
   Started with tested navigator route gating; final screenshot proof still
   needed.

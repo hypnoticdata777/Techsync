@@ -133,6 +133,9 @@ they have been verified in the relevant environment.
       technician/client/viewer/vendor roles.
 - [x] Primary mobile API failure recovery has visible retry states for list,
       report, dispatch, directory, and detail message/attachment loads.
+- [x] Backend regression tests cover client/viewer unrelated-work blocking,
+      viewer client-visible message enforcement, and technician unassigned
+      work/subresource blocking.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

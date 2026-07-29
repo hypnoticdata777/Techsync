@@ -212,7 +212,8 @@ v1.3 exit criteria:
 - Role-specific UX sweep evidence is started locally, with final screenshots
   and walkthrough evidence still required before hosting; manager-only route
   gating is now covered by client tests, and primary mobile API failure states
-  now expose retry actions.
+  now expose retry actions. Backend role-scope regressions now cover
+  client/viewer unrelated-work blocking and technician unassigned-work blocking.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data, while
   the client invite/accept/approval decision is manually verified from the
   hosted email/log path.

@@ -244,6 +244,9 @@ Already represented in the codebase:
   technician, client, viewer, and vendor states.
 - v1.3 manager-only mobile navigation gating for directory, dispatch,
   operations report, and work-order creation screens.
+- v1.3 role-scope regression coverage for client/viewer unrelated-work
+  blocking, client-visible message enforcement, and technician assigned-work
+  boundaries.
 - v1.3 backend dispatch board for unassigned active work, technician lanes,
   workload utilization, and SLA risk.
 - v1.3 mobile dispatch board view for org admins/coordinators to scan

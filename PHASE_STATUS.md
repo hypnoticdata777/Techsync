@@ -201,6 +201,9 @@ Completed:
   for org admin/coordinator roles.
 - Added reusable mobile retry/error states for primary API failures and
   work-order detail message/attachment subloads.
+- Added backend role-scope regression evidence for client/viewer unrelated-work
+  blocking, viewer client-visible message enforcement, and technician
+  unassigned work/subresource blocking.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and

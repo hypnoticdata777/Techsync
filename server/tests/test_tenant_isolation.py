@@ -422,6 +422,125 @@ def test_client_cannot_view_other_client_work_order():
     assert exc.value.detail == "Not visible to you"
 
 
+def test_viewer_cannot_view_other_client_work_order():
+    viewer_user = User(
+        id=7,
+        organization_id=6,
+        email="viewer@example.com",
+        full_name="Viewer",
+        role="viewer",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "client_id": 10},
+    ):
+        with patch(
+            "routers.work_orders.clients_repo.get_by_email_in_org",
+            return_value={"id": 9, "email": "viewer@example.com"},
+        ):
+            with pytest.raises(HTTPException) as exc:
+                work_orders_router.get_work_order(
+                    1,
+                    current_user=viewer_user,
+                    organization={"id": 6},
+                )
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "Not visible to you"
+
+
+def test_viewer_message_list_forces_client_visibility():
+    viewer_user = User(
+        id=7,
+        organization_id=6,
+        email="viewer@example.com",
+        full_name="Viewer",
+        role="viewer",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "client_id": 9},
+    ):
+        with patch(
+            "routers.work_orders.clients_repo.get_by_email_in_org",
+            return_value={"id": 9, "email": "viewer@example.com"},
+        ):
+            with patch("routers.work_orders.messages_repo.list_for_work_order", return_value=[]) as mock_list:
+                rows = work_orders_router.list_messages(
+                    1,
+                    visibility="internal",
+                    current_user=viewer_user,
+                    organization={"id": 6},
+                )
+
+    assert rows == []
+    assert mock_list.call_args.kwargs["visibility"] == "client"
+
+
+def test_technician_cannot_view_unassigned_work_order():
+    technician_user = User(
+        id=8,
+        organization_id=6,
+        email="tech@example.com",
+        full_name="Technician",
+        role="technician",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "assigned_technician_id": None},
+    ):
+        with patch(
+            "routers.work_orders.technicians_repo.get_by_user_id",
+            return_value={"id": 4, "user_id": 8},
+        ):
+            with pytest.raises(HTTPException) as exc:
+                work_orders_router.get_work_order(
+                    1,
+                    current_user=technician_user,
+                    organization={"id": 6},
+                )
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "Not assigned to you"
+
+
+def test_technician_detail_subresources_block_unassigned_work_order():
+    technician_user = User(
+        id=8,
+        organization_id=6,
+        email="tech@example.com",
+        full_name="Technician",
+        role="technician",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "assigned_technician_id": None},
+    ):
+        with patch(
+            "routers.work_orders.technicians_repo.get_by_user_id",
+            return_value={"id": 4, "user_id": 8},
+        ):
+            with patch("routers.work_orders.attachments_repo.list_for_work_order") as mock_list:
+                with pytest.raises(HTTPException) as exc:
+                    work_orders_router.list_attachments(
+                        1,
+                        current_user=technician_user,
+                        organization={"id": 6},
+                    )
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "Not assigned to you"
+    mock_list.assert_not_called()
+
+
 def test_staff_cannot_request_client_approval_without_linked_client():
     admin_user = User(
         id=5,

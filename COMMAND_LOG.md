@@ -1237,6 +1237,41 @@ Result:
 - Backend tests passed: `115 passed`.
 - Compile check passed.
 
+## 2026-07-29 - v1.3 Role Scope Regression Evidence
+
+Decision:
+
+- Turn the remaining role-access UX sweep items into backend regression proof
+  before any public demo work.
+- Keep screenshot walkthrough evidence separate for the final pre-hosting pass.
+
+Changes:
+
+- Added viewer detail-access regression coverage so viewer users cannot open
+  another client-linked work order by ID.
+- Added viewer message-list coverage proving requested internal messages are
+  forced to client-visible messages.
+- Added technician detail-access coverage so technicians cannot open unassigned
+  work orders.
+- Added attachment subresource coverage so unassigned technician access is
+  blocked before attachment rows are queried.
+- Updated role UX, QA, roadmap, phase, requirements, traceability, and README
+  docs.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+npm.cmd run test:ci
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Backend tests passed: `119 passed`.
+- Client tests passed: `5 passed suites`, `25 passed tests`.
+- Compile check passed.
+
 ## 2026-07-29 - v1.3 Mobile Retry-State Polish
 
 Decision:
