@@ -214,3 +214,52 @@ def list_property_hotspots(
         """,
         {"organization_id": organization_id, "cutoff": cutoff, "limit": limit},
     )
+
+
+def list_dispatch_board_work_orders(organization_id: int) -> list[dict]:
+    """v1.3 dispatch board: active work enriched with PMC context."""
+    return fetch_all(
+        """
+        SELECT
+            wo.id,
+            wo.title,
+            wo.status,
+            wo.priority,
+            wo.assigned_technician_id,
+            wo.property_id,
+            p.name AS property_name,
+            wo.client_id,
+            c.display_name AS client_display_name,
+            wo.vendor_id,
+            v.name AS vendor_name,
+            wo.created_at,
+            wo.sla_due_at
+        FROM work_orders wo
+        LEFT JOIN properties p
+            ON p.id = wo.property_id
+           AND p.organization_id = wo.organization_id
+        LEFT JOIN clients c
+            ON c.id = wo.client_id
+           AND c.organization_id = wo.organization_id
+        LEFT JOIN vendors v
+            ON v.id = wo.vendor_id
+           AND v.organization_id = wo.organization_id
+        WHERE wo.organization_id = :organization_id
+          AND wo.status IN ('open', 'in_progress')
+        ORDER BY
+            CASE
+                WHEN wo.sla_due_at IS NOT NULL AND wo.sla_due_at <= NOW() THEN 0
+                WHEN wo.sla_due_at IS NOT NULL AND wo.sla_due_at <= NOW() + INTERVAL '2 hours' THEN 1
+                ELSE 2
+            END,
+            CASE wo.priority
+                WHEN 'emergency' THEN 0
+                WHEN 'high' THEN 1
+                WHEN 'medium' THEN 2
+                WHEN 'low' THEN 3
+                ELSE 99
+            END,
+            wo.created_at ASC
+        """,
+        {"organization_id": organization_id},
+    )

@@ -145,11 +145,15 @@ Completed:
   or an org admin/coordinator override reason.
 - Added backend operations report under `/dashboard/operations-report` for stale
   work, overloaded technicians, and property hotspots.
+- Added backend dispatch board under `/dashboard/dispatch-board` for unassigned
+  active work, technician lanes, workload utilization, and SLA risk.
 - Added backend closeout package summary under
   `/work-orders/{work_order_id}/closeout-package`.
 - Added mobile operations report screen for org admins/coordinators, showing
   stale work, overloaded technicians, and property hotspots from the backend
   report endpoint.
+- Added mobile dispatch board screen for org admins/coordinators, showing
+  unassigned work, technician load, active lane work, and SLA risk.
 - Added client/viewer work-order scoping by active client email, so client
   users only list/view their own work orders.
 - Added mobile work-order communication timeline with internal versus
@@ -165,6 +169,7 @@ Completed:
   work-order entity links, internal/client-visible messages, staff approval
   request state, proof-gated completion, closeout package JSON, HTML/text
   exports, and operations reporting.
+- Added hosted v1.3 smoke coverage for the dispatch board shape and summary.
 
 Next:
 
@@ -175,6 +180,8 @@ Next:
   hosted email/log path because invite tokens are intentionally not echoed by
   the API response.
 - Decide whether binary PDF rendering is needed before the portfolio showcase.
+- Continue local-only product depth with duplicate-detection warnings or richer
+  report exports before hosting.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 

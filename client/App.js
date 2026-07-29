@@ -13,6 +13,7 @@ import WorkOrdersListScreen from './src/screens/WorkOrdersListScreen';
 import WorkOrderDetailsScreen from './src/screens/WorkOrderDetailsScreen';
 import WorkOrderFormScreen from './src/screens/WorkOrderFormScreen';
 import OperationsReportScreen from './src/screens/OperationsReportScreen';
+import DispatchBoardScreen from './src/screens/DispatchBoardScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -113,6 +114,13 @@ function Navigation() {
               component={OperationsReportScreen}
               options={{
                 title: 'Operations Report',
+              }}
+            />
+            <Stack.Screen
+              name="DispatchBoard"
+              component={DispatchBoardScreen}
+              options={{
+                title: 'Dispatch Board',
               }}
             />
           </>

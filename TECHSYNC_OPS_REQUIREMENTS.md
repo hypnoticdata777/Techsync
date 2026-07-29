@@ -228,6 +228,10 @@ Already represented in the codebase:
   property hotspots.
 - v1.3 mobile operations report view for org admins/coordinators to scan stale
   work, overloaded technicians, and property hotspots.
+- v1.3 backend dispatch board for unassigned active work, technician lanes,
+  workload utilization, and SLA risk.
+- v1.3 mobile dispatch board view for org admins/coordinators to scan
+  unassigned work, technician load, and SLA risk.
 - v1.3 backend closeout package summary for work-order status, proof,
   attachments, messages, and audit events.
 - v1.3 printable HTML/text closeout export endpoint for work-order summary,
@@ -239,8 +243,8 @@ Already represented in the codebase:
 
 Important gaps for the PMC operations product:
 
-- Property/client/vendor backend records are being promoted to first-class v1.3
-  entities; frontend workflows and richer operations logic remain.
+- Property/client/vendor backend records are first-class v1.3 entities;
+  dedicated frontend CRUD workflows remain.
 - Full client/homeowner portal UI is not built yet; scoped work-order
   visibility, client-visible comments, and approval/decline actions have
   started in v1.3.

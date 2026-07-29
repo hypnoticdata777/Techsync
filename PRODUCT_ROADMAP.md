@@ -140,8 +140,8 @@ Likely scope:
   - printable HTML/text closeout export now started in v1.3
   - binary PDF rendering remains optional later polish
 - Dispatch improvements:
-  - workload board
-  - SLA-risk flags
+  - workload board now started in v1.3 with backend/mobile dispatch view
+  - SLA-risk flags now started in v1.3 dispatch board
   - duplicate-detection warnings
   - manual override tracking
 - Reporting improvements:
@@ -179,6 +179,8 @@ v1.3 exit criteria:
   actions are now started.
 - Backend and mobile reporting show stale work, overloaded technicians, and
   property hotspot evidence, with richer charts/export still to complete.
+- Backend and mobile dispatch board show unassigned active work, technician
+  lanes, workload utilization, and SLA risk.
 - Vercel hosting and portfolio linking are completed as the final showcase step,
   not before the product feels robust enough to show.
 - Documentation explains which v1.3 features are prototype-ready versus still

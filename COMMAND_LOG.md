@@ -760,3 +760,44 @@ Result:
 - Compile passed.
 - FastAPI app imported successfully and printed `TechSync Ops API`.
 - `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
+
+## 2026-07-29 - v1.3 Dispatch Board
+
+Decision:
+
+- Add the next local-only product-depth item before Vercel hosting: a
+  coordinator/admin dispatch board for unassigned work, technician load, active
+  lane work, and SLA risk.
+- Implement it as a read-model with no migration, so it is safe to build before
+  paid/hosted infrastructure work.
+
+Changes:
+
+- Added dispatch board response schemas in `server/models/dashboard.py`.
+- Added tenant-scoped dispatch board work-order query in
+  `server/repositories/work_orders.py`.
+- Added `GET /dashboard/dispatch-board` for org admins/coordinators.
+- Added mobile `DispatchBoardScreen` and linked it from the work-order list.
+- Added v1.3 hosted smoke coverage for dispatch board shape and summary.
+- Updated README, requirements, roadmap, traceability, QA, phase status,
+  Vercel runbook, and v1.3 evidence template.
+
+Verification:
+
+```powershell
+python -m compileall -q server\models\dashboard.py server\repositories\work_orders.py server\routers\dashboard.py server\tests\test_tenant_isolation.py scripts\smoke_v13.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+server\venv\Scripts\python.exe -c "import os, sys; from unittest.mock import patch; os.environ['JWT_SECRET_KEY']='test-secret-key-for-import-check-only'; sys.path.insert(0, 'server'); from models.user import User; from routers.dashboard import get_dispatch_board; user=User(id=1, organization_id=6, email='admin@example.com', full_name='Admin', role='org_admin', is_active=True); rows=[{'id':1,'title':'Leak','status':'open','priority':'emergency','assigned_technician_id':None,'property_id':3,'property_name':'West','client_id':9,'client_display_name':'Owner','vendor_id':None,'vendor_name':None,'created_at':'2026-07-28T00:00:00Z','sla_due_at':'2026-07-28T01:00:00Z'},{'id':2,'title':'Sink','status':'in_progress','priority':'medium','assigned_technician_id':8,'property_id':4,'property_name':'East','client_id':10,'client_display_name':'Owner B','vendor_id':11,'vendor_name':'Vendor','created_at':'2026-07-28T00:00:00Z','sla_due_at':None}]; techs=[{'id':8,'availability_status':'available','max_daily_jobs':4,'users':{'full_name':'Tech One','email':'tech@example.com'}}]; p1=patch('routers.dashboard.work_orders_repo.list_dispatch_board_work_orders', return_value=rows); p2=patch('routers.dashboard.technicians_repo.list_by_org', return_value=techs); p1.start(); p2.start(); board=get_dispatch_board(current_user=user, organization={'id':6}); p1.stop(); p2.stop(); print(board.summary.unassigned_count, board.technician_lanes[0].utilization_percent)"
+git diff --check
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- Direct dispatch-board route smoke printed `1 25.0`.
+- `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
+- Focused pytest could not run because `server\venv` does not have pytest
+  installed.
+- Client Babel transform could not run because `client\node_modules` is not
+  installed in this checkout.

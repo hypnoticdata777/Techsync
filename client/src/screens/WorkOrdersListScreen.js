@@ -120,6 +120,13 @@ function WorkOrdersListScreen({navigation}) {
         <View style={styles.headerActions}>
           {canManageWorkOrders && (
             <TouchableOpacity
+              style={styles.dispatchButton}
+              onPress={() => navigation.navigate('DispatchBoard')}>
+              <Text style={styles.dispatchButtonText}>Dispatch</Text>
+            </TouchableOpacity>
+          )}
+          {canManageWorkOrders && (
+            <TouchableOpacity
               style={styles.reportButton}
               onPress={() => navigation.navigate('OperationsReport')}>
               <Text style={styles.reportButtonText}>Report</Text>
@@ -218,6 +225,19 @@ const styles = StyleSheet.create({
   reportButtonText: {
     color: '#38bdf8',
     fontWeight: '600',
+    fontSize: 14,
+  },
+  dispatchButton: {
+    backgroundColor: '#111827',
+    borderWidth: 1,
+    borderColor: '#a3e635',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  dispatchButtonText: {
+    color: '#a3e635',
+    fontWeight: '700',
     fontSize: 14,
   },
   addButton: {

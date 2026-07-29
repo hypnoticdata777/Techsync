@@ -92,6 +92,9 @@ they have been verified in the relevant environment.
       property hotspots.
 - [x] Mobile operations report view added for stale work, overloaded technicians,
       and property hotspots.
+- [x] Backend dispatch board added for unassigned work, technician lanes,
+      workload utilization, and SLA risk.
+- [x] Mobile dispatch board view added for org admins/coordinators.
 - [ ] Richer reporting charts/export implemented.
 
 ## Client / Demo Surface

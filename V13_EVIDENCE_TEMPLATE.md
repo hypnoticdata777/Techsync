@@ -79,6 +79,8 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Text closeout export rendered.
 - [ ] HTML closeout export rendered.
 - [ ] Operations report endpoint returned stale/overloaded/hotspot buckets.
+- [ ] Dispatch board endpoint returned summary, unassigned queue, and
+      technician lanes.
 
 ## Manual Hosted Follow-Up
 
@@ -96,4 +98,3 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - No credentials, tokens, database URLs, provider secrets, or private keys were
   pasted into documentation.
 - Any generated JSON evidence was reviewed before sharing.
-

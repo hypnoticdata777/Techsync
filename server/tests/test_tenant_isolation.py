@@ -88,6 +88,19 @@ def test_property_hotspot_report_scopes_by_organization_id():
     assert params["limit"] == 5
 
 
+def test_dispatch_board_work_orders_scope_and_join_by_organization_id():
+    with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
+        work_orders_repo.list_dispatch_board_work_orders(organization_id=42)
+
+    sql, params = mock_fetch.call_args.args
+    assert "WHERE wo.organization_id = :organization_id" in sql
+    assert "p.organization_id = wo.organization_id" in sql
+    assert "c.organization_id = wo.organization_id" in sql
+    assert "v.organization_id = wo.organization_id" in sql
+    assert "wo.status IN ('open', 'in_progress')" in sql
+    assert params == {"organization_id": 42}
+
+
 def test_get_by_id_in_org_always_filters_by_caller_org_not_just_row_id():
     with patch("repositories.work_orders.fetch_one", return_value=None) as mock_fetch:
         work_orders_repo.get_by_id_in_org(work_order_id=99, organization_id=7)
@@ -586,3 +599,72 @@ def test_operations_report_uses_tenant_scoped_repository_calls():
     assert overloaded.call_args.kwargs == {"limit": 5}
     assert hotspots.call_args.args == (6,)
     assert hotspots.call_args.kwargs == {"since_days": 60, "limit": 5}
+
+
+def test_dispatch_board_uses_tenant_scoped_repository_calls_and_summarizes():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    work_rows = [
+        {
+            "id": 1,
+            "title": "Unassigned leak",
+            "status": "open",
+            "priority": "emergency",
+            "assigned_technician_id": None,
+            "property_id": 3,
+            "property_name": "West Tower",
+            "client_id": 9,
+            "client_display_name": "Owner A",
+            "vendor_id": 11,
+            "vendor_name": "Vendor A",
+            "created_at": "2026-07-28T00:00:00Z",
+            "sla_due_at": "2026-07-28T01:00:00Z",
+        },
+        {
+            "id": 2,
+            "title": "Assigned sink",
+            "status": "in_progress",
+            "priority": "medium",
+            "assigned_technician_id": 8,
+            "property_id": 4,
+            "property_name": "East Tower",
+            "client_id": 10,
+            "client_display_name": "Owner B",
+            "vendor_id": None,
+            "vendor_name": None,
+            "created_at": "2026-07-28T00:00:00Z",
+            "sla_due_at": None,
+        },
+    ]
+    technician_rows = [
+        {
+            "id": 8,
+            "availability_status": "available",
+            "max_daily_jobs": 4,
+            "users": {"full_name": "Tech One", "email": "tech@example.com"},
+        }
+    ]
+
+    with patch("routers.dashboard.work_orders_repo.list_dispatch_board_work_orders", return_value=work_rows) as work_list:
+        with patch("routers.dashboard.technicians_repo.list_by_org", return_value=technician_rows) as tech_list:
+            board = dashboard_router.get_dispatch_board(
+                current_user=admin_user,
+                organization={"id": 6},
+            )
+
+    assert work_list.call_args.args == (6,)
+    assert tech_list.call_args.args == (6,)
+    assert board.summary.open_count == 1
+    assert board.summary.in_progress_count == 1
+    assert board.summary.unassigned_count == 1
+    assert board.summary.emergency_count == 1
+    assert board.unassigned_work_orders[0].id == 1
+    assert board.technician_lanes[0].technician_id == 8
+    assert board.technician_lanes[0].active_work_order_count == 1
+    assert board.technician_lanes[0].utilization_percent == 25.0

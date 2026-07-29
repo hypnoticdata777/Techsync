@@ -128,6 +128,7 @@ Then verify:
 - proof-gated closeout
 - closeout package and printable export
 - dashboard metrics and operations report
+- dispatch board summary, unassigned queue, technician lanes, and SLA risk
 - CSV ingestion with synthetic data
 - attachment metadata/proof boundary
 - attachment upload if storage is configured

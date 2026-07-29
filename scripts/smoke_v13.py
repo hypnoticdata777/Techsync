@@ -442,6 +442,24 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         },
     )
 
+    dispatch_board = request(base_url, "GET", "/dashboard/dispatch-board", token=admin_token)
+    assert_detail(
+        "dispatch_board_shape",
+        {"summary", "unassigned_work_orders", "technician_lanes"}.issubset(
+            dispatch_board.data.keys()
+        ),
+        dispatch_board.data,
+    )
+    record(
+        "dispatch_board",
+        dispatch_board,
+        {
+            "unassigned_count": dispatch_board.data["summary"].get("unassigned_count"),
+            "sla_at_risk_count": dispatch_board.data["summary"].get("sla_at_risk_count"),
+            "lane_count": len(dispatch_board.data.get("technician_lanes", [])),
+        },
+    )
+
     evidence["run_finished_at"] = datetime.now(timezone.utc).isoformat()
     evidence["result"] = "passed"
     evidence["created"] = {
