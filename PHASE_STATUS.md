@@ -140,11 +140,13 @@ Completed:
   work, overloaded technicians, and property hotspots.
 - Added backend closeout package summary under
   `/work-orders/{work_order_id}/closeout-package`.
+- Added mobile operations report screen for org admins/coordinators, showing
+  stale work, overloaded technicians, and property hotspots from the backend
+  report endpoint.
 
 Next:
 
-- Add reporting UI, client/homeowner UI visibility, and later closeout
-  PDF/export generation.
+- Add client/homeowner UI visibility and later closeout PDF/export generation.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -197,6 +199,6 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue v1.3 product depth before hosting: move into reporting UI and the
-client/homeowner UI surface. Vercel deployment and portfolio sliver linking
-should happen at the end of v1.3.
+Continue v1.3 product depth before hosting: move into the client/homeowner UI
+surface and then closeout PDF/export planning. Vercel deployment and portfolio
+sliver linking should happen at the end of v1.3.

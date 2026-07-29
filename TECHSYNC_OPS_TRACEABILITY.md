@@ -32,12 +32,12 @@ showcase gate.
 | 2 | Business Rules | Partially proven: tenant scoping, roles, technician assignment boundaries, status/audit events, manual reassignment, priority support. | Client-visible/internal-note separation and proof-gated closeout begin in v1.3; escalations expand next. |
 | 3 | Constraints | Captured as guardrails: tenant privacy, synthetic data, CSV remains useful, offline/deep integrations deferred. | Consent-aware location, offline sync, advanced routing, PDF/email ingestion, accounting integrations staged later. |
 | 4 | External Interfaces | Partially proven: CSV import, webhook intake, attachment storage boundary, Stripe/email boundaries. | CSV export, SMS/push, calendar/maps, accounting/export, closeout PDFs, and deeper storage workflows expand later. |
-| 5 | Features | Partially proven: central work-order intake, assignment, technician queue/status, attachment proof boundary, dashboard metrics. | Client/property/vendor CRUD, backend communication visibility, and operations reporting begin in v1.3; dispatch board, client/homeowner portal, cost trends, and richer hotspot UX expand through v1.3+. |
+| 5 | Features | Partially proven: central work-order intake, assignment, technician queue/status, attachment proof boundary, dashboard metrics. | Client/property/vendor CRUD, backend communication visibility, and operations reporting UI begin in v1.3; dispatch board, client/homeowner portal, cost trends, and richer hotspot UX expand through v1.3+. |
 | 6 | Functional Requirements | Partially proven: admin onboarding, role-scoped users, work orders, technician recommendation/assignment, technician status, CSV/webhook ingestion. | Proof-gated closeout and backend closeout summaries begin in v1.3; admin-created non-technician roles, archive/pause/escalate/cancel depth, duplicate detection, client approvals/comments, closeout PDF/export, and real notifications expand in v1.3+. |
 | 7 | Nonfunctional Requirements | Partially proven: app-layer tenant isolation, RLS policies, audit trail, structured logs, hosted-demo config. | Performance targets, retry/offline resilience, backup/restore/export, monitoring, and accessibility evidence remain v1.2/v1.3 operational work. |
 | 8 | Quality Attributes | Partially proven: security, auditability, maintainability, and core reliability boundaries. | Scalability, operational observability, and field usability evidence mature through hosted smoke tests and v1.3 workflows. |
 | 9 | System Requirements | Partially proven: multi-tenant backend API, relational model for current core entities, mobile client, object storage boundary, deployment pipeline. | Properties, clients, vendors, and work-order messages are v1.3 foundation work; approvals, background jobs, monitoring, backups, and web admin dashboard expand in v1.3+. |
-| 10 | User Requirements | Partially proven: coordinator/admin/dispatcher/technician flows are represented in API/mobile POC. | Backend operations-manager reporting begins in v1.3; client/homeowner and reporting UI flows expand next. |
+| 10 | User Requirements | Partially proven: coordinator/admin/dispatcher/technician flows are represented in API/mobile POC. | Operations-manager reporting now has a backend endpoint and mobile admin/coordinator view in v1.3; client/homeowner flows expand next. |
 
 ## v1.2 Must Be True Before Calling The Checkpoint Complete
 
@@ -80,7 +80,7 @@ v1.3 should focus on the highest-value PMC product gaps:
 5. Dispatch board with workload and SLA-risk visibility.
 6. Duplicate-detection warnings.
 7. Reporting for stale work, overloaded technicians, property hotspots, and
-   completion cycle time.
+   completion cycle time, with the first mobile report view now started.
 8. End-of-v1.3 Vercel deployment, hosted smoke evidence, and portfolio sliver
    link after the product feels robust enough to show.
 

@@ -80,8 +80,9 @@ they have been verified in the relevant environment.
 - [ ] Closeout PDF/export generation implemented.
 - [x] Backend operations report added for stale work, overloaded technicians, and
       property hotspots.
-- [ ] UI reporting view expanded for stale work, overloaded technicians, and property
-      hotspots.
+- [x] Mobile operations report view added for stale work, overloaded technicians,
+      and property hotspots.
+- [ ] Richer reporting charts/export implemented.
 
 ## Client / Demo Surface
 

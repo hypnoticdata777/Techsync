@@ -12,6 +12,7 @@ import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import WorkOrdersListScreen from './src/screens/WorkOrdersListScreen';
 import WorkOrderDetailsScreen from './src/screens/WorkOrderDetailsScreen';
 import WorkOrderFormScreen from './src/screens/WorkOrderFormScreen';
+import OperationsReportScreen from './src/screens/OperationsReportScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -106,6 +107,13 @@ function Navigation() {
                   ? 'Edit Work Order'
                   : 'New Work Order',
               })}
+            />
+            <Stack.Screen
+              name="OperationsReport"
+              component={OperationsReportScreen}
+              options={{
+                title: 'Operations Report',
+              }}
             />
           </>
         )}

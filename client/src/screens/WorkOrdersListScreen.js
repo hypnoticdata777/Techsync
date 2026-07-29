@@ -33,6 +33,7 @@ function WorkOrdersListScreen({navigation}) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const canManageWorkOrders = ['org_admin', 'coordinator'].includes(user?.role);
 
   // RF-22: technicians see their assigned queue ordered by priority;
   // admins/coordinators see the org-wide list (RF-21).
@@ -116,13 +117,22 @@ function WorkOrdersListScreen({navigation}) {
 
       <View style={styles.header}>
         <Text style={styles.sectionTitle}>Work Orders</Text>
-        {user?.role !== 'technician' && (
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => navigation.navigate('WorkOrderForm')}>
-            <Text style={styles.addButtonText}>+ Add</Text>
-          </TouchableOpacity>
-        )}
+        <View style={styles.headerActions}>
+          {canManageWorkOrders && (
+            <TouchableOpacity
+              style={styles.reportButton}
+              onPress={() => navigation.navigate('OperationsReport')}>
+              <Text style={styles.reportButtonText}>Report</Text>
+            </TouchableOpacity>
+          )}
+          {canManageWorkOrders && (
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => navigation.navigate('WorkOrderForm')}>
+              <Text style={styles.addButtonText}>+ Add</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {loading && <ActivityIndicator style={styles.loader} />}
@@ -192,6 +202,23 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: '#f9fafb',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  reportButton: {
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#38bdf8',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  reportButtonText: {
+    color: '#38bdf8',
+    fontWeight: '600',
+    fontSize: 14,
   },
   addButton: {
     backgroundColor: '#38bdf8',

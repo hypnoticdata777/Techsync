@@ -1,0 +1,489 @@
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {useAuth} from '../context/AuthContext';
+
+const STALE_DAY_OPTIONS = [7, 14, 30];
+const HOTSPOT_DAY_OPTIONS = [30, 90, 180];
+const REPORT_LIMIT = 10;
+
+const getStatusColor = status => {
+  switch (status) {
+    case 'open':
+      return '#fbbf24';
+    case 'in_progress':
+      return '#38bdf8';
+    case 'completed':
+      return '#a3e635';
+    case 'cancelled':
+      return '#ef4444';
+    default:
+      return '#9ca3af';
+  }
+};
+
+const getPriorityColor = priority => {
+  switch (priority) {
+    case 'emergency':
+      return '#f97316';
+    case 'high':
+      return '#fb7185';
+    case 'medium':
+      return '#fbbf24';
+    case 'low':
+      return '#a3e635';
+    default:
+      return '#9ca3af';
+  }
+};
+
+const formatLabel = value => (value || '').replace(/_/g, ' ');
+
+const formatDate = value => {
+  if (!value) {
+    return 'No date';
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return 'No date';
+  }
+
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
+const SegmentGroup = ({label, options, selected, onSelect, suffix}) => (
+  <View style={styles.segmentBlock}>
+    <Text style={styles.segmentLabel}>{label}</Text>
+    <View style={styles.segmentRow}>
+      {options.map(option => {
+        const isSelected = option === selected;
+        return (
+          <TouchableOpacity
+            key={option}
+            style={[styles.segmentButton, isSelected && styles.segmentButtonActive]}
+            onPress={() => onSelect(option)}>
+            <Text
+              style={[
+                styles.segmentButtonText,
+                isSelected && styles.segmentButtonTextActive,
+              ]}>
+              {option}
+              {suffix}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  </View>
+);
+
+const EmptyState = ({message}) => (
+  <View style={styles.emptyPanel}>
+    <Text style={styles.emptyText}>{message}</Text>
+  </View>
+);
+
+function OperationsReportScreen() {
+  const {authFetch, logout} = useAuth();
+  const [report, setReport] = useState(null);
+  const [staleDays, setStaleDays] = useState(7);
+  const [hotspotDays, setHotspotDays] = useState(90);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchReport = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await authFetch(
+        `/dashboard/operations-report?stale_days=${staleDays}&hotspot_days=${hotspotDays}&limit=${REPORT_LIMIT}`,
+      );
+
+      if (res.ok) {
+        const json = await res.json();
+        setReport(json);
+        setError(null);
+      } else if (res.status === 401) {
+        setError('Session expired. Please login again.');
+        await logout();
+      } else if (res.status === 403) {
+        setError('Operations report access requires an admin or coordinator role.');
+      } else {
+        setError('Unable to load operations report.');
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'Unable to load operations report.');
+    } finally {
+      setLoading(false);
+    }
+  }, [authFetch, hotspotDays, logout, staleDays]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchReport();
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    fetchReport();
+  }, [fetchReport]);
+
+  const summary = useMemo(
+    () => ({
+      stale: report?.stale_work_orders?.length || 0,
+      overloaded: report?.overloaded_technicians?.length || 0,
+      hotspots: report?.property_hotspots?.length || 0,
+    }),
+    [report],
+  );
+
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor="#38bdf8"
+          colors={['#38bdf8']}
+        />
+      }>
+      <View style={styles.header}>
+        <Text style={styles.title}>Operations Report</Text>
+        <Text style={styles.subtitle}>Stale work, capacity risk, property patterns</Text>
+      </View>
+
+      <View style={styles.controls}>
+        <SegmentGroup
+          label="Stale older than"
+          options={STALE_DAY_OPTIONS}
+          selected={staleDays}
+          onSelect={setStaleDays}
+          suffix="d"
+        />
+        <SegmentGroup
+          label="Hotspot window"
+          options={HOTSPOT_DAY_OPTIONS}
+          selected={hotspotDays}
+          onSelect={setHotspotDays}
+          suffix="d"
+        />
+      </View>
+
+      {loading && <ActivityIndicator style={styles.loader} color="#38bdf8" />}
+
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={fetchReport}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {!loading && !error && report && (
+        <>
+          <View style={styles.summaryRow}>
+            <View style={styles.summaryTile}>
+              <Text style={styles.summaryValue}>{summary.stale}</Text>
+              <Text style={styles.summaryLabel}>Stale</Text>
+            </View>
+            <View style={styles.summaryTile}>
+              <Text style={styles.summaryValue}>{summary.overloaded}</Text>
+              <Text style={styles.summaryLabel}>Overloaded</Text>
+            </View>
+            <View style={styles.summaryTile}>
+              <Text style={styles.summaryValue}>{summary.hotspots}</Text>
+              <Text style={styles.summaryLabel}>Hotspots</Text>
+            </View>
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Stale Work</Text>
+            {report.stale_work_orders.length === 0 ? (
+              <EmptyState message="No stale open work in this window." />
+            ) : (
+              report.stale_work_orders.map(item => (
+                <View key={item.id} style={styles.card}>
+                  <Text style={styles.cardTitle}>{item.title}</Text>
+                  <View style={styles.metaRow}>
+                    <Text style={[styles.metaBadge, {color: getStatusColor(item.status)}]}>
+                      {formatLabel(item.status)}
+                    </Text>
+                    <Text
+                      style={[styles.metaBadge, {color: getPriorityColor(item.priority)}]}>
+                      {formatLabel(item.priority)}
+                    </Text>
+                  </View>
+                  <Text style={styles.cardMeta}>Created {formatDate(item.created_at)}</Text>
+                  {item.sla_due_at ? (
+                    <Text style={styles.cardMeta}>SLA due {formatDate(item.sla_due_at)}</Text>
+                  ) : null}
+                </View>
+              ))
+            )}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Technician Load</Text>
+            {report.overloaded_technicians.length === 0 ? (
+              <EmptyState message="No technicians over their daily capacity." />
+            ) : (
+              report.overloaded_technicians.map(item => (
+                <View key={item.technician_id} style={styles.card}>
+                  <Text style={styles.cardTitle}>{item.full_name}</Text>
+                  <Text style={styles.cardMeta}>{item.email}</Text>
+                  <View style={styles.loadRow}>
+                    <Text style={styles.loadValue}>{item.active_work_order_count}</Text>
+                    <Text style={styles.loadLabel}>active / max {item.max_daily_jobs}</Text>
+                  </View>
+                  <Text style={styles.cardMeta}>
+                    Availability: {formatLabel(item.availability_status)}
+                  </Text>
+                </View>
+              ))
+            )}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Property Hotspots</Text>
+            {report.property_hotspots.length === 0 ? (
+              <EmptyState message="No repeated property activity in this window." />
+            ) : (
+              report.property_hotspots.map(item => (
+                <View key={item.property_id} style={styles.card}>
+                  <Text style={styles.cardTitle}>{item.property_name}</Text>
+                  <Text style={styles.cardMeta}>{item.address_line1}</Text>
+                  <View style={styles.countGrid}>
+                    <Text style={styles.countCell}>Total {item.total_work_orders}</Text>
+                    <Text style={styles.countCell}>Open {item.open_count}</Text>
+                    <Text style={styles.countCell}>Active {item.in_progress_count}</Text>
+                    <Text style={styles.countCell}>Done {item.completed_count}</Text>
+                  </View>
+                  <Text style={styles.cardMeta}>
+                    Latest {formatDate(item.latest_work_order_at)}
+                  </Text>
+                </View>
+              ))
+            )}
+          </View>
+        </>
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#050816',
+  },
+  content: {
+    padding: 16,
+    paddingBottom: 28,
+  },
+  header: {
+    marginBottom: 14,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#f9fafb',
+  },
+  subtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#94a3b8',
+  },
+  controls: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 14,
+  },
+  segmentBlock: {
+    marginBottom: 12,
+  },
+  segmentLabel: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  segmentRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  segmentButton: {
+    minWidth: 58,
+    minHeight: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#334155',
+    backgroundColor: '#0f172a',
+  },
+  segmentButtonActive: {
+    backgroundColor: '#38bdf8',
+    borderColor: '#38bdf8',
+  },
+  segmentButtonText: {
+    color: '#cbd5e1',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  segmentButtonTextActive: {
+    color: '#050816',
+  },
+  loader: {
+    marginTop: 24,
+  },
+  errorContainer: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#f97373',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  retryButton: {
+    backgroundColor: '#38bdf8',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  retryButtonText: {
+    color: '#050816',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  summaryTile: {
+    flex: 1,
+    minHeight: 72,
+    justifyContent: 'center',
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#1e293b',
+    borderRadius: 8,
+    padding: 10,
+  },
+  summaryValue: {
+    color: '#38bdf8',
+    fontSize: 24,
+    fontWeight: '800',
+  },
+  summaryLabel: {
+    color: '#cbd5e1',
+    fontSize: 11,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  section: {
+    marginBottom: 18,
+  },
+  sectionTitle: {
+    color: '#f9fafb',
+    fontSize: 18,
+    fontWeight: '800',
+    marginBottom: 10,
+  },
+  card: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+  },
+  cardTitle: {
+    color: '#e5e7eb',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  cardMeta: {
+    color: '#94a3b8',
+    fontSize: 12,
+    marginTop: 6,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 8,
+  },
+  metaBadge: {
+    fontSize: 12,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+  loadRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginTop: 10,
+    marginBottom: 2,
+  },
+  loadValue: {
+    color: '#fb7185',
+    fontSize: 24,
+    fontWeight: '800',
+    marginRight: 8,
+  },
+  loadLabel: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  countGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+  },
+  countCell: {
+    minWidth: 86,
+    color: '#cbd5e1',
+    backgroundColor: '#0f172a',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  emptyPanel: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 14,
+  },
+  emptyText: {
+    color: '#94a3b8',
+    fontSize: 13,
+    textAlign: 'center',
+  },
+});
+
+export default OperationsReportScreen;

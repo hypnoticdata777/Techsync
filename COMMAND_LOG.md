@@ -520,6 +520,43 @@ Result:
 - Local pytest could not run because `server\venv` does not have pytest
   installed.
 
+## 2026-07-28 - v1.3 Mobile Operations Report View
+
+Decision:
+
+- Expose the new operations report backend in the mobile app for org admins and
+  coordinators before public hosting, so reporting becomes visible in the demo
+  surface instead of backend-only evidence.
+
+Changes:
+
+- Added `OperationsReportScreen` in the Expo client.
+- Added operator controls for stale-work and property-hotspot time windows.
+- Rendered three report buckets:
+  - stale open/in-progress work orders;
+  - technicians over daily capacity;
+  - properties with repeated maintenance activity.
+- Linked the report from the work-order list only for `org_admin` and
+  `coordinator` users.
+- Tightened the work-order list Add action to the same admin/coordinator roles
+  that the backend create endpoint already requires.
+- Updated roadmap, traceability, requirements, QA, and phase-status docs.
+
+Verification:
+
+```powershell
+node -e "const babel=require('@babel/core'); ['App.js','src/screens/WorkOrdersListScreen.js','src/screens/OperationsReportScreen.js'].forEach(f=>babel.transformFileSync(f,{presets:['module:metro-react-native-babel-preset']})); console.log('babel ok')"
+npm run test:ci -- --runTestsByPath src/utils/validation.test.js src/utils/tokenStorage.test.js
+git diff --check
+```
+
+Result:
+
+- `git diff --check` passed.
+- Babel transform and focused client Jest tests could not run locally because
+  `client/node_modules` is not installed in this checkout (`@babel/core` and
+  `jest` were unavailable).
+
 ## 2026-07-28 - v1.3 Proof-Gated Closeout
 
 Decision:
