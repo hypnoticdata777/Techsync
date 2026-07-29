@@ -160,7 +160,8 @@ v1.3 exit criteria:
 
 - Property/client/vendor concepts exist in the data model and API.
 - Client-visible communication is separated from internal notes at the backend
-  API/data layer, with frontend/client portal UX still to complete.
+  API/data layer, with mobile communication and approval UX started; a fuller
+  client portal remains later work.
 - A work order cannot be closed without attachment proof unless an org
   admin/coordinator override reason is recorded.
 - At least one client/homeowner demo flow is showable with synthetic data:

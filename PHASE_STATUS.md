@@ -1,6 +1,6 @@
 # TechSync Ops Phase Status
 
-Date: July 23, 2026
+Date: July 28, 2026
 
 This file is the current project pulse. Update it after each build, QA, hosting,
 or portfolio-integration slice so future sessions can resume without guessing.
@@ -17,8 +17,8 @@ Current verified repo state:
 ```text
 Repository: https://github.com/hypnoticdata777/Techsync
 Branch: main
-Latest verified commit before scanner-doc update: 05626ac Document TechSync public POC readiness and tracker docs
-Latest verified CI run before scanner-doc update: success on main for 3c3f0ac
+Latest local HEAD during this review: 1b3b02f Add TechSync Ops client approvals and closeout exports
+Latest known CI evidence in this tracker: success on main for 3c3f0ac
 Working clone: C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync
 ```
 
@@ -94,7 +94,7 @@ Completed:
 - Reset the Neon database password after a connection string was visible during
   setup, then continued with the rotated credentials.
 - Ran `alembic upgrade head` against the Neon demo database using the direct
-  connection string.
+  connection string during the initial hosted-readiness pass.
 - Confirmed `alembic current` reports `0001 (head)`.
 - Cleared `DATABASE_URL` from the local PowerShell session after migration.
 - Selected Vercel as the eventual backend host for portfolio alignment, now
@@ -111,8 +111,9 @@ Completed:
 
 Next:
 
-- Build the v1.3 PMC foundation before hosting: first-class clients,
-  properties, vendors, and work-order links.
+- Apply and smoke-test the newer v1.3 migrations on the Neon demo database:
+  `0002` PMC entities, `0003` messages, `0004` proof gate, and `0005` client
+  approvals.
 - Keep Vercel secrets/deployment work parked until the end-of-v1.3 showcase
   gate.
 - Smoke-test auth, onboarding, work-order lifecycle, ingestion, dashboard

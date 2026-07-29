@@ -37,7 +37,7 @@ showcase gate.
 | 7 | Nonfunctional Requirements | Partially proven: app-layer tenant isolation, RLS policies, audit trail, structured logs, hosted-demo config. | Performance targets, retry/offline resilience, backup/restore/export, monitoring, and accessibility evidence remain v1.2/v1.3 operational work. |
 | 8 | Quality Attributes | Partially proven: security, auditability, maintainability, and core reliability boundaries. | Scalability, operational observability, and field usability evidence mature through hosted smoke tests and v1.3 workflows. |
 | 9 | System Requirements | Partially proven: multi-tenant backend API, relational model for current core entities, mobile client, object storage boundary, deployment pipeline. | Properties, clients, vendors, and work-order messages are v1.3 foundation work; approvals, background jobs, monitoring, backups, and web admin dashboard expand in v1.3+. |
-| 10 | User Requirements | Partially proven: coordinator/admin/dispatcher/technician flows are represented in API/mobile POC. | Operations-manager reporting now has a backend endpoint and mobile admin/coordinator view in v1.3; client/homeowner flows expand next. |
+| 10 | User Requirements | Partially proven: coordinator/admin/dispatcher/technician flows are represented in API/mobile POC. | Operations-manager reporting now has a backend endpoint and mobile admin/coordinator view in v1.3; client/homeowner scoped visibility, comments, and approval decisions are started, with fuller portal UX later. |
 
 ## v1.2 Must Be True Before Calling The Checkpoint Complete
 
@@ -62,8 +62,8 @@ These are requirements captured by the product, but not required to finish v1.2:
 - Offline sync.
 - Real push notifications.
 - Full client/homeowner portal.
-- Approval workflow.
-- Closeout PDF/export generation.
+- Advanced approval workflow beyond basic approve/decline.
+- Binary closeout PDF rendering beyond printable HTML/text export.
 - Duplicate detection.
 - Calendar/maps/routing.
 - Background jobs.

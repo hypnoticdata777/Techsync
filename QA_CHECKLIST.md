@@ -53,7 +53,8 @@ they have been verified in the relevant environment.
 - [x] Demo-mode vs full `APP_ENV=production` decision made for the first hosted
       POC.
 - [ ] Host secret manager configured at the end-of-v1.3 showcase gate.
-- [x] Alembic migrations run against hosted/demo database.
+- [x] Initial Alembic migration run against hosted/demo database.
+- [ ] Latest v1.3 Alembic migrations verified against hosted/demo database.
 - [ ] `/health` verified over HTTPS.
 - [ ] CORS verified against the intended demo client origin.
 - [ ] Onboarding flow verified.
