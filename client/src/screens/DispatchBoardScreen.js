@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
 import ScreenErrorState from '../components/ScreenErrorState';
+import {summaryA11yLabel, workOrderButtonA11y} from '../utils/accessibility';
 
 const getPriorityColor = priority => {
   switch (priority) {
@@ -69,7 +70,7 @@ const formatDate = value => {
 };
 
 const WorkOrderChip = ({item, onPress}) => (
-  <TouchableOpacity style={styles.workChip} onPress={onPress}>
+  <TouchableOpacity style={styles.workChip} onPress={onPress} {...workOrderButtonA11y(item)}>
     <View style={styles.workChipHeader}>
       <Text style={styles.workTitle} numberOfLines={2}>
         {item.title}
@@ -93,7 +94,10 @@ const WorkOrderChip = ({item, onPress}) => (
 );
 
 const SummaryTile = ({label, value, tone}) => (
-  <View style={[styles.summaryTile, tone && styles[tone]]}>
+  <View
+    style={[styles.summaryTile, tone && styles[tone]]}
+    accessible
+    accessibilityLabel={summaryA11yLabel(label, value)}>
     <Text style={styles.summaryValue}>{value}</Text>
     <Text style={styles.summaryLabel}>{label}</Text>
   </View>

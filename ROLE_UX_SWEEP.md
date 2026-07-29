@@ -55,6 +55,11 @@ Implemented:
   evidence safety checks.
 - Added `ROLE_UX_EVIDENCE_TEMPLATE.md` and expanded the synthetic seed to
   include viewer/vendor logins for final role screenshots.
+- Added tested accessibility labels/hints for role dashboard actions,
+  work-order cards, dispatch chips, form inputs/selectors, approval controls,
+  attachment controls, messages, and lifecycle actions.
+- Added `ACCESSIBILITY_EVIDENCE.md` for the final screen-reader and
+  small-width proof pass.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
 
@@ -67,8 +72,8 @@ server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 
 Result:
 
-- Client tests passed: `6 passed suites`, `31 passed tests`.
-- Backend tests passed: `119 passed`.
+- Client tests passed: `7 passed suites`, `36 passed tests`.
+- Backend tests passed: `143 passed`.
 
 ## Role Matrix
 
@@ -98,6 +103,10 @@ Result:
   Implemented in code; final screenshot proof still needed.
 - Validate text wrapping and touch target comfort on small mobile widths.
   Touch target polish is implemented in code; final screenshot proof still
+  needed.
+- Validate screen-reader labels/hints for role dashboards, approvals,
+  lifecycle actions, dispatch chips, and work-order forms.
+  Helper tests and primary control labels are implemented; manual proof still
   needed.
 - Run the final screenshot/walkthrough pass only after local product depth is
   otherwise complete.

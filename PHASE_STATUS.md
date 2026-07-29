@@ -218,6 +218,11 @@ Completed:
   work orders.
 - Added `OPERATIONS_RUNBOOK.md` for local/demo backup, restore, export,
   lifecycle, and monitoring evidence.
+- Added tested accessibility helpers and primary mobile accessibility labels
+  for role dashboards, work-order cards, form inputs, dispatch chips, approval
+  controls, attachments, messages, and lifecycle actions.
+- Added `ACCESSIBILITY_EVIDENCE.md` for the final manual screen-reader and
+  small-width proof pass.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and

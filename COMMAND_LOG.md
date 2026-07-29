@@ -1277,6 +1277,45 @@ Result:
 - Backend tests passed: `143 passed`.
 - Compile check passed for `server` and `scripts`.
 
+## 2026-07-29 - v1.3 Accessibility Evidence Batch
+
+Decision:
+
+- Continue local-only hardening before hosting.
+- Address the nonfunctional requirement for role dashboard and client approval
+  accessibility by adding code-level labels/hints plus an evidence checklist.
+
+Changes:
+
+- Added `client/src/utils/accessibility.js` with shared helpers for work-order
+  card labels, summary labels, role actions, form inputs, lifecycle actions,
+  and evidence checklist text.
+- Added `client/src/utils/accessibility.test.js` coverage for work-order
+  announcement text, lifecycle transition labels/hints, input labels, role
+  action labels, summary labels, and checklist visibility.
+- Added accessibility roles, labels, and hints to the primary work-order list,
+  role dashboard action cards, empty-state action, logout, dispatch board
+  summary/work chips, work-order form inputs/selectors/save/cancel, and
+  work-order detail approval, messaging, attachment, edit, and lifecycle
+  controls.
+- Added `ACCESSIBILITY_EVIDENCE.md` for the final manual screen-reader,
+  small-width, touch comfort, and screenshot safety pass.
+- Updated QA, roadmap, phase, requirements, traceability, and README docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Client tests passed: `7 passed suites`, `36 passed tests`.
+- Backend tests passed: `143 passed`.
+- Compile check passed for `server` and `scripts`.
+
 ## 2026-07-29 - v1.3 Role Scope Regression Evidence
 
 Decision:

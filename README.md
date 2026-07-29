@@ -329,6 +329,10 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   and `DEMO_DATA_RUNBOOK.md`; run it only against local or demo databases.
 - Local/demo operational backup, restore, export, lifecycle, and monitoring
   evidence is tracked in `OPERATIONS_RUNBOOK.md`.
+- Local/mobile accessibility evidence is tracked in `ACCESSIBILITY_EVIDENCE.md`;
+  helper coverage now labels primary role dashboard, form, dispatch, approval,
+  attachment, message, and lifecycle controls before the final manual
+  screen-reader pass.
 
 ## License
 

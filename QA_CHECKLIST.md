@@ -148,6 +148,11 @@ they have been verified in the relevant environment.
       archive states with backend/mobile regression evidence.
 - [x] Local/demo operations runbook added for backup, restore, export,
       lifecycle, and monitoring evidence.
+- [x] Accessibility helper coverage added for work-order cards, summary
+      counters, role actions, form inputs, dispatch chips, and lifecycle
+      controls.
+- [x] Accessibility evidence template added for manual screen-reader and
+      small-width verification before hosting.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

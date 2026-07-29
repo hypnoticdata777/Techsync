@@ -12,6 +12,12 @@ import {
 import {useAuth} from '../context/AuthContext';
 import ScreenErrorState from '../components/ScreenErrorState';
 import {
+  actionButtonA11y,
+  roleActionA11y,
+  summaryA11yLabel,
+  workOrderButtonA11y,
+} from '../utils/accessibility';
+import {
   buildQueueSummary,
   canManageOperations,
   getRoleAccessMessage,
@@ -104,6 +110,7 @@ function WorkOrdersListScreen({navigation}) {
   const renderWorkOrder = ({item}) => (
     <TouchableOpacity
       style={styles.workOrderCard}
+      {...workOrderButtonA11y(item)}
       onPress={() => navigation.navigate('WorkOrderDetails', {workOrder: item})}>
       <Text style={styles.workOrderTitle}>{item.title}</Text>
       {item.description ? (
@@ -138,7 +145,9 @@ function WorkOrdersListScreen({navigation}) {
     <View style={styles.container}>
       <View style={styles.userBar}>
         <Text style={styles.userName}>{user?.full_name || 'User'}</Text>
-        <TouchableOpacity onPress={handleLogout}>
+        <TouchableOpacity
+          onPress={handleLogout}
+          {...actionButtonA11y('Logout', 'Signs out of TechSync Ops.')}>
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -152,19 +161,31 @@ function WorkOrdersListScreen({navigation}) {
 
       <View style={styles.rolePanel}>
         <View style={styles.summaryRow}>
-          <View style={styles.summaryPill}>
+          <View
+            style={styles.summaryPill}
+            accessible
+            accessibilityLabel={summaryA11yLabel('Total work orders', queueSummary.total)}>
             <Text style={styles.summaryValue}>{queueSummary.total}</Text>
             <Text style={styles.summaryLabel}>Total</Text>
           </View>
-          <View style={styles.summaryPill}>
+          <View
+            style={styles.summaryPill}
+            accessible
+            accessibilityLabel={summaryA11yLabel('Open work orders', queueSummary.open)}>
             <Text style={styles.summaryValue}>{queueSummary.open}</Text>
             <Text style={styles.summaryLabel}>Open</Text>
           </View>
-          <View style={styles.summaryPill}>
+          <View
+            style={styles.summaryPill}
+            accessible
+            accessibilityLabel={summaryA11yLabel('Active work orders', queueSummary.inProgress)}>
             <Text style={styles.summaryValue}>{queueSummary.inProgress}</Text>
             <Text style={styles.summaryLabel}>Active</Text>
           </View>
-          <View style={styles.summaryPill}>
+          <View
+            style={styles.summaryPill}
+            accessible
+            accessibilityLabel={summaryA11yLabel('Pending approvals', queueSummary.pendingApproval)}>
             <Text style={styles.summaryValue}>{queueSummary.pendingApproval}</Text>
             <Text style={styles.summaryLabel}>Approvals</Text>
           </View>
@@ -176,6 +197,7 @@ function WorkOrdersListScreen({navigation}) {
               <TouchableOpacity
                 key={action.key}
                 style={[styles.actionCard, styles[`${action.tone}Action`]]}
+                {...roleActionA11y(action)}
                 onPress={() => navigation.navigate(action.route)}>
                 <Text
                   style={[
@@ -230,7 +252,10 @@ const EmptyQueueState = ({state, onAction}) => (
     <Text style={styles.emptyMessage}>{state.message}</Text>
     <Text style={styles.emptyDetail}>{state.detail}</Text>
     {onAction ? (
-      <TouchableOpacity style={styles.emptyActionButton} onPress={onAction}>
+      <TouchableOpacity
+        style={styles.emptyActionButton}
+        onPress={onAction}
+        {...actionButtonA11y(state.actionLabel, state.message)}>
         <Text style={styles.emptyActionText}>{state.actionLabel}</Text>
       </TouchableOpacity>
     ) : null}

@@ -14,6 +14,11 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import {useAuth} from '../context/AuthContext';
 import ScreenErrorState from '../components/ScreenErrorState';
+import {
+  actionButtonA11y,
+  inputA11y,
+  statusActionA11y,
+} from '../utils/accessibility';
 import {buildDetailSummary, getDetailRoleContext} from '../utils/roleWorkflows';
 
 // Helper function to get status color
@@ -562,6 +567,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
                 {canRequestApproval ? (
                   <TouchableOpacity
                     style={[styles.messageButton, updatingApproval && styles.buttonDisabled]}
+                    {...actionButtonA11y(
+                      'Request client approval',
+                      'Creates a pending client approval request for this work order.',
+                    )}
                     onPress={requestApproval}
                     disabled={updatingApproval}>
                     <Text style={styles.messageButtonText}>
@@ -574,12 +583,20 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   <View style={styles.approvalActions}>
                     <TouchableOpacity
                       style={[styles.approveButton, updatingApproval && styles.buttonDisabled]}
+                      {...actionButtonA11y(
+                        'Approve work order',
+                        'Approves the pending client approval request.',
+                      )}
                       onPress={() => decideApproval('approved')}
                       disabled={updatingApproval}>
                       <Text style={styles.approveButtonText}>Approve</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.declineButton, updatingApproval && styles.buttonDisabled]}
+                      {...actionButtonA11y(
+                        'Decline work order',
+                        'Declines the pending client approval request.',
+                      )}
                       onPress={() => decideApproval('declined')}
                       disabled={updatingApproval}>
                       <Text style={styles.declineButtonText}>Decline</Text>
@@ -604,6 +621,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   styles.visibilityTab,
                   messageVisibility === 'internal' && styles.visibilityTabActive,
                 ]}
+                {...actionButtonA11y(
+                  'Internal messages tab',
+                  'Shows and sends internal-only work-order messages.',
+                )}
                 onPress={() => setMessageVisibility('internal')}>
                 <Text
                   style={[
@@ -618,6 +639,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   styles.visibilityTab,
                   messageVisibility === 'client' && styles.visibilityTabActive,
                 ]}
+                {...actionButtonA11y(
+                  'Client-visible messages tab',
+                  'Shows and sends messages visible to the linked client.',
+                )}
                 onPress={() => setMessageVisibility('client')}>
                 <Text
                   style={[
@@ -636,10 +661,17 @@ function WorkOrderDetailsScreen({route, navigation}) {
             placeholderTextColor="#6b7280"
             value={messageBody}
             onChangeText={setMessageBody}
+            {...inputA11y('Work-order message', {multiline: true})}
             multiline
           />
           <TouchableOpacity
             style={[styles.messageButton, sendingMessage && styles.buttonDisabled]}
+            {...actionButtonA11y(
+              'Send message',
+              canUseInternalMessages
+                ? `Sends a ${messageVisibility} message.`
+                : 'Sends a client-visible message.',
+            )}
             onPress={sendMessage}
             disabled={sendingMessage}>
             <Text style={styles.messageButtonText}>
@@ -688,6 +720,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
             <View style={styles.attachmentActions}>
               <TouchableOpacity
                 style={[styles.secondaryButton, uploadingAttachment && styles.buttonDisabled]}
+                {...actionButtonA11y(
+                  'Take proof photo',
+                  'Opens the camera to upload work-order proof.',
+                )}
                 onPress={() => pickAttachment('camera')}
                 disabled={uploadingAttachment}>
                 <Text style={styles.secondaryButtonText}>
@@ -696,6 +732,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.secondaryButton, uploadingAttachment && styles.buttonDisabled]}
+                {...actionButtonA11y(
+                  'Choose proof photo',
+                  'Opens the photo library to upload work-order proof.',
+                )}
                 onPress={() => pickAttachment('library')}
                 disabled={uploadingAttachment}>
                 <Text style={styles.secondaryButtonText}>Choose Photo</Text>
@@ -721,6 +761,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
             <TouchableOpacity
               key={attachment.id}
               style={styles.attachmentItem}
+              {...actionButtonA11y(
+                `Open attachment ${attachment.file_name}`,
+                'Opens the attachment URL if the device supports it.',
+              )}
               onPress={() => openAttachment(attachment)}>
               {isImageAttachment(attachment) ? (
                 <Image source={{uri: attachment.file_url}} style={styles.attachmentThumb} />
@@ -750,6 +794,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
               placeholderTextColor="#6b7280"
               value={notes}
               onChangeText={setNotes}
+              {...inputA11y('Status change notes', {multiline: true})}
               multiline
             />
           </View>
@@ -759,6 +804,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
           {canEdit && (
             <TouchableOpacity
               style={[styles.editButton, updating && styles.buttonDisabled]}
+              {...actionButtonA11y(
+                'Edit work order details',
+                'Opens the work-order edit form.',
+              )}
               onPress={handleEdit}
               disabled={updating}>
               <Text style={styles.editButtonText}>Edit Details</Text>
@@ -776,6 +825,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
                     : styles.primaryButton,
                 updating && styles.buttonDisabled,
               ]}
+              {...statusActionA11y(nextStatus, workOrder.status)}
               onPress={() => confirmTransition(nextStatus)}
               disabled={updating}>
               <Text

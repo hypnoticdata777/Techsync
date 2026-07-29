@@ -249,6 +249,9 @@ Already represented in the codebase:
   boundaries.
 - v1.3 compact mobile touch target and text-wrapping hardening for primary role
   workflow controls before public screenshot capture.
+- v1.3 accessibility labels/hints and tested helper coverage for role
+  dashboards, work-order cards, form inputs, dispatch chips, approval controls,
+  attachments, messages, and lifecycle actions.
 - v1.3 tested role-specific empty queue panel states for manager, technician,
   client, viewer, and vendor contexts.
 - v1.3 role walkthrough manifest and evidence template for synthetic

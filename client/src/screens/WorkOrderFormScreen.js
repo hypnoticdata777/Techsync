@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import {actionButtonA11y, inputA11y} from '../utils/accessibility';
 import {
   buildWorkOrderContextSummary,
   summarizeContextStates,
@@ -50,6 +51,10 @@ const SelectorSection = ({label, emptyLabel, records, selectedId, getLabel, onSe
       contentContainerStyle={styles.selectorScroller}>
       <TouchableOpacity
         style={[styles.selectorChip, !selectedId && styles.selectorChipActive]}
+        {...actionButtonA11y(
+          `Clear ${label}`,
+          !selectedId ? `${label} is already unset.` : `Removes the selected ${label.toLowerCase()}.`,
+        )}
         onPress={() => onSelect(null)}>
         <Text
           style={[
@@ -65,6 +70,10 @@ const SelectorSection = ({label, emptyLabel, records, selectedId, getLabel, onSe
           <TouchableOpacity
             key={item.id}
             style={[styles.selectorChip, isSelected && styles.selectorChipActive]}
+            {...actionButtonA11y(
+              `Select ${label} ${getLabel(item)}`,
+              isSelected ? `${getLabel(item)} is currently selected.` : `Sets ${label.toLowerCase()} context.`,
+            )}
             onPress={() => onSelect(item.id)}>
             <Text
               style={[
@@ -329,6 +338,7 @@ function WorkOrderFormScreen({route, navigation}) {
             placeholderTextColor="#6b7280"
             value={title}
             onChangeText={setTitle}
+            {...inputA11y('Title', {required: true})}
           />
         </View>
 
@@ -340,6 +350,7 @@ function WorkOrderFormScreen({route, navigation}) {
             placeholderTextColor="#6b7280"
             value={description}
             onChangeText={setDescription}
+            {...inputA11y('Description', {multiline: true})}
             multiline
             numberOfLines={4}
           />
@@ -353,6 +364,10 @@ function WorkOrderFormScreen({route, navigation}) {
             </View>
             <TouchableOpacity
               style={styles.directoryManageButton}
+              {...actionButtonA11y(
+                'Manage PMC directory',
+                'Opens client, property, and vendor management.',
+              )}
               onPress={() => navigation.navigate('PmcDirectory')}>
               <Text style={styles.directoryManageButtonText}>Manage</Text>
             </TouchableOpacity>
@@ -414,6 +429,7 @@ function WorkOrderFormScreen({route, navigation}) {
             placeholderTextColor="#6b7280"
             value={customerName}
             onChangeText={setCustomerName}
+            {...inputA11y('Customer name')}
           />
         </View>
 
@@ -425,6 +441,7 @@ function WorkOrderFormScreen({route, navigation}) {
             placeholderTextColor="#6b7280"
             value={address}
             onChangeText={setAddress}
+            {...inputA11y('Address')}
           />
         </View>
 
@@ -436,6 +453,7 @@ function WorkOrderFormScreen({route, navigation}) {
             placeholderTextColor="#6b7280"
             value={serviceType}
             onChangeText={setServiceType}
+            {...inputA11y('Service type', {required: true})}
             autoCapitalize="none"
           />
         </View>
@@ -450,6 +468,12 @@ function WorkOrderFormScreen({route, navigation}) {
                   styles.statusOption,
                   priority === option && styles.statusOptionActive,
                 ]}
+                {...actionButtonA11y(
+                  `Set priority to ${option}`,
+                  priority === option
+                    ? 'This priority is currently selected.'
+                    : 'Changes the work-order priority.',
+                )}
                 onPress={() => setPriority(option)}>
                 <Text
                   style={[
@@ -465,6 +489,10 @@ function WorkOrderFormScreen({route, navigation}) {
 
         <TouchableOpacity
           style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+          {...actionButtonA11y(
+            isEditing ? 'Update work order' : 'Create work order',
+            'Saves the work-order form after validation.',
+          )}
           onPress={handleSave}
           disabled={saving}>
           <Text style={styles.saveButtonText}>
@@ -474,6 +502,7 @@ function WorkOrderFormScreen({route, navigation}) {
 
         <TouchableOpacity
           style={styles.cancelButton}
+          {...actionButtonA11y('Cancel work-order form', 'Returns to the previous screen without saving.')}
           onPress={() => navigation.goBack()}
           disabled={saving}>
           <Text style={styles.cancelButtonText}>Cancel</Text>
