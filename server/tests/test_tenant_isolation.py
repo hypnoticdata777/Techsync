@@ -18,6 +18,7 @@ from repositories import vendors as vendors_repo
 from repositories import work_order_events as events_repo
 from repositories import work_order_messages as messages_repo
 from repositories import work_orders as work_orders_repo
+from routers import dashboard as dashboard_router
 from routers import work_orders as work_orders_router
 from models.user import User
 from models.work_order_message import WorkOrderMessageCreate
@@ -52,6 +53,38 @@ def test_work_order_filters_keep_property_client_and_vendor_inside_org_scope():
         "client_id": 10,
         "vendor_id": 11,
     }
+
+
+def test_stale_work_order_report_scopes_by_organization_id():
+    with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
+        work_orders_repo.list_stale_work_orders(organization_id=42, older_than_days=14, limit=5)
+
+    sql, params = mock_fetch.call_args.args
+    assert "organization_id = :organization_id" in sql
+    assert "status IN ('open', 'in_progress')" in sql
+    assert params["organization_id"] == 42
+    assert params["limit"] == 5
+
+
+def test_overloaded_technician_report_scopes_by_organization_id():
+    with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
+        work_orders_repo.list_overloaded_technicians(organization_id=42, limit=5)
+
+    sql, params = mock_fetch.call_args.args
+    assert "WHERE t.organization_id = :organization_id" in sql
+    assert "wo.organization_id = t.organization_id" in sql
+    assert params == {"organization_id": 42, "limit": 5}
+
+
+def test_property_hotspot_report_scopes_by_organization_id():
+    with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
+        work_orders_repo.list_property_hotspots(organization_id=42, since_days=30, limit=5)
+
+    sql, params = mock_fetch.call_args.args
+    assert "WHERE p.organization_id = :organization_id" in sql
+    assert "wo.organization_id = p.organization_id" in sql
+    assert params["organization_id"] == 42
+    assert params["limit"] == 5
 
 
 def test_get_by_id_in_org_always_filters_by_caller_org_not_just_row_id():
@@ -232,3 +265,35 @@ def test_client_cannot_add_internal_message():
 
     assert exc.value.status_code == 403
     assert exc.value.detail == "Client users can only add client-visible messages"
+
+
+def test_operations_report_uses_tenant_scoped_repository_calls():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+
+    with patch("routers.dashboard.work_orders_repo.list_stale_work_orders", return_value=[]) as stale:
+        with patch("routers.dashboard.work_orders_repo.list_overloaded_technicians", return_value=[]) as overloaded:
+            with patch("routers.dashboard.work_orders_repo.list_property_hotspots", return_value=[]) as hotspots:
+                report = dashboard_router.get_operations_report(
+                    stale_days=14,
+                    hotspot_days=60,
+                    limit=5,
+                    current_user=admin_user,
+                    organization={"id": 6},
+                )
+
+    assert report.stale_work_orders == []
+    assert report.overloaded_technicians == []
+    assert report.property_hotspots == []
+    assert stale.call_args.args == (6,)
+    assert stale.call_args.kwargs == {"older_than_days": 14, "limit": 5}
+    assert overloaded.call_args.args == (6,)
+    assert overloaded.call_args.kwargs == {"limit": 5}
+    assert hotspots.call_args.args == (6,)
+    assert hotspots.call_args.kwargs == {"since_days": 60, "limit": 5}

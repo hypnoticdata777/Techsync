@@ -440,6 +440,45 @@ Result:
 - Local pytest could not run because `server\venv` does not have pytest
   installed.
 
+## 2026-07-28 - v1.3 Operations Reporting
+
+Decision:
+
+- Add backend reporting that helps PMC operators spot urgent operational risk
+  before public hosting: stale work, overloaded technicians, and property
+  hotspots.
+
+Changes:
+
+- Added nested dashboard/report schemas for stale work orders, overloaded
+  technicians, property hotspots, and the combined operations report.
+- Added work-order repository report queries:
+  - `list_stale_work_orders`
+  - `list_overloaded_technicians`
+  - `list_property_hotspots`
+- Added `GET /dashboard/operations-report` with configurable `stale_days`,
+  `hotspot_days`, and `limit` query params.
+- Added tenant-scoping regression coverage for all report queries and endpoint
+  composition.
+- Updated roadmap, traceability, requirements, QA, and phase-status docs.
+
+Verification:
+
+```powershell
+python -m compileall -q server\models\dashboard.py server\repositories\work_orders.py server\routers\dashboard.py server\tests\test_tenant_isolation.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+git diff --check
+server\venv\Scripts\python.exe -m pytest server\tests\test_tenant_isolation.py -p no:cacheprovider
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- `git diff --check` passed.
+- Local pytest could not run because `server\venv` does not have pytest
+  installed.
+
 ## 2026-07-28 - v1.3 Proof-Gated Closeout
 
 Decision:

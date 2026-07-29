@@ -1,6 +1,6 @@
 """Data access for work orders, always scoped by organization_id (RF-05, RF-18, RF-21)."""
 
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from typing import Optional
 
 from database import fetch_all, fetch_one, fetch_scalar, insert_row, update_row
@@ -107,8 +107,6 @@ def counts_by_status(organization_id: int) -> dict[str, int]:
 
 
 def count_sla_at_risk(organization_id: int) -> int:
-    from datetime import datetime, timedelta, timezone
-
     soon = datetime.now(timezone.utc) + timedelta(hours=2)
     count = fetch_scalar(
         """
@@ -122,3 +120,97 @@ def count_sla_at_risk(organization_id: int) -> int:
         {"organization_id": organization_id, "soon": soon},
     )
     return int(count or 0)
+
+
+def list_stale_work_orders(
+    organization_id: int,
+    older_than_days: int = 7,
+    limit: int = 20,
+) -> list[dict]:
+    cutoff = datetime.now(timezone.utc) - timedelta(days=older_than_days)
+    return fetch_all(
+        """
+        SELECT
+            id,
+            title,
+            status,
+            priority,
+            assigned_technician_id,
+            property_id,
+            client_id,
+            created_at,
+            sla_due_at
+        FROM work_orders
+        WHERE organization_id = :organization_id
+          AND status IN ('open', 'in_progress')
+          AND created_at <= :cutoff
+        ORDER BY CASE priority
+            WHEN 'emergency' THEN 0
+            WHEN 'high' THEN 1
+            WHEN 'medium' THEN 2
+            WHEN 'low' THEN 3
+            ELSE 99
+        END, created_at ASC
+        LIMIT :limit
+        """,
+        {"organization_id": organization_id, "cutoff": cutoff, "limit": limit},
+    )
+
+
+def list_overloaded_technicians(organization_id: int, limit: int = 20) -> list[dict]:
+    return fetch_all(
+        """
+        SELECT
+            t.id AS technician_id,
+            t.user_id,
+            u.full_name,
+            u.email,
+            t.availability_status,
+            t.max_daily_jobs,
+            COUNT(wo.id) AS active_work_order_count
+        FROM technicians t
+        JOIN users u ON u.id = t.user_id AND u.organization_id = t.organization_id
+        LEFT JOIN work_orders wo
+            ON wo.assigned_technician_id = t.id
+           AND wo.organization_id = t.organization_id
+           AND wo.status IN ('open', 'in_progress')
+        WHERE t.organization_id = :organization_id
+        GROUP BY t.id, t.user_id, u.full_name, u.email, t.availability_status, t.max_daily_jobs
+        HAVING COUNT(wo.id) > t.max_daily_jobs
+        ORDER BY active_work_order_count DESC, t.max_daily_jobs ASC
+        LIMIT :limit
+        """,
+        {"organization_id": organization_id, "limit": limit},
+    )
+
+
+def list_property_hotspots(
+    organization_id: int,
+    since_days: int = 90,
+    limit: int = 10,
+) -> list[dict]:
+    cutoff = datetime.now(timezone.utc) - timedelta(days=since_days)
+    return fetch_all(
+        """
+        SELECT
+            p.id AS property_id,
+            p.name AS property_name,
+            p.address_line1,
+            COUNT(wo.id) AS total_work_orders,
+            SUM(CASE WHEN wo.status = 'open' THEN 1 ELSE 0 END) AS open_count,
+            SUM(CASE WHEN wo.status = 'in_progress' THEN 1 ELSE 0 END) AS in_progress_count,
+            SUM(CASE WHEN wo.status = 'completed' THEN 1 ELSE 0 END) AS completed_count,
+            MAX(wo.created_at) AS latest_work_order_at
+        FROM properties p
+        JOIN work_orders wo
+            ON wo.property_id = p.id
+           AND wo.organization_id = p.organization_id
+           AND wo.created_at >= :cutoff
+        WHERE p.organization_id = :organization_id
+        GROUP BY p.id, p.name, p.address_line1
+        HAVING COUNT(wo.id) > 0
+        ORDER BY total_work_orders DESC, latest_work_order_at DESC
+        LIMIT :limit
+        """,
+        {"organization_id": organization_id, "cutoff": cutoff, "limit": limit},
+    )

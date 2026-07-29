@@ -136,11 +136,13 @@ Completed:
   override reason.
 - Added backend proof-gated closeout: completed status requires attachment proof
   or an org admin/coordinator override reason.
+- Added backend operations report under `/dashboard/operations-report` for stale
+  work, overloaded technicians, and property hotspots.
 
 Next:
 
-- Add reporting improvements, closeout package summaries, and client/homeowner
-  UI visibility.
+- Add closeout package summaries, reporting UI, and client/homeowner UI
+  visibility.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -193,6 +195,6 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue v1.3 product depth before hosting: move into reporting and closeout
-package summaries, then add the client/homeowner UI surface. Vercel deployment
+Continue v1.3 product depth before hosting: move into closeout package
+summaries, reporting UI, and the client/homeowner UI surface. Vercel deployment
 and portfolio sliver linking should happen at the end of v1.3.

@@ -136,6 +136,7 @@ Likely scope:
   - aging work orders
   - overloaded technicians
   - property hotspots
+  - backend operations report now started in v1.3
   - completion cycle time
   - basic CSV export
 - Operational hardening:
@@ -158,7 +159,8 @@ v1.3 exit criteria:
 - A work order cannot be closed without attachment proof unless an org
   admin/coordinator override reason is recorded.
 - At least one client/homeowner demo flow is showable with synthetic data.
-- Reporting shows stale work, workload, and property hotspot evidence.
+- Backend reporting shows stale work, overloaded technicians, and property
+  hotspot evidence, with dashboard UI still to complete.
 - Vercel hosting and portfolio linking are completed as the final showcase step,
   not before the product feels robust enough to show.
 - Documentation explains which v1.3 features are prototype-ready versus still

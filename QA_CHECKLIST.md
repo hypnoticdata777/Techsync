@@ -77,7 +77,9 @@ they have been verified in the relevant environment.
 - [x] Backend closeout proof requirement and manager override reason
       implemented.
 - [ ] Closeout package summary/PDF generation implemented.
-- [ ] Reporting expanded for stale work, overloaded technicians, and property
+- [x] Backend operations report added for stale work, overloaded technicians, and
+      property hotspots.
+- [ ] UI reporting view expanded for stale work, overloaded technicians, and property
       hotspots.
 
 ## Client / Demo Surface

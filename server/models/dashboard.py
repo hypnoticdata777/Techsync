@@ -1,4 +1,7 @@
-"""Pydantic schema for admin dashboard metrics (RF-25)."""
+"""Pydantic schemas for admin dashboard metrics and operations reporting (RF-25)."""
+
+from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -12,3 +15,42 @@ class DashboardMetrics(BaseModel):
     sla_at_risk_count: int
     active_technicians_count: int
     total_technicians_count: int
+
+
+class StaleWorkOrderMetric(BaseModel):
+    id: int
+    title: str
+    status: str
+    priority: str
+    assigned_technician_id: Optional[int] = None
+    property_id: Optional[int] = None
+    client_id: Optional[int] = None
+    created_at: datetime
+    sla_due_at: Optional[datetime] = None
+
+
+class OverloadedTechnicianMetric(BaseModel):
+    technician_id: int
+    user_id: int
+    full_name: str
+    email: str
+    availability_status: str
+    active_work_order_count: int
+    max_daily_jobs: int
+
+
+class PropertyHotspotMetric(BaseModel):
+    property_id: int
+    property_name: str
+    address_line1: str
+    total_work_orders: int
+    open_count: int
+    in_progress_count: int
+    completed_count: int
+    latest_work_order_at: Optional[datetime] = None
+
+
+class OperationsReport(BaseModel):
+    stale_work_orders: list[StaleWorkOrderMetric]
+    overloaded_technicians: list[OverloadedTechnicianMetric]
+    property_hotspots: list[PropertyHotspotMetric]
