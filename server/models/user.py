@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from core.security import validate_password_strength
 
-Role = Literal["org_admin", "coordinator", "technician"]
+Role = Literal["org_admin", "coordinator", "technician", "vendor", "client", "viewer"]
 
 
 class User(BaseModel):

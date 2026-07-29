@@ -22,6 +22,7 @@ they have been verified in the relevant environment.
       portfolio launch.
 - [x] All 10 PMC operations requirement batches captured in
       `TECHSYNC_OPS_REQUIREMENTS.md`.
+- [x] Requirement coverage mapped in `TECHSYNC_OPS_TRACEABILITY.md`.
 - [x] v1.2/v1.3 roadmap captured in `PRODUCT_ROADMAP.md`.
 
 ## Backend Local/CI Quality
@@ -31,7 +32,7 @@ they have been verified in the relevant environment.
 - [ ] Alembic migration dry run or upgrade verified against a demo database.
 - [ ] Production config validation reviewed for hosted deployment.
 
-## Hosted Backend POC
+## Hosting-Ready Foundation
 
 - [x] Preferred database provider documented as Neon Postgres.
 - [x] Cloudflare role documented as DNS/portfolio front door and preferred R2
@@ -39,8 +40,9 @@ they have been verified in the relevant environment.
 - [x] Stripe documented as deferred for first investor POC.
 - [x] Email/storage deferral tradeoffs documented.
 - [x] Code-supported `APP_ENV=demo` hosted POC mode added.
-- [x] Backend host chosen: Vercel.
-- [x] Vercel deployment adapter and runbook added.
+- [x] Eventual backend host chosen: Vercel.
+- [x] Vercel deployment adapter and runbook added, with deployment deferred to
+      the end of v1.3.
 - [x] Repeatable v1.2 hosted smoke-test script added.
 - [x] Manual GitHub Actions hosted smoke workflow added.
 - [x] v1.2 evidence template added.
@@ -50,7 +52,7 @@ they have been verified in the relevant environment.
 - [x] Pooled Neon connection string selected for hosted/serverless runtime.
 - [x] Demo-mode vs full `APP_ENV=production` decision made for the first hosted
       POC.
-- [ ] Host secret manager configured.
+- [ ] Host secret manager configured at the end-of-v1.3 showcase gate.
 - [x] Alembic migrations run against hosted/demo database.
 - [ ] `/health` verified over HTTPS.
 - [ ] CORS verified against the intended demo client origin.
@@ -64,11 +66,23 @@ they have been verified in the relevant environment.
 - [ ] Attachment upload verified if object storage is configured.
 - [ ] Stripe webhook verified if Stripe test-mode demo is enabled.
 
+## v1.3 PMC Product Foundation
+
+- [x] Clients, properties, and vendors added to the database migration path.
+- [x] Tenant-scoped API/repository/model foundation added for clients,
+      properties, and vendors.
+- [x] Work orders can reference property, client, and vendor records.
+- [ ] Client-visible communication separated from internal notes.
+- [ ] Closeout proof requirement and manager override reason implemented.
+- [ ] Reporting expanded for stale work, overloaded technicians, and property
+      hotspots.
+
 ## Client / Demo Surface
 
 - [ ] Demo surface chosen: Expo web, hosted preview, screenshots, recording, or
       portfolio wrapper.
-- [ ] `EXPO_PUBLIC_API_BASE_URL` points to hosted backend in demo mode.
+- [ ] `EXPO_PUBLIC_API_BASE_URL` points to hosted backend in demo mode after
+      the end-of-v1.3 hosting gate.
 - [ ] Synthetic demo walkthrough validated.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.
@@ -80,7 +94,8 @@ they have been verified in the relevant environment.
 - [x] Problem statement drafted.
 - [x] Architecture/proof summary drafted.
 - [ ] GitHub repo linked.
-- [ ] Hosted demo or walkthrough linked.
+- [ ] Hosted demo or walkthrough linked after v1.3 workflows are robust enough
+      to show.
 - [ ] POC status label added.
 - [ ] Production limitations listed honestly.
 

@@ -33,7 +33,8 @@ Latest verified CI run before this scan: success on main for 3c3f0ac
 - CI workflow for backend pytest and client Jest checks.
 - Launch-hardening docs and pre-launch checklist.
 - Active PMC operations requirements captured in `TECHSYNC_OPS_REQUIREMENTS.md`.
-- v1.2/v1.3 product path captured in `PRODUCT_ROADMAP.md`.
+- v1.2/v1.3 product path captured in `PRODUCT_ROADMAP.md`, with Vercel hosting
+  held until the end-of-v1.3 showcase gate.
 - Repeatable hosted smoke-test script added in `scripts/smoke_v12.py`.
 - Portfolio case-study source copy added in `PORTFOLIO_TECHSYNC_OPS.md`.
 - v1.2 evidence capture template added in `V12_EVIDENCE_TEMPLATE.md`.
@@ -117,28 +118,31 @@ Before real customer data, real money, or public self-serve usage:
 
 ## Recommended Next Step
 
-Proceed to hosted POC setup:
+Continue v1.3 product depth before hosted public promotion:
 
-1. Use Neon Postgres for the demo database. Completed for the POC.
-2. Choose the backend host: Vercel for portfolio alignment, or Render/Railway
-   for a more traditional FastAPI service.
-3. Use `APP_ENV=demo` for the first hosted POC while SMTP and object storage
-   are deferred.
-4. Configure host secrets.
-5. Deploy the backend behind HTTPS.
+1. Keep Neon Postgres as the demo database. Completed for the POC.
+2. Keep Vercel as the selected showcase host, but defer public deployment until
+   v1.3 product depth is ready.
+3. Build first-class clients, properties, vendors, and work-order links.
+4. Add client-visible communication separation, proof-gated closeout, and richer
+   reporting.
+5. Use `APP_ENV=demo` and host-managed secrets when the end-of-v1.3 Vercel
+   deployment begins.
 6. Verify `/health`, onboarding, login/refresh, work-order creation, assignment,
    status transitions, CSV ingestion, dashboard metrics, and attachment flow if
    storage is configured.
-7. Run `scripts/smoke_v12.py` and capture sanitized evidence.
-8. Connect the synthetic demo or walkthrough from the portfolio once the
-   portfolio URL exists.
+7. Run `scripts/smoke_v12.py` or its v1.3 successor and capture sanitized
+   evidence.
+8. Connect the synthetic demo or walkthrough from the portfolio only after the
+   portfolio URL exists and the v1.3 showcase gate passes.
 
 ## Stop Point For This Phase
 
 Stop when TechSync Ops is:
 
-- hosted in a controlled POC environment;
-- connected from the portfolio;
+- robust enough for public review;
+- hosted in a controlled POC environment at the end-of-v1.3 showcase gate;
+- connected from the portfolio after the showcase gate;
 - using synthetic/demo data only;
 - passing CI;
 - smoke-tested through the core journey;
@@ -146,4 +150,4 @@ Stop when TechSync Ops is:
 
 At that point, TechSync Ops is investor-safe as a public POC and should pause
 before production-only work such as app-store release, push notifications,
-offline sync, advanced reporting, or real customer onboarding.
+offline sync, advanced billing, or real customer onboarding.

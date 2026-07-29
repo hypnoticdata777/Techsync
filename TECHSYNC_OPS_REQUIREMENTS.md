@@ -207,7 +207,8 @@ Already represented in the codebase:
   events, invitations, password reset tokens, priority rules, attachments, and
   billing boundary tables.
 - FastAPI backend with SQLAlchemy/psycopg2 repositories and Alembic migration
-  `0001`.
+  `0001`, plus v1.3 migration work for clients, properties, vendors, and work
+  order entity links.
 - JWT auth, bcrypt password hashing, role dependencies, tenant-scoped data
   access, and Postgres RLS policies as a database backstop.
 - Work-order CRUD, status transitions, assignment, technician queue, CSV
@@ -220,17 +221,21 @@ Already represented in the codebase:
 
 Important gaps for the PMC operations product:
 
-- Property/client/vendor records are not first-class yet.
+- Property/client/vendor backend records are being promoted to first-class v1.3
+  entities; frontend workflows and richer operations logic remain.
 - Client/homeowner portal and client-visible communication are not built yet.
 - Closeout packages, approvals, duplicate detection, SLA risk reporting,
   calendar/maps, background jobs, and export workflows remain roadmap items.
 
 ## Version Planning Boundary
 
-- v1.2 is the first checkpoint-complete public POC: hosted, portfolio-connected,
-  safe to show, and clearly positioned as TechSync Ops for PMC maintenance
-  operations.
-- v1.3 is the next productization pass: properties, clients, approvals,
-  communication separation, closeout packages, and richer reporting.
+- v1.2 is the checkpoint-complete product foundation: safe, documented,
+  tenant-scoped, demo-database ready, and clearly positioned as TechSync Ops for
+  PMC maintenance operations.
+- v1.3 is the next productization pass: properties, clients, vendors, approvals,
+  communication separation, closeout packages, richer reporting, and the final
+  Vercel/portfolio showcase gate.
 
 See `PRODUCT_ROADMAP.md` for version scope and exit criteria.
+See `TECHSYNC_OPS_TRACEABILITY.md` for the requirement-by-requirement mapping
+to v1.2, v1.3, and later work.

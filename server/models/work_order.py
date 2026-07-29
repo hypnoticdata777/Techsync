@@ -21,6 +21,9 @@ ALLOWED_STATUS_TRANSITIONS: dict[Status, set[Status]] = {
 class WorkOrderCreate(BaseModel):
     title: str = Field(..., min_length=3, max_length=200)
     description: Optional[str] = Field(None, max_length=2000)
+    property_id: Optional[int] = None
+    client_id: Optional[int] = None
+    vendor_id: Optional[int] = None
     customer_name: Optional[str] = Field(None, max_length=150)
     address: Optional[str] = Field(None, max_length=300)
     latitude: Optional[float] = Field(None, ge=-90, le=90)
@@ -41,6 +44,9 @@ class WorkOrderCreate(BaseModel):
 class WorkOrderUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=3, max_length=200)
     description: Optional[str] = Field(None, max_length=2000)
+    property_id: Optional[int] = None
+    client_id: Optional[int] = None
+    vendor_id: Optional[int] = None
     customer_name: Optional[str] = Field(None, max_length=150)
     address: Optional[str] = Field(None, max_length=300)
     priority: Optional[Priority] = None
@@ -69,6 +75,9 @@ class WorkOrder(BaseModel):
     organization_id: int
     title: str
     description: Optional[str] = None
+    property_id: Optional[int] = None
+    client_id: Optional[int] = None
+    vendor_id: Optional[int] = None
     customer_name: Optional[str] = None
     address: Optional[str] = None
     latitude: Optional[float] = None

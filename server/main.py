@@ -12,7 +12,20 @@ from fastapi.responses import JSONResponse
 from core.config import settings
 from database import DatabaseNotConfigured
 from logger import logger
-from routers import auth, billing, dashboard, ingestion, invitations, organizations, technicians, users, work_orders
+from routers import (
+    auth,
+    billing,
+    clients,
+    dashboard,
+    ingestion,
+    invitations,
+    organizations,
+    properties,
+    technicians,
+    users,
+    vendors,
+    work_orders,
+)
 from services.attachment_storage_service import StorageNotConfigured
 
 app = FastAPI(
@@ -49,6 +62,9 @@ app.include_router(organizations.router)
 app.include_router(invitations.router)
 app.include_router(users.router)
 app.include_router(technicians.router)
+app.include_router(clients.router)
+app.include_router(properties.router)
+app.include_router(vendors.router)
 app.include_router(work_orders.router)
 app.include_router(ingestion.router)
 app.include_router(dashboard.router)

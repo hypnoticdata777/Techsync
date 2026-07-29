@@ -19,7 +19,10 @@ from models.work_order import (
     WorkOrderUpdate,
 )
 from repositories import attachments as attachments_repo
+from repositories import clients as clients_repo
+from repositories import properties as properties_repo
 from repositories import technicians as technicians_repo
+from repositories import vendors as vendors_repo
 from repositories import work_order_events as events_repo
 from repositories import work_orders as work_orders_repo
 from services import attachment_storage_service, work_order_service
@@ -31,6 +34,22 @@ def _load_caller_technician(current_user: User, organization_id: int) -> Optiona
     if current_user.role != "technician":
         return None
     return technicians_repo.get_by_user_id(current_user.id, organization_id)
+
+
+def _validate_entity_links(organization_id: int, patch: dict) -> None:
+    if patch.get("client_id") and not clients_repo.get_by_id_in_org(patch["client_id"], organization_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Client not found")
+    if patch.get("property_id"):
+        property_row = properties_repo.get_by_id_in_org(patch["property_id"], organization_id)
+        if not property_row:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Property not found")
+        if patch.get("client_id") and property_row.get("client_id") not in (None, patch["client_id"]):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Property does not belong to the selected client",
+            )
+    if patch.get("vendor_id") and not vendors_repo.get_by_id_in_org(patch["vendor_id"], organization_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Vendor not found")
 
 
 def _get_accessible_work_order(work_order_id: int, current_user: User, organization: dict) -> dict:
@@ -52,25 +71,29 @@ def create_work_order(
     current_user: User = Depends(require_roles("org_admin", "coordinator")),
     organization: dict = Depends(get_current_organization),
 ):
-    priority = work_order_service.apply_priority_rule(
-        organization["id"], payload.service_type, payload.priority
-    )
+    patch = {
+        "title": payload.title,
+        "description": payload.description,
+        "property_id": payload.property_id,
+        "client_id": payload.client_id,
+        "vendor_id": payload.vendor_id,
+        "customer_name": payload.customer_name,
+        "address": payload.address,
+        "latitude": payload.latitude,
+        "longitude": payload.longitude,
+        "service_type": payload.service_type,
+        "priority": work_order_service.apply_priority_rule(
+            organization["id"], payload.service_type, payload.priority
+        ),
+        "status": "open",
+        "created_by": current_user.id,
+        "source": "manual",
+        "sla_due_at": payload.sla_due_at.isoformat() if payload.sla_due_at else None,
+    }
+    _validate_entity_links(organization["id"], patch)
     work_order = work_orders_repo.create(
         organization["id"],
-        {
-            "title": payload.title,
-            "description": payload.description,
-            "customer_name": payload.customer_name,
-            "address": payload.address,
-            "latitude": payload.latitude,
-            "longitude": payload.longitude,
-            "service_type": payload.service_type,
-            "priority": priority,
-            "status": "open",
-            "created_by": current_user.id,
-            "source": "manual",
-            "sla_due_at": payload.sla_due_at.isoformat() if payload.sla_due_at else None,
-        },
+        patch,
     )
     events_repo.create_event(
         organization["id"], work_order["id"], event_type="created", actor_user_id=current_user.id
@@ -86,6 +109,9 @@ def create_work_order(
 def list_work_orders(
     status_filter: Optional[str] = Query(None, alias="status"),
     technician_id: Optional[int] = None,
+    property_id: Optional[int] = None,
+    client_id: Optional[int] = None,
+    vendor_id: Optional[int] = None,
     customer_name: Optional[str] = None,
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
@@ -103,6 +129,9 @@ def list_work_orders(
         organization["id"],
         status=status_filter,
         technician_id=technician_id,
+        property_id=property_id,
+        client_id=client_id,
+        vendor_id=vendor_id,
         customer_name=customer_name,
         date_from=date_from,
         date_to=date_to,
@@ -147,6 +176,7 @@ def update_work_order(
     if not patch:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No fields to update")
 
+    _validate_entity_links(organization["id"], patch)
     updated = work_orders_repo.update(work_order_id, organization["id"], patch)
     return WorkOrder(**updated)
 

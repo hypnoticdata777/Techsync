@@ -7,8 +7,15 @@ calls carry the caller's organization_id.
 
 from unittest.mock import patch
 
+import pytest
+
+from fastapi import HTTPException
+from repositories import clients as clients_repo
+from repositories import properties as properties_repo
 from repositories import technicians as technicians_repo
 from repositories import users as users_repo
+from repositories import vendors as vendors_repo
+from routers import work_orders as work_orders_router
 from repositories import work_order_events as events_repo
 from repositories import work_orders as work_orders_repo
 
@@ -20,6 +27,28 @@ def test_list_filtered_scopes_by_organization_id():
     sql, params = mock_fetch.call_args.args
     assert "organization_id = :organization_id" in sql
     assert params["organization_id"] == 42
+
+
+def test_work_order_filters_keep_property_client_and_vendor_inside_org_scope():
+    with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
+        work_orders_repo.list_filtered(
+            organization_id=42,
+            property_id=9,
+            client_id=10,
+            vendor_id=11,
+        )
+
+    sql, params = mock_fetch.call_args.args
+    assert "organization_id = :organization_id" in sql
+    assert "property_id = :property_id" in sql
+    assert "client_id = :client_id" in sql
+    assert "vendor_id = :vendor_id" in sql
+    assert params == {
+        "organization_id": 42,
+        "property_id": 9,
+        "client_id": 10,
+        "vendor_id": 11,
+    }
 
 
 def test_get_by_id_in_org_always_filters_by_caller_org_not_just_row_id():
@@ -59,6 +88,64 @@ def test_technicians_get_by_id_scoped_to_org():
     assert "t.id = :technician_id" in sql
     assert "t.organization_id = :organization_id" in sql
     assert params == {"technician_id": 8, "organization_id": 2}
+
+
+def test_clients_get_by_id_scoped_to_org():
+    with patch("repositories.clients.fetch_one", return_value=None) as mock_fetch:
+        clients_repo.get_by_id_in_org(client_id=8, organization_id=2)
+
+    sql, params = mock_fetch.call_args.args
+    assert "id = :client_id" in sql
+    assert "organization_id = :organization_id" in sql
+    assert params == {"client_id": 8, "organization_id": 2}
+
+
+def test_properties_get_by_id_scoped_to_org():
+    with patch("repositories.properties.fetch_one", return_value=None) as mock_fetch:
+        properties_repo.get_by_id_in_org(property_id=8, organization_id=2)
+
+    sql, params = mock_fetch.call_args.args
+    assert "id = :property_id" in sql
+    assert "organization_id = :organization_id" in sql
+    assert params == {"property_id": 8, "organization_id": 2}
+
+
+def test_vendors_get_by_id_scoped_to_org():
+    with patch("repositories.vendors.fetch_one", return_value=None) as mock_fetch:
+        vendors_repo.get_by_id_in_org(vendor_id=8, organization_id=2)
+
+    sql, params = mock_fetch.call_args.args
+    assert "id = :vendor_id" in sql
+    assert "organization_id = :organization_id" in sql
+    assert params == {"vendor_id": 8, "organization_id": 2}
+
+
+def test_new_pmc_entity_updates_require_id_and_organization_id():
+    with patch("repositories.clients.update_row", return_value=None) as mock_clients_update:
+        clients_repo.update(client_id=5, organization_id=3, patch={"display_name": "Owner"})
+    with patch("repositories.properties.update_row", return_value=None) as mock_properties_update:
+        properties_repo.update(property_id=6, organization_id=3, patch={"name": "West Tower"})
+    with patch("repositories.vendors.update_row", return_value=None) as mock_vendors_update:
+        vendors_repo.update(vendor_id=7, organization_id=3, patch={"name": "HVAC Partner"})
+
+    assert mock_clients_update.call_args.args[2] == {"id": 5, "organization_id": 3}
+    assert mock_properties_update.call_args.args[2] == {"id": 6, "organization_id": 3}
+    assert mock_vendors_update.call_args.args[2] == {"id": 7, "organization_id": 3}
+
+
+def test_work_order_property_client_link_must_match_inside_org():
+    with patch("routers.work_orders.clients_repo.get_by_id_in_org", return_value={"id": 10}):
+        with patch(
+            "routers.work_orders.properties_repo.get_by_id_in_org",
+            return_value={"id": 9, "client_id": 12},
+        ):
+            with pytest.raises(HTTPException) as exc:
+                work_orders_router._validate_entity_links(
+                    42, {"property_id": 9, "client_id": 10}
+                )
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "Property does not belong to the selected client"
 
 
 def test_events_are_written_with_org_id():

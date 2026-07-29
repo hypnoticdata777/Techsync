@@ -6,17 +6,17 @@ Date: July 28, 2026
 
 TechSync Ops should advance in checkpoints that are easy to demo, easy to
 verify, and honest about what is production-ready versus POC-ready. The next
-checkpoint is v1.2: public POC completion. v1.3 is the first deeper PMC
-operations expansion.
+checkpoint is v1.2: product-foundation completion. v1.3 is the deeper PMC
+operations expansion and public showcase gate.
 
-## v1.2 - Public POC Completion Checkpoint
+## v1.2 - Product Foundation Completion Checkpoint
 
 Goal:
 
-TechSync Ops is a hosted, portfolio-connected, investor-safe public POC for PMC
-maintenance operations. It proves the multi-tenant backend, hosted database,
-core intake/dispatch/technician workflow, and public product positioning without
-using real customer data.
+TechSync Ops proves the tenant-safe backend, demo database, core
+intake/dispatch/technician workflow, public product positioning, and durable
+requirements trail without using real customer data. Hosting is prepared, but
+not the checkpoint finish line.
 
 Primary audience:
 
@@ -30,10 +30,7 @@ Scope:
 - Product name and documentation updated to TechSync Ops.
 - Active requirements source moved to `TECHSYNC_OPS_REQUIREMENTS.md`.
 - Vercel backend deployment adapter and runbook prepared.
-- Hosted FastAPI backend deployed behind HTTPS.
 - Neon demo Postgres used through the pooled runtime connection string.
-- `APP_ENV=demo` configured in the host secret manager.
-- CORS locked to the intended portfolio/demo origins.
 - Synthetic organization, users, technicians, and work orders available for
   demo/evidence.
 - Repeatable hosted smoke-test script and evidence template available.
@@ -69,18 +66,19 @@ Deferred from v1.2:
 - Offline sync
 - Real push notifications
 - Full client/homeowner portal
-- Full property/client/vendor data model
 - Closeout PDF packages
 - Deep accounting integrations
+- Public Vercel/portfolio linking
 
 v1.2 exit criteria:
 
 - Repo is clean, pushed, and CI passes.
 - Public docs consistently use TechSync Ops positioning.
 - All 10 requirement batches are captured.
-- Hosted backend works over HTTPS.
+- Requirement coverage is mapped in `TECHSYNC_OPS_TRACEABILITY.md`.
 - Neon migration is at `0001 (head)` or later.
-- Runtime secrets are only in the host secret manager.
+- Hosting adapter and runbook exist, but deployment remains deferred until the
+  end of v1.3.
 - Demo uses synthetic data only.
 - Portfolio page or case-study shell exists.
 - Evidence screenshots/notes are captured.
@@ -90,9 +88,10 @@ v1.2 exit criteria:
 
 Goal:
 
-TechSync Ops moves from a hosted POC into a more complete PMC operations product
-prototype with first-class property/client context, client-facing visibility,
-closeout proof, and stronger operational reporting.
+TechSync Ops moves from a strong POC foundation into a more complete PMC
+operations prototype with first-class property/client/vendor context,
+client-facing visibility, closeout proof, stronger operational reporting, and a
+final Vercel/portfolio showcase gate.
 
 Primary audience:
 
@@ -104,6 +103,8 @@ Primary audience:
 Likely scope:
 
 - First-class property records:
+  - client records
+  - vendor records
   - property name/address
   - unit/building identifiers
   - owner/client association
@@ -140,15 +141,22 @@ Likely scope:
   - uptime monitoring
   - backup/restore documentation
   - stricter synthetic demo reset process
+- End-of-v1.3 showcase gate:
+  - Vercel backend deployed behind HTTPS
+  - `APP_ENV=demo` configured in Vercel
+  - CORS locked to the intended portfolio/demo origins
+  - hosted smoke-test evidence captured
+  - portfolio sliver/showcase link connected only after the portfolio is live
 
 v1.3 exit criteria:
 
-- Property/client/vendor concepts exist in the data model or are intentionally
-  mocked with a documented migration path.
+- Property/client/vendor concepts exist in the data model and API.
 - Client-visible communication is separated from internal notes.
 - A work order cannot be closed without proof unless an override is recorded.
 - At least one client/homeowner demo flow is showable with synthetic data.
 - Reporting shows stale work, workload, and property hotspot evidence.
+- Vercel hosting and portfolio linking are completed as the final showcase step,
+  not before the product feels robust enough to show.
 - Documentation explains which v1.3 features are prototype-ready versus still
   deferred.
 

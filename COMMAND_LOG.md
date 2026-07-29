@@ -364,3 +364,40 @@ Result:
 - Remaining matches are either active docs saying Supabase is not the runtime
   dependency, explicit historical labels, test/example values, or tracker
   evidence.
+
+## 2026-07-28 - v1.3 PMC Foundation and Hosting Deferral
+
+Decision:
+
+- Vercel remains the selected showcase host, but public deployment and portfolio
+  hard-linking are deferred to the end of v1.3 so TechSync Ops can become more
+  robust before it is promoted.
+
+Changes:
+
+- Added Alembic migration `0002_pmc_entities.py` for clients, properties,
+  vendors, expanded user/invitation roles, and work-order links.
+- Added tenant-scoped client, property, and vendor API models, repositories, and
+  routers.
+- Updated work orders so they can reference property, client, and vendor records
+  while keeping the legacy customer/address fields.
+- Updated the base SQL schema to match the v1.3 PMC entity model.
+- Updated roadmap, traceability, QA, hosting, Vercel, pre-launch, requirements,
+  and public-readiness docs so Vercel/portfolio hosting sits at the
+  end-of-v1.3 showcase gate.
+
+Verification:
+
+```powershell
+python -m compileall -q server\alembic\versions\0001_initial_schema.py server\alembic\versions\0002_pmc_entities.py server\main.py server\models server\repositories server\routers server\tests
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+git diff --check
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- `git diff --check` passed.
+- Local pytest could not run because neither `server\venv` nor system Python has
+  pytest installed in this checkout.

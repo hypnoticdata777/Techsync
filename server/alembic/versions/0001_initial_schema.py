@@ -34,6 +34,9 @@ def downgrade() -> None:
         DROP TABLE IF EXISTS work_order_attachments CASCADE;
         DROP TABLE IF EXISTS work_order_events CASCADE;
         DROP TABLE IF EXISTS work_orders CASCADE;
+        DROP TABLE IF EXISTS vendors CASCADE;
+        DROP TABLE IF EXISTS properties CASCADE;
+        DROP TABLE IF EXISTS clients CASCADE;
         DROP TABLE IF EXISTS technicians CASCADE;
         DROP TABLE IF EXISTS invitations CASCADE;
         DROP TABLE IF EXISTS password_reset_tokens CASCADE;

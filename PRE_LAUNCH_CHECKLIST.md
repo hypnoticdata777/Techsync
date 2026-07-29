@@ -33,7 +33,8 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       `PRODUCT_ROADMAP.md`.
 - [x] **Prepare Vercel deployment adapter.** `api/index.py`, root
       `requirements.txt`, `.python-version`, `vercel.json`, and
-      `VERCEL_DEPLOYMENT.md` now define the v1.2 Vercel backend path.
+      `VERCEL_DEPLOYMENT.md` define the Vercel backend path, now deferred to the
+      end-of-v1.3 showcase gate.
 - [x] **Prepare v1.2 smoke/evidence harness.** `scripts/smoke_v12.py`,
       `V12_EVIDENCE_TEMPLATE.md`, and `PORTFOLIO_TECHSYNC_OPS.md` define the
       hosted proof path and portfolio source copy.

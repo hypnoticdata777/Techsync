@@ -25,6 +25,9 @@ def list_filtered(
     organization_id: int,
     status: Optional[str] = None,
     technician_id: Optional[int] = None,
+    property_id: Optional[int] = None,
+    client_id: Optional[int] = None,
+    vendor_id: Optional[int] = None,
     customer_name: Optional[str] = None,
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
@@ -39,6 +42,15 @@ def list_filtered(
     if technician_id:
         where.append("assigned_technician_id = :technician_id")
         params["technician_id"] = technician_id
+    if property_id:
+        where.append("property_id = :property_id")
+        params["property_id"] = property_id
+    if client_id:
+        where.append("client_id = :client_id")
+        params["client_id"] = client_id
+    if vendor_id:
+        where.append("vendor_id = :vendor_id")
+        params["vendor_id"] = vendor_id
     if customer_name:
         where.append("customer_name ILIKE :customer_name")
         params["customer_name"] = f"%{customer_name}%"

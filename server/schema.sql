@@ -1,4 +1,4 @@
--- TechSync SaaS Database Schema
+-- TechSync Ops Database Schema
 -- Run this SQL via Alembic migrations or any managed Postgres SQL console.
 --
 -- Multi-tenancy model (RF-05):
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash TEXT NOT NULL,
     full_name TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'technician'
-        CHECK (role IN ('org_admin', 'coordinator', 'technician')),
+        CHECK (role IN ('org_admin', 'coordinator', 'technician', 'vendor', 'client', 'viewer')),
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS invitations (
     organization_id BIGINT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     email TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'technician'
-        CHECK (role IN ('org_admin', 'coordinator', 'technician')),
+        CHECK (role IN ('org_admin', 'coordinator', 'technician', 'vendor', 'client', 'viewer')),
     token_hash TEXT NOT NULL,
     invited_by BIGINT REFERENCES users(id) ON DELETE SET NULL,
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -174,6 +174,105 @@ CREATE POLICY technicians_isolation ON technicians
     USING (organization_id = techsync_current_org_id());
 
 -- =====================================================================
+-- clients: owners, tenants, board members, and named PMC contacts
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS clients (
+    id BIGSERIAL PRIMARY KEY,
+    organization_id BIGINT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    display_name TEXT NOT NULL,
+    contact_name TEXT,
+    email TEXT,
+    phone TEXT,
+    client_type TEXT NOT NULL DEFAULT 'homeowner'
+        CHECK (client_type IN ('homeowner', 'owner', 'tenant', 'board_member', 'other')),
+    notes TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_clients_org ON clients(organization_id);
+CREATE INDEX IF NOT EXISTS idx_clients_org_email ON clients(organization_id, email);
+
+CREATE TRIGGER update_clients_updated_at
+    BEFORE UPDATE ON clients
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY clients_isolation ON clients
+    USING (organization_id = techsync_current_org_id());
+
+-- =====================================================================
+-- properties: managed locations where service work happens
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS properties (
+    id BIGSERIAL PRIMARY KEY,
+    organization_id BIGINT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    client_id BIGINT REFERENCES clients(id) ON DELETE SET NULL,
+    name TEXT NOT NULL,
+    address_line1 TEXT NOT NULL,
+    address_line2 TEXT,
+    city TEXT,
+    state TEXT,
+    postal_code TEXT,
+    country TEXT NOT NULL DEFAULT 'US',
+    unit TEXT,
+    access_notes TEXT,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_properties_org ON properties(organization_id);
+CREATE INDEX IF NOT EXISTS idx_properties_org_client ON properties(organization_id, client_id);
+CREATE INDEX IF NOT EXISTS idx_properties_org_active ON properties(organization_id, is_active);
+
+CREATE TRIGGER update_properties_updated_at
+    BEFORE UPDATE ON properties
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY properties_isolation ON properties
+    USING (organization_id = techsync_current_org_id());
+
+-- =====================================================================
+-- vendors: external providers that can be associated with work
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS vendors (
+    id BIGSERIAL PRIMARY KEY,
+    organization_id BIGINT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    contact_name TEXT,
+    email TEXT,
+    phone TEXT,
+    service_types TEXT[] NOT NULL DEFAULT '{}',
+    coverage_area TEXT,
+    notes TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_vendors_org ON vendors(organization_id);
+CREATE INDEX IF NOT EXISTS idx_vendors_org_active ON vendors(organization_id, is_active);
+
+CREATE TRIGGER update_vendors_updated_at
+    BEFORE UPDATE ON vendors
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY vendors_isolation ON vendors
+    USING (organization_id = techsync_current_org_id());
+
+-- =====================================================================
 -- work_orders (RF-18)
 -- =====================================================================
 CREATE TABLE IF NOT EXISTS work_orders (
@@ -181,6 +280,9 @@ CREATE TABLE IF NOT EXISTS work_orders (
     organization_id BIGINT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     description TEXT,
+    property_id BIGINT REFERENCES properties(id) ON DELETE SET NULL,
+    client_id BIGINT REFERENCES clients(id) ON DELETE SET NULL,
+    vendor_id BIGINT REFERENCES vendors(id) ON DELETE SET NULL,
     customer_name TEXT,
     address TEXT,
     latitude DOUBLE PRECISION,
@@ -205,6 +307,9 @@ CREATE TABLE IF NOT EXISTS work_orders (
 CREATE INDEX IF NOT EXISTS idx_work_orders_org ON work_orders(organization_id);
 CREATE INDEX IF NOT EXISTS idx_work_orders_org_status ON work_orders(organization_id, status);
 CREATE INDEX IF NOT EXISTS idx_work_orders_org_tech ON work_orders(organization_id, assigned_technician_id);
+CREATE INDEX IF NOT EXISTS idx_work_orders_org_property ON work_orders(organization_id, property_id);
+CREATE INDEX IF NOT EXISTS idx_work_orders_org_client ON work_orders(organization_id, client_id);
+CREATE INDEX IF NOT EXISTS idx_work_orders_org_vendor ON work_orders(organization_id, vendor_id);
 CREATE INDEX IF NOT EXISTS idx_work_orders_created_at ON work_orders(created_at DESC);
 
 CREATE TRIGGER update_work_orders_updated_at

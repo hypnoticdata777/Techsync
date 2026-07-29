@@ -7,8 +7,10 @@ or portfolio-integration slice so future sessions can resume without guessing.
 
 ## Current Position
 
-TechSync Ops is moving from a local/public code POC into a hosted,
-portfolio-connected, investor-safe public POC for PMC maintenance operations.
+TechSync Ops is moving from a local/public code POC into a robust,
+investor-safe PMC maintenance operations POC. Vercel and portfolio linking are
+now intentionally held until the end of v1.3 so the product is stronger before
+it is promoted publicly.
 
 Current verified repo state:
 
@@ -68,15 +70,17 @@ Completed:
 - Added `server/.env.demo.example`.
 - Replaced the older SaaS requirements file with `TECHSYNC_OPS_REQUIREMENTS.md`
   and captured all 10 PMC operations requirement batches.
-- Added `PRODUCT_ROADMAP.md` with v1.2 public POC completion and v1.3 PMC
-  operations expansion scope.
+- Added `TECHSYNC_OPS_TRACEABILITY.md` to map captured requirements to v1.2,
+  v1.3, and later work.
+- Added `PRODUCT_ROADMAP.md` with v1.2 product-foundation completion and v1.3
+  PMC operations expansion scope.
 
 Remaining:
 
 - Confirm no generated mobile build artifacts appear after the next local build.
 - Keep public-facing docs aligned as hosted backend/demo work changes.
 
-### Phase 2 - Hosted Backend POC
+### Phase 2 - Demo Database and Hosted-Readiness Foundation
 
 Status: in progress
 
@@ -93,11 +97,12 @@ Completed:
   connection string.
 - Confirmed `alembic current` reports `0001 (head)`.
 - Cleared `DATABASE_URL` from the local PowerShell session after migration.
-- Selected Vercel as the v1.2 backend host for portfolio alignment.
+- Selected Vercel as the eventual backend host for portfolio alignment, now
+  deferred to the end of v1.3.
 - Added Vercel deployment prep files: `api/index.py`, root `requirements.txt`,
   `.python-version`, `vercel.json`, and `VERCEL_DEPLOYMENT.md`.
 - Updated the FastAPI metadata and health service name to TechSync Ops.
-- Added `scripts/smoke_v12.py` and `V12_EVIDENCE_TEMPLATE.md` so hosted v1.2
+- Added `scripts/smoke_v12.py` and `V12_EVIDENCE_TEMPLATE.md` so hosted
   evidence can be collected repeatably with synthetic data.
 - Added manual GitHub Actions workflow `Hosted v1.2 smoke test` for hosted
   evidence collection after Vercel deploy.
@@ -106,15 +111,32 @@ Completed:
 
 Next:
 
-- Use the pooled Neon connection string for hosted/serverless runtime.
-- Use `APP_ENV=demo` for the first hosted POC while storage/email/Stripe are
-  deferred.
-- Configure host secrets.
-- Deploy FastAPI behind HTTPS.
-- Smoke-test `/health`, auth, onboarding, work-order lifecycle, ingestion, and
-  dashboard metrics.
+- Build the v1.3 PMC foundation before hosting: first-class clients,
+  properties, vendors, and work-order links.
+- Keep Vercel secrets/deployment work parked until the end-of-v1.3 showcase
+  gate.
+- Smoke-test auth, onboarding, work-order lifecycle, ingestion, dashboard
+  metrics, and the new PMC entity APIs locally/CI before public hosting.
 
-### Phase 3 - Hosted Client or Demo Surface
+### Phase 3 - v1.3 PMC Operations Foundation
+
+Status: in progress
+
+Completed:
+
+- Added Alembic migration `0002` for clients, properties, vendors, expanded
+  roles, and work-order links.
+- Started tenant-scoped API/repository/model work for client, property, and
+  vendor records.
+
+Next:
+
+- Add client/homeowner visibility, communication separation, completion proof
+  rules, and reporting improvements.
+- Decide the demo surface only after the v1.3 product workflows are robust
+  enough to show.
+
+### Phase 4 - Hosted Client or Demo Surface
 
 Status: not started
 
@@ -125,7 +147,7 @@ Next:
 - Configure `EXPO_PUBLIC_API_BASE_URL`.
 - Validate synthetic demo flow against hosted backend.
 
-### Phase 4 - Portfolio Integration
+### Phase 5 - Portfolio Integration
 
 Status: not started
 
@@ -136,7 +158,7 @@ Next:
 - Link the GitHub repo and hosted demo/walkthrough.
 - Label production limitations honestly.
 
-### Phase 5 - Demo QA and Evidence Pack
+### Phase 6 - Demo QA and Evidence Pack
 
 Status: not started
 
@@ -148,7 +170,7 @@ Next:
 - Capture screenshots and evidence notes.
 - Document known limitations.
 
-### Phase 6 - Investor-Safe Stop Point
+### Phase 7 - Investor-Safe Stop Point
 
 Status: not started
 
@@ -163,6 +185,7 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Choose the backend host, configure its secret manager with `APP_ENV=demo`, the
-pooled Neon runtime URL, HTTPS app URLs, JWT secret, and locked-down CORS, then
-deploy FastAPI behind HTTPS and run the hosted smoke-test checklist.
+Continue v1.3 product depth before hosting: finish the tenant-scoped
+property/client/vendor foundation, then move into client-visible communication,
+proof-gated closeout, and reporting. Vercel deployment and portfolio sliver
+linking should happen at the end of v1.3.

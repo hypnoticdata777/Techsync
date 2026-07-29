@@ -4,9 +4,11 @@ Date: July 28, 2026
 
 ## Purpose
 
-This runbook prepares the v1.2 hosted backend checkpoint on Vercel. It keeps
-the codebase investor-safe by using `APP_ENV=demo`, Neon pooled Postgres, host
-secret storage, HTTPS-only public URLs, and synthetic data only.
+This runbook prepares the eventual Vercel backend deployment. Deployment is
+intentionally deferred until the end of v1.3 so the product has stronger PMC
+workflows before it is promoted through the portfolio sliver/showcase. When it
+is used, it keeps the codebase investor-safe with `APP_ENV=demo`, Neon pooled
+Postgres, host secret storage, HTTPS-only public URLs, and synthetic data only.
 
 Official docs checked:
 
@@ -17,8 +19,8 @@ Important Vercel notes:
 
 - Vercel supports FastAPI through the Python runtime when a Python entrypoint
   exports an ASGI `app`.
-- The Python runtime is marked Beta by Vercel, so v1.2 must include a real
-  hosted smoke test before the portfolio link is promoted.
+- The Python runtime is marked Beta by Vercel, so the end-of-v1.3 showcase gate
+  must include a real hosted smoke test before the portfolio link is promoted.
 - Runtime dependencies are installed from root-level dependency files, so this
   repo has a root `requirements.txt` that points to `server/requirements.txt`.
 
@@ -135,9 +137,9 @@ python scripts/smoke_v12.py --base-url "https://<vercel-url>" --output "v12-smok
 `v12-smoke-evidence*.json` is ignored by Git because it is local deployment
 evidence, not source code.
 
-Use `V12_EVIDENCE_TEMPLATE.md` to capture the final portfolio-safe v1.2 proof,
-then wire the public copy from `PORTFOLIO_TECHSYNC_OPS.md` into the portfolio
-page.
+Use `V12_EVIDENCE_TEMPLATE.md` or its v1.3 successor to capture the final
+portfolio-safe proof, then wire the public copy from `PORTFOLIO_TECHSYNC_OPS.md`
+into the portfolio page.
 
 You can also run the same script from GitHub Actions:
 
@@ -147,7 +149,7 @@ You can also run the same script from GitHub Actions:
 4. Paste the hosted Vercel API base URL.
 5. Download the `v12-smoke-evidence` artifact after it passes.
 
-## Known v1.2 Hosting Limits
+## Known Hosting Limits
 
 - Vercel Python runtime is Beta.
 - This deployment is a public POC, not a real-customer production system.
