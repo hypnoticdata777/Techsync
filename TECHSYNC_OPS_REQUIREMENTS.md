@@ -232,6 +232,8 @@ Already represented in the codebase:
   work, overloaded technicians, and property hotspots.
 - v1.3 mobile operations report chart bars for risk mix, technician capacity
   pressure, and property hotspot activity.
+- v1.3 completion cycle-time reporting by service type, with mobile chart bars
+  and operations-report CSV export evidence.
 - v1.3 mobile PMC directory workflow for org admins/coordinators to create and
   edit clients, properties, and vendors.
 - v1.3 mobile work-order form selectors for linking client, property, and

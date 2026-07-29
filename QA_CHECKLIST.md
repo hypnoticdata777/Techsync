@@ -112,7 +112,8 @@ they have been verified in the relevant environment.
 - [x] Client/property/vendor CSV exports implemented.
 - [x] Mobile operations report chart bars implemented for risk mix,
       technician capacity pressure, and property hotspot activity.
-- [ ] Completion cycle-time charts and deeper export workflows implemented.
+- [x] Completion cycle-time reporting, mobile chart bars, and operations-report
+      CSV export evidence implemented.
 
 ## Client / Demo Surface
 

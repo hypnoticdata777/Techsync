@@ -50,10 +50,20 @@ class PropertyHotspotMetric(BaseModel):
     latest_work_order_at: Optional[datetime] = None
 
 
+class CompletionCycleMetric(BaseModel):
+    service_type: str
+    completed_count: int
+    average_cycle_hours: float
+    fastest_cycle_hours: float
+    slowest_cycle_hours: float
+    latest_completed_at: Optional[datetime] = None
+
+
 class OperationsReport(BaseModel):
     stale_work_orders: list[StaleWorkOrderMetric]
     overloaded_technicians: list[OverloadedTechnicianMetric]
     property_hotspots: list[PropertyHotspotMetric]
+    completion_cycles: list[CompletionCycleMetric]
 
 
 class DispatchBoardWorkOrder(BaseModel):

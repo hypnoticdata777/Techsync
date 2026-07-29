@@ -1138,3 +1138,38 @@ Result:
 
 - Client tests passed: `5 passed suites`, `23 passed tests`.
 - Backend tests passed: `113 passed`.
+
+## 2026-07-29 - v1.3 Completion Cycle-Time Reporting
+
+Decision:
+
+- Close the remaining completion cycle-time reporting gap before hosting.
+- Keep the metric tenant-scoped, API-backed, CSV-exportable, smoke-testable,
+  and visible in the mobile operations report.
+
+Changes:
+
+- Added `completion_cycles` to the backend operations report response.
+- Added `list_completion_cycles` to compute average, fastest, and slowest
+  created-to-completed hours by service type.
+- Added completion cycle rows to the operations-report CSV export.
+- Updated `scripts/smoke_v13.py` and `V13_EVIDENCE_TEMPLATE.md` so the final
+  hosted gate verifies completion cycle metrics and export evidence.
+- Added mobile completion cycle-time chart bars and detail cards to the
+  Operations Report screen.
+- Updated README, roadmap, requirements, traceability, QA, public-readiness, and
+  phase-status docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Client tests passed: `5 passed suites`, `24 passed tests`.
+- Backend tests passed: `114 passed`.
+- Compile check passed.

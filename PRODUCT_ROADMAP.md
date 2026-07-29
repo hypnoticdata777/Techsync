@@ -157,11 +157,13 @@ Likely scope:
   - property hotspots
   - backend operations report now started in v1.3
   - mobile operations report view now started in v1.3
-  - completion cycle time
+  - completion cycle-time reporting now started in v1.3
   - operations report and dispatch board CSV exports now started in v1.3
   - client/property/vendor CSV exports now started in v1.3
   - mobile risk/capacity/hotspot chart bars now started in v1.3
-  - completion cycle-time charts and deeper export workflows remain later polish
+  - mobile completion cycle-time chart bars and operations-report CSV evidence
+    now started in v1.3
+  - deeper cost/export workflows remain later polish
 - Operational hardening:
   - error monitoring
   - uptime monitoring
@@ -196,8 +198,8 @@ v1.3 exit criteria:
   actions are now started.
 - Backend and mobile reporting show stale work, overloaded technicians, and
   property hotspot evidence, with dashboard CSV export and client/property/vendor
-  CSV export plus mobile risk/capacity/hotspot chart bars started; completion
-  cycle-time charts and deeper exports still remain later polish.
+  CSV export plus mobile risk/capacity/hotspot/completion cycle-time chart bars
+  started; deeper cost/export workflows still remain later polish.
 - Backend and mobile dispatch board show unassigned active work, technician
   lanes, workload utilization, and SLA risk.
 - Manual work-order creation warns coordinators about likely duplicates before

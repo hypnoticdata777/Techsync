@@ -48,9 +48,14 @@ def build_operations_report_csv(report: OperationsReport) -> str:
         "open_count",
         "in_progress_count",
         "completed_count",
+        "service_type",
+        "average_cycle_hours",
+        "fastest_cycle_hours",
+        "slowest_cycle_hours",
         "created_at",
         "sla_due_at",
         "latest_work_order_at",
+        "latest_completed_at",
     ]
     rows: list[dict[str, Any]] = []
 
@@ -94,6 +99,19 @@ def build_operations_report_csv(report: OperationsReport) -> str:
                 "in_progress_count": item.in_progress_count,
                 "completed_count": item.completed_count,
                 "latest_work_order_at": item.latest_work_order_at,
+            }
+        )
+
+    for item in report.completion_cycles:
+        rows.append(
+            {
+                "section": "completion_cycle",
+                "service_type": item.service_type,
+                "completed_count": item.completed_count,
+                "average_cycle_hours": item.average_cycle_hours,
+                "fastest_cycle_hours": item.fastest_cycle_hours,
+                "slowest_cycle_hours": item.slowest_cycle_hours,
+                "latest_completed_at": item.latest_completed_at,
             }
         )
 

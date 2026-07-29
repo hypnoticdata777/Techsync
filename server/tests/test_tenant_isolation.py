@@ -94,6 +94,18 @@ def test_property_hotspot_report_scopes_by_organization_id():
     assert params["limit"] == 5
 
 
+def test_completion_cycle_report_scopes_by_organization_id():
+    with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
+        work_orders_repo.list_completion_cycles(organization_id=42, since_days=90, limit=5)
+
+    sql, params = mock_fetch.call_args.args
+    assert "WHERE organization_id = :organization_id" in sql
+    assert "status = 'completed'" in sql
+    assert "completed_at IS NOT NULL" in sql
+    assert params["organization_id"] == 42
+    assert params["limit"] == 5
+
+
 def test_dispatch_board_work_orders_scope_and_join_by_organization_id():
     with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
         work_orders_repo.list_dispatch_board_work_orders(organization_id=42)
@@ -677,23 +689,28 @@ def test_operations_report_uses_tenant_scoped_repository_calls():
     with patch("routers.dashboard.work_orders_repo.list_stale_work_orders", return_value=[]) as stale:
         with patch("routers.dashboard.work_orders_repo.list_overloaded_technicians", return_value=[]) as overloaded:
             with patch("routers.dashboard.work_orders_repo.list_property_hotspots", return_value=[]) as hotspots:
-                report = dashboard_router.get_operations_report(
-                    stale_days=14,
-                    hotspot_days=60,
-                    limit=5,
-                    current_user=admin_user,
-                    organization={"id": 6},
-                )
+                with patch("routers.dashboard.work_orders_repo.list_completion_cycles", return_value=[]) as cycles:
+                    report = dashboard_router.get_operations_report(
+                        stale_days=14,
+                        hotspot_days=60,
+                        completion_days=120,
+                        limit=5,
+                        current_user=admin_user,
+                        organization={"id": 6},
+                    )
 
     assert report.stale_work_orders == []
     assert report.overloaded_technicians == []
     assert report.property_hotspots == []
+    assert report.completion_cycles == []
     assert stale.call_args.args == (6,)
     assert stale.call_args.kwargs == {"older_than_days": 14, "limit": 5}
     assert overloaded.call_args.args == (6,)
     assert overloaded.call_args.kwargs == {"limit": 5}
     assert hotspots.call_args.args == (6,)
     assert hotspots.call_args.kwargs == {"since_days": 60, "limit": 5}
+    assert cycles.call_args.args == (6,)
+    assert cycles.call_args.kwargs == {"since_days": 120, "limit": 5}
 
 
 def test_dispatch_board_uses_tenant_scoped_repository_calls_and_summarizes():
@@ -787,17 +804,29 @@ def test_operations_report_export_returns_downloadable_csv():
             "sla_due_at": None,
         }
     ]
+    cycle_rows = [
+        {
+            "service_type": "plumbing",
+            "completed_count": 3,
+            "average_cycle_hours": 18.5,
+            "fastest_cycle_hours": 4.0,
+            "slowest_cycle_hours": 36.0,
+            "latest_completed_at": "2026-07-28T03:00:00Z",
+        }
+    ]
 
     with patch("routers.dashboard.work_orders_repo.list_stale_work_orders", return_value=stale_rows) as stale:
         with patch("routers.dashboard.work_orders_repo.list_overloaded_technicians", return_value=[]):
             with patch("routers.dashboard.work_orders_repo.list_property_hotspots", return_value=[]):
-                response = dashboard_router.export_operations_report(
-                    stale_days=14,
-                    hotspot_days=60,
-                    limit=5,
-                    current_user=admin_user,
-                    organization={"id": 6},
-                )
+                with patch("routers.dashboard.work_orders_repo.list_completion_cycles", return_value=cycle_rows):
+                    response = dashboard_router.export_operations_report(
+                        stale_days=14,
+                        hotspot_days=60,
+                        completion_days=120,
+                        limit=5,
+                        current_user=admin_user,
+                        organization={"id": 6},
+                    )
 
     assert stale.call_args.args == (6,)
     assert response.media_type == "text/csv"
@@ -805,6 +834,8 @@ def test_operations_report_export_returns_downloadable_csv():
     body = response.body.decode("utf-8")
     assert "section,id,title" in body
     assert "stale_work_order,1,Old leak" in body
+    assert "completion_cycle" in body
+    assert "plumbing,18.5,4.0,36.0" in body
 
 
 def test_dispatch_board_export_returns_summary_and_lane_csv():

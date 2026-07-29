@@ -87,7 +87,8 @@ v1.3 should focus on the highest-value PMC product gaps:
 6. Duplicate-detection warnings now started for manual work-order creation.
 7. Reporting for stale work, overloaded technicians, property hotspots, and
    completion cycle time, with the first mobile report view, mobile chart bars,
-   dashboard CSV exports, and PMC directory entity CSV exports now started.
+   dashboard CSV exports, completion cycle export evidence, and PMC directory
+   entity CSV exports now started.
 8. v1.3 hosted smoke evidence for PMC entity links, communication visibility,
    approval request state, proof-gated closeout, closeout exports, and
    operations reporting, dashboard CSV exports, and PMC directory entity CSV

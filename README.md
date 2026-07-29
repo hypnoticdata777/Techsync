@@ -165,7 +165,8 @@ plan-limit enforcement, tenant-isolation of the repository layer, public
 endpoint rate limiting, Stripe webhook handling, attachment upload validation,
 v1.3 communication/approval guardrails, operations reporting, and closeout
 package/export behavior, dispatch-board composition, and dashboard CSV export
-behavior. These run without a live database (repositories are mocked); the RLS
+behavior including completion cycle-time export evidence. These run without a
+live database (repositories are mocked); the RLS
 behavior described above was additionally verified by hand against a local
 Postgres instance.
 
@@ -280,12 +281,12 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
 - **v1.3 PMC operations**: client/property/vendor records, work-order links,
   client-visible versus internal messages, client approval requests/decisions,
   proof-gated closeout, closeout package summary, printable HTML/text closeout
-  exports, operations reporting for stale work, overload, and property
-  hotspots, CSV exports for the operations report, dispatch board, clients,
-  properties, and vendors, and a dispatch board for unassigned work, technician
-  lanes, utilization, SLA risk, duplicate-warning preflight checks, mobile PMC
-  directory management, mobile report chart bars, and work-order entity
-  linking.
+  exports, operations reporting for stale work, overload, property hotspots,
+  and completion cycle time, CSV exports for the operations report, dispatch
+  board, clients, properties, and vendors, and a dispatch board for unassigned
+  work, technician lanes, utilization, SLA risk, duplicate-warning preflight
+  checks, mobile PMC directory management, mobile report chart bars, and
+  work-order entity linking.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.
@@ -306,10 +307,10 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
 - **No web admin panel** was built (RF-25/RF-26 exist as API endpoints
   only); the spec's "panel administrativo" is assumed to be a future
   separate web client consuming this same API.
-- **PMC operations expansion still remaining**: calendar/maps, completion
-  cycle-time charts, deeper entity exports, binary PDF generation, deeper
-  client/vendor portals, and final UI/UX screenshot testing are tracked for
-  v1.3+ / later in `PRODUCT_ROADMAP.md`.
+- **PMC operations expansion still remaining**: calendar/maps, deeper cost and
+  accounting exports, binary PDF generation, deeper client/vendor portals, and
+  final UI/UX screenshot testing are tracked for v1.3+ / later in
+  `PRODUCT_ROADMAP.md`.
 
 - **RF-23 (offline sync)**, **RF-10/RF-13 (PDF/email ingestion)**: deferred,
   per the spec's own "Notas de Alcance" — not blocking for a POC.

@@ -1,4 +1,5 @@
 import {
+  buildCompletionCycleRows,
   buildPropertyHotspotRows,
   buildRiskBreakdown,
   buildTechnicianLoadRows,
@@ -53,5 +54,34 @@ describe('report metric helpers', () => {
       expect.objectContaining({id: 1, percent: 50}),
       expect.objectContaining({id: 2, percent: 100}),
     ]);
+  });
+
+  test('sorts completion cycle rows by slowest average cycle time', () => {
+    const rows = buildCompletionCycleRows([
+      {
+        service_type: 'plumbing',
+        completed_count: 3,
+        average_cycle_hours: 18.5,
+        fastest_cycle_hours: 4,
+        slowest_cycle_hours: 36,
+      },
+      {
+        service_type: 'hvac',
+        completed_count: 2,
+        average_cycle_hours: 80,
+        fastest_cycle_hours: 48,
+        slowest_cycle_hours: 120,
+      },
+    ]);
+
+    expect(rows[0]).toEqual(
+      expect.objectContaining({
+        id: 'hvac',
+        value: '80h',
+        percent: 100,
+        color: '#fb7185',
+      }),
+    );
+    expect(rows[1]).toEqual(expect.objectContaining({id: 'plumbing', percent: 23}));
   });
 });

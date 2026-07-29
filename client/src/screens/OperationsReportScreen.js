@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
 import {
+  buildCompletionCycleRows,
   buildPropertyHotspotRows,
   buildRiskBreakdown,
   buildTechnicianLoadRows,
@@ -17,6 +18,7 @@ import {
 
 const STALE_DAY_OPTIONS = [7, 14, 30];
 const HOTSPOT_DAY_OPTIONS = [30, 90, 180];
+const COMPLETION_DAY_OPTIONS = [30, 90, 180];
 const REPORT_LIMIT = 10;
 
 const getStatusColor = status => {
@@ -143,6 +145,7 @@ function OperationsReportScreen() {
   const [report, setReport] = useState(null);
   const [staleDays, setStaleDays] = useState(7);
   const [hotspotDays, setHotspotDays] = useState(90);
+  const [completionDays, setCompletionDays] = useState(90);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -151,7 +154,7 @@ function OperationsReportScreen() {
     try {
       setLoading(true);
       const res = await authFetch(
-        `/dashboard/operations-report?stale_days=${staleDays}&hotspot_days=${hotspotDays}&limit=${REPORT_LIMIT}`,
+        `/dashboard/operations-report?stale_days=${staleDays}&hotspot_days=${hotspotDays}&completion_days=${completionDays}&limit=${REPORT_LIMIT}`,
       );
 
       if (res.ok) {
@@ -172,7 +175,7 @@ function OperationsReportScreen() {
     } finally {
       setLoading(false);
     }
-  }, [authFetch, hotspotDays, logout, staleDays]);
+  }, [authFetch, completionDays, hotspotDays, logout, staleDays]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -189,6 +192,7 @@ function OperationsReportScreen() {
       stale: report?.stale_work_orders?.length || 0,
       overloaded: report?.overloaded_technicians?.length || 0,
       hotspots: report?.property_hotspots?.length || 0,
+      cycles: report?.completion_cycles?.length || 0,
     }),
     [report],
   );
@@ -202,6 +206,11 @@ function OperationsReportScreen() {
     () => buildPropertyHotspotRows(report?.property_hotspots),
     [report],
   );
+  const completionCycleRows = useMemo(
+    () => buildCompletionCycleRows(report?.completion_cycles),
+    [report],
+  );
+  const completionCycles = report?.completion_cycles || [];
 
   return (
     <ScrollView
@@ -235,6 +244,13 @@ function OperationsReportScreen() {
           onSelect={setHotspotDays}
           suffix="d"
         />
+        <SegmentGroup
+          label="Completion window"
+          options={COMPLETION_DAY_OPTIONS}
+          selected={completionDays}
+          onSelect={setCompletionDays}
+          suffix="d"
+        />
       </View>
 
       {loading && <ActivityIndicator style={styles.loader} color="#38bdf8" />}
@@ -263,6 +279,10 @@ function OperationsReportScreen() {
               <Text style={styles.summaryValue}>{summary.hotspots}</Text>
               <Text style={styles.summaryLabel}>Hotspots</Text>
             </View>
+            <View style={styles.summaryTile}>
+              <Text style={styles.summaryValue}>{summary.cycles}</Text>
+              <Text style={styles.summaryLabel}>Cycle Types</Text>
+            </View>
           </View>
 
           <ChartBlock
@@ -284,6 +304,13 @@ function OperationsReportScreen() {
             subtitle="Top repeated-property activity by total work orders"
             rows={propertyHotspotRows}
             emptyMessage="No repeated property activity to chart."
+          />
+
+          <ChartBlock
+            title="Completion Cycle Time"
+            subtitle="Average created-to-completed hours by service type"
+            rows={completionCycleRows}
+            emptyMessage="No completed work orders in this window."
           />
 
           <View style={styles.section}>
@@ -350,6 +377,28 @@ function OperationsReportScreen() {
                   </View>
                   <Text style={styles.cardMeta}>
                     Latest {formatDate(item.latest_work_order_at)}
+                  </Text>
+                </View>
+              ))
+            )}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Completion Cycle Time</Text>
+            {completionCycles.length === 0 ? (
+              <EmptyState message="No completed work orders in this window." />
+            ) : (
+              completionCycles.map(item => (
+                <View key={item.service_type} style={styles.card}>
+                  <Text style={styles.cardTitle}>{formatLabel(item.service_type)}</Text>
+                  <View style={styles.countGrid}>
+                    <Text style={styles.countCell}>Done {item.completed_count}</Text>
+                    <Text style={styles.countCell}>Avg {item.average_cycle_hours}h</Text>
+                    <Text style={styles.countCell}>Fast {item.fastest_cycle_hours}h</Text>
+                    <Text style={styles.countCell}>Slow {item.slowest_cycle_hours}h</Text>
+                  </View>
+                  <Text style={styles.cardMeta}>
+                    Latest {formatDate(item.latest_completed_at)}
                   </Text>
                 </View>
               ))
@@ -452,11 +501,13 @@ const styles = StyleSheet.create({
   },
   summaryRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 10,
     marginBottom: 16,
   },
   summaryTile: {
     flex: 1,
+    minWidth: 132,
     minHeight: 72,
     justifyContent: 'center',
     backgroundColor: '#0f172a',

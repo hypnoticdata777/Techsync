@@ -216,6 +216,39 @@ def list_property_hotspots(
     )
 
 
+def list_completion_cycles(
+    organization_id: int,
+    since_days: int = 90,
+    limit: int = 10,
+) -> list[dict]:
+    cutoff = datetime.now(timezone.utc) - timedelta(days=since_days)
+    return fetch_all(
+        """
+        SELECT
+            COALESCE(NULLIF(service_type, ''), 'general') AS service_type,
+            COUNT(id) AS completed_count,
+            ROUND(AVG(EXTRACT(EPOCH FROM (completed_at - created_at)) / 3600.0)::numeric, 1)
+                AS average_cycle_hours,
+            ROUND(MIN(EXTRACT(EPOCH FROM (completed_at - created_at)) / 3600.0)::numeric, 1)
+                AS fastest_cycle_hours,
+            ROUND(MAX(EXTRACT(EPOCH FROM (completed_at - created_at)) / 3600.0)::numeric, 1)
+                AS slowest_cycle_hours,
+            MAX(completed_at) AS latest_completed_at
+        FROM work_orders
+        WHERE organization_id = :organization_id
+          AND status = 'completed'
+          AND completed_at IS NOT NULL
+          AND completed_at >= :cutoff
+          AND completed_at >= created_at
+        GROUP BY COALESCE(NULLIF(service_type, ''), 'general')
+        HAVING COUNT(id) > 0
+        ORDER BY average_cycle_hours DESC, completed_count DESC
+        LIMIT :limit
+        """,
+        {"organization_id": organization_id, "cutoff": cutoff, "limit": limit},
+    )
+
+
 def list_dispatch_board_work_orders(organization_id: int) -> list[dict]:
     """v1.3 dispatch board: active work enriched with PMC context."""
     return fetch_all(

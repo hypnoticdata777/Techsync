@@ -109,8 +109,9 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Closeout package returned proof, messages, attachments, and audit context.
 - [ ] Text closeout export rendered.
 - [ ] HTML closeout export rendered.
-- [ ] Operations report endpoint returned stale/overloaded/hotspot buckets.
-- [ ] Operations report CSV export rendered.
+- [ ] Operations report endpoint returned stale/overloaded/hotspot/completion
+      cycle buckets.
+- [ ] Operations report CSV export rendered completion cycle evidence.
 - [ ] Dispatch board endpoint returned summary, unassigned queue, and
       technician lanes.
 - [ ] Dispatch board CSV export rendered.

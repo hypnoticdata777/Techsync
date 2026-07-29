@@ -186,6 +186,9 @@ Completed:
 - Added hosted v1.3 smoke coverage for client/property/vendor CSV exports.
 - Added mobile operations report chart bars for risk mix, technician capacity
   pressure, and property hotspot activity.
+- Added completion cycle-time reporting by service type to the backend
+  operations report, operations-report CSV export, hosted v1.3 smoke harness,
+  and mobile operations report chart/detail view.
 - Added role-specific mobile work-order landing band and `ROLE_UX_SWEEP.md` to
   start the exhaustive pre-hosting UX sweep.
 - Added role-aware work-order detail command panel for status, approval, proof,
@@ -201,9 +204,8 @@ Next:
 
 - Keep hosting deferred until every non-hosting requirement bucket is locally
   as complete as practical.
-- Continue local-only product depth with binary PDF closeout polish, completion
-  cycle-time/deeper export workflows, or the remaining role-by-role UI/UX
-  friction sweep.
+- Continue local-only product depth with binary PDF closeout polish, deeper
+  export workflows, or the remaining role-by-role UI/UX friction sweep.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,

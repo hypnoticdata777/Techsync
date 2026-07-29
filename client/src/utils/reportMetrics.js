@@ -61,8 +61,33 @@ export const buildPropertyHotspotRows = hotspots => {
     .slice(0, 5);
 };
 
+export const buildCompletionCycleRows = cycles => {
+  const rows = [...(cycles || [])];
+  const maxAverage = Math.max(...rows.map(item => safeNumber(item.average_cycle_hours)), 0);
+
+  return rows
+    .map(item => {
+      const average = safeNumber(item.average_cycle_hours);
+      const count = safeNumber(item.completed_count);
+      return {
+        id: item.service_type || 'general',
+        label: item.service_type || 'general',
+        detail: `${count} completed | fastest ${safeNumber(
+          item.fastest_cycle_hours,
+        )}h | slowest ${safeNumber(item.slowest_cycle_hours)}h`,
+        value: `${average}h`,
+        rawValue: average,
+        percent: maxAverage > 0 ? clampPercent((average / maxAverage) * 100) : 0,
+        color: average >= 72 ? '#fb7185' : average >= 24 ? '#fbbf24' : '#a3e635',
+      };
+    })
+    .sort((a, b) => b.rawValue - a.rawValue)
+    .slice(0, 5);
+};
+
 export default {
   buildRiskBreakdown,
   buildTechnicianLoadRows,
   buildPropertyHotspotRows,
+  buildCompletionCycleRows,
 };

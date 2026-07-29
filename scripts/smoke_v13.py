@@ -474,13 +474,16 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         "GET",
         "/dashboard/operations-report",
         token=admin_token,
-        query={"stale_days": 1, "hotspot_days": 90, "limit": 10},
+        query={"stale_days": 1, "hotspot_days": 90, "completion_days": 90, "limit": 10},
     )
     assert_detail(
         "operations_report_shape",
-        {"stale_work_orders", "overloaded_technicians", "property_hotspots"}.issubset(
-            operations_report.data.keys()
-        ),
+        {
+            "stale_work_orders",
+            "overloaded_technicians",
+            "property_hotspots",
+            "completion_cycles",
+        }.issubset(operations_report.data.keys()),
         operations_report.data,
     )
     record(
@@ -490,6 +493,7 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
             "stale_count": len(operations_report.data.get("stale_work_orders", [])),
             "overloaded_count": len(operations_report.data.get("overloaded_technicians", [])),
             "hotspot_count": len(operations_report.data.get("property_hotspots", [])),
+            "completion_cycle_count": len(operations_report.data.get("completion_cycles", [])),
         },
     )
 
@@ -498,12 +502,13 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         "GET",
         "/dashboard/operations-report/export",
         token=admin_token,
-        query={"stale_days": 1, "hotspot_days": 90, "limit": 10},
+        query={"stale_days": 1, "hotspot_days": 90, "completion_days": 90, "limit": 10},
     )
     assert_detail(
         "operations_report_csv_export",
         isinstance(operations_report_export.data, str)
-        and "section,id,title" in operations_report_export.data,
+        and "section,id,title" in operations_report_export.data
+        and "completion_cycle" in operations_report_export.data,
         operations_report_export.data[:200]
         if isinstance(operations_report_export.data, str)
         else operations_report_export.data,
@@ -511,7 +516,7 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
     record(
         "operations_report_csv_export",
         operations_report_export,
-        {"contains_csv_header": True},
+        {"contains_csv_header": True, "contains_completion_cycle": True},
     )
 
     dispatch_board = request(base_url, "GET", "/dashboard/dispatch-board", token=admin_token)
