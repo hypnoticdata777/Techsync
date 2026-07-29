@@ -843,3 +843,41 @@ Result:
   installed.
 - Client Babel transform could not run because `client\node_modules` is not
   installed in this checkout.
+
+## 2026-07-29 - v1.3 Dashboard CSV Exports
+
+Decision:
+
+- Add downloadable CSV evidence for coordinator/admin dashboard views before
+  hosting so operations report and dispatch board data can be shared or
+  archived during investor-safe demos.
+- Keep exports server-generated and tenant-scoped through the existing
+  dashboard routes rather than adding a separate reporting subsystem.
+
+Changes:
+
+- Added `server/services/dashboard_export_service.py`.
+- Added `GET /dashboard/operations-report/export`.
+- Added `GET /dashboard/dispatch-board/export`.
+- Added route-level regression coverage for both CSV responses.
+- Updated `scripts/smoke_v13.py` to verify both dashboard CSV exports.
+- Updated README, requirements, roadmap, traceability, QA, phase status,
+  Vercel runbook, and v1.3 evidence template.
+
+Verification:
+
+```powershell
+python -m compileall -q server\services\dashboard_export_service.py server\routers\dashboard.py server\tests\test_tenant_isolation.py scripts\smoke_v13.py
+$env:JWT_SECRET_KEY='test-secret-key-for-import-check-only'; server\venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'server'); import main; print(main.app.title)"; Remove-Item Env:JWT_SECRET_KEY
+server\venv\Scripts\python.exe -c "import os, sys; from unittest.mock import patch; os.environ['JWT_SECRET_KEY']='test-secret-key-for-import-check-only'; sys.path.insert(0, 'server'); from models.user import User; from routers.dashboard import export_dispatch_board, export_operations_report; user=User(id=1, organization_id=6, email='admin@example.com', full_name='Admin', role='org_admin', is_active=True); stale=[{'id':1,'title':'Old leak','status':'open','priority':'high','assigned_technician_id':None,'property_id':3,'client_id':9,'created_at':'2026-07-28T00:00:00Z','sla_due_at':None}]; techs=[{'id':8,'availability_status':'available','max_daily_jobs':4,'users':{'full_name':'Tech One','email':'tech@example.com'}}]; dispatch=[{'id':2,'title':'New leak','status':'open','priority':'emergency','assigned_technician_id':None,'property_id':3,'property_name':'West','client_id':9,'client_display_name':'Owner','vendor_id':None,'vendor_name':None,'created_at':'2026-07-28T00:00:00Z','sla_due_at':None}]; patches=[patch('routers.dashboard.work_orders_repo.list_stale_work_orders', return_value=stale), patch('routers.dashboard.work_orders_repo.list_overloaded_technicians', return_value=[]), patch('routers.dashboard.work_orders_repo.list_property_hotspots', return_value=[]), patch('routers.dashboard.work_orders_repo.list_dispatch_board_work_orders', return_value=dispatch), patch('routers.dashboard.technicians_repo.list_by_org', return_value=techs)]; [p.start() for p in patches]; report=export_operations_report(current_user=user, organization={'id':6}); board=export_dispatch_board(current_user=user, organization={'id':6}); [p.stop() for p in patches]; print(report.media_type, board.media_type, 'stale_work_order' in report.body.decode(), 'summary,open_count' in board.body.decode())"
+git diff --check
+```
+
+Result:
+
+- Compile passed.
+- FastAPI app imported successfully and printed `TechSync Ops API`.
+- Direct dashboard CSV export smoke printed `text/csv text/csv True True`.
+- `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
+- Focused pytest was attempted but could not run because the current local
+  `server\venv` still does not have pytest installed.

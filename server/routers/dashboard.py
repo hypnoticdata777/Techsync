@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends
 from fastapi import Query
+from fastapi.responses import PlainTextResponse
 
 from dependencies import get_current_organization, require_roles
 from models.dashboard import (
@@ -17,6 +18,7 @@ from models.dashboard import (
 from models.user import User
 from repositories import technicians as technicians_repo
 from repositories import work_orders as work_orders_repo
+from services import dashboard_export_service
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -61,6 +63,28 @@ def get_operations_report(
         property_hotspots=work_orders_repo.list_property_hotspots(
             organization["id"], since_days=hotspot_days, limit=limit
         ),
+    )
+
+
+@router.get("/operations-report/export")
+def export_operations_report(
+    stale_days: int = Query(7, ge=1, le=90),
+    hotspot_days: int = Query(90, ge=1, le=365),
+    limit: int = Query(10, ge=1, le=50),
+    current_user: User = Depends(require_roles("org_admin", "coordinator")),
+    organization: dict = Depends(get_current_organization),
+):
+    report = get_operations_report(
+        stale_days=stale_days,
+        hotspot_days=hotspot_days,
+        limit=limit,
+        current_user=current_user,
+        organization=organization,
+    )
+    return PlainTextResponse(
+        dashboard_export_service.build_operations_report_csv(report),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="techsync-operations-report.csv"'},
     )
 
 
@@ -165,4 +189,17 @@ def get_dispatch_board(
         summary=summary,
         unassigned_work_orders=unassigned,
         technician_lanes=lanes,
+    )
+
+
+@router.get("/dispatch-board/export")
+def export_dispatch_board(
+    current_user: User = Depends(require_roles("org_admin", "coordinator")),
+    organization: dict = Depends(get_current_organization),
+):
+    board = get_dispatch_board(current_user=current_user, organization=organization)
+    return PlainTextResponse(
+        dashboard_export_service.build_dispatch_board_csv(board),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="techsync-dispatch-board.csv"'},
     )

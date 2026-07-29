@@ -80,8 +80,10 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Text closeout export rendered.
 - [ ] HTML closeout export rendered.
 - [ ] Operations report endpoint returned stale/overloaded/hotspot buckets.
+- [ ] Operations report CSV export rendered.
 - [ ] Dispatch board endpoint returned summary, unassigned queue, and
       technician lanes.
+- [ ] Dispatch board CSV export rendered.
 
 ## Manual Hosted Follow-Up
 

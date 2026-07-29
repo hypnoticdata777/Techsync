@@ -757,3 +757,96 @@ def test_dispatch_board_uses_tenant_scoped_repository_calls_and_summarizes():
     assert board.technician_lanes[0].technician_id == 8
     assert board.technician_lanes[0].active_work_order_count == 1
     assert board.technician_lanes[0].utilization_percent == 25.0
+
+
+def test_operations_report_export_returns_downloadable_csv():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    stale_rows = [
+        {
+            "id": 1,
+            "title": "Old leak",
+            "status": "open",
+            "priority": "high",
+            "assigned_technician_id": None,
+            "property_id": 3,
+            "client_id": 9,
+            "created_at": "2026-07-28T00:00:00Z",
+            "sla_due_at": None,
+        }
+    ]
+
+    with patch("routers.dashboard.work_orders_repo.list_stale_work_orders", return_value=stale_rows) as stale:
+        with patch("routers.dashboard.work_orders_repo.list_overloaded_technicians", return_value=[]):
+            with patch("routers.dashboard.work_orders_repo.list_property_hotspots", return_value=[]):
+                response = dashboard_router.export_operations_report(
+                    stale_days=14,
+                    hotspot_days=60,
+                    limit=5,
+                    current_user=admin_user,
+                    organization={"id": 6},
+                )
+
+    assert stale.call_args.args == (6,)
+    assert response.media_type == "text/csv"
+    assert "techsync-operations-report.csv" in response.headers["content-disposition"]
+    body = response.body.decode("utf-8")
+    assert "section,id,title" in body
+    assert "stale_work_order,1,Old leak" in body
+
+
+def test_dispatch_board_export_returns_summary_and_lane_csv():
+    admin_user = User(
+        id=5,
+        organization_id=6,
+        email="admin@example.com",
+        full_name="Admin",
+        role="org_admin",
+        is_active=True,
+    )
+    work_rows = [
+        {
+            "id": 1,
+            "title": "Unassigned leak",
+            "status": "open",
+            "priority": "emergency",
+            "assigned_technician_id": None,
+            "property_id": 3,
+            "property_name": "West Tower",
+            "client_id": 9,
+            "client_display_name": "Owner A",
+            "vendor_id": 11,
+            "vendor_name": "Vendor A",
+            "created_at": "2026-07-28T00:00:00Z",
+            "sla_due_at": None,
+        }
+    ]
+    technician_rows = [
+        {
+            "id": 8,
+            "availability_status": "available",
+            "max_daily_jobs": 4,
+            "users": {"full_name": "Tech One", "email": "tech@example.com"},
+        }
+    ]
+
+    with patch("routers.dashboard.work_orders_repo.list_dispatch_board_work_orders", return_value=work_rows) as work_list:
+        with patch("routers.dashboard.technicians_repo.list_by_org", return_value=technician_rows):
+            response = dashboard_router.export_dispatch_board(
+                current_user=admin_user,
+                organization={"id": 6},
+            )
+
+    assert work_list.call_args.args == (6,)
+    assert response.media_type == "text/csv"
+    assert "techsync-dispatch-board.csv" in response.headers["content-disposition"]
+    body = response.body.decode("utf-8")
+    assert "summary,open_count,1" in body
+    assert "unassigned_work_order" in body
+    assert "technician_lane" in body

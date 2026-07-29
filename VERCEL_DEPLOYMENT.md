@@ -128,8 +128,9 @@ Then verify:
 - approval request state
 - proof-gated closeout
 - closeout package and printable export
-- dashboard metrics and operations report
+- dashboard metrics, operations report, and operations report CSV export
 - dispatch board summary, unassigned queue, technician lanes, and SLA risk
+- dispatch board CSV export
 - CSV ingestion with synthetic data
 - attachment metadata/proof boundary
 - attachment upload if storage is configured

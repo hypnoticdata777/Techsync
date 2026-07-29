@@ -461,6 +461,27 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         },
     )
 
+    operations_report_export = request(
+        base_url,
+        "GET",
+        "/dashboard/operations-report/export",
+        token=admin_token,
+        query={"stale_days": 1, "hotspot_days": 90, "limit": 10},
+    )
+    assert_detail(
+        "operations_report_csv_export",
+        isinstance(operations_report_export.data, str)
+        and "section,id,title" in operations_report_export.data,
+        operations_report_export.data[:200]
+        if isinstance(operations_report_export.data, str)
+        else operations_report_export.data,
+    )
+    record(
+        "operations_report_csv_export",
+        operations_report_export,
+        {"contains_csv_header": True},
+    )
+
     dispatch_board = request(base_url, "GET", "/dashboard/dispatch-board", token=admin_token)
     assert_detail(
         "dispatch_board_shape",
@@ -477,6 +498,26 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
             "sla_at_risk_count": dispatch_board.data["summary"].get("sla_at_risk_count"),
             "lane_count": len(dispatch_board.data.get("technician_lanes", [])),
         },
+    )
+
+    dispatch_board_export = request(
+        base_url,
+        "GET",
+        "/dashboard/dispatch-board/export",
+        token=admin_token,
+    )
+    assert_detail(
+        "dispatch_board_csv_export",
+        isinstance(dispatch_board_export.data, str)
+        and "summary,open_count" in dispatch_board_export.data,
+        dispatch_board_export.data[:200]
+        if isinstance(dispatch_board_export.data, str)
+        else dispatch_board_export.data,
+    )
+    record(
+        "dispatch_board_csv_export",
+        dispatch_board_export,
+        {"contains_summary_rows": True},
     )
 
     evidence["run_finished_at"] = datetime.now(timezone.utc).isoformat()

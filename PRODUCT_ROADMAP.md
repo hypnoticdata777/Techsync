@@ -56,6 +56,7 @@ Scope:
   - proof-gated closeout
   - closeout package JSON and printable exports
   - operations reporting
+  - dashboard CSV exports
 - Portfolio TechSync Ops page prepared with:
   - problem statement
   - architecture summary
@@ -152,7 +153,8 @@ Likely scope:
   - backend operations report now started in v1.3
   - mobile operations report view now started in v1.3
   - completion cycle time
-  - basic CSV export
+  - operations report and dispatch board CSV exports now started in v1.3
+  - richer charts and broader entity exports
 - Operational hardening:
   - error monitoring
   - uptime monitoring
@@ -179,7 +181,8 @@ v1.3 exit criteria:
   scoped work-order visibility, client-visible comments, and approval/decline
   actions are now started.
 - Backend and mobile reporting show stale work, overloaded technicians, and
-  property hotspot evidence, with richer charts/export still to complete.
+  property hotspot evidence, with dashboard CSV export started and richer
+  charts/broader exports still to complete.
 - Backend and mobile dispatch board show unassigned active work, technician
   lanes, workload utilization, and SLA risk.
 - Manual work-order creation warns coordinators about likely duplicates before

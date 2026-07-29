@@ -176,6 +176,8 @@ Completed:
   exports, and operations reporting.
 - Added hosted v1.3 smoke coverage for the dispatch board shape and summary.
 - Added hosted v1.3 smoke coverage for duplicate-warning preflight.
+- Added CSV export endpoints for the operations report and dispatch board.
+- Added hosted v1.3 smoke coverage for both dashboard CSV exports.
 
 Next:
 
@@ -186,8 +188,9 @@ Next:
   hosted email/log path because invite tokens are intentionally not echoed by
   the API response.
 - Decide whether binary PDF rendering is needed before the portfolio showcase.
-- Continue local-only product depth with richer report exports, synthetic demo
-  seed/reset tooling, or binary PDF closeout polish before hosting.
+- Continue local-only product depth with synthetic demo seed/reset tooling,
+  richer charts, broader entity exports, or binary PDF closeout polish before
+  hosting.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -240,8 +243,8 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue toward the end-of-v1.3 showcase gate: apply the latest migrations to
-the Neon demo database, deploy to the selected Vercel backend when ready, run
-`scripts/smoke_v13.py`, capture `V13_EVIDENCE_TEMPLATE.md`, then decide whether
-binary PDF rendering or a screenshot/walkthrough demo surface is the better
-final portfolio proof.
+Continue local-only v1.3 hardening before the showcase gate: add synthetic demo
+seed/reset tooling or binary PDF closeout polish, then apply the latest
+migrations to the Neon demo database, deploy to Vercel when ready, run
+`scripts/smoke_v13.py`, capture `V13_EVIDENCE_TEMPLATE.md`, and connect the
+portfolio sliver only after the product surface feels robust enough to show.

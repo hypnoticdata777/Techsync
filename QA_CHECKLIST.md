@@ -90,16 +90,18 @@ they have been verified in the relevant environment.
 - [ ] Binary closeout PDF renderer implemented if needed after hosted demo.
 - [x] Backend operations report added for stale work, overloaded technicians, and
       property hotspots.
+- [x] Operations report CSV export implemented.
 - [x] Mobile operations report view added for stale work, overloaded technicians,
       and property hotspots.
 - [x] Backend dispatch board added for unassigned work, technician lanes,
       workload utilization, and SLA risk.
+- [x] Dispatch board CSV export implemented.
 - [x] Mobile dispatch board view added for org admins/coordinators.
 - [x] Backend duplicate-warning preflight added for likely same-property/address
       and service-type work.
 - [x] Mobile duplicate-warning confirmation added before manual work-order
       creation.
-- [ ] Richer reporting charts/export implemented.
+- [ ] Richer reporting charts and broader entity exports implemented.
 
 ## Client / Demo Surface
 
