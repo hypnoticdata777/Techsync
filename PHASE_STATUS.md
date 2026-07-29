@@ -93,11 +93,13 @@ Completed:
   connection string.
 - Confirmed `alembic current` reports `0001 (head)`.
 - Cleared `DATABASE_URL` from the local PowerShell session after migration.
+- Selected Vercel as the v1.2 backend host for portfolio alignment.
+- Added Vercel deployment prep files: `api/index.py`, root `requirements.txt`,
+  `.python-version`, `vercel.json`, and `VERCEL_DEPLOYMENT.md`.
+- Updated the FastAPI metadata and health service name to TechSync Ops.
 
 Next:
 
-- Choose hosting provider: Vercel for portfolio alignment, or Render/Railway
-  for a more traditional FastAPI service.
 - Use the pooled Neon connection string for hosted/serverless runtime.
 - Use `APP_ENV=demo` for the first hosted POC while storage/email/Stripe are
   deferred.

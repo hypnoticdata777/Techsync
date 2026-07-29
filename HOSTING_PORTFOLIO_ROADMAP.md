@@ -32,7 +32,7 @@ Product roadmap:
 Current recommendation:
 
 ```text
-Neon Postgres + Vercel or Render/Railway FastAPI + Cloudflare DNS/portfolio/R2 later
+Neon Postgres + Vercel FastAPI + Cloudflare DNS/portfolio/R2 later
 ```
 
 Rationale:
@@ -41,8 +41,9 @@ Rationale:
   connection string for serverless-style hosting.
 - Cloudflare is the best fit for DNS, the portfolio front door, and later R2
   attachment storage.
-- Vercel is attractive if the portfolio is also hosted there, but the Python
-  runtime is beta and must be smoke-tested carefully.
+- Vercel is selected for v1.2 because the portfolio is expected to land there
+  too. Its Python runtime is beta, so the hosted API must be smoke-tested
+  carefully before the portfolio promotes the live link.
 - Render or Railway are lower-friction traditional FastAPI service options if
   we want fewer serverless runtime constraints.
 - Cloudflare Workers Python can run FastAPI, but Python Workers are beta and
@@ -75,10 +76,9 @@ Email candidates:
 - Postmark SMTP
 - Mailgun SMTP
 
-Decision needed:
+Current decision:
 
-- Which backend host will run FastAPI: Vercel for portfolio alignment, or
-  Render/Railway for a more traditional web service.
+- Backend host selected for v1.2: Vercel.
 - First hosted POC uses `APP_ENV=demo`; full `APP_ENV=production` waits until
   SMTP and object storage are configured.
 - Whether attachment upload is part of the first hosted POC, or deferred.
@@ -91,6 +91,8 @@ Decision needed:
 Tasks:
 
 - Choose backend host.
+- Prepare Vercel deployment adapter and runbook. Completed with `api/index.py`,
+  root `requirements.txt`, `vercel.json`, and `VERCEL_DEPLOYMENT.md`.
 - Create managed Postgres demo database. Completed with Neon project
   `techsync-poc`, branch `production`, database `neondb`.
 - Configure host secrets:

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ],
+  "functions": {
+    "api/**/*.py": {
+      "excludeFiles": "{client/**,server/tests/**,server/__pycache__/**,server/**/*.pyc,tools/**,turnflow-mvp/**,*.md,gitleaks*.json}"
+    }
+  }
+}

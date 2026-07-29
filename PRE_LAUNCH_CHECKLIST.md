@@ -31,6 +31,9 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
 - [x] **Reposition product docs as TechSync Ops.** Active requirements now live
       in `TECHSYNC_OPS_REQUIREMENTS.md`, with v1.2/v1.3 planning in
       `PRODUCT_ROADMAP.md`.
+- [x] **Prepare Vercel deployment adapter.** `api/index.py`, root
+      `requirements.txt`, `.python-version`, `vercel.json`, and
+      `VERCEL_DEPLOYMENT.md` now define the v1.2 Vercel backend path.
 - [x] **Wire up real password-reset and invitation emails.** The backend
       now sends reset and invitation emails through `services/email_service.py`.
       Local development can use `EMAIL_DELIVERY_METHOD=log`; production

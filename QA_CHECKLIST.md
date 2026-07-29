@@ -39,7 +39,8 @@ they have been verified in the relevant environment.
 - [x] Stripe documented as deferred for first investor POC.
 - [x] Email/storage deferral tradeoffs documented.
 - [x] Code-supported `APP_ENV=demo` hosted POC mode added.
-- [ ] Backend host chosen: Vercel, Render, or Railway.
+- [x] Backend host chosen: Vercel.
+- [x] Vercel deployment adapter and runbook added.
 - [x] Neon demo database created.
 - [x] Direct Neon connection string used for Alembic migrations.
 - [x] Pooled Neon connection string selected for hosted/serverless runtime.

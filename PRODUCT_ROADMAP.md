@@ -29,6 +29,7 @@ Scope:
 
 - Product name and documentation updated to TechSync Ops.
 - Active requirements source moved to `TECHSYNC_OPS_REQUIREMENTS.md`.
+- Vercel backend deployment adapter and runbook prepared.
 - Hosted FastAPI backend deployed behind HTTPS.
 - Neon demo Postgres used through the pooled runtime connection string.
 - `APP_ENV=demo` configured in the host secret manager.

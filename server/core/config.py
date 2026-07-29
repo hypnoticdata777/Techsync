@@ -1,5 +1,5 @@
 """
-Centralized environment configuration for the TechSync API.
+Centralized environment configuration for the TechSync Ops API.
 """
 
 import os

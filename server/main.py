@@ -1,5 +1,5 @@
 """
-TechSync API entrypoint.
+TechSync Ops API entrypoint.
 
 Business logic lives in services/, data access in repositories/, request/response
 shapes in models/, and HTTP wiring in routers/ (RNF-09: modular structure).
@@ -16,9 +16,9 @@ from routers import auth, billing, dashboard, ingestion, invitations, organizati
 from services.attachment_storage_service import StorageNotConfigured
 
 app = FastAPI(
-    title="TechSync API",
-    version="1.0.0",
-    description="Multi-tenant SaaS backend for TechSync, a field service management platform.",
+    title="TechSync Ops API",
+    version="1.2.0",
+    description="Multi-tenant maintenance operations backend for PMCs and field-service teams.",
 )
 
 app.add_middleware(
@@ -41,7 +41,7 @@ async def storage_not_configured_handler(request: Request, exc: StorageNotConfig
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": "techsync-api"}
+    return {"status": "ok", "service": "techsync-ops-api"}
 
 
 app.include_router(auth.router)

@@ -11,12 +11,12 @@ Use this as the default unless a later implementation pass finds a blocker:
 
 ```text
 Database: Neon Postgres, project techsync-poc, using the pooled connection string for hosted/serverless runtime
-Backend: Vercel or Render/Railway for FastAPI
+Backend: Vercel for the v1.2 FastAPI public POC
 Cloudflare: DNS, portfolio/static front door, and later R2 object storage
 Storage: deferred for the first hosted smoke test unless attachment upload is in scope
 Email: deferred/logged for the first hosted smoke test unless invitation/reset email is in scope
 Stripe: deferred; document as a supported billing boundary for later test-mode enablement
-Portfolio: prepare the TechSync project entry now, connect the live link after the portfolio URL exists
+Portfolio: prepare the TechSync Ops project entry now, connect the live link after the portfolio URL exists
 ```
 
 ## Why This Path
@@ -29,11 +29,11 @@ Portfolio: prepare the TechSync project entry now, connect the live link after t
 - Cloudflare Workers can run Python/FastAPI, but Python Workers are still beta
   and require a different deployment shape. Keep that as a later optimization,
   not the first investor POC backend.
-- Vercel is attractive if the portfolio also lands there, but its Python
-  runtime is also beta. It can still be a good first POC host if the app fits
-  serverless constraints.
-- Render or Railway are simpler traditional FastAPI hosting options if we want
-  fewer serverless/runtime surprises.
+- Vercel is selected for v1.2 because the portfolio is expected to land there
+  too. Its Python runtime is beta, so the hosted API must be smoke-tested
+  carefully before the live link is promoted.
+- Render or Railway remain fallback options if Vercel's Python/serverless
+  constraints create blockers.
 
 ## Provider Tradeoffs
 
@@ -89,6 +89,7 @@ Pros:
 - Easy to connect to a portfolio or project landing page.
 - Supports FastAPI through the Python runtime.
 - Good preview deployment workflow.
+- Selected for v1.2 because the portfolio path is expected to use Vercel.
 
 Tradeoffs:
 
@@ -183,13 +184,12 @@ Current flow:
 
 1. Neon demo Postgres is created and migrated to `0001 (head)`.
 2. Use the pooled Neon connection string for hosted/serverless runtime.
-3. Choose backend host: Vercel for portfolio alignment, or Render/Railway for
-   a more traditional FastAPI service.
+3. Deploy the backend on Vercel for portfolio alignment.
 4. Use `APP_ENV=demo` for the first hosted environment while
    storage/email/Stripe are deferred.
 5. Configure host secrets, deploy, and smoke-test the backend.
-6. Add the TechSync card/case study to the portfolio.
-7. Connect the live TechSync URL once the portfolio landing page is up.
+6. Add the TechSync Ops card/case study to the portfolio.
+7. Connect the live TechSync Ops URL once the portfolio landing page is up.
 
 ## Official References Checked
 

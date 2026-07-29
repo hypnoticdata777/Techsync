@@ -1,5 +1,5 @@
 """
-Logging configuration for TechSync API (RNF-12: structured logs for ingestion,
+Logging configuration for TechSync Ops API (RNF-12: structured logs for ingestion,
 assignment, and auth-failure events).
 
 Set LOG_FORMAT=json to emit one JSON object per line (recommended in any
