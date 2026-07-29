@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import ScreenErrorState from '../components/ScreenErrorState';
 
 const TABS = [
   {key: 'clients', label: 'Clients'},
@@ -468,12 +469,7 @@ function PmcDirectoryScreen() {
       {loading && <ActivityIndicator style={styles.loader} color="#38bdf8" />}
 
       {error && (
-        <View style={styles.errorPanel}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadDirectory}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
+        <ScreenErrorState message={error} onRetry={loadDirectory} />
       )}
 
       {!loading && !error && (
@@ -784,27 +780,6 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginTop: 20,
-  },
-  errorPanel: {
-    alignItems: 'center',
-    padding: 16,
-  },
-  errorText: {
-    color: '#f97373',
-    fontSize: 14,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  retryButton: {
-    backgroundColor: '#38bdf8',
-    borderRadius: 8,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-  },
-  retryButtonText: {
-    color: '#050816',
-    fontSize: 14,
-    fontWeight: '800',
   },
   emptyPanel: {
     backgroundColor: '#020617',

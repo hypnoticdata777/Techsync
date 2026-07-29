@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import {useAuth} from '../context/AuthContext';
+import ScreenErrorState from '../components/ScreenErrorState';
 import {buildDetailSummary, getDetailRoleContext} from '../utils/roleWorkflows';
 
 // Helper function to get status color
@@ -104,9 +105,11 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const [updating, setUpdating] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [attachmentsLoading, setAttachmentsLoading] = useState(true);
+  const [attachmentsError, setAttachmentsError] = useState(null);
   const [uploadingAttachment, setUploadingAttachment] = useState(false);
   const [messages, setMessages] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(true);
+  const [messagesError, setMessagesError] = useState(null);
   const [messageBody, setMessageBody] = useState('');
   const [messageVisibility, setMessageVisibility] = useState('internal');
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -137,9 +140,15 @@ function WorkOrderDetailsScreen({route, navigation}) {
       if (res.ok) {
         const data = await res.json();
         setAttachments(data);
+        setAttachmentsError(null);
+      } else if (res.status === 403) {
+        setAttachmentsError('Attachments are not available for this role.');
+      } else {
+        setAttachmentsError('Unable to load attachments.');
       }
     } catch (error) {
       console.error('Attachment load error:', error);
+      setAttachmentsError(error.message || 'Unable to load attachments.');
     } finally {
       setAttachmentsLoading(false);
     }
@@ -156,9 +165,15 @@ function WorkOrderDetailsScreen({route, navigation}) {
       if (res.ok) {
         const data = await res.json();
         setMessages(data);
+        setMessagesError(null);
+      } else if (res.status === 403) {
+        setMessagesError('Messages are not available for this role.');
+      } else {
+        setMessagesError('Unable to load messages.');
       }
     } catch (error) {
       console.error('Message load error:', error);
+      setMessagesError(error.message || 'Unable to load messages.');
     } finally {
       setMessagesLoading(false);
     }
@@ -584,11 +599,21 @@ function WorkOrderDetailsScreen({route, navigation}) {
             </Text>
           </TouchableOpacity>
 
-          {!messagesLoading && messages.length === 0 ? (
+          {messagesError ? (
+            <ScreenErrorState
+              compact
+              title="Messages unavailable"
+              message={messagesError}
+              actionLabel="Retry messages"
+              onRetry={loadMessages}
+            />
+          ) : null}
+
+          {!messagesError && !messagesLoading && messages.length === 0 ? (
             <Text style={styles.emptyAttachments}>No messages yet.</Text>
           ) : null}
 
-          {messages.map(message => (
+          {!messagesError && messages.map(message => (
             <View key={message.id} style={styles.messageItem}>
               <View style={styles.messageHeader}>
                 <Text
@@ -630,11 +655,21 @@ function WorkOrderDetailsScreen({route, navigation}) {
             </View>
           ) : null}
 
-          {!attachmentsLoading && attachments.length === 0 ? (
+          {attachmentsError ? (
+            <ScreenErrorState
+              compact
+              title="Attachments unavailable"
+              message={attachmentsError}
+              actionLabel="Retry attachments"
+              onRetry={loadAttachments}
+            />
+          ) : null}
+
+          {!attachmentsError && !attachmentsLoading && attachments.length === 0 ? (
             <Text style={styles.emptyAttachments}>No attachments yet.</Text>
           ) : null}
 
-          {attachments.map(attachment => (
+          {!attachmentsError && attachments.map(attachment => (
             <TouchableOpacity
               key={attachment.id}
               style={styles.attachmentItem}

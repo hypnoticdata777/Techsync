@@ -131,6 +131,8 @@ they have been verified in the relevant environment.
       proof, and message summary.
 - [x] Manager-only mobile screens are role-gated in navigation for
       technician/client/viewer/vendor roles.
+- [x] Primary mobile API failure recovery has visible retry states for list,
+      report, dispatch, directory, and detail message/attachment loads.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.

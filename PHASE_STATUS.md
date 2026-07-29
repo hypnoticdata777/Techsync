@@ -199,6 +199,8 @@ Completed:
   client, property, vendor, and address state.
 - Added tested mobile navigator gating so manager-only screens are mounted only
   for org admin/coordinator roles.
+- Added reusable mobile retry/error states for primary API failures and
+  work-order detail message/attachment subloads.
 - Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and
@@ -208,8 +210,8 @@ Next:
 
 - Keep hosting deferred until every non-hosting requirement bucket is locally
   as complete as practical.
-- Continue local-only product depth with deeper export workflows or the
-  remaining role-by-role UI/UX friction sweep.
+- Continue local-only product depth with the remaining role-by-role UI/UX
+  friction sweep and screenshot-proof preparation.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,

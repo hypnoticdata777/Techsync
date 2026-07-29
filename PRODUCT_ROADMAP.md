@@ -211,7 +211,8 @@ v1.3 exit criteria:
   deferred.
 - Role-specific UX sweep evidence is started locally, with final screenshots
   and walkthrough evidence still required before hosting; manager-only route
-  gating is now covered by client tests.
+  gating is now covered by client tests, and primary mobile API failure states
+  now expose retry actions.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data, while
   the client invite/accept/approval decision is manually verified from the
   hosted email/log path.

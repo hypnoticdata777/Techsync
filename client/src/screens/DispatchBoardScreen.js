@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import ScreenErrorState from '../components/ScreenErrorState';
 
 const getPriorityColor = priority => {
   switch (priority) {
@@ -178,12 +179,7 @@ function DispatchBoardScreen({navigation}) {
       {loading && <ActivityIndicator style={styles.loader} color="#38bdf8" />}
 
       {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={fetchBoard}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
+        <ScreenErrorState message={error} onRetry={fetchBoard} />
       )}
 
       {!loading && !error && board && (
@@ -281,27 +277,6 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginTop: 24,
-  },
-  errorContainer: {
-    padding: 16,
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 14,
-    color: '#f97373',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  retryButton: {
-    backgroundColor: '#38bdf8',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 6,
-  },
-  retryButtonText: {
-    color: '#050816',
-    fontWeight: '700',
-    fontSize: 14,
   },
   summaryGrid: {
     flexDirection: 'row',

@@ -10,6 +10,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import ScreenErrorState from '../components/ScreenErrorState';
 import {
   buildQueueSummary,
   canManageOperations,
@@ -178,12 +179,7 @@ function WorkOrdersListScreen({navigation}) {
 
       {loading && <ActivityIndicator style={styles.loader} />}
       {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={fetchWorkOrders}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
+        <ScreenErrorState message={error} onRetry={fetchWorkOrders} />
       )}
       {!loading && !error && (
         <FlatList
@@ -359,27 +355,6 @@ const styles = StyleSheet.create({
     color: '#9ca3af',
     marginTop: 24,
     textAlign: 'center',
-  },
-  errorContainer: {
-    padding: 16,
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 14,
-    color: '#f97373',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  retryButton: {
-    backgroundColor: '#38bdf8',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 6,
-  },
-  retryButtonText: {
-    color: '#050816',
-    fontWeight: '600',
-    fontSize: 14,
   },
   loader: {
     marginTop: 24,

@@ -1236,3 +1236,34 @@ Result:
 - Client tests passed: `5 passed suites`, `25 passed tests`.
 - Backend tests passed: `115 passed`.
 - Compile check passed.
+
+## 2026-07-29 - v1.3 Mobile Retry-State Polish
+
+Decision:
+
+- Continue the local-only UX sweep before hosting.
+- Standardize mobile API failure recovery so primary screens and work-order
+  detail subloads give users a clear retry action.
+
+Changes:
+
+- Added reusable `client/src/components/ScreenErrorState.js`.
+- Replaced duplicated retry panels on the work-order list, dispatch board,
+  operations report, and PMC directory screens.
+- Added explicit retry states for work-order detail message and attachment
+  loading failures.
+- Updated role UX, QA, roadmap, README, and phase-status docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+```
+
+Result:
+
+- Client tests passed: `5 passed suites`, `25 passed tests`.
+- Backend tests passed: `115 passed`.
+- Compile check passed.

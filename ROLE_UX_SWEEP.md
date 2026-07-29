@@ -37,6 +37,9 @@ Implemented:
   property, vendor, and address context before save.
 - Added tested role-aware route registration so manager-only screens are not
   mounted for technician, client, viewer, or vendor roles.
+- Added a reusable retry/error panel for primary mobile API failures, including
+  work-order list, dispatch board, operations report, PMC directory, and
+  work-order detail message/attachment subloads.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
 
@@ -50,7 +53,7 @@ server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 Result:
 
 - Client tests passed: `5 passed suites`, `25 passed tests`.
-- Backend tests passed: `113 passed`.
+- Backend tests passed: `115 passed`.
 
 ## Role Matrix
 
@@ -73,6 +76,7 @@ Result:
   Started with tested navigator route gating; final screenshot proof still
   needed.
 - Verify all primary screens have clear retry states after API failures.
+  Implemented in code; final screenshot proof still needed.
 - Validate text wrapping and touch target comfort on small mobile widths.
 - Run the final screenshot/walkthrough pass only after local product depth is
   otherwise complete.
