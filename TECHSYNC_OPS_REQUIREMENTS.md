@@ -243,6 +243,10 @@ Already represented in the codebase:
   details, creation, invitation acceptance, and password reset.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,
   storage, and Stripe where intentionally configured.
+- Synthetic demo seed/reset tooling for a repeatable tenant story covering
+  users, technicians, clients, properties, vendors, work orders, messages,
+  events, proof metadata, dashboard reports, dispatch board, duplicate
+  warnings, approvals, and closeout evidence.
 
 Important gaps for the PMC operations product:
 

@@ -91,6 +91,9 @@ STRIPE_WEBHOOK_SECRET=<stripe webhook signing secret>
 
 - [ ] Neon migration is current: `alembic current` reports `0005 (head)` or
       later.
+- [ ] Synthetic demo tenant has been seeded/reset with
+      `scripts/seed_demo_data.py` using the direct Neon URL from a local
+      terminal, then `DATABASE_URL` has been cleared from that shell.
 - [ ] `DATABASE_URL` in Vercel uses the Neon pooled runtime URL, not the direct
       migration URL.
 - [ ] `JWT_SECRET_KEY` is newly generated for Vercel.

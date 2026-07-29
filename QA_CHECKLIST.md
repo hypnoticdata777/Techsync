@@ -45,6 +45,8 @@ they have been verified in the relevant environment.
       the end of v1.3.
 - [x] Repeatable v1.2 hosted smoke-test script added.
 - [x] Repeatable v1.3 hosted smoke-test script added.
+- [x] Repeatable synthetic demo seed/reset script added.
+- [x] Synthetic demo data runbook added.
 - [x] Manual GitHub Actions hosted smoke workflow updated for v1.3.
 - [x] v1.2 evidence template added.
 - [x] v1.3 evidence template added.
@@ -57,6 +59,7 @@ they have been verified in the relevant environment.
 - [ ] Host secret manager configured at the end-of-v1.3 showcase gate.
 - [x] Initial Alembic migration run against hosted/demo database.
 - [ ] Latest v1.3 Alembic migrations verified against hosted/demo database.
+- [ ] Synthetic demo tenant seeded or reset against hosted/demo database.
 - [ ] `/health` verified over HTTPS.
 - [ ] CORS verified against the intended demo client origin.
 - [ ] Onboarding flow verified.
@@ -110,6 +113,8 @@ they have been verified in the relevant environment.
 - [ ] `EXPO_PUBLIC_API_BASE_URL` points to hosted backend in demo mode after
       the end-of-v1.3 hosting gate.
 - [ ] Synthetic demo walkthrough validated.
+- [ ] Synthetic demo seed/reset run captured without exposing database URLs or
+      provider secrets.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.
 - [ ] Mobile/desktop screenshots captured for portfolio.

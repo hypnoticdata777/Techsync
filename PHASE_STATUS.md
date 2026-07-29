@@ -178,19 +178,23 @@ Completed:
 - Added hosted v1.3 smoke coverage for duplicate-warning preflight.
 - Added CSV export endpoints for the operations report and dispatch board.
 - Added hosted v1.3 smoke coverage for both dashboard CSV exports.
+- Added `scripts/seed_demo_data.py` for repeatable synthetic demo tenant
+  seed/reset.
+- Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and
+  safety guardrails.
 
 Next:
 
 - Migrate/smoke-test the demo database through the latest v1.3 migrations, then
+- seed/reset the synthetic demo tenant with `scripts/seed_demo_data.py`, then
 - run `scripts/smoke_v13.py` against the hosted API and capture
   `V13_EVIDENCE_TEMPLATE.md`.
 - Manually verify a synthetic client invite/accept/approval decision from the
   hosted email/log path because invite tokens are intentionally not echoed by
   the API response.
 - Decide whether binary PDF rendering is needed before the portfolio showcase.
-- Continue local-only product depth with synthetic demo seed/reset tooling,
-  richer charts, broader entity exports, or binary PDF closeout polish before
-  hosting.
+- Continue local-only product depth with richer charts, broader entity exports,
+  binary PDF closeout polish, or the UI/UX friction sweep before hosting.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -243,8 +247,9 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue local-only v1.3 hardening before the showcase gate: add synthetic demo
-seed/reset tooling or binary PDF closeout polish, then apply the latest
-migrations to the Neon demo database, deploy to Vercel when ready, run
-`scripts/smoke_v13.py`, capture `V13_EVIDENCE_TEMPLATE.md`, and connect the
-portfolio sliver only after the product surface feels robust enough to show.
+Continue local-only v1.3 hardening before the showcase gate: consider binary
+PDF closeout polish or a role-by-role UI/UX friction sweep, then apply the
+latest migrations to the Neon demo database, seed/reset the synthetic demo
+tenant, deploy to Vercel when ready, run `scripts/smoke_v13.py`, capture
+`V13_EVIDENCE_TEMPLATE.md`, and connect the portfolio sliver only after the
+product surface feels robust enough to show.

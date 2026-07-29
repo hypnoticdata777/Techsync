@@ -35,6 +35,33 @@ Observed:
 PASTE SANITIZED OUTPUT HERE
 ```
 
+## Synthetic Demo Seed Evidence
+
+Command:
+
+```powershell
+python scripts\seed_demo_data.py seed --reset-existing
+python scripts\seed_demo_data.py status
+```
+
+Expected:
+
+```text
+Demo org slug: techsync-ops-demo-pmc
+users: 6
+technicians: 3
+clients: 2
+properties: 3
+vendors: 2
+work_orders: 5
+```
+
+Observed:
+
+```text
+PASTE SANITIZED OUTPUT HERE
+```
+
 ## Hosted Smoke Command
 
 Local:

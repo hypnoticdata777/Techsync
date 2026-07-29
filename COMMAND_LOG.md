@@ -881,3 +881,40 @@ Result:
 - `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
 - Focused pytest was attempted but could not run because the current local
   `server\venv` still does not have pytest installed.
+
+## 2026-07-29 - v1.3 Synthetic Demo Seed/Reset
+
+Decision:
+
+- Add repeatable local/demo database seed and reset tooling before Vercel
+  hosting so the product can show the same synthetic PMC story every time.
+- Scope reset to one deterministic synthetic organization slug,
+  `techsync-ops-demo-pmc`, so the script cannot wipe arbitrary tenant data.
+
+Changes:
+
+- Added `scripts/seed_demo_data.py` with `status`, `seed`, and `reset` actions.
+- Seed creates synthetic admin, coordinator, client, and technician users;
+  technician profiles; clients; properties; vendors; active/stale/assigned/
+  unassigned/completed work orders; internal/client messages; audit events; and
+  proof attachment metadata.
+- Added `DEMO_DATA_RUNBOOK.md`.
+- Updated README, roadmap, QA, evidence, deployment, readiness, hosting, phase
+  status, requirements, and traceability docs.
+
+Verification:
+
+```powershell
+python -m compileall -q scripts\seed_demo_data.py
+python scripts\seed_demo_data.py --help
+git diff --check
+```
+
+Result:
+
+- Compile passed.
+- Script help rendered successfully with system Python.
+- Backend-venv dependency load check printed `seed app modules loaded`.
+- `git diff --check` passed with normal Windows LF-to-CRLF warnings only.
+- Database seed/reset was not run in this slice because no local
+  `DATABASE_URL` was provided to this environment.

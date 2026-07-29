@@ -37,6 +37,8 @@ Latest verified CI run before this scan: success on main for 3c3f0ac
   held until the end-of-v1.3 showcase gate.
 - Repeatable hosted smoke-test scripts added in `scripts/smoke_v12.py` and
   `scripts/smoke_v13.py`.
+- Repeatable synthetic demo seed/reset tooling added in
+  `scripts/seed_demo_data.py` with runbook coverage in `DEMO_DATA_RUNBOOK.md`.
 - Portfolio case-study source copy added in `PORTFOLIO_TECHSYNC_OPS.md`.
 - v1.2 and v1.3 evidence capture templates added in
   `V12_EVIDENCE_TEMPLATE.md` and `V13_EVIDENCE_TEMPLATE.md`.
@@ -131,14 +133,16 @@ Continue v1.3 product depth before hosted public promotion:
 4. Add client-visible communication separation, proof-gated closeout, and richer
    reporting. Completed as v1.3 API/mobile foundation, with richer charts and
    binary PDF still optional later polish.
-5. Use `APP_ENV=demo` and host-managed secrets when the end-of-v1.3 Vercel
+5. Use `scripts/seed_demo_data.py` to refresh the synthetic demo tenant after
+   v1.3 migrations are applied.
+6. Use `APP_ENV=demo` and host-managed secrets when the end-of-v1.3 Vercel
    deployment begins.
-6. Verify `/health`, onboarding, login/refresh, work-order creation, assignment,
+7. Verify `/health`, onboarding, login/refresh, work-order creation, assignment,
    status transitions, CSV ingestion, dashboard metrics, and attachment flow if
    storage is configured.
-7. Run `scripts/smoke_v13.py` and capture sanitized evidence in
+8. Run `scripts/smoke_v13.py` and capture sanitized evidence in
    `V13_EVIDENCE_TEMPLATE.md`.
-8. Connect the synthetic demo or walkthrough from the portfolio only after the
+9. Connect the synthetic demo or walkthrough from the portfolio only after the
    portfolio URL exists and the v1.3 showcase gate passes.
 
 ## Stop Point For This Phase

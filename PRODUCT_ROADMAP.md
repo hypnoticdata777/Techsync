@@ -35,6 +35,8 @@ Scope:
   demo/evidence.
 - Repeatable hosted smoke-test script and evidence template available.
 - Manual GitHub Actions hosted smoke workflow available.
+- Repeatable synthetic demo seed/reset tooling available for local/demo
+  databases.
 - Smoke-test proof for:
   - `/health`
   - organization onboarding
@@ -159,7 +161,8 @@ Likely scope:
   - error monitoring
   - uptime monitoring
   - backup/restore documentation
-  - stricter synthetic demo reset process
+  - stricter synthetic demo reset process now started with
+    `scripts/seed_demo_data.py` and `DEMO_DATA_RUNBOOK.md`
 - End-of-v1.3 showcase gate:
   - Vercel backend deployed behind HTTPS
   - `APP_ENV=demo` configured in Vercel

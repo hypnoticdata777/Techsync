@@ -131,6 +131,18 @@ Apply the schema with Alembic (recommended), or run `schema.sql` in your managed
 alembic upgrade head
 ```
 
+Optional synthetic demo seed/reset path:
+
+```bash
+cd ..
+python scripts/seed_demo_data.py seed --reset-existing
+python scripts/seed_demo_data.py status
+```
+
+See `DEMO_DATA_RUNBOOK.md` before seeding a shared demo database. The seed
+targets only the synthetic `techsync-ops-demo-pmc` organization and is not for
+real customer tenants.
+
 Run the server:
 ```bash
 uvicorn main:app --reload
@@ -301,6 +313,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   Expo 50 / React Native 0.73 transitive tooling and require a planned Expo/RN
   upgrade before treating the client as public-showcase clean.
 - Docker image build was not network-testable in the sandbox this was built in (registry pull blocked); verify the image build in your deployment environment before relying on it.
+- Synthetic demo seed/reset tooling now exists in `scripts/seed_demo_data.py`
+  and `DEMO_DATA_RUNBOOK.md`; run it only against local or demo databases.
 
 ## License
 

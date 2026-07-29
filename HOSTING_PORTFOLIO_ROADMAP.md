@@ -135,6 +135,8 @@ Tasks:
 - Add repeatable v1.3 hosted smoke coverage for the above. Completed with
   `scripts/smoke_v13.py`, the `Hosted v1.3 smoke test` workflow, and
   `V13_EVIDENCE_TEMPLATE.md`.
+- Add repeatable synthetic demo seed/reset tooling. Completed with
+  `scripts/seed_demo_data.py` and `DEMO_DATA_RUNBOOK.md`.
 - Apply v1.3 migrations and run hosted smoke evidence after deployment.
 
 Exit criteria:
@@ -154,6 +156,8 @@ Tasks:
   - portfolio wrapper
 - Point demo client to hosted backend after the end-of-v1.3 hosting gate.
 - Use synthetic organization, users, technicians, work orders, and attachments.
+- Seed/reset the synthetic demo tenant before final screenshots or walkthrough
+  recording.
 - Validate onboarding and core work-order flow.
 
 Exit criteria:
@@ -201,6 +205,8 @@ Tasks:
 
 - Capture GitHub Actions CI status.
 - Capture hosted `/health` result after the end-of-v1.3 deploy.
+- Capture synthetic demo seed/reset status output after hosted/demo database
+  migration.
 - Capture `scripts/smoke_v13.py` result after the end-of-v1.3 deploy.
 - Capture screenshots of:
   - onboarding;

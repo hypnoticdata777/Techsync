@@ -49,6 +49,8 @@ showcase gate.
 - Neon migration is verified against the demo database.
 - Sanitized evidence is captured with `V12_EVIDENCE_TEMPLATE.md`.
 - Portfolio case-study source exists in `PORTFOLIO_TECHSYNC_OPS.md`.
+- Synthetic demo seed/reset tooling exists in `scripts/seed_demo_data.py` and
+  `DEMO_DATA_RUNBOOK.md`.
 - Portfolio public page or shell is prepared with POC status and limitations,
   but no hard public demo link is required until the v1.3 showcase gate.
 
@@ -88,7 +90,8 @@ v1.3 should focus on the highest-value PMC product gaps:
 8. v1.3 hosted smoke evidence for PMC entity links, communication visibility,
    approval request state, proof-gated closeout, closeout exports, and
    operations reporting, and dashboard CSV exports.
-9. End-of-v1.3 Vercel deployment, hosted smoke evidence, and portfolio sliver
+9. Repeatable synthetic demo seed/reset tooling for the hosted/demo tenant.
+10. End-of-v1.3 Vercel deployment, hosted smoke evidence, and portfolio sliver
    link after the product feels robust enough to show.
 
 ## Confidence Statement

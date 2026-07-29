@@ -1,0 +1,605 @@
+"""Seed or reset a synthetic TechSync Ops demo tenant.
+
+This script is intentionally scoped to one deterministic synthetic organization
+slug. Reset mode deletes only that organization, relying on tenant FK cascades.
+It is for local/demo databases only, never real customer data.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from types import SimpleNamespace
+from typing import Any
+
+
+SERVER_DIR = Path(__file__).resolve().parents[1] / "server"
+
+
+DEMO_ORG_NAME = "TechSync Ops Demo PMC"
+DEMO_ORG_SLUG = "techsync-ops-demo-pmc"
+DEFAULT_PASSWORD = os.getenv("TECHSYNC_DEMO_PASSWORD", "DemoPass123!")
+APP_MODULES: SimpleNamespace | None = None
+
+
+class SeedError(RuntimeError):
+    pass
+
+
+def _now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _app() -> SimpleNamespace:
+    global APP_MODULES
+    if APP_MODULES is not None:
+        return APP_MODULES
+
+    sys.path.insert(0, str(SERVER_DIR))
+    os.environ.setdefault("JWT_SECRET_KEY", "local-demo-seed-script-only-not-for-hosting")
+
+    from core.security import get_password_hash
+    from database import fetch_one, fetch_scalar
+    from repositories import (
+        attachments as attachments_repo,
+        clients as clients_repo,
+        organizations as organizations_repo,
+        properties as properties_repo,
+        technicians as technicians_repo,
+        users as users_repo,
+        vendors as vendors_repo,
+        work_order_events as events_repo,
+        work_order_messages as messages_repo,
+        work_orders as work_orders_repo,
+    )
+
+    APP_MODULES = SimpleNamespace(
+        attachments_repo=attachments_repo,
+        clients_repo=clients_repo,
+        events_repo=events_repo,
+        fetch_one=fetch_one,
+        fetch_scalar=fetch_scalar,
+        get_password_hash=get_password_hash,
+        messages_repo=messages_repo,
+        organizations_repo=organizations_repo,
+        properties_repo=properties_repo,
+        technicians_repo=technicians_repo,
+        users_repo=users_repo,
+        vendors_repo=vendors_repo,
+        work_orders_repo=work_orders_repo,
+    )
+    return APP_MODULES
+
+
+def _get_demo_org() -> dict | None:
+    return _app().fetch_one("SELECT * FROM organizations WHERE slug = :slug", {"slug": DEMO_ORG_SLUG})
+
+
+def _count(table: str, organization_id: int) -> int:
+    return int(
+        _app().fetch_scalar(
+            f"SELECT COUNT(*) FROM {table} WHERE organization_id = :organization_id",
+            {"organization_id": organization_id},
+        )
+        or 0
+    )
+
+
+def reset_demo_org() -> dict[str, Any]:
+    org = _get_demo_org()
+    if not org:
+        return {"deleted": False, "slug": DEMO_ORG_SLUG}
+    _app().organizations_repo.hard_delete(org["id"])
+    return {"deleted": True, "organization_id": org["id"], "slug": DEMO_ORG_SLUG}
+
+
+def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
+    existing = _get_demo_org()
+    if existing and not reset_existing:
+        raise SeedError(
+            f"Demo org '{DEMO_ORG_SLUG}' already exists. "
+            "Run with --reset-existing to rebuild it."
+        )
+    if existing:
+        reset_demo_org()
+
+    app = _app()
+    current_time = _now()
+    password_hash = app.get_password_hash(DEFAULT_PASSWORD)
+
+    org = app.organizations_repo.create_organization(
+        DEMO_ORG_NAME,
+        "property_management",
+        "America/New_York",
+    )
+    organization_id = org["id"]
+
+    admin = app.users_repo.create_user(
+        organization_id,
+        "admin.demo@techsync.local",
+        password_hash,
+        "Avery Morgan",
+        "org_admin",
+    )
+    coordinator = app.users_repo.create_user(
+        organization_id,
+        "coordinator.demo@techsync.local",
+        password_hash,
+        "Jordan Lee",
+        "coordinator",
+    )
+    client_user = app.users_repo.create_user(
+        organization_id,
+        "client.demo@techsync.local",
+        password_hash,
+        "Riley Homeowner",
+        "client",
+    )
+
+    tech_user_lena = app.users_repo.create_user(
+        organization_id,
+        "lena.tech@techsync.local",
+        password_hash,
+        "Lena Ortiz",
+        "technician",
+    )
+    tech_user_marco = app.users_repo.create_user(
+        organization_id,
+        "marco.tech@techsync.local",
+        password_hash,
+        "Marco Vega",
+        "technician",
+    )
+    tech_user_priya = app.users_repo.create_user(
+        organization_id,
+        "priya.tech@techsync.local",
+        password_hash,
+        "Priya Singh",
+        "technician",
+    )
+
+    lena = app.technicians_repo.create_technician(
+        organization_id,
+        tech_user_lena["id"],
+        {
+            "skills": ["plumbing", "general"],
+            "certifications": ["backflow"],
+            "zone": "north",
+            "latitude": 40.713,
+            "longitude": -74.006,
+            "availability_status": "available",
+            "max_daily_jobs": 4,
+        },
+    )
+    marco = app.technicians_repo.create_technician(
+        organization_id,
+        tech_user_marco["id"],
+        {
+            "skills": ["electrical", "hvac"],
+            "certifications": ["epa-608"],
+            "zone": "central",
+            "latitude": 40.721,
+            "longitude": -74.01,
+            "availability_status": "busy",
+            "max_daily_jobs": 1,
+        },
+    )
+    priya = app.technicians_repo.create_technician(
+        organization_id,
+        tech_user_priya["id"],
+        {
+            "skills": ["general", "appliance"],
+            "certifications": ["osha-10"],
+            "zone": "south",
+            "latitude": 40.7,
+            "longitude": -74.0,
+            "availability_status": "available",
+            "max_daily_jobs": 3,
+        },
+    )
+
+    riverside_client = app.clients_repo.create(
+        organization_id,
+        {
+            "display_name": "Riverside HOA",
+            "contact_name": "Riley Homeowner",
+            "email": client_user["email"],
+            "phone": "555-0100",
+            "client_type": "homeowner",
+            "notes": "Synthetic owner contact for client visibility and approval demo.",
+        },
+    )
+    west_client = app.clients_repo.create(
+        organization_id,
+        {
+            "display_name": "West Garden Owner Group",
+            "contact_name": "Morgan Board",
+            "email": "owner-group.demo@techsync.local",
+            "phone": "555-0101",
+            "client_type": "owner",
+            "notes": "Synthetic owner group for property hotspot reporting.",
+        },
+    )
+
+    riverside_unit = app.properties_repo.create(
+        organization_id,
+        {
+            "client_id": riverside_client["id"],
+            "name": "Riverside Tower Unit 4B",
+            "address_line1": "1300 Demo Ridge",
+            "city": "Test City",
+            "state": "NY",
+            "postal_code": "10001",
+            "country": "US",
+            "unit": "4B",
+            "access_notes": "Use synthetic lockbox code DEMO-0000.",
+            "latitude": 40.713,
+            "longitude": -74.0062,
+        },
+    )
+    riverside_roof = app.properties_repo.create(
+        organization_id,
+        {
+            "client_id": riverside_client["id"],
+            "name": "Riverside Tower Roof",
+            "address_line1": "1300 Demo Ridge",
+            "city": "Test City",
+            "state": "NY",
+            "postal_code": "10001",
+            "country": "US",
+            "unit": "Roof",
+            "access_notes": "Synthetic roof access through maintenance stairwell.",
+            "latitude": 40.7134,
+            "longitude": -74.0065,
+        },
+    )
+    west_townhome = app.properties_repo.create(
+        organization_id,
+        {
+            "client_id": west_client["id"],
+            "name": "West Garden Townhome 12",
+            "address_line1": "77 Sample Green",
+            "city": "Test City",
+            "state": "NY",
+            "postal_code": "10002",
+            "country": "US",
+            "unit": "12",
+            "access_notes": "Synthetic resident available after 3 PM.",
+            "latitude": 40.706,
+            "longitude": -74.002,
+        },
+    )
+
+    apex = app.vendors_repo.create(
+        organization_id,
+        {
+            "name": "Apex Demo Plumbing",
+            "contact_name": "Sam Dispatcher",
+            "email": "apex.demo@techsync.local",
+            "phone": "555-0110",
+            "service_types": ["plumbing", "general"],
+            "coverage_area": "North and central synthetic zones",
+            "notes": "Synthetic external vendor for overflow plumbing.",
+        },
+    )
+    brightline = app.vendors_repo.create(
+        organization_id,
+        {
+            "name": "BrightLine Demo Electrical",
+            "contact_name": "Casey Electric",
+            "email": "brightline.demo@techsync.local",
+            "phone": "555-0111",
+            "service_types": ["electrical", "hvac"],
+            "coverage_area": "All synthetic zones",
+            "notes": "Synthetic electrical and HVAC partner.",
+        },
+    )
+
+    work_orders = []
+    work_orders.append(
+        app.work_orders_repo.create(
+            organization_id,
+            {
+                "title": "Emergency leak under kitchen sink",
+                "description": "Synthetic active leak for SLA-risk and duplicate-warning demos.",
+                "property_id": riverside_unit["id"],
+                "client_id": riverside_client["id"],
+                "vendor_id": apex["id"],
+                "customer_name": "Riley Homeowner",
+                "address": "1300 Demo Ridge Unit 4B, Test City, NY",
+                "latitude": 40.713,
+                "longitude": -74.0062,
+                "service_type": "plumbing",
+                "priority": "emergency",
+                "status": "open",
+                "created_by": coordinator["id"],
+                "source": "manual",
+                "external_ref": "DEMO-WO-001",
+                "sla_due_at": current_time + timedelta(hours=1),
+                "client_approval_status": "pending",
+                "client_approval_requested_at": current_time - timedelta(hours=1),
+                "client_approval_requested_by": coordinator["id"],
+                "created_at": current_time - timedelta(days=9),
+            },
+        )
+    )
+    work_orders.append(
+        app.work_orders_repo.create(
+            organization_id,
+            {
+                "title": "Lobby breaker panel inspection",
+                "description": "Synthetic assigned electrical work that makes Marco overloaded.",
+                "property_id": riverside_roof["id"],
+                "client_id": riverside_client["id"],
+                "vendor_id": brightline["id"],
+                "customer_name": "Riverside HOA",
+                "address": "1300 Demo Ridge Roof, Test City, NY",
+                "service_type": "electrical",
+                "priority": "high",
+                "status": "in_progress",
+                "assigned_technician_id": marco["id"],
+                "created_by": admin["id"],
+                "source": "csv",
+                "external_ref": "DEMO-WO-002",
+                "sla_due_at": current_time - timedelta(hours=2),
+                "created_at": current_time - timedelta(days=5),
+            },
+        )
+    )
+    work_orders.append(
+        app.work_orders_repo.create(
+            organization_id,
+            {
+                "title": "Common hallway lights flickering",
+                "description": "Synthetic second active job for the same technician overload report.",
+                "property_id": riverside_roof["id"],
+                "client_id": riverside_client["id"],
+                "vendor_id": brightline["id"],
+                "customer_name": "Riverside HOA",
+                "address": "1300 Demo Ridge Floor 8, Test City, NY",
+                "service_type": "electrical",
+                "priority": "medium",
+                "status": "open",
+                "assigned_technician_id": marco["id"],
+                "created_by": coordinator["id"],
+                "source": "manual",
+                "external_ref": "DEMO-WO-003",
+                "sla_due_at": current_time + timedelta(hours=6),
+                "created_at": current_time - timedelta(days=2),
+            },
+        )
+    )
+    work_orders.append(
+        app.work_orders_repo.create(
+            organization_id,
+            {
+                "title": "Completed disposal replacement with proof",
+                "description": "Synthetic completed work for closeout package proof.",
+                "property_id": riverside_unit["id"],
+                "client_id": riverside_client["id"],
+                "vendor_id": apex["id"],
+                "customer_name": "Riley Homeowner",
+                "address": "1300 Demo Ridge Unit 4B, Test City, NY",
+                "service_type": "plumbing",
+                "priority": "medium",
+                "status": "completed",
+                "assigned_technician_id": lena["id"],
+                "created_by": coordinator["id"],
+                "source": "manual",
+                "external_ref": "DEMO-WO-004",
+                "completed_at": current_time - timedelta(hours=18),
+                "completion_notes": "Synthetic disposal replaced and leak test passed.",
+                "completion_proof_verified_at": current_time - timedelta(hours=18),
+                "client_approval_status": "approved",
+                "client_approval_requested_at": current_time - timedelta(days=1, hours=2),
+                "client_approval_requested_by": coordinator["id"],
+                "client_approval_decision_at": current_time - timedelta(hours=19),
+                "client_approval_decision_by": client_user["id"],
+                "client_approval_notes": "Synthetic approval accepted.",
+                "created_at": current_time - timedelta(days=4),
+            },
+        )
+    )
+    work_orders.append(
+        app.work_orders_repo.create(
+            organization_id,
+            {
+                "title": "Townhome HVAC noise follow-up",
+                "description": "Synthetic active work at a second client property.",
+                "property_id": west_townhome["id"],
+                "client_id": west_client["id"],
+                "vendor_id": brightline["id"],
+                "customer_name": "Morgan Board",
+                "address": "77 Sample Green Unit 12, Test City, NY",
+                "service_type": "hvac",
+                "priority": "low",
+                "status": "open",
+                "assigned_technician_id": priya["id"],
+                "created_by": admin["id"],
+                "source": "webhook",
+                "external_ref": "DEMO-WO-005",
+                "sla_due_at": current_time + timedelta(days=2),
+                "created_at": current_time - timedelta(days=1),
+            },
+        )
+    )
+
+    for item in work_orders:
+        app.events_repo.create_event(
+            organization_id,
+            item["id"],
+            "created",
+            actor_user_id=item.get("created_by"),
+            notes=f"Synthetic seed created {item['external_ref']}.",
+        )
+
+    app.events_repo.create_event(
+        organization_id,
+        work_orders[1]["id"],
+        "status_changed",
+        actor_user_id=tech_user_marco["id"],
+        from_status="open",
+        to_status="in_progress",
+        notes="Synthetic technician started breaker inspection.",
+    )
+    app.events_repo.create_event(
+        organization_id,
+        work_orders[3]["id"],
+        "status_changed",
+        actor_user_id=tech_user_lena["id"],
+        from_status="in_progress",
+        to_status="completed",
+        notes="Synthetic technician completed work with proof.",
+    )
+
+    app.messages_repo.create(
+        organization_id,
+        work_orders[0]["id"],
+        coordinator["id"],
+        {
+            "visibility": "internal",
+            "body": "Synthetic dispatcher note: verify shutoff before vendor arrival.",
+        },
+    )
+    app.messages_repo.create(
+        organization_id,
+        work_orders[0]["id"],
+        coordinator["id"],
+        {
+            "visibility": "client",
+            "body": "We flagged this as emergency priority and requested approval for immediate dispatch.",
+        },
+    )
+    app.messages_repo.create(
+        organization_id,
+        work_orders[3]["id"],
+        tech_user_lena["id"],
+        {
+            "visibility": "client",
+            "body": "Synthetic completion note: disposal replaced, leak test passed.",
+        },
+    )
+
+    app.attachments_repo.create(
+        organization_id,
+        work_orders[3]["id"],
+        tech_user_lena["id"],
+        {
+            "file_name": "synthetic-disposal-after.jpg",
+            "file_url": "https://example.com/techsync-ops-demo/synthetic-disposal-after.jpg",
+            "content_type": "image/jpeg",
+        },
+    )
+
+    return {
+        "organization_id": organization_id,
+        "organization_slug": org["slug"],
+        "users": {
+            "admin": admin["email"],
+            "coordinator": coordinator["email"],
+            "client": client_user["email"],
+            "technicians": [tech_user_lena["email"], tech_user_marco["email"], tech_user_priya["email"]],
+        },
+        "counts": get_demo_status()["counts"],
+    }
+
+
+def get_demo_status() -> dict[str, Any]:
+    org = _get_demo_org()
+    if not org:
+        return {"exists": False, "slug": DEMO_ORG_SLUG, "counts": {}}
+
+    organization_id = org["id"]
+    counts = {
+        "users": _count("users", organization_id),
+        "technicians": _count("technicians", organization_id),
+        "clients": _count("clients", organization_id),
+        "properties": _count("properties", organization_id),
+        "vendors": _count("vendors", organization_id),
+        "work_orders": _count("work_orders", organization_id),
+        "messages": _count("work_order_messages", organization_id),
+        "attachments": _count("work_order_attachments", organization_id),
+        "events": _count("work_order_events", organization_id),
+    }
+    return {
+        "exists": True,
+        "organization_id": organization_id,
+        "slug": org["slug"],
+        "name": org["name"],
+        "counts": counts,
+    }
+
+
+def _print_status(result: dict[str, Any]) -> None:
+    print(f"Demo org slug: {result['slug']}")
+    if not result.get("exists"):
+        print("Status: not seeded")
+        return
+    print(f"Status: seeded organization_id={result['organization_id']}")
+    for name, count in result["counts"].items():
+        print(f"- {name}: {count}")
+
+
+def _print_seed_summary(result: dict[str, Any], show_credentials: bool) -> None:
+    print(f"Seeded {DEMO_ORG_NAME} ({result['organization_slug']})")
+    print(f"Organization ID: {result['organization_id']}")
+    print("Synthetic login emails:")
+    print(f"- admin: {result['users']['admin']}")
+    print(f"- coordinator: {result['users']['coordinator']}")
+    print(f"- client: {result['users']['client']}")
+    for email in result["users"]["technicians"]:
+        print(f"- technician: {email}")
+    if show_credentials:
+        print(f"Synthetic shared password: {DEFAULT_PASSWORD}")
+    else:
+        print("Synthetic shared password: hidden; pass --show-credentials to print it.")
+    print("Seed counts:")
+    for name, count in result["counts"].items():
+        print(f"- {name}: {count}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Seed/reset the synthetic TechSync Ops demo tenant.")
+    parser.add_argument(
+        "action",
+        choices=("seed", "reset", "status"),
+        help="seed creates the demo org, reset deletes it, status prints counts.",
+    )
+    parser.add_argument(
+        "--reset-existing",
+        action="store_true",
+        help="Delete the existing synthetic demo org before seeding it again.",
+    )
+    parser.add_argument(
+        "--show-credentials",
+        action="store_true",
+        help="Print synthetic demo login password after seeding.",
+    )
+    args = parser.parse_args()
+
+    try:
+        if args.action == "status":
+            _print_status(get_demo_status())
+            return 0
+        if args.action == "reset":
+            result = reset_demo_org()
+            print(
+                f"Deleted demo org '{result['slug']}'"
+                if result["deleted"]
+                else f"Demo org '{result['slug']}' did not exist"
+            )
+            return 0
+
+        result = seed_demo_org(reset_existing=args.reset_existing)
+        _print_seed_summary(result, args.show_credentials)
+        return 0
+    except Exception as exc:
+        print(f"DEMO SEED FAILED: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
