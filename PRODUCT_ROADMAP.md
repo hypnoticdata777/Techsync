@@ -144,7 +144,7 @@ Likely scope:
   - backend completion gate now started in v1.3
   - backend closeout package summary now started in v1.3
   - printable HTML/text closeout export now started in v1.3
-  - binary PDF rendering remains optional later polish
+  - lightweight binary PDF closeout export now started in v1.3
 - Dispatch improvements:
   - workload board now started in v1.3 with backend/mobile dispatch view
   - SLA-risk flags now started in v1.3 dispatch board
@@ -219,7 +219,7 @@ v1.3 exit criteria:
 Candidate later versions:
 
 - v1.4: background jobs, notifications, PDF/email ingestion, richer exports, and
-  optional binary closeout PDF generation.
+  richer branded PDF package styling.
 - v1.5: offline mobile sync, maps/routing, calendar integration, and stronger
   technician field UX.
 - v2.0: paid pilots, production-grade monitoring/backups, legal docs, billing,

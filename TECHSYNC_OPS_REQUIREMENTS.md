@@ -250,8 +250,8 @@ Already represented in the codebase:
   property/address plus service type, with mobile coordinator confirmation.
 - v1.3 backend closeout package summary for work-order status, proof,
   attachments, messages, and audit events.
-- v1.3 printable HTML/text closeout export endpoint for work-order summary,
-  proof, attachments, communication, and audit history.
+- v1.3 HTML/text/PDF closeout export endpoint for work-order summary, proof,
+  attachments, communication, and audit history.
 - React Native/Expo mobile client for onboarding, auth, work-order list,
   details, creation, invitation acceptance, and password reset.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,

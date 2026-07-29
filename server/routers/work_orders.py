@@ -5,7 +5,7 @@ from datetime import date, datetime, timezone
 from typing import Literal, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 
 from dependencies import get_current_organization, get_current_user, require_roles
 from models.closeout_package import WorkOrderCloseoutPackage
@@ -487,20 +487,26 @@ def get_closeout_package(
 @router.get("/{work_order_id}/closeout-package/export")
 def export_closeout_package(
     work_order_id: int,
-    format: Literal["html", "text"] = Query("html"),
+    format: Literal["html", "text", "pdf"] = Query("html"),
     current_user: User = Depends(require_roles("org_admin", "coordinator", "technician")),
     organization: dict = Depends(get_current_organization),
 ):
-    """v1.3 printable closeout package export. The HTML response is designed to
-    be saved or printed as PDF from the browser or hosting layer."""
+    """v1.3 closeout package export for HTML, text, or lightweight PDF evidence."""
     package = _build_closeout_package(work_order_id, current_user, organization)
-    extension = "txt" if format == "text" else "html"
+    extension = {"html": "html", "text": "txt", "pdf": "pdf"}[format]
     filename = f"techsync-closeout-wo-{package.work_order.id}.{extension}"
     headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
 
     if format == "text":
         return PlainTextResponse(
             closeout_export_service.build_closeout_text(package),
+            headers=headers,
+        )
+
+    if format == "pdf":
+        return Response(
+            closeout_export_service.build_closeout_pdf(package),
+            media_type="application/pdf",
             headers=headers,
         )
 

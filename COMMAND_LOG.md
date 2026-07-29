@@ -1173,3 +1173,37 @@ Result:
 - Client tests passed: `5 passed suites`, `24 passed tests`.
 - Backend tests passed: `114 passed`.
 - Compile check passed.
+
+## 2026-07-29 - v1.3 Closeout PDF Export
+
+Decision:
+
+- Close the binary closeout PDF gap before hosting without adding a server PDF
+  dependency.
+- Keep HTML/text exports intact and add a lightweight PDF evidence path for the
+  same closeout package data.
+
+Changes:
+
+- Added `build_closeout_pdf` to `server/services/closeout_export_service.py`.
+- Extended `GET /work-orders/{work_order_id}/closeout-package/export` with
+  `format=pdf`.
+- Added closeout PDF service and route tests.
+- Updated `scripts/smoke_v13.py` and `V13_EVIDENCE_TEMPLATE.md` so the final
+  hosted gate verifies PDF closeout export.
+- Updated README, roadmap, requirements, traceability, QA, public-readiness, and
+  phase-status docs.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+python -m compileall -q server scripts
+npm.cmd run test:ci
+```
+
+Result:
+
+- Backend tests passed: `115 passed`.
+- Compile check passed.
+- Client tests passed: `5 passed suites`, `24 passed tests`.

@@ -1,6 +1,7 @@
 """Printable closeout package export rendering."""
 
 from html import escape
+from textwrap import wrap
 
 from models.closeout_package import WorkOrderCloseoutPackage
 
@@ -97,6 +98,61 @@ def build_closeout_html(package: WorkOrderCloseoutPackage) -> str:
 
 
 def build_closeout_text(package: WorkOrderCloseoutPackage) -> str:
+    return "\n".join(build_closeout_text_lines(package)) + "\n"
+
+
+def build_closeout_pdf(package: WorkOrderCloseoutPackage) -> bytes:
+    """Build a lightweight dependency-free PDF for investor/demo evidence."""
+    pages = paginate_lines(build_closeout_text_lines(package), lines_per_page=54)
+    page_objects: list[tuple[int, bytes]] = []
+    next_object_id = 3
+    page_ids = []
+
+    for page_number, page_lines in enumerate(pages, start=1):
+        page_id = next_object_id
+        content_id = next_object_id + 1
+        next_object_id += 2
+        page_ids.append(page_id)
+        content = build_pdf_page_content(page_lines, page_number, len(pages))
+        page_objects.append(
+            (
+                page_id,
+                (
+                    f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
+                    f"/Resources << /Font << /F1 1 0 R >> >> "
+                    f"/Contents {content_id} 0 R >>"
+                ).encode("ascii"),
+            )
+        )
+        page_objects.append(
+            (
+                content_id,
+                b"<< /Length "
+                + str(len(content)).encode("ascii")
+                + b" >>\nstream\n"
+                + content
+                + b"\nendstream",
+            )
+        )
+
+    objects = [
+        (1, b"<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>"),
+        (
+            2,
+            (
+                "<< /Type /Pages /Kids "
+                f"[{' '.join(f'{page_id} 0 R' for page_id in page_ids)}] "
+                f"/Count {len(page_ids)} >>"
+            ).encode("ascii"),
+        ),
+        *page_objects,
+        (next_object_id, b"<< /Type /Catalog /Pages 2 0 R >>"),
+    ]
+
+    return build_pdf_document(objects, catalog_id=next_object_id)
+
+
+def build_closeout_text_lines(package: WorkOrderCloseoutPackage) -> list[str]:
     work_order = package.work_order
     lines = [
         f"TechSync Ops Closeout Package - WO #{work_order.id}",
@@ -138,7 +194,7 @@ def build_closeout_text(package: WorkOrderCloseoutPackage) -> str:
     else:
         lines.append("- None")
 
-    return "\n".join(lines) + "\n"
+    return lines
 
 
 def summary_tile(label: str, value: object) -> str:
@@ -228,3 +284,70 @@ def format_value(value: object) -> str:
     if hasattr(value, "isoformat"):
         return value.isoformat()
     return str(value)
+
+
+def paginate_lines(lines: list[str], lines_per_page: int) -> list[list[str]]:
+    wrapped_lines: list[str] = []
+    for line in lines:
+        if not line:
+            wrapped_lines.append("")
+            continue
+        wrapped_lines.extend(wrap(line, width=88, replace_whitespace=False) or [""])
+
+    pages = [
+        wrapped_lines[index : index + lines_per_page]
+        for index in range(0, len(wrapped_lines), lines_per_page)
+    ]
+    return pages or [["No closeout content."]]
+
+
+def build_pdf_page_content(lines: list[str], page_number: int, page_count: int) -> bytes:
+    commands = ["BT", "/F1 9 Tf", "12 TL", "50 748 Td"]
+    for line in lines:
+        commands.append(f"({escape_pdf_text(line)}) Tj")
+        commands.append("T*")
+    commands.extend(
+        [
+            "ET",
+            "BT",
+            "/F1 8 Tf",
+            "50 32 Td",
+            f"(TechSync Ops Closeout Package | Page {page_number} of {page_count}) Tj",
+            "ET",
+        ]
+    )
+    return "\n".join(commands).encode("latin-1", errors="replace")
+
+
+def escape_pdf_text(value: str) -> str:
+    return (
+        value.replace("\\", "\\\\")
+        .replace("(", "\\(")
+        .replace(")", "\\)")
+        .replace("\r", " ")
+        .replace("\n", " ")
+    )
+
+
+def build_pdf_document(objects: list[tuple[int, bytes]], catalog_id: int) -> bytes:
+    output = bytearray(b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
+    offsets = [0] * (max(object_id for object_id, _ in objects) + 1)
+
+    for object_id, body in objects:
+        offsets[object_id] = len(output)
+        output.extend(f"{object_id} 0 obj\n".encode("ascii"))
+        output.extend(body)
+        output.extend(b"\nendobj\n")
+
+    xref_offset = len(output)
+    output.extend(f"xref\n0 {len(offsets)}\n".encode("ascii"))
+    output.extend(b"0000000000 65535 f \n")
+    for object_id in range(1, len(offsets)):
+        output.extend(f"{offsets[object_id]:010d} 00000 n \n".encode("ascii"))
+    output.extend(
+        (
+            f"trailer\n<< /Size {len(offsets)} /Root {catalog_id} 0 R >>\n"
+            f"startxref\n{xref_offset}\n%%EOF\n"
+        ).encode("ascii")
+    )
+    return bytes(output)

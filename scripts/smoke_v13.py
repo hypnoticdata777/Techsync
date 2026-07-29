@@ -63,7 +63,7 @@ def request(
     if query:
         clean_path = f"{clean_path}?{urlencode(query)}"
     url = urljoin(base_url.rstrip("/") + "/", clean_path)
-    headers = {"Accept": "application/json, text/plain, text/html"}
+    headers = {"Accept": "application/json, text/plain, text/html, application/pdf"}
     data = None
     if payload is not None:
         headers["Content-Type"] = "application/json"
@@ -468,6 +468,24 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         export_html.data[:200] if isinstance(export_html.data, str) else export_html.data,
     )
     record("closeout_html_export", export_html, {"contains_closeout_package": True})
+
+    export_pdf = request(
+        base_url,
+        "GET",
+        f"/work-orders/{work_order_id}/closeout-package/export",
+        token=admin_token,
+        query={"format": "pdf"},
+    )
+    assert_detail(
+        "closeout_pdf_export",
+        isinstance(export_pdf.data, str) and export_pdf.data.startswith("%PDF"),
+        export_pdf.data[:80] if isinstance(export_pdf.data, str) else export_pdf.data,
+    )
+    record(
+        "closeout_pdf_export",
+        export_pdf,
+        {"contains_pdf_header": True},
+    )
 
     operations_report = request(
         base_url,

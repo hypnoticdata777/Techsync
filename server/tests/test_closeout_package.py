@@ -192,6 +192,7 @@ def test_closeout_export_service_renders_html_and_text():
 
     html = closeout_export_service.build_closeout_html(package)
     text = closeout_export_service.build_closeout_text(package)
+    pdf = closeout_export_service.build_closeout_pdf(package)
 
     assert "TechSync Ops Closeout Package - WO #1" in html
     assert "Work completed." in html
@@ -199,6 +200,9 @@ def test_closeout_export_service_renders_html_and_text():
     assert "TechSync Ops Closeout Package - WO #1" in text
     assert "Breaker checked." in text
     assert "https://files.example/after.jpg" in text
+    assert pdf.startswith(b"%PDF-1.4")
+    assert b"TechSync Ops Closeout Package" in pdf
+    assert b"after.jpg" in pdf
 
 
 def test_closeout_export_route_returns_downloadable_html():
@@ -231,3 +235,20 @@ def test_closeout_export_route_returns_downloadable_text():
     assert response.media_type == "text/plain"
     assert 'filename="techsync-closeout-wo-1.txt"' in response.headers["content-disposition"]
     assert b"Work completed." in response.body
+
+
+def test_closeout_export_route_returns_downloadable_pdf():
+    package = _sample_package()
+
+    with patch("routers.work_orders._build_closeout_package", return_value=package):
+        response = work_orders_router.export_closeout_package(
+            1,
+            format="pdf",
+            current_user=_admin_user(),
+            organization={"id": 6},
+        )
+
+    assert response.media_type == "application/pdf"
+    assert 'filename="techsync-closeout-wo-1.pdf"' in response.headers["content-disposition"]
+    assert response.body.startswith(b"%PDF-1.4")
+    assert b"TechSync Ops Closeout Package" in response.body

@@ -174,6 +174,8 @@ Completed:
 - Added mobile approval UI inside work-order details.
 - Added printable HTML/text closeout export endpoint under
   `/work-orders/{work_order_id}/closeout-package/export`.
+- Added lightweight binary PDF closeout export support under the same endpoint
+  with `format=pdf`, plus hosted v1.3 smoke coverage.
 - Added hosted v1.3 smoke coverage for client/property/vendor creation,
   work-order entity links, internal/client-visible messages, staff approval
   request state, proof-gated completion, closeout package JSON, HTML/text
@@ -204,8 +206,8 @@ Next:
 
 - Keep hosting deferred until every non-hosting requirement bucket is locally
   as complete as practical.
-- Continue local-only product depth with binary PDF closeout polish, deeper
-  export workflows, or the remaining role-by-role UI/UX friction sweep.
+- Continue local-only product depth with deeper export workflows or the
+  remaining role-by-role UI/UX friction sweep.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,

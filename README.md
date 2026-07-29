@@ -280,7 +280,7 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   storage when configured), RF-20 (audit log), RF-21 (filtered search).
 - **v1.3 PMC operations**: client/property/vendor records, work-order links,
   client-visible versus internal messages, client approval requests/decisions,
-  proof-gated closeout, closeout package summary, printable HTML/text closeout
+  proof-gated closeout, closeout package summary, HTML/text/PDF closeout
   exports, operations reporting for stale work, overload, property hotspots,
   and completion cycle time, CSV exports for the operations report, dispatch
   board, clients, properties, and vendors, and a dispatch board for unassigned
@@ -308,8 +308,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   only); the spec's "panel administrativo" is assumed to be a future
   separate web client consuming this same API.
 - **PMC operations expansion still remaining**: calendar/maps, deeper cost and
-  accounting exports, binary PDF generation, deeper client/vendor portals, and
-  final UI/UX screenshot testing are tracked for v1.3+ / later in
+  accounting exports, richer branded PDF package styling, deeper client/vendor
+  portals, and final UI/UX screenshot testing are tracked for v1.3+ / later in
   `PRODUCT_ROADMAP.md`.
 
 - **RF-23 (offline sync)**, **RF-10/RF-13 (PDF/email ingestion)**: deferred,

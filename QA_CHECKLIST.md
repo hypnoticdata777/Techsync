@@ -95,7 +95,8 @@ they have been verified in the relevant environment.
       implemented.
 - [x] Backend closeout package summary implemented.
 - [x] Closeout printable HTML/text export generation implemented.
-- [ ] Binary closeout PDF renderer implemented if needed after hosted demo.
+- [x] Binary closeout PDF renderer implemented for lightweight closeout
+      evidence without adding a PDF dependency.
 - [x] Backend operations report added for stale work, overloaded technicians, and
       property hotspots.
 - [x] Operations report CSV export implemented.
