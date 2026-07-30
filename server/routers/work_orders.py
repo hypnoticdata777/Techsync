@@ -521,6 +521,37 @@ def export_closeout_package(
     )
 
 
+@router.get("/{work_order_id}/closeout-package/attachments/export")
+def export_closeout_attachment_manifest(
+    work_order_id: int,
+    format: Literal["json", "csv"] = Query("json"),
+    current_user: User = Depends(require_roles("org_admin", "coordinator", "technician")),
+    organization: dict = Depends(get_current_organization),
+):
+    """v1.3 closeout attachment handoff manifest for binary evidence exports.
+
+    The manifest lists tenant-scoped attachment references and transfer notes;
+    binary files stay in object storage and are not embedded in API responses.
+    """
+    package = _build_closeout_package(work_order_id, current_user, organization)
+    extension = {"json": "json", "csv": "csv"}[format]
+    filename = f"techsync-closeout-wo-{package.work_order.id}-attachments.{extension}"
+    headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
+
+    if format == "csv":
+        return PlainTextResponse(
+            closeout_export_service.build_attachment_manifest_csv(package),
+            media_type="text/csv",
+            headers=headers,
+        )
+
+    return Response(
+        closeout_export_service.build_attachment_manifest_json(package),
+        media_type="application/json",
+        headers=headers,
+    )
+
+
 @router.post(
     "/{work_order_id}/messages",
     response_model=WorkOrderMessage,

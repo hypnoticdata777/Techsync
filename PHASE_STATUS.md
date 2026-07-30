@@ -236,14 +236,18 @@ Completed:
   seed/reset.
 - Added `DEMO_DATA_RUNBOOK.md` with direct-database seed/reset commands and
   safety guardrails.
+- Added tested closeout attachment JSON/CSV handoff manifests so binary
+  evidence portability is documented without embedding files or exposing
+  private storage paths/credentials.
 
 Next:
 
 - Keep hosting deferred until every non-hosting requirement bucket is locally
   as complete as practical.
 - Continue local-only product depth with the remaining role-by-role UI/UX
-  friction sweep, accessibility evidence, and screenshot-proof preparation.
-  The manifest audit is now code-backed; final manual screenshots still remain.
+  friction sweep, accessibility evidence, screenshot-proof preparation, and
+  cost/export enrichment. The manifest audit is now code-backed; final manual
+  screenshots still remain.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,
@@ -303,6 +307,6 @@ Stop when:
 
 Continue local-only v1.3 hardening and leave hosting as the absolute final
 gate. Best next candidates: final role-by-role UI/UX friction evidence,
-binary attachment export planning, cost/export enrichment, or remaining
-client/vendor portal polish. Only after those non-hosting requirements are
-complete should the Neon/Vercel/portfolio showcase sequence resume.
+accessibility proof, cost/export enrichment, or remaining client/vendor portal
+polish. Only after those non-hosting requirements are complete should the
+Neon/Vercel/portfolio showcase sequence resume.

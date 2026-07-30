@@ -1,6 +1,9 @@
-"""Printable closeout package export rendering."""
+"""Printable closeout package and attachment export rendering."""
 
+import csv
 from html import escape
+import json
+from io import StringIO
 from textwrap import wrap
 
 from models.closeout_package import WorkOrderCloseoutPackage
@@ -150,6 +153,72 @@ def build_closeout_pdf(package: WorkOrderCloseoutPackage) -> bytes:
     ]
 
     return build_pdf_document(objects, catalog_id=next_object_id)
+
+
+def build_attachment_manifest(package: WorkOrderCloseoutPackage) -> dict:
+    """Build a closeout attachment handoff manifest without private storage keys.
+
+    Binary files remain in object storage. This manifest gives admins a
+    repeatable export checklist for evidence portability without exposing
+    provider-specific storage paths, credentials, or signed URL internals.
+    """
+    work_order = package.work_order
+    items = [
+        {
+            "attachment_id": attachment.id,
+            "work_order_id": attachment.work_order_id,
+            "file_name": attachment.file_name,
+            "content_type": attachment.content_type,
+            "file_url": attachment.file_url,
+            "uploaded_by": attachment.uploaded_by,
+            "created_at": format_value(attachment.created_at),
+            "transfer_status": "external_file_reference",
+            "transfer_note": (
+                "Download/copy this binary from the configured object storage "
+                "provider; TechSync Ops exports metadata and public/reference URLs only."
+            ),
+        }
+        for attachment in package.attachments
+    ]
+
+    return {
+        "schema_version": "techsync_ops_closeout_attachment_manifest.v1",
+        "work_order_id": work_order.id,
+        "work_order_title": work_order.title,
+        "proof_status": package.proof_status,
+        "attachment_count": len(items),
+        "attachments": items,
+        "omitted_fields": ["storage_path", "storage_access_key", "storage_secret_key"],
+        "notes": [
+            "Binary attachment files are not embedded in this manifest.",
+            "Use the configured object storage provider export/download flow for the actual files.",
+            "Only tenant-scoped work-order attachments visible to the requesting role are included.",
+        ],
+    }
+
+
+def build_attachment_manifest_json(package: WorkOrderCloseoutPackage) -> str:
+    return json.dumps(build_attachment_manifest(package), indent=2, default=str) + "\n"
+
+
+def build_attachment_manifest_csv(package: WorkOrderCloseoutPackage) -> str:
+    output = StringIO()
+    fieldnames = [
+        "attachment_id",
+        "work_order_id",
+        "file_name",
+        "content_type",
+        "file_url",
+        "uploaded_by",
+        "created_at",
+        "transfer_status",
+        "transfer_note",
+    ]
+    writer = csv.DictWriter(output, fieldnames=fieldnames, lineterminator="\n")
+    writer.writeheader()
+    for item in build_attachment_manifest(package)["attachments"]:
+        writer.writerow(item)
+    return output.getvalue()
 
 
 def build_closeout_text_lines(package: WorkOrderCloseoutPackage) -> list[str]:

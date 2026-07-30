@@ -146,6 +146,8 @@ Likely scope:
   - backend closeout package summary now started in v1.3
   - printable HTML/text closeout export now started in v1.3
   - lightweight binary PDF closeout export now started in v1.3
+  - closeout attachment JSON/CSV handoff manifest now started in v1.3 for
+    evidence portability without exposing private storage paths
 - Dispatch improvements:
   - workload board now started in v1.3 with backend/mobile dispatch view
   - SLA-risk flags now started in v1.3 dispatch board
@@ -213,7 +215,8 @@ v1.3 exit criteria:
   property hotspot evidence, with dashboard CSV export and client/property/vendor
   CSV export plus tenant JSON export and mobile
   risk/capacity/hotspot/completion cycle-time chart bars started; deeper cost
-  and binary attachment export workflows still remain later polish.
+  and closeout attachment handoff manifests started; deeper cost workflows and
+  provider-level binary storage export automation still remain later polish.
 - Backend and mobile dispatch board show unassigned active work, technician
   lanes, workload utilization, and SLA risk.
 - Manual work-order creation warns coordinators about likely duplicates before

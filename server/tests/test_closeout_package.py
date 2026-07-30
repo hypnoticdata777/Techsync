@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timezone
 from unittest.mock import patch
 
@@ -252,3 +253,59 @@ def test_closeout_export_route_returns_downloadable_pdf():
     assert 'filename="techsync-closeout-wo-1.pdf"' in response.headers["content-disposition"]
     assert response.body.startswith(b"%PDF-1.4")
     assert b"TechSync Ops Closeout Package" in response.body
+
+
+def test_attachment_manifest_export_service_omits_storage_paths():
+    package = _sample_package()
+
+    manifest = closeout_export_service.build_attachment_manifest(package)
+    manifest_json = closeout_export_service.build_attachment_manifest_json(package)
+    manifest_csv = closeout_export_service.build_attachment_manifest_csv(package)
+
+    assert manifest["schema_version"] == "techsync_ops_closeout_attachment_manifest.v1"
+    assert manifest["attachment_count"] == 1
+    assert manifest["attachments"][0]["file_name"] == "after.jpg"
+    assert manifest["attachments"][0]["transfer_status"] == "external_file_reference"
+    assert "storage_path" not in manifest["attachments"][0]
+    assert "storage_path" in manifest["omitted_fields"]
+    assert "after.jpg" in manifest_json
+    assert "storage_path" not in json.loads(manifest_json)["attachments"][0]
+    assert "attachment_id,work_order_id,file_name" in manifest_csv
+    assert "after.jpg" in manifest_csv
+
+
+def test_closeout_attachment_manifest_route_returns_downloadable_json():
+    package = _sample_package()
+
+    with patch("routers.work_orders._build_closeout_package", return_value=package):
+        response = work_orders_router.export_closeout_attachment_manifest(
+            1,
+            format="json",
+            current_user=_admin_user(),
+            organization={"id": 6},
+        )
+
+    body = json.loads(response.body)
+    assert response.media_type == "application/json"
+    assert 'filename="techsync-closeout-wo-1-attachments.json"' in response.headers["content-disposition"]
+    assert body["attachment_count"] == 1
+    assert body["attachments"][0]["file_url"] == "https://files.example/after.jpg"
+    assert "storage_secret_key" in body["omitted_fields"]
+
+
+def test_closeout_attachment_manifest_route_returns_downloadable_csv():
+    package = _sample_package()
+
+    with patch("routers.work_orders._build_closeout_package", return_value=package):
+        response = work_orders_router.export_closeout_attachment_manifest(
+            1,
+            format="csv",
+            current_user=_admin_user(),
+            organization={"id": 6},
+        )
+
+    body = response.body.decode("utf-8")
+    assert response.media_type == "text/csv"
+    assert 'filename="techsync-closeout-wo-1-attachments.csv"' in response.headers["content-disposition"]
+    assert "attachment_id,work_order_id,file_name" in body
+    assert "after.jpg" in body

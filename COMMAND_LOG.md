@@ -1237,6 +1237,43 @@ Result:
 - Backend tests passed: `115 passed`.
 - Compile check passed.
 
+## 2026-07-30 - v1.3 Closeout Attachment Manifest Export
+
+Decision:
+
+- Close the remaining attachment portability planning gap before hosting.
+- Add a safe, tenant-scoped handoff manifest instead of embedding binary files
+  or exposing provider-private storage paths.
+
+Changes:
+
+- Added closeout attachment JSON/CSV manifest builders to
+  `server/services/closeout_export_service.py`.
+- Added `GET /work-orders/{work_order_id}/closeout-package/attachments/export`
+  with `format=json|csv`.
+- Manifest rows include attachment filename, content type, file URL, uploader,
+  timestamp, and explicit transfer notes.
+- Manifest output omits private storage paths, storage access keys, and storage
+  secret keys.
+- Added backend tests for JSON/CSV download behavior and omitted storage-path
+  guarantees.
+- Updated README, requirements, traceability, QA, roadmap, and phase-status
+  docs.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_closeout_package.py server\tests\test_tenant_isolation.py -p no:cacheprovider
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+```
+
+Result:
+
+- Focused backend tests passed: `57 passed`.
+- Full backend tests passed: `149 passed`.
+- Compile check passed for `server` and `scripts`.
+
 ## 2026-07-29 - v1.3 Tenant Data Export Bundle
 
 Decision:

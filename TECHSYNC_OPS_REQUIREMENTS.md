@@ -278,6 +278,9 @@ Already represented in the codebase:
   attachments, messages, and audit events.
 - v1.3 HTML/text/PDF closeout export endpoint for work-order summary, proof,
   attachments, communication, and audit history.
+- v1.3 closeout attachment JSON/CSV handoff manifest for binary evidence
+  portability without embedding files, private storage paths, or storage
+  credentials.
 - React Native/Expo mobile client for onboarding, auth, work-order list,
   details, creation, invitation acceptance, and password reset.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,
@@ -296,7 +299,8 @@ Important gaps for the PMC operations product:
   visibility, client-visible comments, and approval/decline actions have
   started in v1.3.
 - Calendar/maps, background jobs, final role screenshot evidence, cost/export
-  enrichment, and binary attachment export workflows remain roadmap items.
+  enrichment, and provider-level binary storage export automation remain
+  roadmap items.
 
 ## Version Planning Boundary
 

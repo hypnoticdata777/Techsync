@@ -97,6 +97,9 @@ they have been verified in the relevant environment.
 - [x] Closeout printable HTML/text export generation implemented.
 - [x] Binary closeout PDF renderer implemented for lightweight closeout
       evidence without adding a PDF dependency.
+- [x] Closeout attachment JSON/CSV handoff manifest implemented so binary
+      evidence portability is documented without exposing private storage
+      paths or credentials.
 - [x] Backend operations report added for stale work, overloaded technicians, and
       property hotspots.
 - [x] Operations report CSV export implemented.
