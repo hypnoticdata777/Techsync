@@ -239,6 +239,10 @@ Completed:
 - Added tested closeout attachment JSON/CSV handoff manifests so binary
   evidence portability is documented without embedding files or exposing
   private storage paths/credentials.
+- Added Alembic migration `0007` for estimated/actual work-order cost fields
+  and invoice references.
+- Added backend cost summary reporting, operations-report CSV cost evidence,
+  synthetic demo cost data, and mobile operations-report cost chart/cards.
 
 Next:
 
@@ -246,8 +250,8 @@ Next:
   as complete as practical.
 - Continue local-only product depth with the remaining role-by-role UI/UX
   friction sweep, accessibility evidence, screenshot-proof preparation, and
-  cost/export enrichment. The manifest audit is now code-backed; final manual
-  screenshots still remain.
+  client/vendor portal polish. The manifest audit is now code-backed; final
+  manual screenshots still remain.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,
@@ -307,6 +311,6 @@ Stop when:
 
 Continue local-only v1.3 hardening and leave hosting as the absolute final
 gate. Best next candidates: final role-by-role UI/UX friction evidence,
-accessibility proof, cost/export enrichment, or remaining client/vendor portal
-polish. Only after those non-hosting requirements are complete should the
-Neon/Vercel/portfolio showcase sequence resume.
+accessibility proof, remaining client/vendor portal polish, or deep accounting
+integration documentation. Only after those non-hosting requirements are
+complete should the Neon/Vercel/portfolio showcase sequence resume.

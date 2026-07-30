@@ -120,6 +120,9 @@ they have been verified in the relevant environment.
       technician capacity pressure, and property hotspot activity.
 - [x] Completion cycle-time reporting, mobile chart bars, and operations-report
       CSV export evidence implemented.
+- [x] Work-order estimated/actual cost fields, operations cost summary,
+      mobile cost chart/cards, synthetic demo cost data, and CSV export
+      evidence implemented.
 
 ## Client / Demo Surface
 

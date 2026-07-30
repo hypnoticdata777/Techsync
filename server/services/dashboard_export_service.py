@@ -56,6 +56,11 @@ def build_operations_report_csv(report: OperationsReport) -> str:
         "sla_due_at",
         "latest_work_order_at",
         "latest_completed_at",
+        "estimated_cost_cents",
+        "actual_cost_cents",
+        "variance_cents",
+        "average_actual_cost_cents",
+        "invoice_reference_count",
     ]
     rows: list[dict[str, Any]] = []
 
@@ -112,6 +117,21 @@ def build_operations_report_csv(report: OperationsReport) -> str:
                 "fastest_cycle_hours": item.fastest_cycle_hours,
                 "slowest_cycle_hours": item.slowest_cycle_hours,
                 "latest_completed_at": item.latest_completed_at,
+            }
+        )
+
+    for item in report.cost_summary:
+        rows.append(
+            {
+                "section": "cost_summary",
+                "service_type": item.service_type,
+                "total_work_orders": item.work_order_count,
+                "estimated_cost_cents": item.estimated_cost_cents,
+                "actual_cost_cents": item.actual_cost_cents,
+                "variance_cents": item.variance_cents,
+                "average_actual_cost_cents": item.average_actual_cost_cents,
+                "invoice_reference_count": item.invoice_reference_count,
+                "latest_work_order_at": item.latest_work_order_at,
             }
         )
 

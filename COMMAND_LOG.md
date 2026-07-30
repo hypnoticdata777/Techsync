@@ -1237,6 +1237,52 @@ Result:
 - Backend tests passed: `115 passed`.
 - Compile check passed.
 
+## 2026-07-30 - v1.3 Cost Summary Reporting Foundation
+
+Decision:
+
+- Start cost/export enrichment without introducing billing, payment movement,
+  or accounting-system integration.
+- Keep the implementation tenant-scoped and useful for investor demo evidence:
+  estimated cost, actual cost, invoice reference, grouped cost trends, and CSV
+  export proof.
+
+Changes:
+
+- Added Alembic migration `0007` and base schema columns for
+  `estimated_cost_cents`, `actual_cost_cents`, and `invoice_reference`.
+- Added cost fields to work-order create/update/response models and creation
+  route handling.
+- Added tenant-scoped `list_cost_summary` repository query.
+- Added `cost_summary` buckets to `/dashboard/operations-report`.
+- Added cost summary rows to `/dashboard/operations-report/export`.
+- Added synthetic cost data to `scripts/seed_demo_data.py`.
+- Updated `scripts/smoke_v13.py` to require migration `0007`, submit synthetic
+  work-order costs, verify closeout attachment manifests, and verify cost
+  summary reporting/export evidence.
+- Added mobile operations-report cost window controls, cost chart rows, and
+  read-only cost summary cards.
+- Updated README, QA, roadmap, requirements, traceability, phase, and v1.3
+  evidence docs.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_tenant_isolation.py -p no:cacheprovider
+npm.cmd run test:ci -- --runTestsByPath src/utils/reportMetrics.test.js
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m compileall -q server scripts
+```
+
+Result:
+
+- Focused backend tests passed: `50 passed`.
+- Focused client tests passed: `1 suite`, `6 tests`.
+- Full backend tests passed: `150 passed`.
+- Full client tests passed: `7 passed suites`, `39 passed tests`.
+- Compile check passed for `server` and `scripts`.
+
 ## 2026-07-30 - v1.3 Closeout Attachment Manifest Export
 
 Decision:

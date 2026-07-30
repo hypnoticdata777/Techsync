@@ -105,7 +105,7 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         "checks": [],
         "manual_follow_up": [
             "Accept a synthetic client invitation from hosted email/log output, then verify client approve/decline with a real client token.",
-            "Run Alembic current against the direct Neon URL and confirm the hosted/demo database is at 0006 or later.",
+            "Run Alembic current against the direct Neon URL and confirm the hosted/demo database is at 0007 or later.",
         ],
     }
 
@@ -275,6 +275,9 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         "longitude": -74.0062,
         "service_type": "plumbing",
         "priority": "high",
+        "estimated_cost_cents": 80000,
+        "actual_cost_cents": 94000,
+        "invoice_reference": f"SYN-V13-{suffix}",
         "auto_assign": False,
     }
     work_order = request(
@@ -487,12 +490,31 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         {"contains_pdf_header": True},
     )
 
+    attachment_manifest = request(
+        base_url,
+        "GET",
+        f"/work-orders/{work_order_id}/closeout-package/attachments/export",
+        token=admin_token,
+        query={"format": "json"},
+    )
+    assert_detail(
+        "closeout_attachment_manifest",
+        attachment_manifest.data.get("attachment_count") == 1
+        and "storage_path" not in attachment_manifest.data.get("attachments", [{}])[0],
+        attachment_manifest.data,
+    )
+    record(
+        "closeout_attachment_manifest",
+        attachment_manifest,
+        {"attachment_count": attachment_manifest.data.get("attachment_count")},
+    )
+
     operations_report = request(
         base_url,
         "GET",
         "/dashboard/operations-report",
         token=admin_token,
-        query={"stale_days": 1, "hotspot_days": 90, "completion_days": 90, "limit": 10},
+        query={"stale_days": 1, "hotspot_days": 90, "completion_days": 90, "cost_days": 90, "limit": 10},
     )
     assert_detail(
         "operations_report_shape",
@@ -501,6 +523,7 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
             "overloaded_technicians",
             "property_hotspots",
             "completion_cycles",
+            "cost_summary",
         }.issubset(operations_report.data.keys()),
         operations_report.data,
     )
@@ -512,6 +535,7 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
             "overloaded_count": len(operations_report.data.get("overloaded_technicians", [])),
             "hotspot_count": len(operations_report.data.get("property_hotspots", [])),
             "completion_cycle_count": len(operations_report.data.get("completion_cycles", [])),
+            "cost_summary_count": len(operations_report.data.get("cost_summary", [])),
         },
     )
 
@@ -520,13 +544,14 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         "GET",
         "/dashboard/operations-report/export",
         token=admin_token,
-        query={"stale_days": 1, "hotspot_days": 90, "completion_days": 90, "limit": 10},
+        query={"stale_days": 1, "hotspot_days": 90, "completion_days": 90, "cost_days": 90, "limit": 10},
     )
     assert_detail(
         "operations_report_csv_export",
         isinstance(operations_report_export.data, str)
         and "section,id,title" in operations_report_export.data
-        and "completion_cycle" in operations_report_export.data,
+        and "completion_cycle" in operations_report_export.data
+        and "cost_summary" in operations_report_export.data,
         operations_report_export.data[:200]
         if isinstance(operations_report_export.data, str)
         else operations_report_export.data,
@@ -534,7 +559,7 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
     record(
         "operations_report_csv_export",
         operations_report_export,
-        {"contains_csv_header": True, "contains_completion_cycle": True},
+        {"contains_csv_header": True, "contains_completion_cycle": True, "contains_cost_summary": True},
     )
 
     dispatch_board = request(base_url, "GET", "/dashboard/dispatch-board", token=admin_token)

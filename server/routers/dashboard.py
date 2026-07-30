@@ -53,6 +53,7 @@ def get_operations_report(
     stale_days: int = Query(7, ge=1, le=90),
     hotspot_days: int = Query(90, ge=1, le=365),
     completion_days: int = Query(90, ge=1, le=365),
+    cost_days: int = Query(90, ge=1, le=365),
     limit: int = Query(10, ge=1, le=50),
     current_user: User = Depends(require_roles("org_admin", "coordinator")),
     organization: dict = Depends(get_current_organization),
@@ -70,6 +71,9 @@ def get_operations_report(
         completion_cycles=work_orders_repo.list_completion_cycles(
             organization["id"], since_days=completion_days, limit=limit
         ),
+        cost_summary=work_orders_repo.list_cost_summary(
+            organization["id"], since_days=cost_days, limit=limit
+        ),
     )
 
 
@@ -78,6 +82,7 @@ def export_operations_report(
     stale_days: int = Query(7, ge=1, le=90),
     hotspot_days: int = Query(90, ge=1, le=365),
     completion_days: int = Query(90, ge=1, le=365),
+    cost_days: int = Query(90, ge=1, le=365),
     limit: int = Query(10, ge=1, le=50),
     current_user: User = Depends(require_roles("org_admin", "coordinator")),
     organization: dict = Depends(get_current_organization),
@@ -86,6 +91,7 @@ def export_operations_report(
         stale_days=stale_days,
         hotspot_days=hotspot_days,
         completion_days=completion_days,
+        cost_days=cost_days,
         limit=limit,
         current_user=current_user,
         organization=organization,

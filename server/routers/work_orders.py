@@ -187,6 +187,9 @@ def create_work_order(
         "created_by": current_user.id,
         "source": "manual",
         "sla_due_at": payload.sla_due_at.isoformat() if payload.sla_due_at else None,
+        "estimated_cost_cents": payload.estimated_cost_cents,
+        "actual_cost_cents": payload.actual_cost_cents,
+        "invoice_reference": payload.invoice_reference,
     }
     _validate_entity_links(organization["id"], patch)
     work_order = work_orders_repo.create(

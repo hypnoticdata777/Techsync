@@ -170,7 +170,10 @@ Likely scope:
   - mobile risk/capacity/hotspot chart bars now started in v1.3
   - mobile completion cycle-time chart bars and operations-report CSV evidence
     now started in v1.3
-  - deeper cost/export workflows remain later polish
+  - estimated/actual work-order cost fields, backend cost summary reporting,
+    mobile cost chart/cards, and operations-report CSV cost evidence now
+    started in v1.3
+  - deep accounting integrations remain later polish
 - Operational hardening:
   - error monitoring
   - uptime monitoring
@@ -214,9 +217,10 @@ v1.3 exit criteria:
 - Backend and mobile reporting show stale work, overloaded technicians, and
   property hotspot evidence, with dashboard CSV export and client/property/vendor
   CSV export plus tenant JSON export and mobile
-  risk/capacity/hotspot/completion cycle-time chart bars started; deeper cost
-  and closeout attachment handoff manifests started; deeper cost workflows and
-  provider-level binary storage export automation still remain later polish.
+  risk/capacity/hotspot/completion cycle-time/cost-summary chart bars started,
+  plus closeout attachment handoff manifests started; deep accounting
+  integrations and provider-level binary storage export automation still remain
+  later polish.
 - Backend and mobile dispatch board show unassigned active work, technician
   lanes, workload utilization, and SLA risk.
 - Manual work-order creation warns coordinators about likely duplicates before

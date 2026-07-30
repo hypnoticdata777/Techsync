@@ -62,11 +62,23 @@ class CompletionCycleMetric(BaseModel):
     latest_completed_at: Optional[datetime] = None
 
 
+class CostSummaryMetric(BaseModel):
+    service_type: str
+    work_order_count: int
+    estimated_cost_cents: int
+    actual_cost_cents: int
+    variance_cents: int
+    average_actual_cost_cents: Optional[int] = None
+    invoice_reference_count: int
+    latest_work_order_at: Optional[datetime] = None
+
+
 class OperationsReport(BaseModel):
     stale_work_orders: list[StaleWorkOrderMetric]
     overloaded_technicians: list[OverloadedTechnicianMetric]
     property_hotspots: list[PropertyHotspotMetric]
     completion_cycles: list[CompletionCycleMetric]
+    cost_summary: list[CostSummaryMetric]
 
 
 class DispatchBoardWorkOrder(BaseModel):

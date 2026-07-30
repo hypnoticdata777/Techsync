@@ -85,9 +85,35 @@ export const buildCompletionCycleRows = cycles => {
     .slice(0, 5);
 };
 
+export const buildCostSummaryRows = costs => {
+  const rows = [...(costs || [])];
+  const maxActual = Math.max(...rows.map(item => safeNumber(item.actual_cost_cents)), 0);
+
+  return rows
+    .map(item => {
+      const actual = safeNumber(item.actual_cost_cents);
+      const estimated = safeNumber(item.estimated_cost_cents);
+      const variance = safeNumber(item.variance_cents);
+      return {
+        id: item.service_type || 'general',
+        label: item.service_type || 'general',
+        detail: `estimate $${(estimated / 100).toFixed(0)} | variance $${(
+          variance / 100
+        ).toFixed(0)}`,
+        value: `$${(actual / 100).toFixed(0)}`,
+        rawValue: actual,
+        percent: maxActual > 0 ? clampPercent((actual / maxActual) * 100) : 0,
+        color: variance > 0 ? '#fb7185' : variance < 0 ? '#a3e635' : '#38bdf8',
+      };
+    })
+    .sort((a, b) => b.rawValue - a.rawValue)
+    .slice(0, 5);
+};
+
 export default {
   buildRiskBreakdown,
   buildTechnicianLoadRows,
   buildPropertyHotspotRows,
   buildCompletionCycleRows,
+  buildCostSummaryRows,
 };

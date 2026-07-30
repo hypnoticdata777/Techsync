@@ -26,7 +26,7 @@ alembic current
 Expected:
 
 ```text
-0006 (head)
+0007 (head)
 ```
 
 Observed:
@@ -110,9 +110,10 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Text closeout export rendered.
 - [ ] HTML closeout export rendered.
 - [ ] PDF closeout export rendered.
+- [ ] Closeout attachment manifest rendered and omitted private storage paths.
 - [ ] Operations report endpoint returned stale/overloaded/hotspot/completion
-      cycle buckets.
-- [ ] Operations report CSV export rendered completion cycle evidence.
+      cycle/cost buckets.
+- [ ] Operations report CSV export rendered completion cycle and cost evidence.
 - [ ] Dispatch board endpoint returned summary, unassigned queue, and
       technician lanes.
 - [ ] Dispatch board CSV export rendered.

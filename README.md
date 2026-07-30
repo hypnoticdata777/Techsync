@@ -227,7 +227,7 @@ Full interactive docs at `/docs`. Summary:
 | Clients / Properties / Vendors (v1.3 PMC context) | `POST/GET/PATCH /clients`, `GET /clients/export`, `POST/GET/PATCH /properties`, `GET /properties/export`, `POST/GET/PATCH /vendors`, `GET /vendors/export` |
 | Work Orders (RF-14, RF-15, RF-18..RF-22, RF-24) | `POST/GET /work-orders`, `GET /work-orders/mine`, `POST /work-orders/duplicate-warnings`, `GET/PATCH /work-orders/{id}`, `PATCH /work-orders/{id}/status`, `POST /work-orders/{id}/assign`, `POST /work-orders/{id}/approval-request`, `PATCH /work-orders/{id}/approval`, `POST/GET /work-orders/{id}/messages`, `GET /work-orders/{id}/events`, `GET /work-orders/{id}/closeout-package`, `GET /work-orders/{id}/closeout-package/export`, `GET /work-orders/{id}/closeout-package/attachments/export`, `POST /work-orders/{id}/attachments/upload`, `POST/GET /work-orders/{id}/attachments` |
 | Ingestion (RF-09, RF-11, RF-12) | `POST /ingestion/csv` (multipart), `POST /ingestion/webhook` (`X-API-Key` header, per-org key) |
-| Dashboard (RF-25) | `GET /dashboard/metrics`, `GET /dashboard/operations-report`, `GET /dashboard/operations-report/export`, `GET /dashboard/dispatch-board`, `GET /dashboard/dispatch-board/export` |
+| Dashboard (RF-25) | `GET /dashboard/metrics`, `GET /dashboard/operations-report` including cost summary buckets, `GET /dashboard/operations-report/export`, `GET /dashboard/dispatch-board`, `GET /dashboard/dispatch-board/export` |
 | Billing (RF-27, RF-28, RF-29) | `POST /billing/checkout`, `POST /billing/webhook`, `GET /billing/plan-limits` |
 
 Access token lifetime is 15 minutes, refresh token 7 days (RF-01). Roles are
@@ -286,7 +286,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   proof-gated closeout, closeout package summary, HTML/text/PDF closeout
   exports, closeout attachment handoff manifests for JSON/CSV evidence
   portability, operations reporting for stale work, overload, property hotspots,
-  and completion cycle time, CSV exports for the operations report, dispatch
+  completion cycle time, and estimated-versus-actual cost summaries, CSV
+  exports for the operations report, dispatch
   board, clients, properties, and vendors, tenant JSON export for
   admin-controlled data portability, and a dispatch board for unassigned
   work, technician lanes, utilization, SLA risk, pause/escalate/archive
@@ -319,8 +320,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
 - **No web admin panel** was built (RF-25/RF-26 exist as API endpoints
   only); the spec's "panel administrativo" is assumed to be a future
   separate web client consuming this same API.
-- **PMC operations expansion still remaining**: calendar/maps, deeper cost and
-  accounting exports, richer branded PDF package styling, deeper client/vendor
+- **PMC operations expansion still remaining**: calendar/maps, deep accounting
+  integrations, richer branded PDF package styling, deeper client/vendor
   portals, provider-level binary storage export automation, and final UI/UX
   screenshot testing are tracked for v1.3+ / later in `PRODUCT_ROADMAP.md`.
 

@@ -281,6 +281,9 @@ Already represented in the codebase:
 - v1.3 closeout attachment JSON/CSV handoff manifest for binary evidence
   portability without embedding files, private storage paths, or storage
   credentials.
+- v1.3 estimated/actual work-order cost fields, invoice-reference capture,
+  operations cost-summary reporting, mobile cost chart/cards, and CSV export
+  evidence.
 - React Native/Expo mobile client for onboarding, auth, work-order list,
   details, creation, invitation acceptance, and password reset.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,
@@ -298,9 +301,9 @@ Important gaps for the PMC operations product:
 - Full client/homeowner portal UI is not built yet; scoped work-order
   visibility, client-visible comments, and approval/decline actions have
   started in v1.3.
-- Calendar/maps, background jobs, final role screenshot evidence, cost/export
-  enrichment, and provider-level binary storage export automation remain
-  roadmap items.
+- Calendar/maps, background jobs, final role screenshot evidence, deep
+  accounting integrations, and provider-level binary storage export automation
+  remain roadmap items.
 
 ## Version Planning Boundary
 

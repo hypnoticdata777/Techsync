@@ -109,6 +109,19 @@ def test_completion_cycle_report_scopes_by_organization_id():
     assert params["limit"] == 5
 
 
+def test_cost_summary_report_scopes_by_organization_id_and_omits_empty_cost_rows():
+    with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
+        work_orders_repo.list_cost_summary(organization_id=42, since_days=90, limit=5)
+
+    sql, params = mock_fetch.call_args.args
+    assert "WHERE organization_id = :organization_id" in sql
+    assert "created_at >= :cutoff" in sql
+    assert "estimated_cost_cents IS NOT NULL OR actual_cost_cents IS NOT NULL" in sql
+    assert "GROUP BY COALESCE(NULLIF(service_type, ''), 'general')" in sql
+    assert params["organization_id"] == 42
+    assert params["limit"] == 5
+
+
 def test_dispatch_board_work_orders_scope_and_join_by_organization_id():
     with patch("repositories.work_orders.fetch_all", return_value=[]) as mock_fetch:
         work_orders_repo.list_dispatch_board_work_orders(organization_id=42)
@@ -812,19 +825,22 @@ def test_operations_report_uses_tenant_scoped_repository_calls():
         with patch("routers.dashboard.work_orders_repo.list_overloaded_technicians", return_value=[]) as overloaded:
             with patch("routers.dashboard.work_orders_repo.list_property_hotspots", return_value=[]) as hotspots:
                 with patch("routers.dashboard.work_orders_repo.list_completion_cycles", return_value=[]) as cycles:
-                    report = dashboard_router.get_operations_report(
-                        stale_days=14,
-                        hotspot_days=60,
-                        completion_days=120,
-                        limit=5,
-                        current_user=admin_user,
-                        organization={"id": 6},
-                    )
+                    with patch("routers.dashboard.work_orders_repo.list_cost_summary", return_value=[]) as costs:
+                        report = dashboard_router.get_operations_report(
+                            stale_days=14,
+                            hotspot_days=60,
+                            completion_days=120,
+                            cost_days=30,
+                            limit=5,
+                            current_user=admin_user,
+                            organization={"id": 6},
+                        )
 
     assert report.stale_work_orders == []
     assert report.overloaded_technicians == []
     assert report.property_hotspots == []
     assert report.completion_cycles == []
+    assert report.cost_summary == []
     assert stale.call_args.args == (6,)
     assert stale.call_args.kwargs == {"older_than_days": 14, "limit": 5}
     assert overloaded.call_args.args == (6,)
@@ -833,6 +849,8 @@ def test_operations_report_uses_tenant_scoped_repository_calls():
     assert hotspots.call_args.kwargs == {"since_days": 60, "limit": 5}
     assert cycles.call_args.args == (6,)
     assert cycles.call_args.kwargs == {"since_days": 120, "limit": 5}
+    assert costs.call_args.args == (6,)
+    assert costs.call_args.kwargs == {"since_days": 30, "limit": 5}
 
 
 def test_dispatch_board_uses_tenant_scoped_repository_calls_and_summarizes():
@@ -936,19 +954,33 @@ def test_operations_report_export_returns_downloadable_csv():
             "latest_completed_at": "2026-07-28T03:00:00Z",
         }
     ]
+    cost_rows = [
+        {
+            "service_type": "plumbing",
+            "work_order_count": 2,
+            "estimated_cost_cents": 80000,
+            "actual_cost_cents": 94000,
+            "variance_cents": 14000,
+            "average_actual_cost_cents": 47000,
+            "invoice_reference_count": 1,
+            "latest_work_order_at": "2026-07-28T03:00:00Z",
+        }
+    ]
 
     with patch("routers.dashboard.work_orders_repo.list_stale_work_orders", return_value=stale_rows) as stale:
         with patch("routers.dashboard.work_orders_repo.list_overloaded_technicians", return_value=[]):
             with patch("routers.dashboard.work_orders_repo.list_property_hotspots", return_value=[]):
                 with patch("routers.dashboard.work_orders_repo.list_completion_cycles", return_value=cycle_rows):
-                    response = dashboard_router.export_operations_report(
-                        stale_days=14,
-                        hotspot_days=60,
-                        completion_days=120,
-                        limit=5,
-                        current_user=admin_user,
-                        organization={"id": 6},
-                    )
+                    with patch("routers.dashboard.work_orders_repo.list_cost_summary", return_value=cost_rows):
+                        response = dashboard_router.export_operations_report(
+                            stale_days=14,
+                            hotspot_days=60,
+                            completion_days=120,
+                            cost_days=120,
+                            limit=5,
+                            current_user=admin_user,
+                            organization={"id": 6},
+                        )
 
     assert stale.call_args.args == (6,)
     assert response.media_type == "text/csv"
@@ -958,6 +990,8 @@ def test_operations_report_export_returns_downloadable_csv():
     assert "stale_work_order,1,Old leak" in body
     assert "completion_cycle" in body
     assert "plumbing,18.5,4.0,36.0" in body
+    assert "cost_summary" in body
+    assert "80000,94000,14000,47000,1" in body
 
 
 def test_dispatch_board_export_returns_summary_and_lane_csv():

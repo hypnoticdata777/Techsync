@@ -12,6 +12,7 @@ import {useAuth} from '../context/AuthContext';
 import ScreenErrorState from '../components/ScreenErrorState';
 import {
   buildCompletionCycleRows,
+  buildCostSummaryRows,
   buildPropertyHotspotRows,
   buildRiskBreakdown,
   buildTechnicianLoadRows,
@@ -20,6 +21,7 @@ import {
 const STALE_DAY_OPTIONS = [7, 14, 30];
 const HOTSPOT_DAY_OPTIONS = [30, 90, 180];
 const COMPLETION_DAY_OPTIONS = [30, 90, 180];
+const COST_DAY_OPTIONS = [30, 90, 180];
 const REPORT_LIMIT = 10;
 
 const getStatusColor = status => {
@@ -59,6 +61,15 @@ const getPriorityColor = priority => {
 };
 
 const formatLabel = value => (value || '').replace(/_/g, ' ');
+
+const formatCurrency = cents => {
+  const value = Number(cents || 0) / 100;
+  return value.toLocaleString(undefined, {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  });
+};
 
 const formatDate = value => {
   if (!value) {
@@ -153,6 +164,7 @@ function OperationsReportScreen() {
   const [staleDays, setStaleDays] = useState(7);
   const [hotspotDays, setHotspotDays] = useState(90);
   const [completionDays, setCompletionDays] = useState(90);
+  const [costDays, setCostDays] = useState(90);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -161,7 +173,7 @@ function OperationsReportScreen() {
     try {
       setLoading(true);
       const res = await authFetch(
-        `/dashboard/operations-report?stale_days=${staleDays}&hotspot_days=${hotspotDays}&completion_days=${completionDays}&limit=${REPORT_LIMIT}`,
+        `/dashboard/operations-report?stale_days=${staleDays}&hotspot_days=${hotspotDays}&completion_days=${completionDays}&cost_days=${costDays}&limit=${REPORT_LIMIT}`,
       );
 
       if (res.ok) {
@@ -182,7 +194,7 @@ function OperationsReportScreen() {
     } finally {
       setLoading(false);
     }
-  }, [authFetch, completionDays, hotspotDays, logout, staleDays]);
+  }, [authFetch, completionDays, costDays, hotspotDays, logout, staleDays]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -200,6 +212,7 @@ function OperationsReportScreen() {
       overloaded: report?.overloaded_technicians?.length || 0,
       hotspots: report?.property_hotspots?.length || 0,
       cycles: report?.completion_cycles?.length || 0,
+      costs: report?.cost_summary?.length || 0,
     }),
     [report],
   );
@@ -217,7 +230,12 @@ function OperationsReportScreen() {
     () => buildCompletionCycleRows(report?.completion_cycles),
     [report],
   );
+  const costSummaryRows = useMemo(
+    () => buildCostSummaryRows(report?.cost_summary),
+    [report],
+  );
   const completionCycles = report?.completion_cycles || [];
+  const costSummary = report?.cost_summary || [];
 
   return (
     <ScrollView
@@ -258,6 +276,13 @@ function OperationsReportScreen() {
           onSelect={setCompletionDays}
           suffix="d"
         />
+        <SegmentGroup
+          label="Cost window"
+          options={COST_DAY_OPTIONS}
+          selected={costDays}
+          onSelect={setCostDays}
+          suffix="d"
+        />
       </View>
 
       {loading && <ActivityIndicator style={styles.loader} color="#38bdf8" />}
@@ -284,6 +309,10 @@ function OperationsReportScreen() {
             <View style={styles.summaryTile}>
               <Text style={styles.summaryValue}>{summary.cycles}</Text>
               <Text style={styles.summaryLabel}>Cycle Types</Text>
+            </View>
+            <View style={styles.summaryTile}>
+              <Text style={styles.summaryValue}>{summary.costs}</Text>
+              <Text style={styles.summaryLabel}>Cost Types</Text>
             </View>
           </View>
 
@@ -313,6 +342,13 @@ function OperationsReportScreen() {
             subtitle="Average created-to-completed hours by service type"
             rows={completionCycleRows}
             emptyMessage="No completed work orders in this window."
+          />
+
+          <ChartBlock
+            title="Cost Summary"
+            subtitle="Actual cost by service type with estimate variance"
+            rows={costSummaryRows}
+            emptyMessage="No estimated or actual costs in this window."
           />
 
           <View style={styles.section}>
@@ -401,6 +437,35 @@ function OperationsReportScreen() {
                   </View>
                   <Text style={styles.cardMeta}>
                     Latest {formatDate(item.latest_completed_at)}
+                  </Text>
+                </View>
+              ))
+            )}
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Cost Summary</Text>
+            {costSummary.length === 0 ? (
+              <EmptyState message="No estimated or actual costs in this window." />
+            ) : (
+              costSummary.map(item => (
+                <View key={item.service_type} style={styles.card}>
+                  <Text style={styles.cardTitle}>{formatLabel(item.service_type)}</Text>
+                  <View style={styles.countGrid}>
+                    <Text style={styles.countCell}>Jobs {item.work_order_count}</Text>
+                    <Text style={styles.countCell}>
+                      Est {formatCurrency(item.estimated_cost_cents)}
+                    </Text>
+                    <Text style={styles.countCell}>
+                      Actual {formatCurrency(item.actual_cost_cents)}
+                    </Text>
+                    <Text style={styles.countCell}>
+                      Var {formatCurrency(item.variance_cents)}
+                    </Text>
+                  </View>
+                  <Text style={styles.cardMeta}>
+                    Avg actual {formatCurrency(item.average_actual_cost_cents)} |
+                    invoices {item.invoice_reference_count}
                   </Text>
                 </View>
               ))

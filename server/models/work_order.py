@@ -36,6 +36,9 @@ class WorkOrderCreate(BaseModel):
     service_type: str = Field(default="general", max_length=100)
     priority: Priority = "medium"
     sla_due_at: Optional[datetime] = None
+    estimated_cost_cents: Optional[int] = Field(None, ge=0)
+    actual_cost_cents: Optional[int] = Field(None, ge=0)
+    invoice_reference: Optional[str] = Field(None, max_length=120)
     auto_assign: bool = True
 
     @field_validator("title")
@@ -56,6 +59,9 @@ class WorkOrderUpdate(BaseModel):
     address: Optional[str] = Field(None, max_length=300)
     priority: Optional[Priority] = None
     service_type: Optional[str] = Field(None, max_length=100)
+    estimated_cost_cents: Optional[int] = Field(None, ge=0)
+    actual_cost_cents: Optional[int] = Field(None, ge=0)
+    invoice_reference: Optional[str] = Field(None, max_length=120)
 
     @field_validator("title")
     @classmethod
@@ -126,6 +132,9 @@ class WorkOrder(BaseModel):
     completion_notes: Optional[str] = None
     completion_proof_verified_at: Optional[datetime] = None
     completion_override_reason: Optional[str] = None
+    estimated_cost_cents: Optional[int] = None
+    actual_cost_cents: Optional[int] = None
+    invoice_reference: Optional[str] = None
     client_approval_status: ClientApprovalStatus = "not_required"
     client_approval_requested_at: Optional[datetime] = None
     client_approval_requested_by: Optional[int] = None

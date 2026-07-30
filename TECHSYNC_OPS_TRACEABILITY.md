@@ -32,7 +32,7 @@ showcase gate.
 | 2 | Business Rules | Partially proven: tenant scoping, roles, technician assignment boundaries, status/audit events, manual reassignment, priority support. | Client-visible/internal-note separation, client-scoped work-order visibility, and proof-gated closeout begin in v1.3; escalations expand next. |
 | 3 | Constraints | Captured as guardrails: tenant privacy, synthetic data, CSV remains useful, offline/deep integrations deferred. | Consent-aware location, offline sync, advanced routing, PDF/email ingestion, accounting integrations staged later. |
 | 4 | External Interfaces | Partially proven: CSV import, webhook intake, attachment storage boundary, Stripe/email boundaries. | HTML/text/PDF closeout export, closeout attachment JSON/CSV handoff manifests, dashboard CSV exports, client/property/vendor CSV exports, and admin tenant JSON export are now started in v1.3; SMS/push, calendar/maps, accounting/export, and provider-level binary storage export automation expand later. |
-| 5 | Features | Partially proven: central work-order intake, assignment, technician queue/status, attachment proof boundary, dashboard metrics. | Client/property/vendor CRUD is now started in backend and mobile, backend communication visibility, operations reporting UI with chart bars, and dispatch board begin in v1.3; client/homeowner portal, cost trends, and deeper hotspot analytics expand through v1.3+. |
+| 5 | Features | Partially proven: central work-order intake, assignment, technician queue/status, attachment proof boundary, dashboard metrics. | Client/property/vendor CRUD is now started in backend and mobile, backend communication visibility, operations reporting UI with chart bars, cost summary trends, and dispatch board begin in v1.3; client/homeowner portal and deeper hotspot analytics expand through v1.3+. |
 | 6 | Functional Requirements | Partially proven: admin onboarding, role-scoped users, work orders, technician recommendation/assignment, technician status, CSV/webhook ingestion. | Proof-gated closeout, backend closeout summaries, printable closeout export, client-visible comments, client-scoped visibility, client approvals, duplicate-warning preflight, and pause/escalate/cancel/manager-only archive depth begin in v1.3; admin-created non-technician roles, binary PDF polish, and real notifications expand in v1.3+. |
 | 7 | Nonfunctional Requirements | Partially proven: app-layer tenant isolation, RLS policies, audit trail, structured logs, hosted-demo config. | Local/demo backup/restore/export/monitoring runbook and admin tenant JSON export are now started, and primary mobile accessibility labels/hints now have helper coverage; performance targets, retry/offline resilience, provider backup evidence, monitoring, and final manual accessibility evidence remain v1.2/v1.3 operational work. |
 | 8 | Quality Attributes | Partially proven: security, auditability, maintainability, and core reliability boundaries. | Scalability, operational observability, and field usability evidence mature through hosted smoke tests and v1.3 workflows. |
@@ -87,8 +87,8 @@ v1.3 should focus on the highest-value PMC product gaps:
 6. Duplicate-detection warnings now started for manual work-order creation.
 7. Reporting for stale work, overloaded technicians, property hotspots, and
    completion cycle time, with the first mobile report view, mobile chart bars,
-   dashboard CSV exports, completion cycle export evidence, and PMC directory
-   entity CSV exports now started.
+   dashboard CSV exports, completion cycle/cost export evidence, and PMC
+   directory entity CSV exports now started.
 8. Pause, escalate, cancel, and manager-only archive lifecycle evidence, with
    active/archived visibility reflected in dispatch, reports, mobile actions,
    and synthetic demo data.

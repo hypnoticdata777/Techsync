@@ -1,5 +1,6 @@
 import {
   buildCompletionCycleRows,
+  buildCostSummaryRows,
   buildPropertyHotspotRows,
   buildRiskBreakdown,
   buildTechnicianLoadRows,
@@ -83,5 +84,39 @@ describe('report metric helpers', () => {
       }),
     );
     expect(rows[1]).toEqual(expect.objectContaining({id: 'plumbing', percent: 23}));
+  });
+
+  test('builds cost summary rows with variance color and scaled actual cost', () => {
+    const rows = buildCostSummaryRows([
+      {
+        service_type: 'plumbing',
+        estimated_cost_cents: 80000,
+        actual_cost_cents: 94000,
+        variance_cents: 14000,
+      },
+      {
+        service_type: 'electrical',
+        estimated_cost_cents: 120000,
+        actual_cost_cents: 90000,
+        variance_cents: -30000,
+      },
+    ]);
+
+    expect(rows[0]).toEqual(
+      expect.objectContaining({
+        id: 'plumbing',
+        value: '$940',
+        percent: 100,
+        color: '#fb7185',
+      }),
+    );
+    expect(rows[1]).toEqual(
+      expect.objectContaining({
+        id: 'electrical',
+        value: '$900',
+        percent: 96,
+        color: '#a3e635',
+      }),
+    );
   });
 });

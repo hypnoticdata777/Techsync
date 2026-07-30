@@ -259,6 +259,38 @@ def list_completion_cycles(
     )
 
 
+def list_cost_summary(
+    organization_id: int,
+    since_days: int = 90,
+    limit: int = 10,
+) -> list[dict]:
+    """v1.3 cost trend foundation grouped by service type."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=since_days)
+    return fetch_all(
+        """
+        SELECT
+            COALESCE(NULLIF(service_type, ''), 'general') AS service_type,
+            COUNT(id) AS work_order_count,
+            COALESCE(SUM(estimated_cost_cents), 0) AS estimated_cost_cents,
+            COALESCE(SUM(actual_cost_cents), 0) AS actual_cost_cents,
+            COALESCE(SUM(actual_cost_cents), 0) - COALESCE(SUM(estimated_cost_cents), 0)
+                AS variance_cents,
+            ROUND(AVG(actual_cost_cents)::numeric, 0) AS average_actual_cost_cents,
+            COUNT(invoice_reference) AS invoice_reference_count,
+            MAX(created_at) AS latest_work_order_at
+        FROM work_orders
+        WHERE organization_id = :organization_id
+          AND created_at >= :cutoff
+          AND (estimated_cost_cents IS NOT NULL OR actual_cost_cents IS NOT NULL)
+        GROUP BY COALESCE(NULLIF(service_type, ''), 'general')
+        HAVING COUNT(id) > 0
+        ORDER BY actual_cost_cents DESC, estimated_cost_cents DESC, work_order_count DESC
+        LIMIT :limit
+        """,
+        {"organization_id": organization_id, "cutoff": cutoff, "limit": limit},
+    )
+
+
 def list_dispatch_board_work_orders(organization_id: int) -> list[dict]:
     """v1.3 dispatch board: active work enriched with PMC context."""
     return fetch_all(
