@@ -216,6 +216,9 @@ Completed:
   actions.
 - Added tested role UX walkthrough manifest, screenshot evidence template, and
   viewer/vendor demo users for final role capture.
+- Added tested role UX evidence readiness audit for synthetic login coverage,
+  screenshot-plan uniqueness, safety checks, manager/non-manager controls,
+  technician assigned routing, client/viewer privacy, and staged vendor access.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and
@@ -240,6 +243,7 @@ Next:
   as complete as practical.
 - Continue local-only product depth with the remaining role-by-role UI/UX
   friction sweep, accessibility evidence, and screenshot-proof preparation.
+  The manifest audit is now code-backed; final manual screenshots still remain.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,

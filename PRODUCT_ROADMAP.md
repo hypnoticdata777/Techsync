@@ -179,6 +179,9 @@ Likely scope:
     `scripts/seed_demo_data.py` and `DEMO_DATA_RUNBOOK.md`
   - role-by-role UX sweep now started with `ROLE_UX_SWEEP.md` and a
     role-specific mobile landing band
+  - role UX evidence readiness audit now started for synthetic login coverage,
+    screenshot plan uniqueness, safety guardrails, and role privacy/control
+    expectations
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions
@@ -227,8 +230,9 @@ v1.3 exit criteria:
   Compact mobile touch targets and wrapping behavior are now hardened before
   screenshot capture, role-specific empty queue panels are now tested, and a
   role walkthrough/screenshot evidence manifest is prepared with viewer/vendor
-  synthetic logins. Accessibility helper coverage and a manual evidence
-  template are now prepared for the final screen-reader pass.
+  synthetic logins plus an automated readiness audit. Accessibility helper
+  coverage and a manual evidence template are now prepared for the final
+  screen-reader pass.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data, while
   the client invite/accept/approval decision is manually verified from the
   hosted email/log path.

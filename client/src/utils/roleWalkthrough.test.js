@@ -1,6 +1,8 @@
 import {
   ROLE_WALKTHROUGH_ORDER,
   getEvidenceSafetyChecklist,
+  getRoleEvidenceChecklistMarkdown,
+  getRoleEvidenceReadinessAudit,
   getRoleWalkthrough,
   getRoleWalkthroughManifest,
   getScreenshotPlan,
@@ -52,5 +54,36 @@ describe('role walkthrough manifest', () => {
     expect(checklist).toContain('synthetic demo tenant');
     expect(checklist).toContain('database URLs');
     expect(checklist).toContain('Review every screenshot');
+  });
+
+  test('audits role evidence readiness before manual screenshots', () => {
+    const audit = getRoleEvidenceReadinessAudit();
+
+    expect(audit.passed).toBe(true);
+    expect(audit.roleCount).toBe(6);
+    expect(audit.screenshotCount).toBe(19);
+    expect(audit.checks.map(check => check.key)).toEqual([
+      'synthetic_login_coverage',
+      'screen_coverage',
+      'unique_screenshot_names',
+      'screenshot_safety_checks',
+      'manager_controls_documented',
+      'non_manager_controls_hidden',
+      'technician_assigned_endpoint',
+      'client_privacy_documented',
+      'viewer_readonly_documented',
+      'vendor_staging_documented',
+    ]);
+  });
+
+  test('renders a markdown checklist for the manual capture pass', () => {
+    const markdown = getRoleEvidenceChecklistMarkdown(['vendor']);
+
+    expect(markdown).toContain('# TechSync Ops Role UX Evidence Checklist');
+    expect(markdown).toContain('Roles: 1');
+    expect(markdown).toContain('Screenshots: 1');
+    expect(markdown).toContain('ready for manual capture');
+    expect(markdown).toContain('techsync-ops-vendor-01-vendor-staged.png');
+    expect(markdown).toContain('Vendor staged/disabled state is explicit');
   });
 });

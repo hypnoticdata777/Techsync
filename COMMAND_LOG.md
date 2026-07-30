@@ -1273,6 +1273,37 @@ Result:
 - Backend tests passed: `146 passed`.
 - Compile check passed for `server` and `scripts`.
 
+## 2026-07-30 - v1.3 Role UX Evidence Readiness Audit
+
+Decision:
+
+- Continue moving toward hosting without deploying by tightening the final
+  role-by-role screenshot/evidence path.
+- Keep the screenshot manifest code-backed so role coverage, public-safety
+  checks, and role privacy/control expectations are harder to accidentally
+  drift.
+
+Changes:
+
+- Added `getRoleEvidenceReadinessAudit()` to
+  `client/src/utils/roleWalkthrough.js`.
+- Added `getRoleEvidenceChecklistMarkdown()` for a deterministic manual
+  screenshot checklist generated from the same manifest.
+- Added checks for synthetic login coverage, screen coverage, unique screenshot
+  names, safety checks, manager controls, non-manager hidden controls,
+  technician assigned routing, client/viewer privacy, and staged vendor access.
+- Updated role UX, evidence, QA, roadmap, requirements, README, and phase docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+```
+
+Result:
+
+- Client tests passed: `7 passed suites`, `38 passed tests`.
+
 ## 2026-07-29 - v1.3 Lifecycle and Operations Runbook Batch
 
 Decision:

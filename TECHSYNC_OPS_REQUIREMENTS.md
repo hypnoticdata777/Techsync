@@ -260,6 +260,9 @@ Already represented in the codebase:
 - v1.3 role walkthrough manifest and evidence template for synthetic
   screenshot capture across admin, coordinator, technician, client, viewer, and
   vendor roles.
+- v1.3 role UX evidence readiness audit for synthetic login coverage,
+  screenshot-plan uniqueness, public safety guardrails, role controls, privacy
+  expectations, and staged vendor access before manual capture.
 - v1.3 pause, escalate, cancel, and manager-only archive lifecycle states for
   work orders, with backend/mobile handling, dashboard counts, dispatch
   visibility, regression tests, and synthetic seed examples.

@@ -34,6 +34,9 @@ the password here.
 ## Screenshot Manifest
 
 Use these exact filenames so the portfolio evidence stays easy to audit.
+The filenames and role/safety expectations are generated from
+`client/src/utils/roleWalkthrough.js`; the automated readiness audit should pass
+before manual capture.
 
 | Role | Route / Screen | Screenshot Filename | Required Proof |
 |---|---|---|---|
@@ -59,6 +62,8 @@ Use these exact filenames so the portfolio evidence stays easy to audit.
 
 ## Per-Role Checks
 
+- [ ] `getRoleEvidenceReadinessAudit()` passes before screenshots are captured.
+- [ ] `getRoleEvidenceChecklistMarkdown()` output matches this screenshot plan.
 - [ ] Admin sees Directory, Dispatch, Report, and New Work actions.
 - [ ] Coordinator sees Directory, Dispatch, Report, and New Work actions.
 - [ ] Technician does not see Directory, Dispatch, Report, or New Work actions.

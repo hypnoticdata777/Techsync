@@ -155,6 +155,166 @@ export const getEvidenceSafetyChecklist = () => [
   'Review every screenshot before adding it to portfolio or investor materials.',
 ];
 
+const allRolesHaveLogin = manifest =>
+  manifest.every(item => Boolean(item.loginEmail));
+
+const allRolesHaveScreens = manifest =>
+  manifest.every(item => item.screens.length > 0);
+
+const screenshotNamesAreUnique = plan => {
+  const names = plan.map(item => item.screenshotName);
+  return new Set(names).size === names.length;
+};
+
+const everyScreenshotHasSafetyChecks = plan =>
+  plan.every(item =>
+    SAFETY_CHECKS.every(check => item.safetyChecks.includes(check)),
+  );
+
+const managersHaveManagerControls = manifest =>
+  manifest
+    .filter(item => item.canManage)
+    .every(item =>
+      ['Directory', 'Dispatch', 'Report', 'New Work'].every(control =>
+        item.visibleControls.includes(control),
+      ),
+    );
+
+const nonManagersHideManagerControls = manifest =>
+  manifest
+    .filter(item => !item.canManage)
+    .every(item =>
+      ['Directory', 'Dispatch', 'Report', 'New Work'].every(control =>
+        item.hiddenControls.includes(control),
+      ),
+    );
+
+const clientPrivacyIsDocumented = manifest => {
+  const client = manifest.find(item => item.role === 'client');
+  return Boolean(
+    client &&
+      client.hiddenControls.includes('Internal messages') &&
+      client.objective.includes('linked work visibility'),
+  );
+};
+
+const viewerReadonlyIsDocumented = manifest => {
+  const viewer = manifest.find(item => item.role === 'viewer');
+  return Boolean(
+    viewer &&
+      viewer.hiddenControls.includes('Status updates') &&
+      viewer.hiddenControls.includes('Proof upload') &&
+      viewer.objective.includes('read-only linked work'),
+  );
+};
+
+const technicianEndpointIsAssignedOnly = manifest => {
+  const technician = manifest.find(item => item.role === 'technician');
+  return technician?.endpoint === '/work-orders/mine';
+};
+
+const vendorStagingIsExplicit = manifest => {
+  const vendor = manifest.find(item => item.role === 'vendor');
+  return Boolean(
+    vendor &&
+      vendor.objective.includes('intentionally staged') &&
+      vendor.hiddenControls.includes('Work-order detail'),
+  );
+};
+
+const roleNotRequestedOr = (manifest, role, assertion) =>
+  !manifest.some(item => item.role === role) || assertion(manifest);
+
+export const getRoleEvidenceReadinessAudit = (roles = ROLE_WALKTHROUGH_ORDER) => {
+  const manifest = getRoleWalkthroughManifest(roles);
+  const plan = getScreenshotPlan(roles);
+  const checks = [
+    {
+      key: 'synthetic_login_coverage',
+      passed: allRolesHaveLogin(manifest),
+      detail: 'Every role has a synthetic login email.',
+    },
+    {
+      key: 'screen_coverage',
+      passed: allRolesHaveScreens(manifest),
+      detail: 'Every role has at least one screenshot target.',
+    },
+    {
+      key: 'unique_screenshot_names',
+      passed: screenshotNamesAreUnique(plan),
+      detail: 'Screenshot filenames are deterministic and unique.',
+    },
+    {
+      key: 'screenshot_safety_checks',
+      passed: everyScreenshotHasSafetyChecks(plan),
+      detail: 'Every screenshot target carries the full safety checklist.',
+    },
+    {
+      key: 'manager_controls_documented',
+      passed: managersHaveManagerControls(manifest),
+      detail: 'Admin/coordinator walkthroughs document manager controls.',
+    },
+    {
+      key: 'non_manager_controls_hidden',
+      passed: nonManagersHideManagerControls(manifest),
+      detail: 'Technician/client/viewer/vendor walkthroughs hide manager controls.',
+    },
+    {
+      key: 'technician_assigned_endpoint',
+      passed: roleNotRequestedOr(manifest, 'technician', technicianEndpointIsAssignedOnly),
+      detail: 'Technician evidence uses the assigned-work endpoint.',
+    },
+    {
+      key: 'client_privacy_documented',
+      passed: roleNotRequestedOr(manifest, 'client', clientPrivacyIsDocumented),
+      detail: 'Client evidence calls out linked-work and internal-message privacy.',
+    },
+    {
+      key: 'viewer_readonly_documented',
+      passed: roleNotRequestedOr(manifest, 'viewer', viewerReadonlyIsDocumented),
+      detail: 'Viewer evidence calls out read-only access and hidden mutation controls.',
+    },
+    {
+      key: 'vendor_staging_documented',
+      passed: roleNotRequestedOr(manifest, 'vendor', vendorStagingIsExplicit),
+      detail: 'Vendor evidence documents staged access instead of implied availability.',
+    },
+  ];
+
+  return {
+    generatedFor: roles,
+    roleCount: manifest.length,
+    screenshotCount: plan.length,
+    passed: checks.every(check => check.passed),
+    checks,
+  };
+};
+
+export const getRoleEvidenceChecklistMarkdown = (roles = ROLE_WALKTHROUGH_ORDER) => {
+  const audit = getRoleEvidenceReadinessAudit(roles);
+  const plan = getScreenshotPlan(roles);
+  const lines = [
+    '# TechSync Ops Role UX Evidence Checklist',
+    '',
+    `Roles: ${audit.roleCount}`,
+    `Screenshots: ${audit.screenshotCount}`,
+    `Readiness: ${audit.passed ? 'ready for manual capture' : 'needs manifest fixes'}`,
+    '',
+    '## Automated Manifest Checks',
+    '',
+    ...audit.checks.map(check => `- [${check.passed ? 'x' : ' '}] ${check.detail}`),
+    '',
+    '## Screenshot Plan',
+    '',
+    ...plan.map(
+      item =>
+        `- ${item.role} / ${item.route}: \`${item.screenshotName}\` - ${item.proof}`,
+    ),
+  ];
+
+  return `${lines.join('\n')}\n`;
+};
+
 export default {
   ROLE_WALKTHROUGH_ORDER,
   SYNTHETIC_ROLE_LOGINS,
@@ -162,4 +322,6 @@ export default {
   getRoleWalkthroughManifest,
   getScreenshotPlan,
   getEvidenceSafetyChecklist,
+  getRoleEvidenceReadinessAudit,
+  getRoleEvidenceChecklistMarkdown,
 };

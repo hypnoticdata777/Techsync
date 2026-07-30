@@ -53,6 +53,10 @@ Implemented:
 - Added a tested role walkthrough manifest covering synthetic role logins,
   route/screenshots to capture, expected visible/hidden controls, and public
   evidence safety checks.
+- Added a tested role UX evidence readiness audit that verifies synthetic login
+  coverage, screenshot targets, unique filenames, safety checks, manager
+  controls, non-manager hidden controls, technician assigned routing,
+  client/viewer privacy, and staged vendor access before manual screenshots.
 - Added `ROLE_UX_EVIDENCE_TEMPLATE.md` and expanded the synthetic seed to
   include viewer/vendor logins for final role screenshots.
 - Added tested accessibility labels/hints for role dashboard actions,
@@ -74,6 +78,8 @@ Result:
 
 - Client tests passed: `7 passed suites`, `36 passed tests`.
 - Backend tests passed: `143 passed`.
+- Latest role evidence audit helper test pass: `7 passed suites`, `38 passed
+  tests`.
 
 ## Role Matrix
 
@@ -89,7 +95,8 @@ Result:
 ## Remaining Sweep Items
 
 - Capture mobile screenshots for each role using synthetic demo data.
-  Walkthrough manifest/template is prepared; final screenshots still needed.
+  Walkthrough manifest/template and automated readiness audit are prepared;
+  final screenshots still needed.
 - Verify role-specific empty states with seeded and empty queues.
   Empty-state code/tests are implemented; final screenshot proof still needed.
 - Verify client/viewer cannot see internal messages or unrelated work.

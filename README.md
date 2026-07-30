@@ -11,7 +11,9 @@ This repository implements the POC scope defined in
 implemented vs. deferred.
 
 Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`; hosting remains
-deferred until the local role walkthrough is complete.
+deferred until the local role walkthrough is complete. The walkthrough manifest
+now has a tested readiness audit for synthetic logins, screenshot targets,
+role controls, privacy expectations, and screenshot safety checks.
 
 ## Overview
 
@@ -294,7 +296,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   tests cover client/viewer and technician work-order visibility boundaries, and
   compact mobile workflow controls have hardened touch targets before screenshot
   capture. Role-specific empty queue panels and the role walkthrough/screenshot
-  manifest are implemented and tested.
+  manifest are implemented and tested, including a role evidence readiness
+  audit for the final manual screenshot pass.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.
