@@ -22,6 +22,7 @@ Implemented:
   - PMC directory
   - dispatch board
   - operations report
+  - evidence checklist
   - new work order
 - Added role-specific landing copy and empty states for:
   - org admin
@@ -37,6 +38,9 @@ Implemented:
   property, vendor, and address context before save.
 - Added tested role-aware route registration so manager-only screens are not
   mounted for technician, client, viewer, or vendor roles.
+- Added a manager-only Role Evidence screen that renders automated readiness
+  checks, role capture plan, screenshot targets, and safety checklist inside
+  the app before hosting.
 - Added a reusable retry/error panel for primary mobile API failures, including
   work-order list, dispatch board, operations report, PMC directory, and
   work-order detail message/attachment subloads.
@@ -73,6 +77,8 @@ Implemented:
 - Added backend regression coverage for linked-vendor work-order scoping,
   vendor-visible message enforcement, and vendor/viewer attachment mutation
   blocking.
+- Added tested in-app evidence dashboard data so the final local screenshot
+  pass can be driven from the mobile UI, not only Markdown.
 
 Verification:
 
@@ -92,8 +98,8 @@ Result:
 
 | Role | Landing State | Primary Actions | Status |
 |---|---|---|---|
-| org_admin | Admin Workspace | Directory, Dispatch, Report, New Work | Manager routes mounted |
-| coordinator | Coordinator Queue | Directory, Dispatch, Report, New Work | Manager routes mounted |
+| org_admin | Admin Workspace | Directory, Dispatch, Report, Evidence, New Work | Manager routes mounted |
+| coordinator | Coordinator Queue | Directory, Dispatch, Report, Evidence, New Work | Manager routes mounted |
 | technician | Technician Queue | Assigned queue, status/proof from details | Manager routes hidden |
 | client | Client View | Visible linked work orders, approvals/messages from details | Manager routes hidden |
 | viewer | Viewer Snapshot | Read-only visible linked work orders | Manager routes hidden |

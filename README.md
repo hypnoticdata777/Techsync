@@ -301,7 +301,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   compact mobile workflow controls have hardened touch targets before screenshot
   capture. Role-specific empty queue panels and the role walkthrough/screenshot
   manifest are implemented and tested, including a role evidence readiness
-  audit for the final manual screenshot pass.
+  audit and manager-only in-app Role Evidence screen for the final manual
+  screenshot pass.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.

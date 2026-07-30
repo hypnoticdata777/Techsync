@@ -269,6 +269,9 @@ Already represented in the codebase:
 - v1.3 role UX evidence readiness audit for synthetic login coverage,
   screenshot-plan uniqueness, public safety guardrails, role controls, privacy
   expectations, and linked-vendor scope before manual capture.
+- v1.3 manager-only mobile Role Evidence screen for the readiness audit,
+  role capture plan, screenshot targets, and screenshot safety checklist before
+  hosting.
 - v1.3 pause, escalate, cancel, and manager-only archive lifecycle states for
   work orders, with backend/mobile handling, dashboard counts, dispatch
   visibility, regression tests, and synthetic seed examples.

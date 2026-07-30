@@ -1283,6 +1283,47 @@ Result:
 - Full backend tests passed: `150 passed`.
 - Full client tests passed: `7 passed suites`, `39 passed tests`.
 - Compile check passed for `server` and `scripts`.
+
+## 2026-07-30 - v1.3 In-App Role Evidence Dashboard
+
+Decision:
+
+- Reduce the remaining manual pre-hosting UX proof gap by making the role
+  walkthrough audit visible from the app itself.
+- Keep the evidence surface manager-only and local/demo oriented, with no
+  hosting work.
+
+Changes:
+
+- Added manager-only `RoleEvidence` navigation and a main queue Evidence action
+  for org admins/coordinators.
+- Added `client/src/screens/RoleEvidenceScreen.js` to render readiness checks,
+  role capture rows, screenshot filenames, proof notes, and safety checklist.
+- Added `getRoleEvidenceDashboard()` so the screen, tests, and docs share the
+  same evidence model.
+- Updated role walkthrough controls so Evidence is documented as visible to
+  managers and hidden from technician/client/viewer/vendor roles.
+- Updated role UX, QA, roadmap, requirements, traceability, README, and phase
+  docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- --runTestsByPath src/utils/roleWorkflows.test.js src/utils/roleWalkthrough.test.js
+node -e "const babel=require('@babel/core'); for (const f of ['App.js','src/screens/RoleEvidenceScreen.js','src/screens/WorkOrdersListScreen.js']) { babel.transformFileSync(f,{presets:['module:metro-react-native-babel-preset'],babelrc:false,configFile:false}); console.log(f,'parse ok'); }"
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+```
+
+Result:
+
+- Focused role UX tests passed: `2 passed suites`, `18 passed tests`.
+- App, Role Evidence screen, and work-order list Babel parse checks passed.
+- Full client tests passed: `7 passed suites`, `40 passed tests`.
+- Full backend tests passed: `160 passed`, with one existing Pydantic `dict()`
+  deprecation warning.
+- Compile check passed for `server` and `scripts`.
 - Work-order detail screen Babel parse check passed.
 
 ## 2026-07-30 - v1.3 Closeout Attachment Manifest Export

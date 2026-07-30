@@ -190,6 +190,8 @@ Likely scope:
   - role UX evidence readiness audit now started for synthetic login coverage,
     screenshot plan uniqueness, safety guardrails, and role privacy/control
     expectations
+  - manager-only in-app role evidence screen now started for readiness checks,
+    role capture plan, screenshot targets, and safety checklist
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions
@@ -242,6 +244,8 @@ v1.3 exit criteria:
   screenshot capture, role-specific empty queue panels are now tested, and a
   role walkthrough/screenshot evidence manifest is prepared with viewer/vendor
   synthetic logins plus an automated readiness audit for linked-vendor scope.
+  A manager-only Role Evidence screen now exposes the readiness audit,
+  screenshot targets, and capture safety checklist inside the app.
   Accessibility helper
   coverage and a manual evidence template are now prepared for the final
   screen-reader pass.

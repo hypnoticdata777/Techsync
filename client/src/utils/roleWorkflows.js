@@ -5,6 +5,7 @@ const MANAGER_MAIN_ROUTES = [
   'OperationsReport',
   'DispatchBoard',
   'PmcDirectory',
+  'RoleEvidence',
 ];
 
 export const canManageOperations = role => MANAGER_ROLES.includes(role);
@@ -144,6 +145,13 @@ export const getRoleActions = role => {
       detail: 'Stale work, load, hotspots',
       route: 'OperationsReport',
       tone: 'report',
+    },
+    {
+      key: 'evidence',
+      label: 'Evidence',
+      detail: 'Role capture plan',
+      route: 'RoleEvidence',
+      tone: 'evidence',
     },
     {
       key: 'create',

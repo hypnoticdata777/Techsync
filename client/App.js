@@ -15,6 +15,7 @@ import WorkOrderFormScreen from './src/screens/WorkOrderFormScreen';
 import OperationsReportScreen from './src/screens/OperationsReportScreen';
 import DispatchBoardScreen from './src/screens/DispatchBoardScreen';
 import PmcDirectoryScreen from './src/screens/PmcDirectoryScreen';
+import RoleEvidenceScreen from './src/screens/RoleEvidenceScreen';
 import {canAccessMainRoute} from './src/utils/roleWorkflows';
 
 const Stack = createNativeStackNavigator();
@@ -137,6 +138,15 @@ function Navigation() {
                 component={PmcDirectoryScreen}
                 options={{
                   title: 'PMC Directory',
+                }}
+              />
+            ) : null}
+            {canAccessMainRoute(user?.role, 'RoleEvidence') ? (
+              <Stack.Screen
+                name="RoleEvidence"
+                component={RoleEvidenceScreen}
+                options={{
+                  title: 'Role Evidence',
                 }}
               />
             ) : null}

@@ -156,6 +156,8 @@ they have been verified in the relevant environment.
 - [x] Role UX evidence readiness audit added for synthetic login coverage,
       screenshot plan uniqueness, safety checks, role controls, client/viewer
       privacy, technician routing, and linked-vendor scope.
+- [x] Manager-only in-app Role Evidence screen added for automated readiness
+      checks, role capture plan, screenshot targets, and safety checklist.
 - [x] Synthetic demo seed includes admin, coordinator, client, viewer, vendor,
       and technician login users for role capture.
 - [x] Work-order lifecycle now covers pause, escalate, cancel, and manager-only

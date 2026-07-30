@@ -362,6 +362,9 @@ const styles = StyleSheet.create({
   reportAction: {
     borderColor: '#38bdf8',
   },
+  evidenceAction: {
+    borderColor: '#fbbf24',
+  },
   primaryAction: {
     backgroundColor: '#38bdf8',
     borderColor: '#38bdf8',

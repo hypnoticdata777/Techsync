@@ -42,7 +42,7 @@ const WALKTHROUGH_BY_ROLE = {
       {key: 'report', route: 'OperationsReport', proof: 'Risk, capacity, hotspots, and completion cycle bars visible.'},
       {key: 'create-work', route: 'WorkOrderForm', proof: 'Client/property/vendor selectors and review panel visible.'},
     ],
-    visibleControls: ['Directory', 'Dispatch', 'Report', 'New Work'],
+    visibleControls: ['Directory', 'Dispatch', 'Report', 'Evidence', 'New Work'],
     hiddenControls: [],
   },
   coordinator: {
@@ -54,7 +54,7 @@ const WALKTHROUGH_BY_ROLE = {
       {key: 'dispatch', route: 'DispatchBoard', proof: 'Coordinator can inspect unassigned work and technician load.'},
       {key: 'detail', route: 'WorkOrderDetails', proof: 'Status, approval request, messages, and proof summary visible.'},
     ],
-    visibleControls: ['Directory', 'Dispatch', 'Report', 'New Work'],
+    visibleControls: ['Directory', 'Dispatch', 'Report', 'Evidence', 'New Work'],
     hiddenControls: [],
   },
   technician: {
@@ -66,7 +66,7 @@ const WALKTHROUGH_BY_ROLE = {
       {key: 'empty-assigned', route: 'WorkOrdersList', proof: 'No assigned jobs empty state is clear when queue is empty.'},
     ],
     visibleControls: ['Assigned queue', 'Status updates', 'Proof upload'],
-    hiddenControls: ['Directory', 'Dispatch', 'Report', 'New Work'],
+    hiddenControls: ['Directory', 'Dispatch', 'Report', 'Evidence', 'New Work'],
   },
   client: {
     persona: 'Homeowner/client contact',
@@ -77,7 +77,7 @@ const WALKTHROUGH_BY_ROLE = {
       {key: 'client-messages', route: 'WorkOrderDetails', proof: 'Client-visible messages appear; internal tab is hidden.'},
     ],
     visibleControls: ['Client messages', 'Approval decision when pending'],
-    hiddenControls: ['Internal messages', 'Directory', 'Dispatch', 'Report', 'New Work'],
+    hiddenControls: ['Internal messages', 'Directory', 'Dispatch', 'Report', 'Evidence', 'New Work'],
   },
   viewer: {
     persona: 'Read-only owner/board viewer',
@@ -88,7 +88,7 @@ const WALKTHROUGH_BY_ROLE = {
       {key: 'viewer-empty', route: 'WorkOrdersList', proof: 'No visible snapshot empty state is clear when scoped queue is empty.'},
     ],
     visibleControls: ['Read-only status', 'Client-visible messages'],
-    hiddenControls: ['Internal messages', 'Status updates', 'Proof upload', 'Directory', 'Dispatch', 'Report', 'New Work'],
+    hiddenControls: ['Internal messages', 'Status updates', 'Proof upload', 'Directory', 'Dispatch', 'Report', 'Evidence', 'New Work'],
   },
   vendor: {
     persona: 'External vendor contact',
@@ -99,7 +99,7 @@ const WALKTHROUGH_BY_ROLE = {
       {key: 'vendor-empty', route: 'WorkOrdersList', proof: 'No linked vendor work empty state is clear when scoped queue is empty.'},
     ],
     visibleControls: ['Vendor messages', 'Linked work status', 'Proof context'],
-    hiddenControls: ['Internal messages', 'Client messages', 'Status updates', 'Proof upload', 'Directory', 'Dispatch', 'Report', 'New Work'],
+    hiddenControls: ['Internal messages', 'Client messages', 'Status updates', 'Proof upload', 'Directory', 'Dispatch', 'Report', 'Evidence', 'New Work'],
   },
 };
 
@@ -157,6 +157,28 @@ export const getEvidenceSafetyChecklist = () => [
   'Review every screenshot before adding it to portfolio or investor materials.',
 ];
 
+export const getRoleEvidenceDashboard = (roles = ROLE_WALKTHROUGH_ORDER) => {
+  const manifest = getRoleWalkthroughManifest(roles);
+  const plan = getScreenshotPlan(roles);
+  const audit = getRoleEvidenceReadinessAudit(roles);
+  const safetyChecklist = getEvidenceSafetyChecklist();
+
+  return {
+    audit,
+    safetyChecklist,
+    roleRows: manifest.map(item => ({
+      role: item.role,
+      persona: item.persona,
+      loginEmail: item.loginEmail,
+      objective: item.objective,
+      screenshotCount: item.screens.length,
+      visibleControls: item.visibleControls,
+      hiddenControls: item.hiddenControls,
+    })),
+    screenshotRows: plan,
+  };
+};
+
 const allRolesHaveLogin = manifest =>
   manifest.every(item => Boolean(item.loginEmail));
 
@@ -177,7 +199,7 @@ const managersHaveManagerControls = manifest =>
   manifest
     .filter(item => item.canManage)
     .every(item =>
-      ['Directory', 'Dispatch', 'Report', 'New Work'].every(control =>
+      ['Directory', 'Dispatch', 'Report', 'Evidence', 'New Work'].every(control =>
         item.visibleControls.includes(control),
       ),
     );
@@ -186,7 +208,7 @@ const nonManagersHideManagerControls = manifest =>
   manifest
     .filter(item => !item.canManage)
     .every(item =>
-      ['Directory', 'Dispatch', 'Report', 'New Work'].every(control =>
+      ['Directory', 'Dispatch', 'Report', 'Evidence', 'New Work'].every(control =>
         item.hiddenControls.includes(control),
       ),
     );
@@ -325,6 +347,7 @@ export default {
   getRoleWalkthroughManifest,
   getScreenshotPlan,
   getEvidenceSafetyChecklist,
+  getRoleEvidenceDashboard,
   getRoleEvidenceReadinessAudit,
   getRoleEvidenceChecklistMarkdown,
 };

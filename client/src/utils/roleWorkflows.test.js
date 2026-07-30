@@ -26,6 +26,7 @@ describe('role workflow helpers', () => {
         'OperationsReport',
         'DispatchBoard',
         'PmcDirectory',
+        'RoleEvidence',
       ]),
     );
     expect(getAvailableMainRoutes('technician')).toEqual([
@@ -48,6 +49,7 @@ describe('role workflow helpers', () => {
       'PmcDirectory',
       'DispatchBoard',
       'OperationsReport',
+      'RoleEvidence',
       'WorkOrderForm',
     ]);
     expect(getRoleActions('viewer')).toEqual([]);

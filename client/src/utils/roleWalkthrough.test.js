@@ -1,6 +1,7 @@
 import {
   ROLE_WALKTHROUGH_ORDER,
   getEvidenceSafetyChecklist,
+  getRoleEvidenceDashboard,
   getRoleEvidenceChecklistMarkdown,
   getRoleEvidenceReadinessAudit,
   getRoleWalkthrough,
@@ -19,13 +20,13 @@ describe('role walkthrough manifest', () => {
     expect(getRoleWalkthrough('org_admin')).toEqual(
       expect.objectContaining({
         canManage: true,
-        visibleControls: expect.arrayContaining(['Directory', 'Dispatch', 'Report', 'New Work']),
+        visibleControls: expect.arrayContaining(['Directory', 'Dispatch', 'Report', 'Evidence', 'New Work']),
       }),
     );
     expect(getRoleWalkthrough('technician')).toEqual(
       expect.objectContaining({
         canManage: false,
-        hiddenControls: expect.arrayContaining(['Directory', 'Dispatch', 'Report', 'New Work']),
+        hiddenControls: expect.arrayContaining(['Directory', 'Dispatch', 'Report', 'Evidence', 'New Work']),
       }),
     );
   });
@@ -74,6 +75,31 @@ describe('role walkthrough manifest', () => {
       'viewer_readonly_documented',
       'vendor_scope_documented',
     ]);
+  });
+
+  test('builds an in-app evidence dashboard model', () => {
+    const dashboard = getRoleEvidenceDashboard();
+
+    expect(dashboard.audit).toEqual(
+      expect.objectContaining({
+        passed: true,
+        roleCount: 6,
+        screenshotCount: 21,
+      }),
+    );
+    expect(dashboard.safetyChecklist).toHaveLength(5);
+    expect(dashboard.roleRows.find(item => item.role === 'vendor')).toEqual(
+      expect.objectContaining({
+        loginEmail: 'apex.demo@techsync.local',
+        screenshotCount: 3,
+        hiddenControls: expect.arrayContaining(['Internal messages', 'Client messages']),
+      }),
+    );
+    expect(dashboard.screenshotRows).toContainEqual(
+      expect.objectContaining({
+        screenshotName: 'techsync-ops-vendor-01-vendor-queue.png',
+      }),
+    );
   });
 
   test('renders a markdown checklist for the manual capture pass', () => {

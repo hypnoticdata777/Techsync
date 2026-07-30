@@ -252,6 +252,9 @@ Completed:
 - Added backend guardrails so vendor/viewer roles cannot add or upload
   attachments.
 - Added synthetic vendor-visible seed data for the Apex vendor walkthrough.
+- Added a manager-only mobile Role Evidence screen for automated readiness
+  checks, role capture plan, screenshot targets, and safety checklist before
+  hosting.
 
 Next:
 
@@ -260,7 +263,7 @@ Next:
 - Continue local-only product depth with the remaining role-by-role UI/UX
   friction sweep, accessibility evidence, screenshot-proof preparation, and
   remaining client/vendor portal polish. The manifest audit is now code-backed;
-  final manual screenshots still remain.
+  the in-app evidence screen is started; final manual screenshots still remain.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,
