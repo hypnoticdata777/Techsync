@@ -1,6 +1,6 @@
 # TechSync Ops Phase Status
 
-Date: July 29, 2026
+Date: July 30, 2026
 
 This file is the current project pulse. Update it after each build, QA, hosting,
 or portfolio-integration slice so future sessions can resume without guessing.
@@ -218,7 +218,7 @@ Completed:
   viewer/vendor demo users for final role capture.
 - Added tested role UX evidence readiness audit for synthetic login coverage,
   screenshot-plan uniqueness, safety checks, manager/non-manager controls,
-  technician assigned routing, client/viewer privacy, and staged vendor access.
+  technician assigned routing, client/viewer privacy, and linked-vendor scope.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and
@@ -243,6 +243,15 @@ Completed:
   and invoice references.
 - Added backend cost summary reporting, operations-report CSV cost evidence,
   synthetic demo cost data, and mobile operations-report cost chart/cards.
+- Added Alembic migration `0008` for vendor-visible work-order messages.
+- Added linked-vendor work-order scoping by active vendor email, so vendor
+  users only list/view work orders linked to their vendor record.
+- Added vendor-visible message enforcement in the backend and mobile
+  communication timeline, while keeping internal/client messages hidden from
+  vendors and keeping viewers read-only.
+- Added backend guardrails so vendor/viewer roles cannot add or upload
+  attachments.
+- Added synthetic vendor-visible seed data for the Apex vendor walkthrough.
 
 Next:
 
@@ -250,8 +259,8 @@ Next:
   as complete as practical.
 - Continue local-only product depth with the remaining role-by-role UI/UX
   friction sweep, accessibility evidence, screenshot-proof preparation, and
-  client/vendor portal polish. The manifest audit is now code-backed; final
-  manual screenshots still remain.
+  remaining client/vendor portal polish. The manifest audit is now code-backed;
+  final manual screenshots still remain.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,

@@ -55,8 +55,8 @@ export const getRoleHome = role => {
     case 'vendor':
       return {
         title: 'Vendor View',
-        subtitle: 'Vendor portal access is staged for a later workflow',
-        emptyState: 'Vendor work-order access is not enabled in this POC yet.',
+        subtitle: 'Linked vendor work, updates, and proof context',
+        emptyState: 'No visible vendor work is linked to this vendor profile.',
       };
     default:
       return {
@@ -105,9 +105,9 @@ export const getRoleEmptyState = role => {
       };
     case 'vendor':
       return {
-        title: 'Vendor access staged',
-        message: 'Vendor work-order access is documented for later and intentionally disabled in this POC.',
-        detail: 'This prevents accidental vendor-facing exposure before the workflow is ready.',
+        title: 'No linked vendor work',
+        message: 'Work orders linked to this active vendor profile will appear here with vendor-visible updates.',
+        detail: 'Internal notes, client messages, and unrelated vendor work stay hidden.',
       };
     default:
       return {
@@ -157,7 +157,7 @@ export const getRoleActions = role => {
 
 export const getRoleAccessMessage = role => {
   if (role === 'vendor') {
-    return 'Vendor work-order access is not enabled in this POC yet.';
+    return 'Unable to load linked vendor work orders.';
   }
   return 'Unable to load work orders.';
 };
@@ -203,8 +203,8 @@ export const getDetailRoleContext = (role, workOrder = {}) => {
       };
     case 'vendor':
       return {
-        title: 'Vendor Access Staged',
-        subtitle: 'Vendor-facing workflow is planned after the current POC gate',
+        title: 'Vendor Update',
+        subtitle: 'Linked work status, vendor messages, and proof context',
       };
     default:
       return {

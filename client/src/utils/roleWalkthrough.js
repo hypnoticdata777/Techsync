@@ -92,12 +92,14 @@ const WALKTHROUGH_BY_ROLE = {
   },
   vendor: {
     persona: 'External vendor contact',
-    objective: 'Show that vendor portal access is intentionally staged and blocked in the POC.',
+    objective: 'Show linked vendor work visibility, vendor-visible messages, and hidden internal/client context.',
     screens: [
-      {key: 'vendor-staged', route: 'WorkOrdersList', proof: 'Vendor staged/disabled state is explicit.'},
+      {key: 'vendor-queue', route: 'WorkOrdersList', proof: 'Only work linked to apex.demo@techsync.local is visible.'},
+      {key: 'vendor-detail', route: 'WorkOrderDetails', proof: 'Vendor-visible status, messages, attachments, and proof context appear.'},
+      {key: 'vendor-empty', route: 'WorkOrdersList', proof: 'No linked vendor work empty state is clear when scoped queue is empty.'},
     ],
-    visibleControls: ['Staged access explanation'],
-    hiddenControls: ['Work-order detail', 'Directory', 'Dispatch', 'Report', 'New Work'],
+    visibleControls: ['Vendor messages', 'Linked work status', 'Proof context'],
+    hiddenControls: ['Internal messages', 'Client messages', 'Status updates', 'Proof upload', 'Directory', 'Dispatch', 'Report', 'New Work'],
   },
 };
 
@@ -213,12 +215,13 @@ const technicianEndpointIsAssignedOnly = manifest => {
   return technician?.endpoint === '/work-orders/mine';
 };
 
-const vendorStagingIsExplicit = manifest => {
+const vendorScopeIsDocumented = manifest => {
   const vendor = manifest.find(item => item.role === 'vendor');
   return Boolean(
     vendor &&
-      vendor.objective.includes('intentionally staged') &&
-      vendor.hiddenControls.includes('Work-order detail'),
+      vendor.objective.includes('linked vendor work') &&
+      vendor.hiddenControls.includes('Internal messages') &&
+      vendor.hiddenControls.includes('Client messages'),
   );
 };
 
@@ -275,9 +278,9 @@ export const getRoleEvidenceReadinessAudit = (roles = ROLE_WALKTHROUGH_ORDER) =>
       detail: 'Viewer evidence calls out read-only access and hidden mutation controls.',
     },
     {
-      key: 'vendor_staging_documented',
-      passed: roleNotRequestedOr(manifest, 'vendor', vendorStagingIsExplicit),
-      detail: 'Vendor evidence documents staged access instead of implied availability.',
+      key: 'vendor_scope_documented',
+      passed: roleNotRequestedOr(manifest, 'vendor', vendorScopeIsDocumented),
+      detail: 'Vendor evidence calls out linked-work scope and hidden internal/client context.',
     },
   ];
 

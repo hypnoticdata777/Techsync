@@ -89,6 +89,17 @@ const STATUS_CONFIRMATIONS = {
 
 const INTERNAL_ROLES = ['org_admin', 'coordinator', 'technician'];
 
+const getMessageVisibilityLabel = visibility => {
+  switch (visibility) {
+    case 'client':
+      return 'Client-visible';
+    case 'vendor':
+      return 'Vendor-visible';
+    default:
+      return 'Internal';
+  }
+};
+
 const getApprovalColor = status => {
   switch (status) {
     case 'pending':
@@ -162,6 +173,8 @@ function WorkOrderDetailsScreen({route, navigation}) {
 
   const canEdit = user?.role === 'org_admin' || user?.role === 'coordinator';
   const canUseInternalMessages = INTERNAL_ROLES.includes(user?.role);
+  const canSendMessages = user?.role !== 'viewer';
+  const forcedMessageVisibility = user?.role === 'vendor' ? 'vendor' : 'client';
   const canUpdateStatus = INTERNAL_ROLES.includes(user?.role);
   const canUploadAttachments = INTERNAL_ROLES.includes(user?.role);
   const canRequestApproval = canEdit && !!workOrder.client_id;
@@ -233,9 +246,9 @@ function WorkOrderDetailsScreen({route, navigation}) {
 
   useEffect(() => {
     if (!canUseInternalMessages) {
-      setMessageVisibility('client');
+      setMessageVisibility(forcedMessageVisibility);
     }
-  }, [canUseInternalMessages]);
+  }, [canUseInternalMessages, forcedMessageVisibility]);
 
   const handleEdit = () => {
     navigation.navigate('WorkOrderForm', {workOrder});
@@ -283,6 +296,11 @@ function WorkOrderDetailsScreen({route, navigation}) {
   };
 
   const sendMessage = async () => {
+    if (!canSendMessages) {
+      Alert.alert('Read-only access', 'Viewer users cannot add messages.');
+      return;
+    }
+
     const trimmed = messageBody.trim();
     if (!trimmed) {
       Alert.alert('Message needed', 'Add a message before sending.');
@@ -296,7 +314,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           body: trimmed,
-          visibility: canUseInternalMessages ? messageVisibility : 'client',
+          visibility: canUseInternalMessages ? messageVisibility : forcedMessageVisibility,
         }),
       });
 
@@ -652,32 +670,56 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   Client
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.visibilityTab,
+                  messageVisibility === 'vendor' && styles.visibilityTabActive,
+                ]}
+                {...actionButtonA11y(
+                  'Vendor-visible messages tab',
+                  'Shows and sends messages visible to the linked vendor.',
+                )}
+                onPress={() => setMessageVisibility('vendor')}>
+                <Text
+                  style={[
+                    styles.visibilityTabText,
+                    messageVisibility === 'vendor' && styles.visibilityTabTextActive,
+                  ]}>
+                  Vendor
+                </Text>
+              </TouchableOpacity>
             </View>
           ) : null}
 
-          <TextInput
-            style={styles.messageInput}
-            placeholder="Add a message..."
-            placeholderTextColor="#6b7280"
-            value={messageBody}
-            onChangeText={setMessageBody}
-            {...inputA11y('Work-order message', {multiline: true})}
-            multiline
-          />
-          <TouchableOpacity
-            style={[styles.messageButton, sendingMessage && styles.buttonDisabled]}
-            {...actionButtonA11y(
-              'Send message',
-              canUseInternalMessages
-                ? `Sends a ${messageVisibility} message.`
-                : 'Sends a client-visible message.',
-            )}
-            onPress={sendMessage}
-            disabled={sendingMessage}>
-            <Text style={styles.messageButtonText}>
-              {sendingMessage ? 'Sending...' : 'Send Message'}
-            </Text>
-          </TouchableOpacity>
+          {canSendMessages ? (
+            <>
+              <TextInput
+                style={styles.messageInput}
+                placeholder="Add a message..."
+                placeholderTextColor="#6b7280"
+                value={messageBody}
+                onChangeText={setMessageBody}
+                {...inputA11y('Work-order message', {multiline: true})}
+                multiline
+              />
+              <TouchableOpacity
+                style={[styles.messageButton, sendingMessage && styles.buttonDisabled]}
+                {...actionButtonA11y(
+                  'Send message',
+                  canUseInternalMessages
+                    ? `Sends a ${messageVisibility} message.`
+                    : `Sends a ${getMessageVisibilityLabel(forcedMessageVisibility).toLowerCase()} message.`,
+                )}
+                onPress={sendMessage}
+                disabled={sendingMessage}>
+                <Text style={styles.messageButtonText}>
+                  {sendingMessage ? 'Sending...' : 'Send Message'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <Text style={styles.readOnlyNotice}>Viewer access is read-only.</Text>
+          )}
 
           {messagesError ? (
             <ScreenErrorState
@@ -700,8 +742,9 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   style={[
                     styles.messageBadge,
                     message.visibility === 'client' && styles.messageBadgeClient,
+                    message.visibility === 'vendor' && styles.messageBadgeVendor,
                   ]}>
-                  {message.visibility === 'client' ? 'Client-visible' : 'Internal'}
+                  {getMessageVisibilityLabel(message.visibility)}
                 </Text>
                 <Text style={styles.messageDate}>{formatDate(message.created_at)}</Text>
               </View>
@@ -1130,6 +1173,19 @@ const styles = StyleSheet.create({
   },
   messageBadgeClient: {
     color: '#38bdf8',
+  },
+  messageBadgeVendor: {
+    color: '#a3e635',
+  },
+  readOnlyNotice: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#334155',
+    borderRadius: 8,
+    color: '#94a3b8',
+    fontSize: 13,
+    lineHeight: 18,
+    padding: 12,
   },
   messageDate: {
     color: '#64748b',

@@ -5,6 +5,8 @@ the primary enforcement path, so these tests assert that repository SQL/helper
 calls carry the caller's organization_id.
 """
 
+import asyncio
+
 from unittest.mock import patch
 
 import pytest
@@ -30,8 +32,55 @@ from models.client import ClientUpdate
 from models.property import PropertyUpdate
 from models.user import User
 from models.vendor import VendorUpdate
-from models.work_order import WorkOrderApprovalDecision, WorkOrderApprovalRequest, WorkOrderCreate, WorkOrderUpdate
+from models.work_order import (
+    WorkOrderApprovalDecision,
+    WorkOrderApprovalRequest,
+    WorkOrderAttachmentCreate,
+    WorkOrderCreate,
+    WorkOrderUpdate,
+)
 from models.work_order_message import WorkOrderMessageCreate
+
+
+def _work_order_row(**overrides):
+    row = {
+        "id": 1,
+        "organization_id": 6,
+        "title": "Demo linked work",
+        "description": None,
+        "property_id": 3,
+        "client_id": 9,
+        "vendor_id": None,
+        "customer_name": None,
+        "address": None,
+        "latitude": None,
+        "longitude": None,
+        "service_type": "plumbing",
+        "priority": "medium",
+        "status": "open",
+        "assigned_technician_id": None,
+        "created_by": 5,
+        "source": "manual",
+        "external_ref": None,
+        "sla_due_at": None,
+        "completed_at": None,
+        "completion_notes": None,
+        "completion_proof_verified_at": None,
+        "completion_override_reason": None,
+        "estimated_cost_cents": None,
+        "actual_cost_cents": None,
+        "invoice_reference": None,
+        "client_approval_status": "not_required",
+        "client_approval_requested_at": None,
+        "client_approval_requested_by": None,
+        "client_approval_decision_at": None,
+        "client_approval_decision_by": None,
+        "client_approval_notes": None,
+        "created_at": "2026-07-28T00:00:00Z",
+        "updated_at": "2026-07-28T00:00:00Z",
+    }
+    row.update(overrides)
+    return row
 
 
 def test_list_filtered_scopes_by_organization_id():
@@ -250,6 +299,17 @@ def test_vendors_get_by_id_scoped_to_org():
     assert "id = :vendor_id" in sql
     assert "organization_id = :organization_id" in sql
     assert params == {"vendor_id": 8, "organization_id": 2}
+
+
+def test_vendors_get_by_email_scopes_to_active_vendor_inside_org():
+    with patch("repositories.vendors.fetch_one", return_value=None) as mock_fetch:
+        vendors_repo.get_by_email_in_org(email="Vendor@Example.com", organization_id=2)
+
+    sql, params = mock_fetch.call_args.args
+    assert "organization_id = :organization_id" in sql
+    assert "lower(email) = lower(:email)" in sql
+    assert "is_active = true" in sql
+    assert params == {"email": "Vendor@Example.com", "organization_id": 2}
 
 
 def test_new_pmc_entity_updates_require_id_and_organization_id():
@@ -495,6 +555,313 @@ def test_viewer_message_list_forces_client_visibility():
 
     assert rows == []
     assert mock_list.call_args.kwargs["visibility"] == "client"
+
+
+def test_viewer_cannot_add_message():
+    viewer_user = User(
+        id=7,
+        organization_id=6,
+        email="viewer@example.com",
+        full_name="Viewer",
+        role="viewer",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "client_id": 9},
+    ):
+        with patch(
+            "routers.work_orders.clients_repo.get_by_email_in_org",
+            return_value={"id": 9, "email": "viewer@example.com"},
+        ):
+            with pytest.raises(HTTPException) as exc:
+                work_orders_router.add_message(
+                    1,
+                    WorkOrderMessageCreate(body="Readonly should fail", visibility="client"),
+                    current_user=viewer_user,
+                    organization={"id": 6},
+                )
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "Viewer users cannot add messages"
+
+
+def test_vendor_work_order_list_forces_own_vendor_id():
+    vendor_user = User(
+        id=9,
+        organization_id=6,
+        email="vendor@example.com",
+        full_name="Vendor",
+        role="vendor",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.vendors_repo.get_by_email_in_org",
+        return_value={"id": 11, "email": "vendor@example.com"},
+    ):
+        with patch("routers.work_orders.work_orders_repo.list_filtered", return_value=[]) as mock_list:
+            rows = work_orders_router.list_work_orders(
+                vendor_id=999,
+                current_user=vendor_user,
+                organization={"id": 6},
+            )
+
+    assert rows == []
+    assert mock_list.call_args.kwargs["vendor_id"] == 11
+
+
+def test_vendor_without_matching_record_sees_no_work_orders():
+    vendor_user = User(
+        id=9,
+        organization_id=6,
+        email="vendor@example.com",
+        full_name="Vendor",
+        role="vendor",
+        is_active=True,
+    )
+
+    with patch("routers.work_orders.vendors_repo.get_by_email_in_org", return_value=None):
+        with patch("routers.work_orders.work_orders_repo.list_filtered", return_value=[]) as mock_list:
+            rows = work_orders_router.list_work_orders(
+                current_user=vendor_user,
+                organization={"id": 6},
+            )
+
+    assert rows == []
+    assert mock_list.call_args.kwargs["vendor_id"] == -1
+
+
+def test_vendor_cannot_view_other_vendor_work_order():
+    vendor_user = User(
+        id=9,
+        organization_id=6,
+        email="vendor@example.com",
+        full_name="Vendor",
+        role="vendor",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "vendor_id": 12},
+    ):
+        with patch(
+            "routers.work_orders.vendors_repo.get_by_email_in_org",
+            return_value={"id": 11, "email": "vendor@example.com"},
+        ):
+            with pytest.raises(HTTPException) as exc:
+                work_orders_router.get_work_order(
+                    1,
+                    current_user=vendor_user,
+                    organization={"id": 6},
+                )
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "Not visible to you"
+
+
+def test_vendor_can_view_linked_work_order():
+    vendor_user = User(
+        id=9,
+        organization_id=6,
+        email="vendor@example.com",
+        full_name="Vendor",
+        role="vendor",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value=_work_order_row(vendor_id=11),
+    ):
+        with patch(
+            "routers.work_orders.vendors_repo.get_by_email_in_org",
+            return_value={"id": 11, "email": "vendor@example.com"},
+        ):
+            row = work_orders_router.get_work_order(
+                1,
+                current_user=vendor_user,
+                organization={"id": 6},
+            )
+
+    assert row.id == 1
+    assert row.vendor_id == 11
+
+
+def test_vendor_message_list_forces_vendor_visibility():
+    vendor_user = User(
+        id=9,
+        organization_id=6,
+        email="vendor@example.com",
+        full_name="Vendor",
+        role="vendor",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "vendor_id": 11},
+    ):
+        with patch(
+            "routers.work_orders.vendors_repo.get_by_email_in_org",
+            return_value={"id": 11, "email": "vendor@example.com"},
+        ):
+            with patch("routers.work_orders.messages_repo.list_for_work_order", return_value=[]) as mock_list:
+                rows = work_orders_router.list_messages(
+                    1,
+                    visibility="internal",
+                    current_user=vendor_user,
+                    organization={"id": 6},
+                )
+
+    assert rows == []
+    assert mock_list.call_args.kwargs["visibility"] == "vendor"
+
+
+def test_vendor_can_only_add_vendor_visible_messages():
+    vendor_user = User(
+        id=9,
+        organization_id=6,
+        email="vendor@example.com",
+        full_name="Vendor",
+        role="vendor",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "vendor_id": 11},
+    ):
+        with patch(
+            "routers.work_orders.vendors_repo.get_by_email_in_org",
+            return_value={"id": 11, "email": "vendor@example.com"},
+        ):
+            with pytest.raises(HTTPException) as exc:
+                work_orders_router.add_message(
+                    1,
+                    WorkOrderMessageCreate(body="Client lane should fail", visibility="client"),
+                    current_user=vendor_user,
+                    organization={"id": 6},
+                )
+
+            with patch(
+                "routers.work_orders.messages_repo.create",
+                return_value={
+                    "id": 22,
+                    "organization_id": 6,
+                    "work_order_id": 1,
+                    "author_user_id": 9,
+                    "visibility": "vendor",
+                    "body": "Vendor update",
+                    "created_at": "2026-07-28T00:00:00Z",
+                },
+            ) as mock_create:
+                with patch("routers.work_orders.events_repo.create_event", return_value={}):
+                    row = work_orders_router.add_message(
+                        1,
+                        WorkOrderMessageCreate(body="Vendor update", visibility="vendor"),
+                        current_user=vendor_user,
+                        organization={"id": 6},
+                    )
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "Vendor users can only add vendor-visible messages"
+    assert row.visibility == "vendor"
+    assert mock_create.call_args.args[3]["visibility"] == "vendor"
+
+
+def test_vendor_and_viewer_cannot_add_attachment_metadata():
+    payload = WorkOrderAttachmentCreate(
+        file_name="proof.jpg",
+        file_url="https://example.com/proof.jpg",
+        content_type="image/jpeg",
+    )
+    vendor_user = User(
+        id=9,
+        organization_id=6,
+        email="vendor@example.com",
+        full_name="Vendor",
+        role="vendor",
+        is_active=True,
+    )
+    viewer_user = User(
+        id=7,
+        organization_id=6,
+        email="viewer@example.com",
+        full_name="Viewer",
+        role="viewer",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "vendor_id": 11, "client_id": 9},
+    ):
+        with patch(
+            "routers.work_orders.vendors_repo.get_by_email_in_org",
+            return_value={"id": 11, "email": "vendor@example.com"},
+        ):
+            with patch(
+                "routers.work_orders.clients_repo.get_by_email_in_org",
+                return_value={"id": 9, "email": "viewer@example.com"},
+            ):
+                with patch("routers.work_orders.attachments_repo.create") as mock_create:
+                    with pytest.raises(HTTPException) as vendor_exc:
+                        work_orders_router.add_attachment(
+                            1,
+                            payload,
+                            current_user=vendor_user,
+                            organization={"id": 6},
+                        )
+                    with pytest.raises(HTTPException) as viewer_exc:
+                        work_orders_router.add_attachment(
+                            1,
+                            payload,
+                            current_user=viewer_user,
+                            organization={"id": 6},
+                        )
+
+    assert vendor_exc.value.status_code == 403
+    assert vendor_exc.value.detail == "This role cannot add attachments"
+    assert viewer_exc.value.status_code == 403
+    assert viewer_exc.value.detail == "This role cannot add attachments"
+    mock_create.assert_not_called()
+
+
+def test_vendor_cannot_upload_attachment_file():
+    vendor_user = User(
+        id=9,
+        organization_id=6,
+        email="vendor@example.com",
+        full_name="Vendor",
+        role="vendor",
+        is_active=True,
+    )
+
+    with patch(
+        "routers.work_orders.work_orders_repo.get_by_id_in_org",
+        return_value={"id": 1, "organization_id": 6, "vendor_id": 11},
+    ):
+        with patch(
+            "routers.work_orders.vendors_repo.get_by_email_in_org",
+            return_value={"id": 11, "email": "vendor@example.com"},
+        ):
+            with patch("routers.work_orders.attachment_storage_service.upload_work_order_attachment_file") as mock_upload:
+                with pytest.raises(HTTPException) as exc:
+                    asyncio.run(
+                        work_orders_router.upload_attachment(
+                            1,
+                            file=object(),
+                            current_user=vendor_user,
+                            organization={"id": 6},
+                        )
+                    )
+
+    assert exc.value.status_code == 403
+    assert exc.value.detail == "This role cannot upload attachments"
+    mock_upload.assert_not_called()
 
 
 def test_technician_cannot_view_unassigned_work_order():

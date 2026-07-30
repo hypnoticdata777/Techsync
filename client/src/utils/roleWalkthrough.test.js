@@ -61,7 +61,7 @@ describe('role walkthrough manifest', () => {
 
     expect(audit.passed).toBe(true);
     expect(audit.roleCount).toBe(6);
-    expect(audit.screenshotCount).toBe(19);
+    expect(audit.screenshotCount).toBe(21);
     expect(audit.checks.map(check => check.key)).toEqual([
       'synthetic_login_coverage',
       'screen_coverage',
@@ -72,7 +72,7 @@ describe('role walkthrough manifest', () => {
       'technician_assigned_endpoint',
       'client_privacy_documented',
       'viewer_readonly_documented',
-      'vendor_staging_documented',
+      'vendor_scope_documented',
     ]);
   });
 
@@ -81,9 +81,9 @@ describe('role walkthrough manifest', () => {
 
     expect(markdown).toContain('# TechSync Ops Role UX Evidence Checklist');
     expect(markdown).toContain('Roles: 1');
-    expect(markdown).toContain('Screenshots: 1');
+    expect(markdown).toContain('Screenshots: 3');
     expect(markdown).toContain('ready for manual capture');
-    expect(markdown).toContain('techsync-ops-vendor-01-vendor-staged.png');
-    expect(markdown).toContain('Vendor staged/disabled state is explicit');
+    expect(markdown).toContain('techsync-ops-vendor-01-vendor-queue.png');
+    expect(markdown).toContain('Only work linked to apex.demo@techsync.local is visible.');
   });
 });

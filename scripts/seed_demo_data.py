@@ -606,6 +606,15 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
     )
     app.messages_repo.create(
         organization_id,
+        work_orders[0]["id"],
+        vendor_user["id"],
+        {
+            "visibility": "vendor",
+            "body": "Synthetic vendor update: Apex confirmed ETA and requested shutoff access.",
+        },
+    )
+    app.messages_repo.create(
+        organization_id,
         work_orders[3]["id"],
         tech_user_lena["id"],
         {

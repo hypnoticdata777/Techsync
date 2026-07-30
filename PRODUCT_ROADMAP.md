@@ -133,10 +133,13 @@ Likely scope:
 - Communication timeline:
   - internal notes
   - client-visible messages
+  - vendor-visible messages
   - status and proof events
   - audit/event separation
   - backend message visibility guardrail now started in v1.3
   - mobile communication timeline now started in v1.3
+  - vendors are now scoped to linked active vendor records and vendor-visible
+    messages
 - Completion proof and closeout:
   - required proof rules
   - manager override reason
@@ -233,11 +236,13 @@ v1.3 exit criteria:
   and walkthrough evidence still required before hosting; manager-only route
   gating is now covered by client tests, and primary mobile API failure states
   now expose retry actions. Backend role-scope regressions now cover
-  client/viewer unrelated-work blocking and technician unassigned-work blocking.
+  client/viewer unrelated-work blocking, linked-vendor scope, vendor-visible
+  message enforcement, and technician unassigned-work blocking.
   Compact mobile touch targets and wrapping behavior are now hardened before
   screenshot capture, role-specific empty queue panels are now tested, and a
   role walkthrough/screenshot evidence manifest is prepared with viewer/vendor
-  synthetic logins plus an automated readiness audit. Accessibility helper
+  synthetic logins plus an automated readiness audit for linked-vendor scope.
+  Accessibility helper
   coverage and a manual evidence template are now prepared for the final
   screen-reader pass.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data, while

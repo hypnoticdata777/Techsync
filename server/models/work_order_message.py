@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-MessageVisibility = Literal["internal", "client"]
+MessageVisibility = Literal["internal", "client", "vendor"]
 
 
 class WorkOrderMessageCreate(BaseModel):

@@ -68,7 +68,7 @@ describe('role workflow helpers', () => {
     const technicianState = getRoleEmptyState('technician');
     expect(technicianState.title).toBe('No assigned jobs');
     expect(technicianState).not.toHaveProperty('actionRoute');
-    expect(getRoleEmptyState('vendor').message).toContain('intentionally disabled');
+    expect(getRoleEmptyState('vendor').message).toContain('linked to this active vendor profile');
   });
 
   test('builds queue summary counts from status and approval state', () => {

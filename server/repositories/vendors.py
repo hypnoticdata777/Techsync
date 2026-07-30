@@ -16,6 +16,19 @@ def get_by_id_in_org(vendor_id: int, organization_id: int) -> Optional[dict]:
     )
 
 
+def get_by_email_in_org(email: str, organization_id: int) -> Optional[dict]:
+    return fetch_one(
+        """
+        SELECT *
+        FROM vendors
+        WHERE organization_id = :organization_id
+          AND lower(email) = lower(:email)
+          AND is_active = true
+        """,
+        {"email": email, "organization_id": organization_id},
+    )
+
+
 def list_by_org(organization_id: int, active_only: bool = False) -> list[dict]:
     where = ["organization_id = :organization_id"]
     params = {"organization_id": organization_id}

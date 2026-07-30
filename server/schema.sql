@@ -336,7 +336,7 @@ CREATE POLICY work_orders_isolation ON work_orders
     USING (organization_id = techsync_current_org_id());
 
 -- =====================================================================
--- work_order_messages: internal notes vs client-visible communication
+-- work_order_messages: internal, client-visible, and vendor-visible communication
 -- =====================================================================
 CREATE TABLE IF NOT EXISTS work_order_messages (
     id BIGSERIAL PRIMARY KEY,
@@ -344,7 +344,7 @@ CREATE TABLE IF NOT EXISTS work_order_messages (
     work_order_id BIGINT NOT NULL REFERENCES work_orders(id) ON DELETE CASCADE,
     author_user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
     visibility TEXT NOT NULL DEFAULT 'internal'
-        CHECK (visibility IN ('internal', 'client')),
+        CHECK (visibility IN ('internal', 'client', 'vendor')),
     body TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );

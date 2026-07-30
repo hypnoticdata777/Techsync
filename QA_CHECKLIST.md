@@ -144,6 +144,9 @@ they have been verified in the relevant environment.
 - [x] Backend regression tests cover client/viewer unrelated-work blocking,
       viewer client-visible message enforcement, and technician unassigned
       work/subresource blocking.
+- [x] Backend regression tests cover linked-vendor work-order scoping,
+      vendor-visible message enforcement, and vendor/viewer attachment
+      mutation blocking.
 - [x] Compact mobile touch targets and wrapping behavior have been hardened for
       primary role workflow controls before screenshot capture.
 - [x] Role-specific empty queue panels are implemented and tested for manager,
@@ -152,7 +155,7 @@ they have been verified in the relevant environment.
       deterministic synthetic screenshot filenames.
 - [x] Role UX evidence readiness audit added for synthetic login coverage,
       screenshot plan uniqueness, safety checks, role controls, client/viewer
-      privacy, technician routing, and staged vendor access.
+      privacy, technician routing, and linked-vendor scope.
 - [x] Synthetic demo seed includes admin, coordinator, client, viewer, vendor,
       and technician login users for role capture.
 - [x] Work-order lifecycle now covers pause, escalate, cancel, and manager-only

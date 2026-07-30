@@ -214,12 +214,15 @@ Already represented in the codebase:
 - Work-order CRUD, status transitions, assignment, technician queue, CSV
   import, webhook intake, dashboard metrics, S3-compatible attachment upload,
   and Stripe test-mode boundary.
-- v1.3 backend work-order messages with explicit `internal` versus
-  `client-visible` separation.
+- v1.3 backend work-order messages with explicit `internal`, `client-visible`,
+  and `vendor-visible` separation.
 - v1.3 mobile work-order communication timeline with client-visible comments,
-  internal notes for staff, and client/viewer users limited to client-visible
-  communication.
+  vendor-visible comments, internal notes for staff, client/viewer users
+  limited to client-visible communication, and vendors limited to
+  vendor-visible communication.
 - v1.3 client/viewer work-order visibility scoped by active client email.
+- v1.3 vendor work-order visibility scoped by active vendor email, with
+  vendor users limited to linked work orders and vendor-visible messages.
 - v1.3 client approval state, staff approval request endpoint, client
   approve/decline endpoint, and mobile approval controls.
 - v1.3 backend completion gate that blocks completed status without attachment
@@ -250,6 +253,9 @@ Already represented in the codebase:
 - v1.3 role-scope regression coverage for client/viewer unrelated-work
   blocking, client-visible message enforcement, and technician assigned-work
   boundaries.
+- v1.3 role-scope regression coverage for linked-vendor work-order visibility,
+  vendor-visible message enforcement, and vendor/viewer attachment mutation
+  blocking.
 - v1.3 compact mobile touch target and text-wrapping hardening for primary role
   workflow controls before public screenshot capture.
 - v1.3 accessibility labels/hints and tested helper coverage for role
@@ -262,7 +268,7 @@ Already represented in the codebase:
   vendor roles.
 - v1.3 role UX evidence readiness audit for synthetic login coverage,
   screenshot-plan uniqueness, public safety guardrails, role controls, privacy
-  expectations, and staged vendor access before manual capture.
+  expectations, and linked-vendor scope before manual capture.
 - v1.3 pause, escalate, cancel, and manager-only archive lifecycle states for
   work orders, with backend/mobile handling, dashboard counts, dispatch
   visibility, regression tests, and synthetic seed examples.

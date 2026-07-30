@@ -10,7 +10,7 @@ complete.
 
 ## Current Slice
 
-Date: 2026-07-29
+Date: 2026-07-30
 
 Status: started
 
@@ -56,7 +56,7 @@ Implemented:
 - Added a tested role UX evidence readiness audit that verifies synthetic login
   coverage, screenshot targets, unique filenames, safety checks, manager
   controls, non-manager hidden controls, technician assigned routing,
-  client/viewer privacy, and staged vendor access before manual screenshots.
+  client/viewer privacy, and linked-vendor scope before manual screenshots.
 - Added `ROLE_UX_EVIDENCE_TEMPLATE.md` and expanded the synthetic seed to
   include viewer/vendor logins for final role screenshots.
 - Added tested accessibility labels/hints for role dashboard actions,
@@ -66,6 +66,13 @@ Implemented:
   small-width proof pass.
 - Preserved technician routing to `/work-orders/mine`; client/viewer scoping
   remains handled by the backend `/work-orders` endpoint.
+- Added linked-vendor UX copy and walkthrough targets for vendor queue, vendor
+  detail, and vendor empty-state evidence.
+- Added vendor-specific message visibility in the mobile work-order detail
+  communication timeline while keeping viewers read-only.
+- Added backend regression coverage for linked-vendor work-order scoping,
+  vendor-visible message enforcement, and vendor/viewer attachment mutation
+  blocking.
 
 Verification:
 
@@ -90,7 +97,7 @@ Result:
 | technician | Technician Queue | Assigned queue, status/proof from details | Manager routes hidden |
 | client | Client View | Visible linked work orders, approvals/messages from details | Manager routes hidden |
 | viewer | Viewer Snapshot | Read-only visible linked work orders | Manager routes hidden |
-| vendor | Vendor View | Explicit staged/not-enabled state | Documented guardrail |
+| vendor | Vendor View | Linked vendor work, vendor messages, proof context | Manager/internal/client controls hidden |
 
 ## Remaining Sweep Items
 
@@ -100,6 +107,9 @@ Result:
 - Verify role-specific empty states with seeded and empty queues.
   Empty-state code/tests are implemented; final screenshot proof still needed.
 - Verify client/viewer cannot see internal messages or unrelated work.
+  Covered by backend regression tests; final screenshot proof still needed.
+- Verify vendors cannot see unrelated vendor work, internal messages, or
+  client-visible messages.
   Covered by backend regression tests; final screenshot proof still needed.
 - Verify technician cannot see unassigned/unrelated work.
   Covered by backend regression tests; final screenshot proof still needed.

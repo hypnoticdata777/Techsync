@@ -26,7 +26,7 @@ alembic current
 Expected:
 
 ```text
-0007 (head)
+0008 (head)
 ```
 
 Observed:
@@ -101,6 +101,7 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Internal work-order message created.
 - [ ] Client-visible work-order message created.
 - [ ] Client-visible message filter returned only client messages.
+- [ ] Vendor-visible message path verified with linked synthetic vendor work.
 - [ ] Staff approval request created pending approval state.
 - [ ] Technician login succeeded.
 - [ ] Status moved to `in_progress`.
@@ -126,6 +127,9 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Log in as that synthetic client.
 - [ ] Verify client can only see linked client work orders.
 - [ ] Verify client can only see/add client-visible messages.
+- [ ] Verify vendor can only see linked vendor work orders.
+- [ ] Verify vendor can only see/add vendor-visible messages.
+- [ ] Verify vendor cannot add or upload attachments.
 - [ ] Verify client can approve or decline a pending approval request.
 - [ ] Capture sanitized screenshots for the portfolio sliver.
 - [ ] Complete `ROLE_UX_EVIDENCE_TEMPLATE.md` using synthetic demo users only.

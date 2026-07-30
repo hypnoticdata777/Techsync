@@ -37,7 +37,7 @@ showcase gate.
 | 7 | Nonfunctional Requirements | Partially proven: app-layer tenant isolation, RLS policies, audit trail, structured logs, hosted-demo config. | Local/demo backup/restore/export/monitoring runbook and admin tenant JSON export are now started, and primary mobile accessibility labels/hints now have helper coverage; performance targets, retry/offline resilience, provider backup evidence, monitoring, and final manual accessibility evidence remain v1.2/v1.3 operational work. |
 | 8 | Quality Attributes | Partially proven: security, auditability, maintainability, and core reliability boundaries. | Scalability, operational observability, and field usability evidence mature through hosted smoke tests and v1.3 workflows. |
 | 9 | System Requirements | Partially proven: multi-tenant backend API, relational model for current core entities, mobile client, object storage boundary, deployment pipeline. | Properties, clients, vendors, and work-order messages are v1.3 foundation work; approvals, background jobs, monitoring, backups, and web admin dashboard expand in v1.3+. |
-| 10 | User Requirements | Partially proven: coordinator/admin/dispatcher/technician flows are represented in API/mobile POC. | Operations-manager reporting and dispatch board now have backend endpoints and mobile admin/coordinator views in v1.3; role-specific landing states, empty queue panels, walkthrough manifest, and manager-only navigator gating are started; client/homeowner scoped visibility, comments, and approval decisions are started; client/viewer/vendor/technician synthetic role logins are prepared; client/viewer and technician scope boundaries now have regression proof, with fuller portal UX later. |
+| 10 | User Requirements | Partially proven: coordinator/admin/dispatcher/technician flows are represented in API/mobile POC. | Operations-manager reporting and dispatch board now have backend endpoints and mobile admin/coordinator views in v1.3; role-specific landing states, empty queue panels, walkthrough manifest, and manager-only navigator gating are started; client/homeowner scoped visibility, comments, and approval decisions are started; vendor scoped visibility and vendor-visible messages are started; client/viewer/vendor/technician synthetic role logins are prepared; client/viewer/vendor and technician scope boundaries now have regression proof, with fuller portal UX later. |
 
 ## v1.2 Must Be True Before Calling The Checkpoint Complete
 
@@ -93,9 +93,10 @@ v1.3 should focus on the highest-value PMC product gaps:
    active/archived visibility reflected in dispatch, reports, mobile actions,
    and synthetic demo data.
 9. v1.3 hosted smoke evidence for PMC entity links, communication visibility,
-   approval request state, proof-gated closeout, closeout exports, and
-   operations reporting, dashboard CSV exports, and PMC directory entity CSV
-   exports, closeout attachment manifests, plus tenant JSON export.
+   linked-vendor visibility, approval request state, proof-gated closeout,
+   closeout exports, operations reporting, dashboard CSV exports, PMC
+   directory entity CSV exports, closeout attachment manifests, and tenant JSON
+   export.
 10. Repeatable synthetic demo seed/reset tooling for the hosted/demo tenant.
 11. End-of-v1.3 Vercel deployment, hosted smoke evidence, and portfolio sliver
    link after the product feels robust enough to show.

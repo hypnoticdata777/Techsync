@@ -49,6 +49,12 @@ def _load_caller_client(current_user: User, organization_id: int) -> Optional[di
     return clients_repo.get_by_email_in_org(current_user.email, organization_id)
 
 
+def _load_caller_vendor(current_user: User, organization_id: int) -> Optional[dict]:
+    if current_user.role != "vendor":
+        return None
+    return vendors_repo.get_by_email_in_org(current_user.email, organization_id)
+
+
 def _ensure_client_can_see_work_order(
     work_order: dict,
     current_user: User,
@@ -59,6 +65,19 @@ def _ensure_client_can_see_work_order(
 
     client = _load_caller_client(current_user, organization_id)
     if not client or work_order.get("client_id") != client["id"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not visible to you")
+
+
+def _ensure_vendor_can_see_work_order(
+    work_order: dict,
+    current_user: User,
+    organization_id: int,
+) -> None:
+    if current_user.role != "vendor":
+        return
+
+    vendor = _load_caller_vendor(current_user, organization_id)
+    if not vendor or work_order.get("vendor_id") != vendor["id"]:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not visible to you")
 
 
@@ -134,9 +153,7 @@ def _get_accessible_work_order(work_order_id: int, current_user: User, organizat
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not assigned to you")
 
     _ensure_client_can_see_work_order(work_order, current_user, organization["id"])
-
-    if current_user.role == "vendor":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vendor access is not enabled yet")
+    _ensure_vendor_can_see_work_order(work_order, current_user, organization["id"])
 
     return work_order
 
@@ -156,9 +173,7 @@ def _get_message_accessible_work_order(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not assigned to you")
 
     _ensure_client_can_see_work_order(work_order, current_user, organization["id"])
-
-    if current_user.role == "vendor":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vendor access is not enabled yet")
+    _ensure_vendor_can_see_work_order(work_order, current_user, organization["id"])
 
     return work_order
 
@@ -229,7 +244,8 @@ def list_work_orders(
         client = _load_caller_client(current_user, organization["id"])
         client_id = client["id"] if client else -1
     elif current_user.role == "vendor":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Vendor access is not enabled yet")
+        vendor = _load_caller_vendor(current_user, organization["id"])
+        vendor_id = vendor["id"] if vendor else -1
 
     rows = work_orders_repo.list_filtered(
         organization["id"],
@@ -566,14 +582,25 @@ def add_message(
     current_user: User = Depends(get_current_user),
     organization: dict = Depends(get_current_organization),
 ):
-    """v1.3 communication timeline: internal notes are structurally separated
-    from client-visible messages."""
+    """v1.3 communication timeline with internal, client, and vendor visibility."""
     _get_message_accessible_work_order(work_order_id, current_user, organization)
 
-    if current_user.role in ("client", "viewer") and payload.visibility != "client":
+    if current_user.role == "viewer":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Viewer users cannot add messages",
+        )
+
+    if current_user.role == "client" and payload.visibility != "client":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Client users can only add client-visible messages",
+        )
+
+    if current_user.role == "vendor" and payload.visibility != "vendor":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Vendor users can only add vendor-visible messages",
         )
 
     row = messages_repo.create(
@@ -603,6 +630,8 @@ def list_messages(
 
     if current_user.role in ("client", "viewer"):
         visibility = "client"
+    elif current_user.role == "vendor":
+        visibility = "vendor"
 
     rows = messages_repo.list_for_work_order(
         organization["id"], work_order_id, visibility=visibility
@@ -624,6 +653,12 @@ def add_attachment(
     (e.g. S3/R2) by the client; this endpoint records the resulting
     URL against the work order."""
     _get_accessible_work_order(work_order_id, current_user, organization)
+    if current_user.role in ("vendor", "viewer"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This role cannot add attachments",
+        )
+
     row = attachments_repo.create(organization["id"], work_order_id, current_user.id, payload.dict())
     events_repo.create_event(
         organization["id"],
@@ -648,6 +683,12 @@ async def upload_attachment(
 ):
     """RF-19: upload evidence to object storage and record attachment metadata."""
     _get_accessible_work_order(work_order_id, current_user, organization)
+    if current_user.role in ("vendor", "viewer"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This role cannot upload attachments",
+        )
+
     uploaded = await attachment_storage_service.upload_work_order_attachment_file(
         organization["id"], work_order_id, file
     )

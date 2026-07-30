@@ -1273,6 +1273,7 @@ npm.cmd run test:ci -- --runTestsByPath src/utils/reportMetrics.test.js
 server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 npm.cmd run test:ci
 server\venv\Scripts\python.exe -m compileall -q server scripts
+node -e "const babel=require('@babel/core'); babel.transformFileSync('src/screens/WorkOrderDetailsScreen.js',{presets:['module:metro-react-native-babel-preset'],babelrc:false,configFile:false}); console.log('WorkOrderDetailsScreen parse ok')"
 ```
 
 Result:
@@ -1282,6 +1283,7 @@ Result:
 - Full backend tests passed: `150 passed`.
 - Full client tests passed: `7 passed suites`, `39 passed tests`.
 - Compile check passed for `server` and `scripts`.
+- Work-order detail screen Babel parse check passed.
 
 ## 2026-07-30 - v1.3 Closeout Attachment Manifest Export
 
@@ -1374,7 +1376,8 @@ Changes:
   screenshot checklist generated from the same manifest.
 - Added checks for synthetic login coverage, screen coverage, unique screenshot
   names, safety checks, manager controls, non-manager hidden controls,
-  technician assigned routing, client/viewer privacy, and staged vendor access.
+  technician assigned routing, client/viewer privacy, and vendor access
+  documentation.
 - Updated role UX, evidence, QA, roadmap, requirements, README, and phase docs.
 
 Verification:
@@ -1633,3 +1636,49 @@ Result:
 - Client tests passed: `5 passed suites`, `25 passed tests`.
 - Backend tests passed: `115 passed`.
 - Compile check passed.
+
+## 2026-07-30 - v1.3 Linked Vendor Portal Scope
+
+Decision:
+
+- Move vendor access from a staged placeholder into a scoped POC lane before
+  hosting.
+- Keep vendors limited to work orders linked to their active vendor record,
+  vendor-visible messages, and read-only proof context.
+
+Changes:
+
+- Added Alembic migration `0008_vendor_visible_messages.py`.
+- Expanded work-order message visibility to `internal`, `client`, and
+  `vendor`.
+- Added active vendor-email lookup and routed vendor list/detail access through
+  the linked vendor record.
+- Forced vendor message reads/writes to `vendor` visibility and kept viewers
+  read-only.
+- Blocked vendor/viewer attachment metadata creation and file upload attempts
+  server-side.
+- Updated mobile role copy, work-order detail message controls, and role
+  walkthrough evidence planning for vendor queue/detail/empty-state capture.
+- Added synthetic vendor-visible demo seed data for the Apex vendor user.
+- Updated README, QA, roadmap, requirements, traceability, phase status, role
+  UX sweep, and v1.3 evidence docs.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_tenant_isolation.py -p no:cacheprovider
+npm.cmd run test:ci -- --runTestsByPath src/utils/roleWorkflows.test.js src/utils/roleWalkthrough.test.js
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m compileall -q server scripts
+```
+
+Result:
+
+- Backend tenant isolation tests passed: `60 passed`, with one existing
+  Pydantic `dict()` deprecation warning.
+- Focused role UX tests passed: `2 passed suites`, `17 passed tests`.
+- Full backend tests passed: `160 passed`, with the same Pydantic `dict()`
+  deprecation warning.
+- Full client tests passed: `7 passed suites`, `39 passed tests`.
+- Compile check passed for `server` and `scripts`.

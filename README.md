@@ -282,7 +282,7 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   (attachment metadata plus backend upload endpoint for S3-compatible object
   storage when configured), RF-20 (audit log), RF-21 (filtered search).
 - **v1.3 PMC operations**: client/property/vendor records, work-order links,
-  client-visible versus internal messages, client approval requests/decisions,
+  client-visible, vendor-visible, and internal messages, client approval requests/decisions,
   proof-gated closeout, closeout package summary, HTML/text/PDF closeout
   exports, closeout attachment handoff manifests for JSON/CSV evidence
   portability, operations reporting for stale work, overload, property hotspots,
@@ -294,8 +294,10 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   lifecycle states, duplicate-warning preflight
   checks, mobile PMC directory management, mobile report chart bars, and
   work-order entity linking, with manager-only mobile screens gated by role and
-  primary mobile API failures showing visible retry states. Backend regression
-  tests cover client/viewer and technician work-order visibility boundaries, and
+  primary mobile API failures showing visible retry states. Vendor users are
+  scoped to active vendor records by email and limited to linked work orders and
+  vendor-visible messages. Backend regression
+  tests cover client/viewer, vendor, and technician work-order visibility boundaries, and
   compact mobile workflow controls have hardened touch targets before screenshot
   capture. Role-specific empty queue panels and the role walkthrough/screenshot
   manifest are implemented and tested, including a role evidence readiness
