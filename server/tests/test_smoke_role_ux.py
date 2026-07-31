@@ -108,3 +108,48 @@ def test_failed_evidence_is_sanitized():
     assert evidence["roles"] == []
     assert "password" not in str(evidence).lower()
     assert "bearer" not in str(evidence).lower()
+
+
+def test_smoke_diagnosis_flags_stale_empty_state_seed():
+    evidence = {
+        "passed": False,
+        "roles": [
+            {
+                "role": "viewer_empty",
+                "checks": [{"key": "viewer_empty:login", "passed": False, "detail": "401"}],
+            },
+            {
+                "role": "vendor_empty",
+                "checks": [{"key": "vendor_empty:login", "passed": False, "detail": "401"}],
+            },
+        ],
+    }
+
+    diagnosis = smoke_role_ux.diagnose_role_smoke_evidence(evidence)
+
+    assert diagnosis["stale_seed_suspected"] is True
+    assert diagnosis["stale_seed_login_keys"] == ["viewer_empty:login", "vendor_empty:login"]
+    assert diagnosis["missing_empty_state_logins"] == [
+        "quiet-owner.demo@demo.techsyncops.dev",
+        "quiet-vendor.demo@demo.techsyncops.dev",
+    ]
+    assert "password" not in str(diagnosis).lower()
+    assert "token" not in str(diagnosis).lower()
+
+
+def test_smoke_diagnosis_stays_clean_for_passed_evidence():
+    evidence = {
+        "passed": True,
+        "roles": [
+            {
+                "role": "viewer_empty",
+                "checks": [{"key": "viewer_empty:login", "passed": True, "detail": "200"}],
+            }
+        ],
+    }
+
+    diagnosis = smoke_role_ux.diagnose_role_smoke_evidence(evidence)
+
+    assert diagnosis["stale_seed_suspected"] is False
+    assert diagnosis["stale_seed_login_keys"] == []
+    assert diagnosis["missing_empty_state_logins"] == []

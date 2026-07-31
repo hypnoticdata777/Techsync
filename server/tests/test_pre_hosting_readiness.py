@@ -55,6 +55,35 @@ def _write_clean_smoke(path: Path):
     )
 
 
+def _write_stale_seed_smoke(path: Path):
+    path.write_text(
+        json.dumps(
+            {
+                "passed": False,
+                "check_count": 2,
+                "tokens_saved": False,
+                "roles": [
+                    {
+                        "role": "viewer_empty",
+                        "email": "quiet-owner.demo@demo.techsyncops.dev",
+                        "checks": [
+                            {"key": "viewer_empty:login", "passed": False, "detail": "401"}
+                        ],
+                    },
+                    {
+                        "role": "vendor_empty",
+                        "email": "quiet-vendor.demo@demo.techsyncops.dev",
+                        "checks": [
+                            {"key": "vendor_empty:login", "passed": False, "detail": "401"}
+                        ],
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
 def _write_complete_manual_notes(path: Path):
     path.write_text(
         json.dumps(
@@ -93,6 +122,20 @@ def test_readiness_report_separates_tracked_tooling_from_local_artifact_blockers
     assert checks["screenshot_inventory"]["passed"] is False
     assert checks["manual_notes_complete"]["passed"] is False
     assert checks["evidence_summary_json"]["passed"] is False
+
+
+def test_readiness_report_explains_stale_empty_state_seed_smoke(tmp_path):
+    _copy_required_files(tmp_path)
+    _write_stale_seed_smoke(tmp_path / "role-ux-smoke-evidence.json")
+
+    report = readiness.build_readiness_report(repo_root=tmp_path)
+    smoke = {check["key"]: check for check in report["checks"]}["role_smoke_evidence"]
+
+    assert smoke["passed"] is False
+    assert "Stale demo seed suspected" in smoke["detail"]
+    assert "quiet-owner.demo@demo.techsyncops.dev" in smoke["detail"]
+    assert "quiet-vendor.demo@demo.techsyncops.dev" in smoke["detail"]
+    assert "seed_demo_data.py seed --reset-existing" in smoke["detail"]
 
 
 def test_readiness_report_passes_with_complete_local_evidence(tmp_path):

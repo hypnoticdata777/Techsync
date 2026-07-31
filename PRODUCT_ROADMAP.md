@@ -217,6 +217,8 @@ Likely scope:
   - pre-hosting readiness doctor now summarizes tracked readiness tooling,
     ignored local artifacts, role smoke, screenshots, manual notes, and
     evidence summary JSON before the final Vercel gate
+  - role UX smoke now diagnoses stale quiet viewer/vendor empty-state seed
+    failures and points to reset, strict status, and smoke rerun recovery
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions

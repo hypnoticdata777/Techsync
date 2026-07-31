@@ -198,6 +198,9 @@ they have been verified in the relevant environment.
       ignored local evidence artifacts, smoke status, screenshot inventory,
       manual notes, and evidence summary blockers before the final hosting
       gate.
+- [x] Role UX smoke stale-seed diagnosis added so blocked quiet viewer/vendor
+      empty-state evidence points to the seed reset and strict-status recovery
+      path.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.

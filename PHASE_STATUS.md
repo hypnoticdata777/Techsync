@@ -259,6 +259,9 @@ Completed:
 - Added `scripts/pre_hosting_readiness.py` so the last local gate can summarize
   tracked readiness tooling, ignored local artifacts, role smoke, screenshot
   inventory, manual notes, and evidence summary JSON before any hosting work.
+- Added stale-seed diagnostics to the role UX smoke/readiness flow so blocked
+  quiet viewer/vendor empty-state evidence gives the exact reseed recovery path
+  before the final local capture pass.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and

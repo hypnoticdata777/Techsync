@@ -50,6 +50,12 @@ EMPTY_STATE_LOGINS = {
     },
 }
 
+STALE_SEED_LOGIN_KEYS = {
+    f"{key}:login": login["email"]
+    for key, login in EMPTY_STATE_LOGINS.items()
+    if key in {"viewer_empty", "vendor_empty"}
+}
+
 MANAGER_ROLES = {"org_admin", "coordinator"}
 ACTIVE_FIELD_STATUSES = {"open", "in_progress", "paused", "escalated"}
 
@@ -108,7 +114,7 @@ def _request(
 
 
 def _failed_evidence(base_url: str, error: str) -> dict[str, Any]:
-    return {
+    evidence = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "base_url": base_url,
         "roles": [],
@@ -117,6 +123,63 @@ def _failed_evidence(base_url: str, error: str) -> dict[str, Any]:
         "check_count": 1,
         "error": error,
     }
+    evidence["diagnostics"] = diagnose_role_smoke_evidence(evidence)
+    return evidence
+
+
+def _failed_check_keys(evidence: dict[str, Any]) -> list[str]:
+    keys: list[str] = []
+    for role in evidence.get("roles", []):
+        for check in role.get("checks", []):
+            if not check.get("passed"):
+                keys.append(str(check.get("key", "unknown_check")))
+    return keys
+
+
+def diagnose_role_smoke_evidence(evidence: dict[str, Any]) -> dict[str, Any]:
+    failed_keys = _failed_check_keys(evidence)
+    stale_keys = [key for key in failed_keys if key in STALE_SEED_LOGIN_KEYS]
+    missing_emails = [STALE_SEED_LOGIN_KEYS[key] for key in stale_keys]
+    stale_seed_suspected = bool(stale_keys)
+
+    recommended_next_steps = [
+        "Run python scripts\\seed_demo_data.py status --strict against the local/demo database.",
+        "If strict status is blocked, run python scripts\\seed_demo_data.py seed --reset-existing.",
+        "Rerun scripts\\smoke_role_ux.py after the API is still running on http://127.0.0.1:8000.",
+    ]
+    if stale_seed_suspected:
+        recommended_next_steps.insert(
+            0,
+            "The failed empty-state login checks match a stale demo seed created before the quiet viewer/vendor users existed.",
+        )
+
+    return {
+        "stale_seed_suspected": stale_seed_suspected,
+        "stale_seed_login_keys": stale_keys,
+        "missing_empty_state_logins": missing_emails,
+        "failed_check_count": len(failed_keys),
+        "recommended_next_steps": recommended_next_steps,
+    }
+
+
+def load_smoke_evidence(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def print_diagnosis(diagnosis: dict[str, Any]) -> None:
+    print("TechSync Ops role smoke diagnosis")
+    print(f"Stale seed suspected: {diagnosis['stale_seed_suspected']}")
+    if diagnosis["stale_seed_login_keys"]:
+        print("Blocked checks:")
+        for key in diagnosis["stale_seed_login_keys"]:
+            print(f"- {key}")
+    if diagnosis["missing_empty_state_logins"]:
+        print("Missing empty-state login emails:")
+        for email in diagnosis["missing_empty_state_logins"]:
+            print(f"- {email}")
+    print("Recommended next steps:")
+    for step in diagnosis["recommended_next_steps"]:
+        print(f"- {step}")
 
 
 def _record(checks: list[dict[str, Any]], key: str, passed: bool, detail: str) -> None:
@@ -473,6 +536,7 @@ def run_smoke(base_url: str, password: str) -> dict[str, Any]:
 
     evidence["passed"] = all(check["passed"] for check in all_checks)
     evidence["check_count"] = len(all_checks)
+    evidence["diagnostics"] = diagnose_role_smoke_evidence(evidence)
     return evidence
 
 
@@ -481,7 +545,17 @@ def main() -> int:
     parser.add_argument("--base-url", default=os.getenv("TECHSYNC_API_BASE_URL", DEFAULT_BASE_URL))
     parser.add_argument("--password", default=DEFAULT_PASSWORD)
     parser.add_argument("--output", default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "--diagnose",
+        metavar="PATH",
+        help="Read an existing sanitized smoke evidence JSON and print stale-seed guidance.",
+    )
     args = parser.parse_args()
+
+    if args.diagnose:
+        evidence = load_smoke_evidence(Path(args.diagnose))
+        print_diagnosis(diagnose_role_smoke_evidence(evidence))
+        return 0
 
     try:
         evidence = run_smoke(args.base_url, args.password)

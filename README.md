@@ -21,7 +21,8 @@ show the strict preflight order plus 390px, 320px, and desktop viewport gates.
 The strict evidence pack requires checklist, role-by-role, and viewport notes
 before hosting. `scripts/pre_hosting_readiness.py` now summarizes the final
 local blockers across tracked tooling, ignored evidence artifacts, role smoke,
-screenshots, manual notes, and evidence summary JSON. The latest local
+screenshots, manual notes, and evidence summary JSON. The role smoke helper can
+also diagnose stale empty-state seed evidence before a reseed. The latest local
 capture-prep run proved the Neon-backed API through all six synthetic roles
 with 67 passing smoke checks; the remaining evidence work is the manual
 21-screenshot, small-width, and screen-reader pass.
@@ -377,7 +378,10 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   work, client pending approval, viewer scope, linked vendor work, and vendor-
   visible messages. Before final captures, run
   `scripts\seed_demo_data.py status --strict` against the local/demo database
-  to confirm the seed is current. The local evidence-pack strict gate also
+  to confirm the seed is current. If old smoke evidence reports blocked quiet
+  viewer/vendor logins, run
+  `scripts\smoke_role_ux.py --diagnose role-ux-smoke-evidence.json` before
+  reseeding. The local evidence-pack strict gate also
   requires completed checklist, role-by-role, and viewport notes before any
   public screenshot set is considered ready.
 - Run `scripts\pre_hosting_readiness.py --strict` after the final evidence pack

@@ -81,6 +81,17 @@ cd "C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync"
 server\venv\Scripts\python.exe scripts\smoke_role_ux.py --base-url "http://127.0.0.1:8000" --output role-ux-smoke-evidence.json
 ```
 
+If the role smoke is blocked and an older `role-ux-smoke-evidence.json`
+exists, diagnose it before reseeding:
+
+```powershell
+server\venv\Scripts\python.exe scripts\smoke_role_ux.py --diagnose role-ux-smoke-evidence.json
+```
+
+If the diagnosis says the quiet viewer/vendor empty-state users are missing,
+rerun `python ..\scripts\seed_demo_data.py seed --reset-existing` from the
+server terminal, confirm `status --strict`, then rerun role smoke.
+
 After screenshots are captured into `local-role-ux-evidence`, build the local
 evidence report:
 

@@ -26,6 +26,7 @@ from build_role_ux_evidence_pack import (
     summarize_manual_notes,
     summarize_smoke,
 )
+from smoke_role_ux import diagnose_role_smoke_evidence
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -164,6 +165,15 @@ def _screenshot_plan_check() -> ReadinessCheck:
 
 def _smoke_check(path: Path) -> ReadinessCheck:
     summary = summarize_smoke(path)
+    evidence = _load_json(path)
+    diagnosis = diagnose_role_smoke_evidence(evidence) if evidence else None
+    stale_seed_detail = ""
+    if diagnosis and diagnosis["stale_seed_suspected"]:
+        stale_seed_detail = (
+            " Stale demo seed suspected; missing empty-state logins: "
+            + ", ".join(diagnosis["missing_empty_state_logins"])
+            + ". Run seed_demo_data.py seed --reset-existing, then rerun role smoke."
+        )
     return ReadinessCheck(
         key="role_smoke_evidence",
         passed=summary.clean,
@@ -172,6 +182,7 @@ def _smoke_check(path: Path) -> ReadinessCheck:
             if summary.clean
             else "Role smoke evidence missing or blocked: "
             + "; ".join(summary.failed_checks or ["run scripts/smoke_role_ux.py"])
+            + stale_seed_detail
         ),
     )
 

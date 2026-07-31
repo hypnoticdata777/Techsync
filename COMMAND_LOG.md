@@ -2311,3 +2311,51 @@ Result:
 - Git ignore check confirmed local readiness and role-evidence artifacts remain
   ignored.
 - Diff hygiene passed with normal Windows LF/CRLF warnings.
+
+## 2026-07-31 - v1.3 Role Smoke Stale-Seed Diagnostics
+
+Decision:
+
+- Close the first pre-hosting blocker by making stale quiet viewer/vendor seed
+  failures diagnosable from the sanitized role smoke evidence.
+- Keep the fix local-only: no hosting, no provider writes, and no secrets in
+  tracked docs or generated evidence.
+
+Changes:
+
+- Added `scripts/smoke_role_ux.py --diagnose` to read an existing
+  `role-ux-smoke-evidence.json` and print stale-seed guidance without rerunning
+  the API probe.
+- Added sanitized smoke diagnostics to newly generated smoke evidence.
+- Updated `scripts/pre_hosting_readiness.py` so blocked quiet viewer/vendor
+  logins are reported as a stale demo seed with the exact reset/status/smoke
+  recovery path.
+- Added pytest coverage for stale empty-state smoke diagnosis and readiness
+  doctor messaging.
+- Updated README, QA checklist, roadmap, phase status, role capture pass notes,
+  and demo data runbook with the diagnostic command and recovery path.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_smoke_role_ux.py server\tests\test_pre_hosting_readiness.py -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\smoke_role_ux.py --help
+server\venv\Scripts\python.exe scripts\smoke_role_ux.py --diagnose role-ux-smoke-evidence.json
+server\venv\Scripts\python.exe scripts\pre_hosting_readiness.py --summary-json pre-hosting-readiness-summary.json
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+```
+
+Result:
+
+- Focused stale-seed/readiness tests passed: `9 passed`.
+- Backend tests passed: `184 passed`.
+- Client tests passed: `7 passed suites`, `45 passed tests`.
+- Compile checks passed.
+- Smoke helper CLI help now shows `--diagnose`.
+- Smoke helper diagnosis confirmed the current stale local evidence points to
+  missing quiet viewer/vendor logins and the reseed recovery path.
+- Readiness doctor still correctly blocks hosting, but blocker #1 now explains
+  stale quiet viewer/vendor seed recovery.

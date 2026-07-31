@@ -127,6 +127,16 @@ If `scripts/smoke_role_ux.py` reports `401` for either account, or if
 database is using an older or incomplete seed. Run the seed command again with
 `--reset-existing` before final screenshots.
 
+To diagnose an existing smoke evidence file without rerunning the API probe:
+
+```powershell
+python scripts\smoke_role_ux.py --diagnose role-ux-smoke-evidence.json
+```
+
+If the output reports a stale demo seed and lists the quiet viewer/vendor
+emails, reset the synthetic tenant, confirm `status --strict`, then rerun the
+role smoke against the local API.
+
 Strict status checks:
 
 - exact synthetic counts
