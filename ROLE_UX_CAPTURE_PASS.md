@@ -8,7 +8,7 @@ manager-only in-app Role Evidence screen.
 
 ## Current Status
 
-Prepared and automated:
+Prepared, automated, and partially exercised live:
 
 - Role walkthrough manifest covers admin, coordinator, technician, client,
   viewer, and vendor.
@@ -20,24 +20,36 @@ Prepared and automated:
   boundaries.
 - Client tests cover role workflow helpers, route visibility, role evidence
   dashboard data, screenshot filenames, and manual UX check coverage.
+- The local Neon-backed API was migrated through `0008 (head)`.
+- Synthetic demo data was seeded with 8 users, 3 technicians, 2 clients,
+  3 properties, 2 vendors, 8 work orders, 4 messages, 1 attachment, and
+  13 events.
+- `scripts/smoke_role_ux.py` passed locally against `http://127.0.0.1:8000`
+  with 67 sanitized role/API checks. Tokens were not saved.
+- Admin web login, admin workspace, and an admin work-order detail view were
+  manually observed in the local Expo web client at `http://localhost:19006`.
 
-Blocked in this Codex shell:
+Still pending for the final evidence pack:
 
-- Live local login and screenshot capture require `DATABASE_URL` plus
-  `JWT_SECRET_KEY` to be set before the API can run. Those environment
-  variables are not present in this shell, and no local `server/.env` is
-  checked in.
+- Full 21-screenshot capture using the manifest below.
+- Explicit 390px and 320px layout comfort notes.
+- Manual screen-reader/accessibility notes for each role.
+- Final screenshot safety review before any portfolio or investor use.
 
 ## Local Run Commands
 
 Use the direct local/demo database URL. Do not paste the URL into docs or
 screenshots.
 
+In Neon, copy the direct connection string with pooling off. In Windows
+Terminal, make sure the prompt starts with `PS`. If it starts with plain
+`C:\...>`, run `powershell` first.
+
 ```powershell
 cd "C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync\server"
-$env:DATABASE_URL = Get-Clipboard
+$env:DATABASE_URL = (Get-Clipboard).Trim()
 $env:JWT_SECRET_KEY = "local-role-ux-proof-only-change-me"
-alembic upgrade head
+python -m alembic upgrade head
 python ..\scripts\seed_demo_data.py seed --reset-existing
 python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
@@ -68,12 +80,12 @@ Remove-Item Env:JWT_SECRET_KEY
 Shared synthetic password is the seed script default unless
 `TECHSYNC_DEMO_PASSWORD` is set.
 
-- `admin.demo@techsync.local`
-- `coordinator.demo@techsync.local`
-- `lena.tech@techsync.local`
-- `client.demo@techsync.local`
-- `owner-group.demo@techsync.local`
-- `apex.demo@techsync.local`
+- `admin.demo@demo.techsyncops.dev`
+- `coordinator.demo@demo.techsyncops.dev`
+- `lena.tech@demo.techsyncops.dev`
+- `client.demo@demo.techsyncops.dev`
+- `owner-group.demo@demo.techsyncops.dev`
+- `apex.demo@demo.techsyncops.dev`
 
 ## Capture Widths
 
@@ -135,16 +147,29 @@ Record observations here during the final device/emulator pass:
 
 ## Result Notes
 
-Status: prepared; live capture pending local/demo API credentials.
+Status: local API/client smoke proof passed; full manual capture still pending.
 
-Observed blockers:
+Completed live:
 
-- `DATABASE_URL` not set in the current Codex shell.
-- `JWT_SECRET_KEY` not set in the current Codex shell.
+- `python -m alembic upgrade head`
+- `python -m alembic current` returned `0008 (head)`.
+- `python ..\scripts\seed_demo_data.py seed --reset-existing`
+- `python ..\scripts\seed_demo_data.py status`
+- Backend running on `http://127.0.0.1:8000`.
+- Expo web running on `http://localhost:19006`.
+- Admin login and admin work-order detail were manually observed.
+- `scripts/smoke_role_ux.py` passed: 67 checks.
 
-Next action after env is available:
+Known local setup note:
 
-1. Start API and Expo web locally.
-2. Run `scripts/smoke_role_ux.py`.
-3. Open Role Evidence screen as admin/coordinator.
-4. Capture the 21 screenshots and fill this file's checkboxes.
+- Expo 50 on Node 24 can hit a Windows `node:sea` Metro external path issue.
+  The local `node_modules` workaround proved the app can run, but the durable
+  setup recommendation is Node 20 LTS until Expo is upgraded.
+
+Next action:
+
+1. Open Role Evidence screen as admin/coordinator.
+2. Capture the 21 screenshots and fill this file's checkboxes.
+3. Check 390px and 320px widths.
+4. Record screen-reader notes.
+5. Run screenshot safety review before portfolio use.

@@ -16,7 +16,10 @@ now has a tested readiness audit for synthetic logins, screenshot targets,
 role controls, privacy expectations, and screenshot safety checks. The final
 capture workflow is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
 `scripts/smoke_role_ux.py` can produce sanitized role-scope API evidence once a
-local/demo API is running.
+local/demo API is running. The latest local capture-prep run proved the
+Neon-backed API through all six synthetic roles with 67 passing smoke checks;
+the remaining evidence work is the manual 21-screenshot, small-width, and
+screen-reader pass.
 
 ## Overview
 
@@ -353,6 +356,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   screen-reader pass. `ROLE_UX_CAPTURE_PASS.md` is the local worksheet for the
   final role screenshots, 390px/320px layout comfort check, and manual
   accessibility notes.
+- Local Expo web note: Expo 50 on Node 24 can hit a Windows Metro external path
+  issue involving `node:sea`; use Node 20 LTS for the durable local-web setup
+  until Expo is upgraded.
 
 ## License
 

@@ -105,7 +105,7 @@ describe('role walkthrough manifest', () => {
     expect(dashboard.manualChecklist).toHaveLength(5);
     expect(dashboard.roleRows.find(item => item.role === 'vendor')).toEqual(
       expect.objectContaining({
-        loginEmail: 'apex.demo@techsync.local',
+        loginEmail: 'apex.demo@demo.techsyncops.dev',
         screenshotCount: 3,
         hiddenControls: expect.arrayContaining(['Internal messages', 'Client messages']),
       }),
@@ -125,6 +125,6 @@ describe('role walkthrough manifest', () => {
     expect(markdown).toContain('Screenshots: 3');
     expect(markdown).toContain('ready for manual capture');
     expect(markdown).toContain('techsync-ops-vendor-01-vendor-queue.png');
-    expect(markdown).toContain('Only work linked to apex.demo@techsync.local is visible.');
+    expect(markdown).toContain('Only work linked to apex.demo@demo.techsyncops.dev is visible.');
   });
 });

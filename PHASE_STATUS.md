@@ -96,6 +96,11 @@ Completed:
 - Ran `alembic upgrade head` against the Neon demo database using the direct
   connection string during the initial hosted-readiness pass.
 - Confirmed `alembic current` reports `0001 (head)`.
+- Ran the current v1.3 migration path against the Neon demo database and
+  confirmed `alembic current` reports `0008 (head)`.
+- Seeded the synthetic TechSync Ops demo tenant against the Neon demo database
+  with 8 users, 3 technicians, 2 clients, 3 properties, 2 vendors,
+  8 work orders, 4 messages, 1 attachment, and 13 events.
 - Cleared `DATABASE_URL` from the local PowerShell session after migration.
 - Selected Vercel as the eventual backend host for portfolio alignment, now
   deferred to the end of v1.3.
@@ -117,13 +122,12 @@ Completed:
 
 Next:
 
-- Apply and smoke-test the newer v1.3 migrations on the Neon demo database:
-  `0002` PMC entities, `0003` messages, `0004` proof gate, and `0005` client
-  approvals, plus `0006` lifecycle states.
 - Keep Vercel secrets/deployment work parked until the end-of-v1.3 showcase
   gate.
-- Smoke-test auth, onboarding, work-order lifecycle, ingestion, dashboard
-  metrics, and the new PMC entity APIs locally/CI before public hosting.
+- Use the seeded Neon demo tenant for final role screenshots, small-width
+  checks, and manual accessibility notes before public hosting.
+- Run the hosted-style smoke scripts only after the final Vercel deployment
+  gate is intentionally opened.
 
 ### Phase 3 - v1.3 PMC Operations Foundation
 
@@ -260,21 +264,26 @@ Completed:
   safety.
 - Added `ROLE_UX_CAPTURE_PASS.md` and `scripts/smoke_role_ux.py` to prepare the
   final role-by-role local capture pass without hosting.
+- Updated Expo web startup to use Expo's root registration helper so the app
+  mounts cleanly in web preview.
+- Updated synthetic demo login emails away from a reserved `.local` suffix so
+  FastAPI/Pydantic email validation accepts every role login.
+- Ran the local role UX smoke script against the live local API and seeded
+  Neon demo tenant; all 67 sanitized role/API checks passed.
+- Manually observed admin login, admin workspace, and admin work-order detail
+  in Expo web.
 
 Next:
 
 - Keep hosting deferred until every non-hosting requirement bucket is locally
   as complete as practical.
-- Continue local-only product depth with the remaining role-by-role UI/UX
-  friction sweep, accessibility evidence, screenshot-proof preparation, and
-  remaining client/vendor portal polish. The manifest audit is now code-backed;
-  the in-app evidence screen and capture worksheet are prepared; final manual
-  screenshots still require local/demo API credentials and a running client.
-- Later, after the local product surface is complete, migrate/smoke-test the
-  demo database through the latest v1.3 migrations, seed/reset the synthetic
-  demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,
-  manually verify client invite/accept/approval from the hosted email/log path,
-  run `scripts/smoke_v13.py`, and capture `V13_EVIDENCE_TEMPLATE.md`.
+- Continue the final local-only role-by-role UI/UX evidence pass: open Role
+  Evidence, walk admin/coordinator/technician/client/viewer/vendor, capture the
+  21 screenshot targets, verify 390px and 320px widths, record manual
+  screen-reader notes, and complete screenshot safety review.
+- Later, after the local product surface is complete, deploy only as the final
+  gate, manually verify client invite/accept/approval from the hosted email/log
+  path, run `scripts/smoke_v13.py`, and capture `V13_EVIDENCE_TEMPLATE.md`.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 
@@ -327,8 +336,8 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue local-only v1.3 hardening and leave hosting as the absolute final
-gate. Best next candidates: final role-by-role UI/UX friction evidence,
-accessibility proof, remaining client/vendor portal polish, or deep accounting
-integration documentation. Only after those non-hosting requirements are
-complete should the Neon/Vercel/portfolio showcase sequence resume.
+Continue the local-only v1.3 evidence pass and leave hosting as the absolute
+final gate. The best next move is to open Role Evidence, walk all six synthetic
+roles in Expo web, capture the 21 screenshot targets, check 390px/320px layout
+comfort, and record manual screen-reader notes. Only after those non-hosting
+requirements are complete should the Vercel/portfolio showcase sequence resume.

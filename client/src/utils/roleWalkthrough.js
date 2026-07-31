@@ -15,12 +15,12 @@ export const ROLE_WALKTHROUGH_ORDER = [
 ];
 
 export const SYNTHETIC_ROLE_LOGINS = {
-  org_admin: 'admin.demo@techsync.local',
-  coordinator: 'coordinator.demo@techsync.local',
-  technician: 'lena.tech@techsync.local',
-  client: 'client.demo@techsync.local',
-  viewer: 'owner-group.demo@techsync.local',
-  vendor: 'apex.demo@techsync.local',
+  org_admin: 'admin.demo@demo.techsyncops.dev',
+  coordinator: 'coordinator.demo@demo.techsyncops.dev',
+  technician: 'lena.tech@demo.techsyncops.dev',
+  client: 'client.demo@demo.techsyncops.dev',
+  viewer: 'owner-group.demo@demo.techsyncops.dev',
+  vendor: 'apex.demo@demo.techsyncops.dev',
 };
 
 const SAFETY_CHECKS = [
@@ -100,7 +100,7 @@ const WALKTHROUGH_BY_ROLE = {
     persona: 'Homeowner/client contact',
     objective: 'Show linked work visibility, client-visible messages, approval decision, and hidden internal context.',
     screens: [
-      {key: 'client-queue', route: 'WorkOrdersList', proof: 'Only work linked to client.demo@techsync.local is visible.'},
+      {key: 'client-queue', route: 'WorkOrdersList', proof: 'Only work linked to client.demo@demo.techsyncops.dev is visible.'},
       {key: 'approval-detail', route: 'WorkOrderDetails', proof: 'Approval/decline controls show only when approval is pending.'},
       {key: 'client-messages', route: 'WorkOrderDetails', proof: 'Client-visible messages appear; internal tab is hidden.'},
     ],
@@ -111,7 +111,7 @@ const WALKTHROUGH_BY_ROLE = {
     persona: 'Read-only owner/board viewer',
     objective: 'Show read-only linked work and absence of mutation/manager controls.',
     screens: [
-      {key: 'viewer-queue', route: 'WorkOrdersList', proof: 'Only work linked to owner-group.demo@techsync.local is visible.'},
+      {key: 'viewer-queue', route: 'WorkOrdersList', proof: 'Only work linked to owner-group.demo@demo.techsyncops.dev is visible.'},
       {key: 'readonly-detail', route: 'WorkOrderDetails', proof: 'Visible status/messages/proof context without action controls.'},
       {key: 'viewer-empty', route: 'WorkOrdersList', proof: 'No visible snapshot empty state is clear when scoped queue is empty.'},
     ],
@@ -122,7 +122,7 @@ const WALKTHROUGH_BY_ROLE = {
     persona: 'External vendor contact',
     objective: 'Show linked vendor work visibility, vendor-visible messages, and hidden internal/client context.',
     screens: [
-      {key: 'vendor-queue', route: 'WorkOrdersList', proof: 'Only work linked to apex.demo@techsync.local is visible.'},
+      {key: 'vendor-queue', route: 'WorkOrdersList', proof: 'Only work linked to apex.demo@demo.techsyncops.dev is visible.'},
       {key: 'vendor-detail', route: 'WorkOrderDetails', proof: 'Vendor-visible status, messages, attachments, and proof context appear.'},
       {key: 'vendor-empty', route: 'WorkOrdersList', proof: 'No linked vendor work empty state is clear when scoped queue is empty.'},
     ],

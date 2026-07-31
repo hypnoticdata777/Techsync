@@ -1774,3 +1774,52 @@ Result:
 - `git diff --check` passed with Windows LF-to-CRLF warnings only.
 - Live role login/screenshot capture was not run in this Codex shell because
   `DATABASE_URL` and `JWT_SECRET_KEY` are not present here.
+
+## 2026-07-30 - v1.3 Local Role UX Live Smoke
+
+Decision:
+
+- Continue the final pre-hosting UX proof locally against the Neon demo
+  database and Expo web client.
+- Keep Vercel/portfolio hosting deferred.
+
+Changes:
+
+- Updated Expo web entrypoint to use `registerRootComponent(App)` so the web
+  bundle mounts correctly.
+- Replaced synthetic demo emails using the reserved `.local` suffix with
+  `@demo.techsyncops.dev` addresses because FastAPI/Pydantic email validation
+  rejects special-use domains.
+- Updated the role UX smoke script to respect login rate limiting by retrying
+  after a `429` response instead of weakening API security.
+- Updated role capture, demo data, QA, README, and evidence docs with the live
+  local results and clearer PowerShell/clipboard instructions.
+
+Verification:
+
+```powershell
+python -m alembic upgrade head
+python -m alembic current
+python ..\scripts\seed_demo_data.py seed --reset-existing
+python ..\scripts\seed_demo_data.py status
+server\venv\Scripts\python.exe scripts\smoke_role_ux.py --base-url "http://127.0.0.1:8000" --output role-ux-smoke-evidence.json
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client; npm.cmd run test:ci
+server\venv\Scripts\python.exe -m compileall -q scripts\seed_demo_data.py scripts\smoke_role_ux.py
+```
+
+Result:
+
+- Neon demo database reported `0008 (head)`.
+- Synthetic demo seed succeeded with 8 users, 3 technicians, 2 clients,
+  3 properties, 2 vendors, 8 work orders, 4 messages, 1 attachment, and
+  13 events.
+- Admin login, admin workspace, and admin work-order detail were manually
+  observed in Expo web at `http://localhost:19006`.
+- Role UX smoke passed: `67 checks`.
+- Backend tests passed: `160 passed`, with one existing Pydantic `dict()`
+  deprecation warning.
+- Client tests passed: `7 passed suites`, `41 passed tests`.
+- Script compile checks passed.
+- The old reserved-domain synthetic email suffix is no longer present in
+  tracked files.

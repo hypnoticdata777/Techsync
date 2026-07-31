@@ -44,9 +44,11 @@ From the repo root:
 
 ```powershell
 cd server
-$env:DATABASE_URL = Get-Clipboard
-alembic upgrade head
-alembic current
+$env:DATABASE_URL = (Get-Clipboard).Trim()
+$env:DATABASE_URL.StartsWith("postgresql://")
+$env:DATABASE_URL.Contains("-pooler")
+python -m alembic upgrade head
+python -m alembic current
 cd ..
 python scripts\seed_demo_data.py status
 python scripts\seed_demo_data.py seed --reset-existing
@@ -57,6 +59,10 @@ Remove-Item Env:DATABASE_URL
 Use the direct Neon URL for `alembic upgrade head` and seeding. Use the pooled
 Neon URL only for hosted/serverless runtime configuration.
 
+If Windows Terminal shows a plain `C:\...>` prompt, run `powershell` first.
+The `$env:` commands are PowerShell syntax. Copy only the direct connection
+string from Neon, not a full language-specific code snippet.
+
 To see synthetic demo login emails and the shared demo password after seeding:
 
 ```powershell
@@ -65,11 +71,11 @@ python scripts\seed_demo_data.py seed --reset-existing --show-credentials
 
 Synthetic login emails printed by the seed include:
 
-- `admin.demo@techsync.local`
-- `coordinator.demo@techsync.local`
-- `client.demo@techsync.local`
-- `owner-group.demo@techsync.local`
-- `apex.demo@techsync.local`
+- `admin.demo@demo.techsyncops.dev`
+- `coordinator.demo@demo.techsyncops.dev`
+- `client.demo@demo.techsyncops.dev`
+- `owner-group.demo@demo.techsyncops.dev`
+- `apex.demo@demo.techsyncops.dev`
 - three technician accounts
 
 ## Expected Seed Counts
@@ -83,16 +89,16 @@ clients: 2
 properties: 3
 vendors: 2
 work_orders: 8
-messages: 3
+messages: 4
 attachments: 1
-events: 7
+events: 13
 ```
 
 ## Reset Only
 
 ```powershell
 cd server
-$env:DATABASE_URL = Get-Clipboard
+$env:DATABASE_URL = (Get-Clipboard).Trim()
 cd ..
 python scripts\seed_demo_data.py reset
 python scripts\seed_demo_data.py status

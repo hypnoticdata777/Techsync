@@ -119,35 +119,35 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
 
     admin = app.users_repo.create_user(
         organization_id,
-        "admin.demo@techsync.local",
+        "admin.demo@demo.techsyncops.dev",
         password_hash,
         "Avery Morgan",
         "org_admin",
     )
     coordinator = app.users_repo.create_user(
         organization_id,
-        "coordinator.demo@techsync.local",
+        "coordinator.demo@demo.techsyncops.dev",
         password_hash,
         "Jordan Lee",
         "coordinator",
     )
     client_user = app.users_repo.create_user(
         organization_id,
-        "client.demo@techsync.local",
+        "client.demo@demo.techsyncops.dev",
         password_hash,
         "Riley Homeowner",
         "client",
     )
     viewer_user = app.users_repo.create_user(
         organization_id,
-        "owner-group.demo@techsync.local",
+        "owner-group.demo@demo.techsyncops.dev",
         password_hash,
         "Morgan Board",
         "viewer",
     )
     vendor_user = app.users_repo.create_user(
         organization_id,
-        "apex.demo@techsync.local",
+        "apex.demo@demo.techsyncops.dev",
         password_hash,
         "Sam Dispatcher",
         "vendor",
@@ -155,21 +155,21 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
 
     tech_user_lena = app.users_repo.create_user(
         organization_id,
-        "lena.tech@techsync.local",
+        "lena.tech@demo.techsyncops.dev",
         password_hash,
         "Lena Ortiz",
         "technician",
     )
     tech_user_marco = app.users_repo.create_user(
         organization_id,
-        "marco.tech@techsync.local",
+        "marco.tech@demo.techsyncops.dev",
         password_hash,
         "Marco Vega",
         "technician",
     )
     tech_user_priya = app.users_repo.create_user(
         organization_id,
-        "priya.tech@techsync.local",
+        "priya.tech@demo.techsyncops.dev",
         password_hash,
         "Priya Singh",
         "technician",
@@ -304,7 +304,7 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
         {
             "name": "BrightLine Demo Electrical",
             "contact_name": "Casey Electric",
-            "email": "brightline.demo@techsync.local",
+            "email": "brightline.demo@demo.techsyncops.dev",
             "phone": "555-0111",
             "service_types": ["electrical", "hvac"],
             "coverage_area": "All synthetic zones",

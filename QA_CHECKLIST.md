@@ -28,8 +28,8 @@ they have been verified in the relevant environment.
 ## Backend Local/CI Quality
 
 - [x] GitHub Actions CI passed on latest verified `main`.
-- [ ] Backend pytest suite run locally from the fresh clone.
-- [ ] Alembic migration dry run or upgrade verified against a demo database.
+- [x] Backend pytest suite run locally from the fresh clone.
+- [x] Alembic migration dry run or upgrade verified against a demo database.
 - [ ] Production config validation reviewed for hosted deployment.
 
 ## Hosting-Ready Foundation
@@ -58,8 +58,8 @@ they have been verified in the relevant environment.
       POC.
 - [ ] Host secret manager configured at the end-of-v1.3 showcase gate.
 - [x] Initial Alembic migration run against hosted/demo database.
-- [ ] Latest v1.3 Alembic migrations verified against hosted/demo database.
-- [ ] Synthetic demo tenant seeded or reset against hosted/demo database.
+- [x] Latest v1.3 Alembic migrations verified against hosted/demo database.
+- [x] Synthetic demo tenant seeded or reset against hosted/demo database.
 - [ ] `/health` verified over HTTPS.
 - [ ] CORS verified against the intended demo client origin.
 - [ ] Onboarding flow verified.
@@ -177,7 +177,7 @@ they have been verified in the relevant environment.
 - [x] Accessibility evidence template added for manual screen-reader and
       small-width verification before hosting.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
-- [ ] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
+- [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.
 - [ ] Role Evidence screen opened locally as a manager and used to drive the
       final capture pass.

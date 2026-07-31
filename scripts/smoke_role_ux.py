@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -22,12 +23,12 @@ DEFAULT_OUTPUT = "role-ux-smoke-evidence.json"
 DEFAULT_PASSWORD = os.getenv("TECHSYNC_DEMO_PASSWORD", "DemoPass123!")
 
 ROLE_LOGINS = {
-    "org_admin": "admin.demo@techsync.local",
-    "coordinator": "coordinator.demo@techsync.local",
-    "technician": "lena.tech@techsync.local",
-    "client": "client.demo@techsync.local",
-    "viewer": "owner-group.demo@techsync.local",
-    "vendor": "apex.demo@techsync.local",
+    "org_admin": "admin.demo@demo.techsyncops.dev",
+    "coordinator": "coordinator.demo@demo.techsyncops.dev",
+    "technician": "lena.tech@demo.techsyncops.dev",
+    "client": "client.demo@demo.techsyncops.dev",
+    "viewer": "owner-group.demo@demo.techsyncops.dev",
+    "vendor": "apex.demo@demo.techsyncops.dev",
 }
 
 MANAGER_ROLES = {"org_admin", "coordinator"}
@@ -59,14 +60,30 @@ def _record(checks: list[dict[str, Any]], key: str, passed: bool, detail: str) -
 
 
 def _login(base_url: str, email: str, password: str) -> tuple[str | None, dict[str, Any]]:
-    response = _request(
-        "POST",
-        base_url,
-        "/auth/login",
-        json_body={"email": email, "password": password},
-    )
+    attempts = 0
+    delayed_by = 0
+    while True:
+        attempts += 1
+        response = _request(
+            "POST",
+            base_url,
+            "/auth/login",
+            json_body={"email": email, "password": password},
+        )
+        if response.status_code != 429 or attempts >= 2:
+            break
+
+        retry_after = int(response.headers.get("Retry-After", "60"))
+        delayed_by += retry_after
+        time.sleep(retry_after)
+
     body = response.json() if response.headers.get("content-type", "").startswith("application/json") else {}
-    return body.get("access_token"), {"status_code": response.status_code, "ok": response.ok}
+    return body.get("access_token"), {
+        "status_code": response.status_code,
+        "ok": response.ok,
+        "attempts": attempts,
+        "delayed_by_seconds": delayed_by,
+    }
 
 
 def _safe_json(response: requests.Response) -> Any:
@@ -193,7 +210,10 @@ def run_smoke(base_url: str, password: str) -> dict[str, Any]:
             checks,
             f"{role}:login",
             bool(token),
-            f"Login for {email} returned {login_result['status_code']}",
+            (
+                f"Login for {email} returned {login_result['status_code']}"
+                f" after {login_result['attempts']} attempt(s)"
+            ),
         )
 
         if token:

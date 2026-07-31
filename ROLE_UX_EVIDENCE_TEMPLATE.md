@@ -24,12 +24,12 @@ the password here.
 
 | Role | Synthetic Login | Purpose |
 |---|---|---|
-| org_admin | `admin.demo@techsync.local` | Tenant control, reports, dispatch, directory, work creation |
-| coordinator | `coordinator.demo@techsync.local` | Intake, assignment, client follow-up, closeout readiness |
-| technician | `lena.tech@techsync.local` | Assigned queue, status update, proof upload |
-| client | `client.demo@techsync.local` | Linked work, client-visible messages, approval decision |
-| viewer | `owner-group.demo@techsync.local` | Read-only linked owner/board snapshot |
-| vendor | `apex.demo@techsync.local` | Staged vendor-access guardrail |
+| org_admin | `admin.demo@demo.techsyncops.dev` | Tenant control, reports, dispatch, directory, work creation |
+| coordinator | `coordinator.demo@demo.techsyncops.dev` | Intake, assignment, client follow-up, closeout readiness |
+| technician | `lena.tech@demo.techsyncops.dev` | Assigned queue, status update, proof upload |
+| client | `client.demo@demo.techsyncops.dev` | Linked work, client-visible messages, approval decision |
+| viewer | `owner-group.demo@demo.techsyncops.dev` | Read-only linked owner/board snapshot |
+| vendor | `apex.demo@demo.techsyncops.dev` | Linked vendor work, vendor-visible messages, hidden internal/client context |
 
 ## Screenshot Manifest
 
@@ -58,7 +58,9 @@ before manual capture.
 | viewer | WorkOrdersList | `techsync-ops-viewer-01-viewer-queue.png` | Only linked viewer work is visible |
 | viewer | WorkOrderDetails | `techsync-ops-viewer-02-readonly-detail.png` | Visible status/messages/proof context without action controls |
 | viewer | WorkOrdersList | `techsync-ops-viewer-03-viewer-empty.png` | No visible snapshot empty state is clear when scoped queue is empty |
-| vendor | WorkOrdersList | `techsync-ops-vendor-01-vendor-staged.png` | Vendor staged/disabled state is explicit |
+| vendor | WorkOrdersList | `techsync-ops-vendor-01-vendor-queue.png` | Only linked vendor work is visible |
+| vendor | WorkOrderDetails | `techsync-ops-vendor-02-vendor-detail.png` | Vendor-visible status, messages, attachments, and proof context appear |
+| vendor | WorkOrdersList | `techsync-ops-vendor-03-vendor-empty.png` | No linked vendor work empty state is clear when scoped queue is empty |
 
 ## Per-Role Checks
 
@@ -72,7 +74,9 @@ before manual capture.
 - [ ] Client does not see unrelated client work.
 - [ ] Viewer has no mutation controls.
 - [ ] Viewer does not see internal messages.
-- [ ] Vendor sees staged/disabled access messaging.
+- [ ] Vendor sees only linked vendor work.
+- [ ] Vendor sees vendor-visible messages and does not see internal or client
+      message tabs.
 - [ ] Empty states are captured where meaningful.
 - [ ] Retry/error states are captured or documented if API failure proof is
       needed.
