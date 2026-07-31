@@ -2359,3 +2359,51 @@ Result:
   missing quiet viewer/vendor logins and the reseed recovery path.
 - Readiness doctor still correctly blocks hosting, but blocker #1 now explains
   stale quiet viewer/vendor seed recovery.
+
+## 2026-07-31 - v1.3 Named Screenshot Blocker Output
+
+Decision:
+
+- Close the second pre-hosting evidence blocker by making the remaining
+  screenshot gap exact in both the capture-prep terminal output and readiness
+  doctor report.
+- Keep evidence files local/ignored and avoid adding any screenshots, secrets,
+  or provider data to the repository.
+
+Changes:
+
+- Updated `scripts/prepare_role_ux_capture.py` to print missing screenshot
+  capture rows as `role / screen: filename`.
+- Updated `scripts/pre_hosting_readiness.py` to name missing screenshot files
+  in the `screenshot_inventory` blocker detail.
+- Added tests for named missing screenshot descriptions and readiness doctor
+  screenshot blocker output.
+- Updated README, QA checklist, phase status, roadmap, and role capture pass
+  docs so the manual capture flow points to exact remaining rows.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_prepare_role_ux_capture.py server\tests\test_pre_hosting_readiness.py server\tests\test_role_ux_evidence_pack.py -p no:cacheprovider
+server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
+server\venv\Scripts\python.exe scripts\pre_hosting_readiness.py --summary-json pre-hosting-readiness-summary.json
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+```
+
+Result:
+
+- Focused evidence-tooling tests passed: `14 passed`.
+- Backend tests passed: `186 passed`.
+- Client tests passed: `7 passed suites`, `45 passed tests`.
+- Compile checks passed.
+- Capture prep now reports 18/21 screenshots present and names the three
+  remaining rows:
+  - `org_admin / WorkOrderForm: techsync-ops-org_admin-05-create-work.png`
+  - `viewer / WorkOrdersList: techsync-ops-viewer-03-viewer-empty.png`
+  - `vendor / WorkOrdersList: techsync-ops-vendor-03-vendor-empty.png`
+- Readiness doctor still blocks hosting as expected, but the screenshot blocker
+  now names the exact remaining capture files.

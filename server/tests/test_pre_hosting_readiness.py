@@ -138,6 +138,20 @@ def test_readiness_report_explains_stale_empty_state_seed_smoke(tmp_path):
     assert "seed_demo_data.py seed --reset-existing" in smoke["detail"]
 
 
+def test_readiness_report_names_missing_screenshot_rows(tmp_path):
+    _copy_required_files(tmp_path)
+    screenshots = tmp_path / "local-role-ux-evidence"
+    screenshots.mkdir()
+    for _role, _screen, filename in readiness.EXPECTED_SCREENSHOTS[:-1]:
+        (screenshots / filename).write_bytes(b"fake png")
+
+    report = readiness.build_readiness_report(repo_root=tmp_path)
+    screenshot = {check["key"]: check for check in report["checks"]}["screenshot_inventory"]
+
+    assert screenshot["passed"] is False
+    assert "vendor/WorkOrdersList:techsync-ops-vendor-03-vendor-empty.png" in screenshot["detail"]
+
+
 def test_readiness_report_passes_with_complete_local_evidence(tmp_path):
     _copy_required_files(tmp_path)
     (tmp_path / "local-role-ux-capture-manifest.md").write_text("# manifest", encoding="utf-8")

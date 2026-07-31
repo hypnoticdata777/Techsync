@@ -87,6 +87,18 @@ def _role_steps() -> dict[str, list[tuple[str, str]]]:
     return steps
 
 
+def describe_missing_screenshots(missing_screenshots: list[str]) -> list[str]:
+    expected = {
+        filename: (role, screen)
+        for role, screen, filename in EXPECTED_SCREENSHOTS
+    }
+    descriptions: list[str] = []
+    for filename in missing_screenshots:
+        role, screen = expected.get(filename, ("unknown", "Unknown screen"))
+        descriptions.append(f"{role} / {screen}: {filename}")
+    return descriptions
+
+
 def _write_manifest(
     *,
     manifest_path: Path,
@@ -222,6 +234,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Capture manifest written: {result.manifest_path}")
     print(f"Screenshots present: {result.present_count}/{result.expected_count}")
     print(f"Missing screenshots: {len(result.missing_screenshots)}")
+    if result.missing_screenshots:
+        print("Missing screenshot capture rows:")
+        for description in describe_missing_screenshots(result.missing_screenshots):
+            print(f"- {description}")
     return 0
 
 

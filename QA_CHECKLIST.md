@@ -201,6 +201,9 @@ they have been verified in the relevant environment.
 - [x] Role UX smoke stale-seed diagnosis added so blocked quiet viewer/vendor
       empty-state evidence points to the seed reset and strict-status recovery
       path.
+- [x] Capture prep and readiness doctor now name exact missing
+      role/screen/filename screenshot rows before the final manual evidence
+      pass.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.

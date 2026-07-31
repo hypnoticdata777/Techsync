@@ -262,6 +262,9 @@ Completed:
 - Added stale-seed diagnostics to the role UX smoke/readiness flow so blocked
   quiet viewer/vendor empty-state evidence gives the exact reseed recovery path
   before the final local capture pass.
+- Added named missing-screenshot output to capture prep and the readiness
+  doctor so the remaining local evidence blocker identifies the exact
+  role/screen/filename rows to capture.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and

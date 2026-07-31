@@ -60,6 +60,20 @@ def test_capture_manifest_constants_keep_final_gate_order():
     ]
 
 
+def test_describe_missing_screenshots_names_role_and_screen():
+    missing = [
+        "techsync-ops-viewer-03-viewer-empty.png",
+        "techsync-ops-vendor-03-vendor-empty.png",
+    ]
+
+    descriptions = prepare_capture_module.describe_missing_screenshots(missing)
+
+    assert descriptions == [
+        "viewer / WorkOrdersList: techsync-ops-viewer-03-viewer-empty.png",
+        "vendor / WorkOrdersList: techsync-ops-vendor-03-vendor-empty.png",
+    ]
+
+
 def test_prepare_capture_keeps_existing_manual_notes_without_overwrite(tmp_path):
     screenshot_dir = tmp_path / "local-role-ux-evidence"
     manual_notes_path = tmp_path / "local-role-ux-manual-notes.json"

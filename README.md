@@ -21,8 +21,9 @@ show the strict preflight order plus 390px, 320px, and desktop viewport gates.
 The strict evidence pack requires checklist, role-by-role, and viewport notes
 before hosting. `scripts/pre_hosting_readiness.py` now summarizes the final
 local blockers across tracked tooling, ignored evidence artifacts, role smoke,
-screenshots, manual notes, and evidence summary JSON. The role smoke helper can
-also diagnose stale empty-state seed evidence before a reseed. The latest local
+screenshots, manual notes, and evidence summary JSON; screenshot blockers now
+name the exact role/screen/filename rows still needed. The role smoke helper
+can also diagnose stale empty-state seed evidence before a reseed. The latest local
 capture-prep run proved the Neon-backed API through all six synthetic roles
 with 67 passing smoke checks; the remaining evidence work is the manual
 21-screenshot, small-width, and screen-reader pass.
@@ -386,7 +387,8 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   public screenshot set is considered ready.
 - Run `scripts\pre_hosting_readiness.py --strict` after the final evidence pack
   is built; it should pass only when the local non-hosting evidence gate is
-  actually complete.
+  actually complete. When screenshots are missing, the readiness doctor and
+  capture prep helper now name the exact role/screen/filename rows to capture.
 - Local Expo web note: Expo 50 on Node 24 can hit a Windows Metro external path
   issue involving `node:sea`; use Node 20 LTS for the durable local-web setup
   until Expo is upgraded.

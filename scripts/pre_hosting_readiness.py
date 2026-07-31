@@ -163,6 +163,18 @@ def _screenshot_plan_check() -> ReadinessCheck:
     )
 
 
+def _describe_screenshot_files(filenames: list[str], *, limit: int = 6) -> str:
+    expected = {
+        filename: f"{role}/{screen}:{filename}"
+        for role, screen, filename in EXPECTED_SCREENSHOTS
+    }
+    described = [expected.get(filename, filename) for filename in filenames]
+    visible = described[:limit]
+    hidden_count = max(len(described) - len(visible), 0)
+    suffix = f"; +{hidden_count} more" if hidden_count else ""
+    return ", ".join(visible) + suffix
+
+
 def _smoke_check(path: Path) -> ReadinessCheck:
     summary = summarize_smoke(path)
     evidence = _load_json(path)
@@ -189,6 +201,11 @@ def _smoke_check(path: Path) -> ReadinessCheck:
 
 def _screenshot_inventory_check(path: Path) -> ReadinessCheck:
     inventory = inventory_screenshots(path)
+    blockers: list[str] = []
+    if inventory.missing:
+        blockers.append("missing files: " + _describe_screenshot_files(inventory.missing))
+    if inventory.unsafe_names:
+        blockers.append("unsafe names: " + ", ".join(inventory.unsafe_names))
     return ReadinessCheck(
         key="screenshot_inventory",
         passed=inventory.complete,
@@ -196,7 +213,8 @@ def _screenshot_inventory_check(path: Path) -> ReadinessCheck:
             f"All {inventory.expected_count} expected screenshots are present and safely named."
             if inventory.complete
             else f"{len(inventory.present)}/{inventory.expected_count} screenshots present; "
-            f"{len(inventory.missing)} missing; {len(inventory.unsafe_names)} unsafe names."
+            f"{len(inventory.missing)} missing; {len(inventory.unsafe_names)} unsafe names. "
+            + " ".join(blockers)
         ),
     )
 

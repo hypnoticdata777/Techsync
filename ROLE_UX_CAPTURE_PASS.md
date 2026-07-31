@@ -99,6 +99,7 @@ evidence report:
 cd "C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync"
 server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
 # Use local-role-ux-capture-manifest.md as the screenshot checklist.
+# The capture prep command also prints each missing role/screen/filename row.
 # Fill local-role-ux-manual-notes.json after the manual layout, role-by-role,
 # screen-reader, viewport, and screenshot safety pass.
 server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --manual-notes local-role-ux-manual-notes.json --output role-ux-evidence-pack.md --summary-json role-ux-evidence-summary.json --environment local
