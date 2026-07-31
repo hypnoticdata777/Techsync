@@ -54,7 +54,7 @@ python -m alembic current
 cd ..
 python scripts\seed_demo_data.py status
 python scripts\seed_demo_data.py seed --reset-existing
-python scripts\seed_demo_data.py status
+python scripts\seed_demo_data.py status --strict
 Remove-Item Env:DATABASE_URL
 ```
 
@@ -122,9 +122,21 @@ The final role UX smoke expects both secondary empty-state accounts:
 - `quiet-owner.demo@demo.techsyncops.dev`
 - `quiet-vendor.demo@demo.techsyncops.dev`
 
-If `scripts/smoke_role_ux.py` reports `401` for either account, the demo
-database is using an older seed. Run the seed command again with
+If `scripts/smoke_role_ux.py` reports `401` for either account, or if
+`python scripts\seed_demo_data.py status --strict` exits non-zero, the demo
+database is using an older or incomplete seed. Run the seed command again with
 `--reset-existing` before final screenshots.
+
+Strict status checks:
+
+- exact synthetic counts
+- all ten synthetic login users
+- manager lifecycle depth
+- technician active assigned work targets
+- client pending approval target
+- viewer scoped work plus no-work viewer account
+- linked Apex vendor work plus vendor-visible message target
+- no-work vendor account
 
 ## Reset Only
 

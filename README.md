@@ -366,7 +366,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   accessibility notes. The role UX smoke also verifies screenshot-ready seeded
   scenarios before capture: manager lifecycle depth, technician active assigned
   work, client pending approval, viewer scope, linked vendor work, and vendor-
-  visible messages.
+  visible messages. Before final captures, run
+  `scripts\seed_demo_data.py status --strict` against the local/demo database
+  to confirm the seed is current.
 - Local Expo web note: Expo 50 on Node 24 can hit a Windows Metro external path
   issue involving `node:sea`; use Node 20 LTS for the durable local-web setup
   until Expo is upgraded.

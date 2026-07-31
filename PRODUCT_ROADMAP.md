@@ -207,6 +207,8 @@ Likely scope:
   - local role UX smoke now verifies seeded screenshot scenarios for manager
     lifecycle depth, technician active assigned work, client pending approval,
     viewer scope, linked vendor work, and vendor-visible messages
+  - demo seed status now supports strict capture-readiness checks before the
+    final local screenshot pass
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions

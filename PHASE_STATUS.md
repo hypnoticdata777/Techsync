@@ -247,6 +247,9 @@ Completed:
   screenshot pass fails early if manager lifecycle depth, technician assigned
   work, client pending approval, viewer scope, linked vendor work, or
   vendor-visible messages are missing.
+- Added strict demo-seed status readiness checks so
+  `scripts/seed_demo_data.py status --strict` fails before final screenshots
+  when the demo database is stale or missing synthetic users/scenarios.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and

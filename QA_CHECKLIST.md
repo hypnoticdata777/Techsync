@@ -186,6 +186,8 @@ they have been verified in the relevant environment.
 - [x] Role UX smoke verifies screenshot-ready seeded scenarios for manager
       lifecycle depth, technician active assigned work, client pending
       approval, viewer scope, linked vendor work, and vendor-visible messages.
+- [x] Demo seed status supports `--strict` capture-readiness checks for exact
+      counts, synthetic users, empty-state personas, and screenshot scenarios.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.

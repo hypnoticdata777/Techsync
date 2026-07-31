@@ -24,6 +24,42 @@ DEMO_ORG_SLUG = "techsync-ops-demo-pmc"
 DEFAULT_PASSWORD = os.getenv("TECHSYNC_DEMO_PASSWORD", "DemoPass123!")
 APP_MODULES: SimpleNamespace | None = None
 
+EXPECTED_COUNTS = {
+    "users": 10,
+    "technicians": 3,
+    "clients": 3,
+    "properties": 3,
+    "vendors": 3,
+    "work_orders": 8,
+    "messages": 4,
+    "attachments": 1,
+    "events": 13,
+}
+
+EXPECTED_LOGIN_EMAILS = (
+    "admin.demo@demo.techsyncops.dev",
+    "coordinator.demo@demo.techsyncops.dev",
+    "client.demo@demo.techsyncops.dev",
+    "owner-group.demo@demo.techsyncops.dev",
+    "apex.demo@demo.techsyncops.dev",
+    "quiet-owner.demo@demo.techsyncops.dev",
+    "quiet-vendor.demo@demo.techsyncops.dev",
+    "lena.tech@demo.techsyncops.dev",
+    "marco.tech@demo.techsyncops.dev",
+    "priya.tech@demo.techsyncops.dev",
+)
+
+EXPECTED_SCENARIO_LABELS = {
+    "manager_lifecycle_depth": "manager queue has open, in-progress, paused, escalated, completed, and archived work",
+    "technician_active_targets": "technician screenshot targets include active assigned work",
+    "client_pending_approval": "client screenshot target includes pending approval work",
+    "viewer_scoped_work": "viewer screenshot target includes linked owner-group work",
+    "quiet_viewer_empty": "quiet viewer account has no linked work",
+    "vendor_linked_work": "vendor screenshot target includes linked Apex work",
+    "vendor_visible_message": "vendor screenshot target includes a vendor-visible message",
+    "quiet_vendor_empty": "quiet vendor account has no linked work",
+}
+
 
 class SeedError(RuntimeError):
     pass
@@ -86,6 +122,188 @@ def _count(table: str, organization_id: int) -> int:
         )
         or 0
     )
+
+
+def _scalar_bool(sql: str, params: dict[str, Any]) -> bool:
+    return bool(_app().fetch_scalar(sql, params))
+
+
+def _count_scalar(sql: str, params: dict[str, Any]) -> int:
+    return int(_app().fetch_scalar(sql, params) or 0)
+
+
+def evaluate_demo_readiness(status: dict[str, Any]) -> dict[str, Any]:
+    failures: list[str] = []
+    if not status.get("exists"):
+        return {"ready": False, "failures": ["Demo organization is not seeded."]}
+
+    counts = status.get("counts", {})
+    for name, expected in EXPECTED_COUNTS.items():
+        actual = counts.get(name)
+        if actual != expected:
+            failures.append(f"{name} count is {actual}; expected {expected}.")
+
+    for email, present in status.get("expected_users", {}).items():
+        if not present:
+            failures.append(f"Missing synthetic login user: {email}.")
+
+    for key, passed in status.get("scenario_checks", {}).items():
+        if not passed:
+            label = EXPECTED_SCENARIO_LABELS.get(key, key)
+            failures.append(f"Missing scenario: {label}.")
+
+    return {"ready": not failures, "failures": failures}
+
+
+def _expected_user_presence(organization_id: int) -> dict[str, bool]:
+    return {
+        email: _scalar_bool(
+            """
+            SELECT EXISTS (
+                SELECT 1 FROM users
+                WHERE organization_id = :organization_id AND email = :email
+            )
+            """,
+            {"organization_id": organization_id, "email": email},
+        )
+        for email in EXPECTED_LOGIN_EMAILS
+    }
+
+
+def _work_order_exists(organization_id: int, title: str, extra_where: str = "", extra_params: dict[str, Any] | None = None) -> bool:
+    params = {"organization_id": organization_id, "title": title}
+    params.update(extra_params or {})
+    return _scalar_bool(
+        f"""
+        SELECT EXISTS (
+            SELECT 1 FROM work_orders
+            WHERE organization_id = :organization_id
+              AND title = :title
+              {extra_where}
+        )
+        """,
+        params,
+    )
+
+
+def _client_has_no_work(organization_id: int, email: str) -> bool:
+    return _count_scalar(
+        """
+        SELECT COUNT(*)
+        FROM work_orders wo
+        JOIN clients c ON c.id = wo.client_id
+        WHERE wo.organization_id = :organization_id
+          AND c.organization_id = :organization_id
+          AND c.email = :email
+        """,
+        {"organization_id": organization_id, "email": email},
+    ) == 0
+
+
+def _vendor_has_no_work(organization_id: int, email: str) -> bool:
+    return _count_scalar(
+        """
+        SELECT COUNT(*)
+        FROM work_orders wo
+        JOIN vendors v ON v.id = wo.vendor_id
+        WHERE wo.organization_id = :organization_id
+          AND v.organization_id = :organization_id
+          AND v.email = :email
+        """,
+        {"organization_id": organization_id, "email": email},
+    ) == 0
+
+
+def _scenario_checks(organization_id: int) -> dict[str, bool]:
+    expected_users = _expected_user_presence(organization_id)
+    lifecycle_statuses = (
+        "open",
+        "in_progress",
+        "paused",
+        "escalated",
+        "completed",
+        "archived",
+    )
+    return {
+        "manager_lifecycle_depth": all(
+            _count_scalar(
+                """
+                SELECT COUNT(*) FROM work_orders
+                WHERE organization_id = :organization_id AND status = :status
+                """,
+                {"organization_id": organization_id, "status": status},
+            )
+            > 0
+            for status in lifecycle_statuses
+        ),
+        "technician_active_targets": _work_order_exists(
+            organization_id,
+            "Lobby breaker panel inspection",
+            "AND assigned_technician_id IS NOT NULL AND status = 'in_progress'",
+        )
+        and _work_order_exists(
+            organization_id,
+            "Escalated roof access safety review",
+            "AND assigned_technician_id IS NOT NULL AND status = 'escalated'",
+        ),
+        "client_pending_approval": _work_order_exists(
+            organization_id,
+            "Emergency leak under kitchen sink",
+            "AND client_approval_status = 'pending'",
+        ),
+        "viewer_scoped_work": _scalar_bool(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM work_orders wo
+                JOIN clients c ON c.id = wo.client_id
+                WHERE wo.organization_id = :organization_id
+                  AND c.organization_id = :organization_id
+                  AND c.email = 'owner-group.demo@demo.techsyncops.dev'
+                  AND wo.title = 'Townhome HVAC noise follow-up'
+            )
+            """,
+            {"organization_id": organization_id},
+        ),
+        "quiet_viewer_empty": expected_users.get(
+            "quiet-owner.demo@demo.techsyncops.dev",
+            False,
+        )
+        and _client_has_no_work(organization_id, "quiet-owner.demo@demo.techsyncops.dev"),
+        "vendor_linked_work": _scalar_bool(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM work_orders wo
+                JOIN vendors v ON v.id = wo.vendor_id
+                WHERE wo.organization_id = :organization_id
+                  AND v.organization_id = :organization_id
+                  AND v.email = 'apex.demo@demo.techsyncops.dev'
+                  AND wo.title = 'Emergency leak under kitchen sink'
+            )
+            """,
+            {"organization_id": organization_id},
+        ),
+        "vendor_visible_message": _scalar_bool(
+            """
+            SELECT EXISTS (
+                SELECT 1
+                FROM work_order_messages wom
+                JOIN work_orders wo ON wo.id = wom.work_order_id
+                WHERE wom.organization_id = :organization_id
+                  AND wo.organization_id = :organization_id
+                  AND wo.title = 'Emergency leak under kitchen sink'
+                  AND wom.visibility = 'vendor'
+            )
+            """,
+            {"organization_id": organization_id},
+        ),
+        "quiet_vendor_empty": expected_users.get(
+            "quiet-vendor.demo@demo.techsyncops.dev",
+            False,
+        )
+        and _vendor_has_no_work(organization_id, "quiet-vendor.demo@demo.techsyncops.dev"),
+    }
 
 
 def reset_demo_org() -> dict[str, Any]:
@@ -711,13 +929,17 @@ def get_demo_status() -> dict[str, Any]:
         "attachments": _count("work_order_attachments", organization_id),
         "events": _count("work_order_events", organization_id),
     }
-    return {
+    status = {
         "exists": True,
         "organization_id": organization_id,
         "slug": org["slug"],
         "name": org["name"],
         "counts": counts,
+        "expected_users": _expected_user_presence(organization_id),
+        "scenario_checks": _scenario_checks(organization_id),
     }
+    status["readiness"] = evaluate_demo_readiness(status)
+    return status
 
 
 def _print_status(result: dict[str, Any]) -> None:
@@ -728,6 +950,12 @@ def _print_status(result: dict[str, Any]) -> None:
     print(f"Status: seeded organization_id={result['organization_id']}")
     for name, count in result["counts"].items():
         print(f"- {name}: {count}")
+    readiness = result.get("readiness") or {"ready": False, "failures": ["Readiness was not evaluated."]}
+    print(f"Capture readiness: {'ready' if readiness['ready'] else 'not ready'}")
+    if not readiness["ready"]:
+        print("Readiness blockers:")
+        for failure in readiness["failures"]:
+            print(f"- {failure}")
 
 
 def _print_seed_summary(result: dict[str, Any], show_credentials: bool) -> None:
@@ -769,11 +997,19 @@ def main() -> int:
         action="store_true",
         help="Print synthetic demo login password after seeding.",
     )
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Exit non-zero when status/seed readiness is not capture-ready.",
+    )
     args = parser.parse_args()
 
     try:
         if args.action == "status":
-            _print_status(get_demo_status())
+            result = get_demo_status()
+            _print_status(result)
+            if args.strict and not result.get("readiness", {}).get("ready"):
+                return 1
             return 0
         if args.action == "reset":
             result = reset_demo_org()
@@ -786,6 +1022,13 @@ def main() -> int:
 
         result = seed_demo_org(reset_existing=args.reset_existing)
         _print_seed_summary(result, args.show_credentials)
+        if args.strict:
+            status_result = get_demo_status()
+            readiness = status_result.get("readiness", {})
+            if not readiness.get("ready"):
+                for failure in readiness.get("failures", []):
+                    print(f"- {failure}")
+                return 1
         return 0
     except Exception as exc:
         print(f"DEMO SEED FAILED: {exc}", file=sys.stderr)

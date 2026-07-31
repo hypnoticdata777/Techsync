@@ -2180,3 +2180,46 @@ Result:
   failed the strict gate because the current demo database is from an older
   seed and the secondary empty-state accounts returned `401`.
 - Diff hygiene passed with normal Windows LF/CRLF warnings.
+
+## 2026-07-31 - v1.3 Strict Demo Seed Readiness Gate
+
+Decision:
+
+- Make the final screenshot blocker easier to diagnose by teaching the demo
+  seed status command to fail clearly when the database is stale or incomplete.
+- Keep this local/demo only and avoid writing credentials or provider details
+  to tracked files.
+
+Changes:
+
+- Added expected counts, required synthetic login users, and screenshot-
+  scenario readiness checks to `scripts/seed_demo_data.py`.
+- Added `status --strict` so final capture prep can exit non-zero when the demo
+  tenant is missing secondary empty-state personas or seeded scenario depth.
+- Added pytest coverage for the readiness evaluator, including stale
+  empty-state seed detection and unseeded database detection.
+- Updated README, demo-data runbook, role UX capture pass notes, QA checklist,
+  roadmap, and phase status with the strict seed gate.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\seed_demo_data.py --help
+git diff --check
+```
+
+Result:
+
+- Backend tests passed: `177 passed`.
+- Client tests passed: `7 passed suites`, `43 passed tests`.
+- Compile checks passed.
+- Seed helper CLI help shows the new `--strict` option.
+- Diff hygiene passed with normal Windows LF/CRLF warnings.
+- Secret scan only matched documented placeholders and prior scan commands; no
+  live-looking provider token, database URL, or private key was found in this
+  batch.

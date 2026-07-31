@@ -59,7 +59,9 @@ cd "C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync\server"
 $env:DATABASE_URL = (Get-Clipboard).Trim()
 $env:JWT_SECRET_KEY = "local-role-ux-proof-only-change-me"
 python -m alembic upgrade head
+python ..\scripts\seed_demo_data.py status
 python ..\scripts\seed_demo_data.py seed --reset-existing
+python ..\scripts\seed_demo_data.py status --strict
 python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
@@ -189,7 +191,7 @@ Completed live:
 - `python -m alembic upgrade head`
 - `python -m alembic current` returned `0008 (head)`.
 - `python ..\scripts\seed_demo_data.py seed --reset-existing`
-- `python ..\scripts\seed_demo_data.py status`
+- `python ..\scripts\seed_demo_data.py status --strict`
 - Backend running on `http://127.0.0.1:8000`.
 - Expo web running on `http://localhost:19006`.
 - Admin login and admin work-order detail were manually observed.
@@ -219,7 +221,9 @@ Completed live:
   `quiet-vendor.demo@demo.techsyncops.dev`, which indicates the current demo
   database was seeded before the secondary empty-state personas were added.
   Run `python ..\scripts\seed_demo_data.py seed --reset-existing` against the
-  local/demo database before final screenshot capture.
+  local/demo database, then confirm
+  `python ..\scripts\seed_demo_data.py status --strict` is ready before final
+  screenshot capture.
 - 320px work-order detail summary tiles now allow two-line values so approval
   text does not truncate awkwardly on narrow screens.
 - Automated verification after this hardening:
