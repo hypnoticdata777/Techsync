@@ -227,9 +227,12 @@ Completed:
 - Added tested role UX evidence readiness audit for synthetic login coverage,
   screenshot-plan uniqueness, safety checks, manager/non-manager controls,
   technician assigned routing, client/viewer privacy, and linked-vendor scope.
-- Added local role UX evidence-pack builder so sanitized smoke JSON and the
-  screenshot folder can be summarized into a missing-screenshot/manual-check
-  Markdown report before any public sharing.
+- Added local role UX evidence-pack builder so sanitized smoke JSON, the
+  screenshot folder, and local manual notes can be summarized into a
+  missing-screenshot/manual-check Markdown report before any public sharing.
+- Added `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` so 390px/320px layout,
+  screen-reader, role-scope, and screenshot safety observations can be filled
+  locally and checked by the evidence-pack report without committing notes.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and
@@ -288,8 +291,8 @@ Next:
 - Continue the final local-only role-by-role UI/UX evidence pass: open Role
   Evidence, walk admin/coordinator/technician/client/viewer/vendor, capture the
   21 screenshot targets with primary and empty-state personas, verify 390px and
-  320px widths, record manual screen-reader notes, and complete screenshot
-  safety review.
+  320px widths, fill `local-role-ux-manual-notes.json`, record manual
+  screen-reader notes, and complete screenshot safety review.
 - Later, after the local product surface is complete, deploy only as the final
   gate, manually verify client invite/accept/approval from the hosted email/log
   path, run `scripts/smoke_v13.py`, and capture `V13_EVIDENCE_TEMPLATE.md`.

@@ -18,7 +18,7 @@ def create_vendor(
     current_user: User = Depends(require_roles("org_admin", "coordinator")),
     organization: dict = Depends(get_current_organization),
 ):
-    row = vendors_repo.create(organization["id"], payload.dict())
+    row = vendors_repo.create(organization["id"], payload.model_dump())
     return Vendor(**row)
 
 

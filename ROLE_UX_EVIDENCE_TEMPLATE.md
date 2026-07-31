@@ -17,6 +17,7 @@ evidence path; it does not mean the demo has been deployed.
 - Seed command used:
 - Screenshot storage location:
 - Evidence pack report:
+- Manual notes file: `local-role-ux-manual-notes.json`
 
 ## Synthetic Login Set
 
@@ -76,9 +77,10 @@ before manual capture.
 - [ ] `getRoleEvidenceReadinessAudit()` passes before screenshots are captured.
 - [ ] `getRoleEvidenceChecklistMarkdown()` output matches this screenshot plan.
 - [ ] `scripts/build_role_ux_evidence_pack.py` has been run against the final
-      smoke JSON and screenshot folder.
+      smoke JSON, screenshot folder, and local manual notes JSON.
 - [ ] Evidence pack report shows smoke passed, tokens not saved, and expected
       screenshots present.
+- [ ] Evidence pack report shows manual notes passed with notes recorded.
 - [ ] Admin sees Directory, Dispatch, Report, and New Work actions.
 - [ ] Coordinator sees Directory, Dispatch, Report, and New Work actions.
 - [ ] Technician does not see Directory, Dispatch, Report, or New Work actions.
@@ -103,6 +105,19 @@ before manual capture.
       password, database URL, or secret appears.
 - [ ] Browser URL bars are cropped or safe.
 - [ ] Screenshots are reviewed before portfolio/investor use.
+
+## Local Manual Notes
+
+Before the final report, copy the tracked template and fill the local ignored
+copy:
+
+```powershell
+Copy-Item ROLE_UX_MANUAL_NOTES_TEMPLATE.json local-role-ux-manual-notes.json
+```
+
+Set each `passed` field to `true` only after the check is actually observed,
+and add a short note for every check. The local notes file is intentionally not
+committed.
 
 ## Notes
 

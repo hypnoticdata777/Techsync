@@ -1,0 +1,61 @@
+{
+  "environment": "local",
+  "reviewer": "",
+  "completed_at": "",
+  "checks": [
+    {
+      "key": "mobile_layout_390",
+      "label": "390px layout has no clipped primary controls.",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "mobile_layout_320",
+      "label": "320px layout has no clipped primary controls.",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "admin_coordinator_actions",
+      "label": "Admin/coordinator manager actions are visible only to manager roles.",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "technician_queue_scope",
+      "label": "Technician queue shows assigned active work only.",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "client_approval_scope",
+      "label": "Client approval controls appear only for pending approval work.",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "viewer_read_only",
+      "label": "Viewer detail is read-only.",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "vendor_visibility",
+      "label": "Vendor detail exposes vendor-visible communication only.",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "screen_reader_notes",
+      "label": "Screen-reader notes are recorded for queue, detail, dispatch, form, and evidence screens.",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "screenshot_safety",
+      "label": "Screenshot safety review confirms no terminals, secrets, provider dashboards, or real data.",
+      "passed": false,
+      "notes": ""
+    }
+  ]
+}

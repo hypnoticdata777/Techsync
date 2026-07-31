@@ -176,11 +176,16 @@ they have been verified in the relevant environment.
       controls.
 - [x] Accessibility evidence template added for manual screen-reader and
       small-width verification before hosting.
+- [x] Local manual notes template and evidence-pack validation added for final
+      screen-reader, small-width, role-scope, and screenshot safety proof.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.
 - [ ] Role Evidence screen opened locally as a manager and used to drive the
       final capture pass.
+- [ ] `local-role-ux-manual-notes.json` filled from
+      `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` and included in the final local
+      evidence pack.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.
 - [ ] Mobile/desktop screenshots captured for portfolio.

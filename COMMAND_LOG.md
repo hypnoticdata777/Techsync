@@ -1954,3 +1954,53 @@ Result:
   one existing Pydantic `dict()` deprecation warning.
 - Full client tests passed: `7 passed suites`, `43 passed tests`.
 - Compile and diff hygiene checks passed, with normal Windows LF/CRLF warnings.
+
+## 2026-07-30 - v1.3 Manual UX Evidence Gate and Warning Cleanup
+
+Decision:
+
+- Keep hosting deferred and continue reducing the final local UX evidence
+  blocker.
+- Turn manual screen-reader, small-width, role-scope, and screenshot safety
+  observations into a local evidence-pack input instead of leaving them only as
+  Markdown checklist memory.
+- Clean the known Pydantic v2 deprecation source while touching the backend
+  proof path.
+
+Changes:
+
+- Added `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` as the tracked template for final
+  local manual UX/accessibility/screenshot safety notes.
+- Updated `.gitignore` so filled `local-role-ux-manual-notes*.json` files stay
+  local-only.
+- Extended `scripts/build_role_ux_evidence_pack.py` with `--manual-notes`
+  support, manual-note validation, report summary output, and strict-mode
+  failure when manual notes are incomplete.
+- Added pytest coverage for clean and incomplete manual notes.
+- Replaced remaining Pydantic v1-style payload `.dict()` calls with
+  `.model_dump()` in client/property/vendor/technician/work-order create paths.
+- Updated the role UX capture, evidence, accessibility, roadmap, QA, and phase
+  docs to include the manual-notes workflow.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --manual-notes local-role-ux-manual-notes.json --output role-ux-evidence-pack.md --environment local
+git diff --check
+```
+
+Result:
+
+- Backend tests passed: `165 passed`; the prior Pydantic `dict()` warning no
+  longer appears.
+- Client tests passed: `7 passed suites`, `43 passed tests`.
+- Compile checks passed.
+- Evidence-pack dry run generated `role-ux-evidence-pack.md`, still showing
+  `3` missing screenshots and pending local manual notes until the final
+  capture pass is filled.
+- Diff hygiene passed with normal Windows LF/CRLF warnings.

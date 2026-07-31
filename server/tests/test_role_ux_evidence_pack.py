@@ -29,6 +29,33 @@ def _write_smoke(path: Path, *, passed=True, tokens_saved=False, failed_key=None
     )
 
 
+def _write_manual_notes(path: Path, *, passed=True, missing_notes=False):
+    path.write_text(
+        json.dumps(
+            {
+                "environment": "local",
+                "reviewer": "test",
+                "completed_at": "2026-07-30T00:00:00Z",
+                "checks": [
+                    {
+                        "key": "mobile_layout_390",
+                        "label": "390px layout has no clipped controls.",
+                        "passed": passed,
+                        "notes": "" if missing_notes else "Verified at 390px.",
+                    },
+                    {
+                        "key": "screenshot_safety",
+                        "label": "Screenshots are sanitized.",
+                        "passed": True,
+                        "notes": "No secrets, terminals, or provider dashboards visible.",
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
 def test_smoke_summary_requires_passed_checks_and_no_saved_tokens(tmp_path):
     smoke_path = tmp_path / "role-ux-smoke-evidence.json"
     _write_smoke(smoke_path)
@@ -45,6 +72,25 @@ def test_smoke_summary_requires_passed_checks_and_no_saved_tokens(tmp_path):
     assert summary.clean is False
     assert summary.tokens_saved is True
     assert summary.failed_checks == ["client:queue"]
+
+
+def test_manual_notes_require_passed_checks_and_notes(tmp_path):
+    manual_notes_path = tmp_path / "local-role-ux-manual-notes.json"
+    _write_manual_notes(manual_notes_path)
+
+    summary = evidence_pack.summarize_manual_notes(manual_notes_path)
+
+    assert summary.clean is True
+    assert summary.check_count == 2
+    assert summary.failed_checks == []
+    assert summary.missing_notes == []
+
+    _write_manual_notes(manual_notes_path, passed=False, missing_notes=True)
+    summary = evidence_pack.summarize_manual_notes(manual_notes_path)
+
+    assert summary.clean is False
+    assert summary.failed_checks == ["mobile_layout_390"]
+    assert summary.missing_notes == ["mobile_layout_390"]
 
 
 def test_screenshot_inventory_tracks_expected_missing_extra_and_unsafe_names(tmp_path):
@@ -67,14 +113,17 @@ def test_screenshot_inventory_tracks_expected_missing_extra_and_unsafe_names(tmp
 def test_build_report_writes_sanitized_markdown_with_missing_screenshot_list(tmp_path):
     smoke_path = tmp_path / "role-ux-smoke-evidence.json"
     screenshot_dir = tmp_path / "screenshots"
+    manual_notes_path = tmp_path / "local-role-ux-manual-notes.json"
     output_path = tmp_path / "role-ux-evidence-pack.md"
     screenshot_dir.mkdir()
     _write_smoke(smoke_path)
+    _write_manual_notes(manual_notes_path)
     (screenshot_dir / evidence_pack.EXPECTED_SCREENSHOTS[0][2]).write_bytes(b"fake png")
 
     result = evidence_pack.build_report(
         smoke_path=smoke_path,
         screenshot_dir=screenshot_dir,
+        manual_notes_path=manual_notes_path,
         output_path=output_path,
         environment="local",
         git_commit="abc123",
@@ -83,8 +132,10 @@ def test_build_report_writes_sanitized_markdown_with_missing_screenshot_list(tmp
     body = output_path.read_text(encoding="utf-8")
     assert result["smoke_clean"] is True
     assert result["screenshots_complete"] is False
+    assert result["manual_clean"] is True
     assert "TechSync Ops Role UX Evidence Pack" in body
     assert "Missing screenshots: 20" in body
     assert "Capture the missing role screenshots" in body
+    assert "All manual checks passed with notes recorded" in body
     assert "Bearer" not in body
     assert "postgresql://" not in body

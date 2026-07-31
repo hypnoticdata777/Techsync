@@ -195,8 +195,10 @@ Likely scope:
   - final capture worksheet and local role UX smoke script now prepared for
     synthetic role login/scope proof before screenshots
   - local role UX evidence-pack builder now started to summarize smoke status,
-    missing screenshots, and manual safety checks without committing local
-    evidence artifacts
+    missing screenshots, manual notes, and manual safety checks without
+    committing local evidence artifacts
+  - local manual notes template now started for 390px/320px layout,
+    screen-reader, role-scope, and screenshot safety evidence
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions

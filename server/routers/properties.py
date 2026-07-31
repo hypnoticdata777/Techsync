@@ -29,7 +29,7 @@ def create_property(
     organization: dict = Depends(get_current_organization),
 ):
     _ensure_client_in_org(payload.client_id, organization["id"])
-    row = properties_repo.create(organization["id"], payload.dict())
+    row = properties_repo.create(organization["id"], payload.model_dump())
     return Property(**row)
 
 

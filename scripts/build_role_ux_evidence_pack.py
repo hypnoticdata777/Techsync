@@ -18,6 +18,7 @@ from typing import Any
 
 DEFAULT_SMOKE_PATH = "role-ux-smoke-evidence.json"
 DEFAULT_SCREENSHOT_DIR = "local-role-ux-evidence"
+DEFAULT_MANUAL_NOTES_PATH = "local-role-ux-manual-notes.json"
 DEFAULT_OUTPUT_PATH = "role-ux-evidence-pack.md"
 
 EXPECTED_SCREENSHOTS = [
@@ -93,6 +94,25 @@ class SmokeSummary:
         return self.exists and self.passed and not self.failed_checks and not self.tokens_saved
 
 
+@dataclass(frozen=True)
+class ManualSummary:
+    exists: bool
+    check_count: int
+    failed_checks: list[str]
+    missing_notes: list[str]
+    malformed_checks: list[str]
+
+    @property
+    def clean(self) -> bool:
+        return (
+            self.exists
+            and self.check_count > 0
+            and not self.failed_checks
+            and not self.missing_notes
+            and not self.malformed_checks
+        )
+
+
 def load_json(path: Path) -> dict[str, Any] | None:
     if not path.exists():
         return None
@@ -151,6 +171,51 @@ def inventory_screenshots(screenshot_dir: Path) -> ScreenshotInventory:
     )
 
 
+def summarize_manual_notes(manual_notes_path: Path) -> ManualSummary:
+    evidence = load_json(manual_notes_path)
+    if evidence is None:
+        return ManualSummary(
+            exists=False,
+            check_count=0,
+            failed_checks=["Manual notes file was not found."],
+            missing_notes=[],
+            malformed_checks=[],
+        )
+
+    checks = evidence.get("checks")
+    if not isinstance(checks, list):
+        return ManualSummary(
+            exists=True,
+            check_count=0,
+            failed_checks=[],
+            missing_notes=[],
+            malformed_checks=["checks must be a list"],
+        )
+
+    failed_checks: list[str] = []
+    missing_notes: list[str] = []
+    malformed_checks: list[str] = []
+
+    for index, check in enumerate(checks, start=1):
+        if not isinstance(check, dict):
+            malformed_checks.append(f"check_{index}: expected object")
+            continue
+
+        key = str(check.get("key") or f"check_{index}")
+        if check.get("passed") is not True:
+            failed_checks.append(key)
+        if not str(check.get("notes") or "").strip():
+            missing_notes.append(key)
+
+    return ManualSummary(
+        exists=True,
+        check_count=len(checks),
+        failed_checks=failed_checks,
+        missing_notes=missing_notes,
+        malformed_checks=malformed_checks,
+    )
+
+
 def _status_mark(passed: bool) -> str:
     return "PASS" if passed else "PENDING"
 
@@ -159,12 +224,14 @@ def build_report(
     *,
     smoke_path: Path,
     screenshot_dir: Path,
+    manual_notes_path: Path,
     output_path: Path,
     environment: str,
     git_commit: str | None,
 ) -> dict[str, Any]:
     smoke = summarize_smoke(smoke_path)
     screenshots = inventory_screenshots(screenshot_dir)
+    manual = summarize_manual_notes(manual_notes_path)
     generated_at = datetime.now(timezone.utc).isoformat()
 
     lines = [
@@ -175,6 +242,7 @@ def build_report(
         f"Git commit: {git_commit or 'not recorded'}",
         f"Smoke evidence: `{smoke_path}`",
         f"Screenshot directory: `{screenshot_dir}`",
+        f"Manual notes: `{manual_notes_path}`",
         "",
         "## Automated Smoke Summary",
         "",
@@ -220,8 +288,33 @@ def build_report(
         lines.extend(["", "Unsafe artifact names:", ""])
         lines.extend(f"- `{name}`" for name in screenshots.unsafe_names)
 
-    lines.extend(["", "## Manual Evidence Checks", ""])
-    lines.extend(f"- [ ] {check}" for check in MANUAL_CHECKS)
+    lines.extend(
+        [
+            "",
+            "## Manual Evidence Checks",
+            "",
+            f"- Status: {_status_mark(manual.clean)}",
+            f"- Manual notes file found: {manual.exists}",
+            f"- Checks recorded: {manual.check_count}",
+            f"- Failed/manual-pending checks: {len(manual.failed_checks)}",
+            f"- Checks missing notes: {len(manual.missing_notes)}",
+            f"- Malformed checks: {len(manual.malformed_checks)}",
+            "",
+        ]
+    )
+
+    if manual.exists:
+        lines.extend(["Manual note gaps:", ""])
+        if manual.failed_checks:
+            lines.extend(f"- Pending: `{check}`" for check in manual.failed_checks)
+        if manual.missing_notes:
+            lines.extend(f"- Missing notes: `{check}`" for check in manual.missing_notes)
+        if manual.malformed_checks:
+            lines.extend(f"- Malformed: `{check}`" for check in manual.malformed_checks)
+        if manual.clean:
+            lines.append("- All manual checks passed with notes recorded.")
+    else:
+        lines.extend(f"- [ ] {check}" for check in MANUAL_CHECKS)
 
     lines.extend(
         [
@@ -243,13 +336,15 @@ def build_report(
         lines.append("- Capture the missing role screenshots listed above.")
     if screenshots.unsafe_names:
         lines.append("- Rename or discard unsafe screenshot artifacts before sharing.")
-    lines.append("- Complete the manual screen-reader and screenshot safety checklist.")
+    if not manual.clean:
+        lines.append("- Complete `local-role-ux-manual-notes.json` from the tracked template.")
 
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     return {
         "smoke_clean": smoke.clean,
         "screenshots_complete": screenshots.complete,
+        "manual_clean": manual.clean,
         "missing_screenshots": screenshots.missing,
         "output_path": str(output_path),
     }
@@ -259,6 +354,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Build the TechSync Ops role UX evidence pack.")
     parser.add_argument("--smoke", default=DEFAULT_SMOKE_PATH)
     parser.add_argument("--screenshots", default=DEFAULT_SCREENSHOT_DIR)
+    parser.add_argument("--manual-notes", default=DEFAULT_MANUAL_NOTES_PATH)
     parser.add_argument("--output", default=DEFAULT_OUTPUT_PATH)
     parser.add_argument("--environment", default="local")
     parser.add_argument("--commit", default=None)
@@ -272,6 +368,7 @@ def main() -> int:
     result = build_report(
         smoke_path=Path(args.smoke),
         screenshot_dir=Path(args.screenshots),
+        manual_notes_path=Path(args.manual_notes),
         output_path=Path(args.output),
         environment=args.environment,
         git_commit=args.commit,
@@ -279,7 +376,11 @@ def main() -> int:
     print(f"Role UX evidence pack written to {result['output_path']}")
     print(f"Missing screenshots: {len(result['missing_screenshots'])}")
 
-    if args.strict and (not result["smoke_clean"] or not result["screenshots_complete"]):
+    if args.strict and (
+        not result["smoke_clean"]
+        or not result["screenshots_complete"]
+        or not result["manual_clean"]
+    ):
         return 1
     return 0
 

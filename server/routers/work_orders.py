@@ -619,7 +619,7 @@ def add_message(
         organization["id"],
         work_order_id,
         current_user.id,
-        payload.dict(),
+        payload.model_dump(),
     )
     events_repo.create_event(
         organization["id"],
@@ -671,7 +671,7 @@ def add_attachment(
             detail="This role cannot add attachments",
         )
 
-    row = attachments_repo.create(organization["id"], work_order_id, current_user.id, payload.dict())
+    row = attachments_repo.create(organization["id"], work_order_id, current_user.id, payload.model_dump())
     events_repo.create_event(
         organization["id"],
         work_order_id,

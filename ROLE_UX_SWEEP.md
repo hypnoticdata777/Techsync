@@ -90,6 +90,11 @@ Implemented:
 - Added `scripts/build_role_ux_evidence_pack.py` to summarize sanitized smoke
   JSON, expected screenshot filenames, missing screenshot rows, and manual
   evidence checks into a local-only Markdown report.
+- Added `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` and evidence-pack
+  `--manual-notes` support so 390px/320px layout, screen-reader, role-scope,
+  and screenshot safety observations can be recorded locally and validated.
+- Replaced remaining Pydantic v1-style payload `.dict()` calls with
+  `.model_dump()` in create/update paths to remove the known backend warning.
 - Hardened unfiltered technician work-order listing so the mobile technician
   queue cannot drift from the active assigned `/work-orders/mine` behavior.
 - Polished narrow work-order detail summary tiles so important values such as
@@ -105,8 +110,8 @@ server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 Result:
 
 - Client tests passed: `7 passed suites`, `43 passed tests`.
-- Backend tests passed: `161 passed`, with one existing Pydantic `dict()`
-  deprecation warning.
+- Backend tests passed: `165 passed`; the prior Pydantic `dict()` deprecation
+  warning no longer appears.
 - Compile passed: `python -m compileall -q server scripts`.
 - Diff hygiene passed: `git diff --check`, with normal Windows LF/CRLF
   warnings.
@@ -132,7 +137,8 @@ Result:
 
 - Capture mobile screenshots for each role using synthetic demo data.
   Walkthrough manifest/template, automated readiness audit, in-app manual
-  checklist, role UX smoke script, and evidence-pack builder are prepared;
+  checklist, role UX smoke script, manual notes template, and evidence-pack
+  builder are prepared;
   final screenshots still need a running local/demo API and client.
 - Verify role-specific empty states with seeded and empty queues.
   Empty-state code/tests and secondary no-work screenshot personas are
@@ -152,10 +158,10 @@ Result:
   Implemented in code; final screenshot proof still needed.
 - Validate text wrapping and touch target comfort on small mobile widths.
   Touch target polish and in-app 390px/320px checklist are implemented; final
-  screenshot proof still needed.
+  screenshot proof and local manual notes still needed.
 - Validate screen-reader labels/hints for role dashboards, approvals,
   lifecycle actions, dispatch chips, and work-order forms.
   Helper tests, primary control labels, and manual Role Evidence checklist are
-  implemented; manual proof still needed.
+  implemented; local manual notes and final proof still needed.
 - Run the final screenshot/walkthrough pass only after local product depth is
   otherwise complete.

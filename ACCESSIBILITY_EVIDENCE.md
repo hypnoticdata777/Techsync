@@ -24,6 +24,9 @@ Implemented in this pass:
 - The manager-only Role Evidence screen now includes visible manual evidence
   checks for each synthetic role, 390px/320px width comfort, screen-reader
   notes, and screenshot safety.
+- `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` and
+  `scripts/build_role_ux_evidence_pack.py --manual-notes` now turn those
+  manual checks into local report evidence without committing the filled notes.
 
 ## Manual Evidence Pass
 
@@ -49,6 +52,8 @@ Use synthetic demo data only.
 
 - Run the manual screen-reader pass on device or emulator using
   `ROLE_UX_CAPTURE_PASS.md`.
+- Fill `local-role-ux-manual-notes.json` from
+  `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` during the final pass.
 - Capture final role screenshots after all non-hosting local product depth is
   complete.
 - Add deeper automated component-level accessibility tests if the app later adds

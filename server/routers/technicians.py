@@ -55,7 +55,7 @@ def update_technician(
 
     technician_patch = {
         k: v
-        for k, v in payload.dict(exclude={"is_active"}).items()
+        for k, v in payload.model_dump(exclude={"is_active"}).items()
         if v is not None
     }
     if technician_patch:
