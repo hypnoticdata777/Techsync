@@ -227,6 +227,9 @@ Completed:
 - Added tested role UX evidence readiness audit for synthetic login coverage,
   screenshot-plan uniqueness, safety checks, manager/non-manager controls,
   technician assigned routing, client/viewer privacy, and linked-vendor scope.
+- Added local role UX evidence-pack builder so sanitized smoke JSON and the
+  screenshot folder can be summarized into a missing-screenshot/manual-check
+  Markdown report before any public sharing.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and

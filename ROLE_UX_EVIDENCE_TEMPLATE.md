@@ -16,6 +16,7 @@ evidence path; it does not mean the demo has been deployed.
 - Operator:
 - Seed command used:
 - Screenshot storage location:
+- Evidence pack report:
 
 ## Synthetic Login Set
 
@@ -74,6 +75,10 @@ before manual capture.
 
 - [ ] `getRoleEvidenceReadinessAudit()` passes before screenshots are captured.
 - [ ] `getRoleEvidenceChecklistMarkdown()` output matches this screenshot plan.
+- [ ] `scripts/build_role_ux_evidence_pack.py` has been run against the final
+      smoke JSON and screenshot folder.
+- [ ] Evidence pack report shows smoke passed, tokens not saved, and expected
+      screenshots present.
 - [ ] Admin sees Directory, Dispatch, Report, and New Work actions.
 - [ ] Coordinator sees Directory, Dispatch, Report, and New Work actions.
 - [ ] Technician does not see Directory, Dispatch, Report, or New Work actions.
@@ -103,4 +108,5 @@ before manual capture.
 
 - Issues found:
 - Follow-up fixes:
+- Evidence pack result:
 - Approved for portfolio use: yes / no

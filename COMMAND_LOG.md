@@ -1902,3 +1902,55 @@ Result:
 - Diff hygiene passed with normal Windows LF/CRLF warnings.
 - Local browser DOM proof confirmed `lena.tech@demo.techsyncops.dev` sees
   `Total work orders: 0` and `No assigned jobs`.
+
+## 2026-07-30 - v1.3 Role UX Evidence Pack Builder
+
+Decision:
+
+- Add a repeatable local evidence-pack step before hosting so screenshot
+  completeness, role UX smoke status, and manual safety checks are visible in
+  one place.
+- Keep generated evidence Markdown local-only by default, like smoke JSON and
+  screenshot folders.
+
+Changes:
+
+- Added `scripts/build_role_ux_evidence_pack.py`.
+- The script reads sanitized `role-ux-smoke-evidence.json`, inventories the
+  expected role screenshot filenames, flags missing/extra/unsafe artifact names,
+  and writes a local Markdown report.
+- Added `--strict` mode for the final gate, where missing screenshots or failed
+  smoke evidence should return a non-zero exit.
+- Added pytest coverage for smoke summary handling, screenshot inventory, and
+  sanitized Markdown generation.
+- Updated `.gitignore` so generated `role-ux-evidence-pack*.md` reports are not
+  committed accidentally.
+- Updated the role UX capture docs, evidence template, sweep tracker, and phase
+  status with the new evidence-pack step.
+
+Local report result from current artifacts:
+
+- Smoke evidence: pass, `69` checks, `tokens_saved: false`.
+- Screenshot inventory: `18` of `21` manifest screenshots present.
+- Missing current-manifest screenshots:
+  - `techsync-ops-org_admin-05-create-work.png`
+  - `techsync-ops-viewer-03-viewer-empty.png`
+  - `techsync-ops-vendor-03-vendor-empty.png`
+- Extra local PNGs are older/manual responsive or evidence captures and remain
+  ignored.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_role_ux_evidence_pack.py -p no:cacheprovider
+server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --output role-ux-evidence-pack.md --environment local
+```
+
+Result:
+
+- Evidence-pack tests passed: `3 passed`.
+- Local evidence report generated successfully and stayed ignored by Git.
+- Full backend tests passed after the docs/script update: `164 passed`, with
+  one existing Pydantic `dict()` deprecation warning.
+- Full client tests passed: `7 passed suites`, `43 passed tests`.
+- Compile and diff hygiene checks passed, with normal Windows LF/CRLF warnings.

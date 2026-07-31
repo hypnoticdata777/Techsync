@@ -87,6 +87,9 @@ Implemented:
   evidence worksheet.
 - Added `scripts/smoke_role_ux.py` to log in as every synthetic role and
   produce sanitized role-scope API evidence before screenshots.
+- Added `scripts/build_role_ux_evidence_pack.py` to summarize sanitized smoke
+  JSON, expected screenshot filenames, missing screenshot rows, and manual
+  evidence checks into a local-only Markdown report.
 - Hardened unfiltered technician work-order listing so the mobile technician
   queue cannot drift from the active assigned `/work-orders/mine` behavior.
 - Polished narrow work-order detail summary tiles so important values such as
@@ -107,6 +110,7 @@ Result:
 - Compile passed: `python -m compileall -q server scripts`.
 - Diff hygiene passed: `git diff --check`, with normal Windows LF/CRLF
   warnings.
+- Evidence-pack script coverage is included in backend pytest.
 - Local browser DOM proof confirmed `lena.tech@demo.techsyncops.dev` sees
   `Total work orders: 0` and `No assigned jobs` after the technician route
   hardening.
@@ -128,8 +132,8 @@ Result:
 
 - Capture mobile screenshots for each role using synthetic demo data.
   Walkthrough manifest/template, automated readiness audit, in-app manual
-  checklist, and role UX smoke script are prepared; final screenshots still
-  need a running local/demo API and client.
+  checklist, role UX smoke script, and evidence-pack builder are prepared;
+  final screenshots still need a running local/demo API and client.
 - Verify role-specific empty states with seeded and empty queues.
   Empty-state code/tests and secondary no-work screenshot personas are
   implemented; technician empty-state DOM proof passed, while viewer/vendor

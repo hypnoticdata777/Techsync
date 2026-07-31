@@ -16,6 +16,9 @@ Prepared, automated, and partially exercised live:
   rows, screenshot targets, manual UX checks, and safety checklist.
 - `scripts/smoke_role_ux.py` can log in as each synthetic role and produce
   sanitized role-scope evidence JSON.
+- `scripts/build_role_ux_evidence_pack.py` can combine the sanitized smoke JSON
+  and local screenshot folder into a local Markdown evidence report that lists
+  missing screenshots and remaining manual checks.
 - Backend role-scope tests cover client/viewer, vendor, and technician
   boundaries.
 - Client tests cover role workflow helpers, route visibility, role evidence
@@ -67,6 +70,17 @@ In a third terminal:
 cd "C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync"
 server\venv\Scripts\python.exe scripts\smoke_role_ux.py --base-url "http://127.0.0.1:8000" --output role-ux-smoke-evidence.json
 ```
+
+After screenshots are captured into `local-role-ux-evidence`, build the local
+evidence report:
+
+```powershell
+cd "C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync"
+server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --output role-ux-evidence-pack.md --environment local
+```
+
+Use `--strict` only when the report is expected to be complete; strict mode
+returns non-zero if smoke evidence failed or screenshots are missing.
 
 After capture:
 
@@ -169,6 +183,9 @@ Completed live:
 - Expo web running on `http://localhost:19006`.
 - Admin login and admin work-order detail were manually observed.
 - `scripts/smoke_role_ux.py` passed with primary-role and empty-state checks.
+- `scripts/build_role_ux_evidence_pack.py` was added so final role evidence can
+  be summarized without committing generated smoke JSON, screenshots, or local
+  evidence-pack Markdown.
 - The local browser pass logged in as `lena.tech@demo.techsyncops.dev` and
   confirmed the technician empty-state DOM: `Total work orders: 0`,
   `No assigned jobs`, and no completed/archived assigned rows.
@@ -198,5 +215,6 @@ Next action:
    logins.
 2. Re-run the clean seed with the updated no-work viewer/vendor personas before
    final empty-state screenshots.
-3. Record screen-reader notes.
-4. Run screenshot safety review before portfolio use.
+3. Build `role-ux-evidence-pack.md` locally and resolve missing screenshot rows.
+4. Record screen-reader notes.
+5. Run screenshot safety review before portfolio use.
