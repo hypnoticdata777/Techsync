@@ -152,6 +152,20 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
         "Sam Dispatcher",
         "vendor",
     )
+    empty_viewer_user = app.users_repo.create_user(
+        organization_id,
+        "quiet-owner.demo@demo.techsyncops.dev",
+        password_hash,
+        "Quiet Owner Group",
+        "viewer",
+    )
+    empty_vendor_user = app.users_repo.create_user(
+        organization_id,
+        "quiet-vendor.demo@demo.techsyncops.dev",
+        password_hash,
+        "Quiet Vendor Desk",
+        "vendor",
+    )
 
     tech_user_lena = app.users_repo.create_user(
         organization_id,
@@ -237,6 +251,17 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
             "notes": "Synthetic owner group for property hotspot reporting.",
         },
     )
+    quiet_client = app.clients_repo.create(
+        organization_id,
+        {
+            "display_name": "Quiet Owner Group",
+            "contact_name": "Quiet Owner Group",
+            "email": empty_viewer_user["email"],
+            "phone": "555-0102",
+            "client_type": "owner",
+            "notes": "Synthetic no-work viewer profile for empty-state evidence.",
+        },
+    )
 
     riverside_unit = app.properties_repo.create(
         organization_id,
@@ -311,6 +336,24 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
             "notes": "Synthetic electrical and HVAC partner.",
         },
     )
+    quiet_vendor = app.vendors_repo.create(
+        organization_id,
+        {
+            "name": "Quiet Demo Vendor",
+            "contact_name": "Quiet Vendor Desk",
+            "email": empty_vendor_user["email"],
+            "phone": "555-0112",
+            "service_types": ["general"],
+            "coverage_area": "Synthetic standby coverage only",
+            "notes": "Synthetic no-work vendor profile for empty-state evidence.",
+        },
+    )
+
+    # Keep no-work scoped personas active without linking work orders. These
+    # rows make viewer/vendor empty-state screenshots deterministic after each
+    # seed reset.
+    _ = quiet_client
+    _ = quiet_vendor
 
     work_orders = []
     work_orders.append(
@@ -643,6 +686,8 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
             "client": client_user["email"],
             "viewer": viewer_user["email"],
             "vendor": vendor_user["email"],
+            "empty_viewer": empty_viewer_user["email"],
+            "empty_vendor": empty_vendor_user["email"],
             "technicians": [tech_user_lena["email"], tech_user_marco["email"], tech_user_priya["email"]],
         },
         "counts": get_demo_status()["counts"],
@@ -694,6 +739,8 @@ def _print_seed_summary(result: dict[str, Any], show_credentials: bool) -> None:
     print(f"- client: {result['users']['client']}")
     print(f"- viewer: {result['users']['viewer']}")
     print(f"- vendor: {result['users']['vendor']}")
+    print(f"- empty-state viewer: {result['users']['empty_viewer']}")
+    print(f"- empty-state vendor: {result['users']['empty_vendor']}")
     for email in result["users"]["technicians"]:
         print(f"- technician: {email}")
     if show_credentials:

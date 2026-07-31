@@ -1792,6 +1792,8 @@ Changes:
   rejects special-use domains.
 - Updated the role UX smoke script to respect login rate limiting by retrying
   after a `429` response instead of weakening API security.
+- Updated the role UX capture login from Lena to Marco because Marco owns the
+  active assigned synthetic work needed for technician queue/detail evidence.
 - Updated role capture, demo data, QA, README, and evidence docs with the live
   local results and clearer PowerShell/clipboard instructions.
 
@@ -1823,3 +1825,80 @@ Result:
 - Script compile checks passed.
 - The old reserved-domain synthetic email suffix is no longer present in
   tracked files.
+
+## 2026-07-30 - v1.3 Empty-State Evidence Personas
+
+Decision:
+
+- Keep the final role-by-role evidence pass honest by separating primary
+  active-role screenshots from empty-state screenshots.
+- Add deterministic no-work personas to the synthetic seed instead of manually
+  altering database rows during capture.
+
+Changes:
+
+- Added `quiet-owner.demo@demo.techsyncops.dev` as a viewer linked to a client
+  profile with no work orders.
+- Added `quiet-vendor.demo@demo.techsyncops.dev` as a vendor linked to a vendor
+  profile with no work orders.
+- Documented `lena.tech@demo.techsyncops.dev` as the technician empty-queue
+  screenshot persona while keeping `marco.tech@demo.techsyncops.dev` as the
+  active assigned technician capture persona.
+- Updated the role walkthrough manifest, capture worksheet, evidence template,
+  demo runbook, v1.3 evidence template, role UX sweep, and phase tracker.
+- Expanded the role UX smoke script so empty-state personas are checked after
+  the next clean seed reset.
+
+Expected next clean seed counts:
+
+```text
+users: 10
+technicians: 3
+clients: 3
+properties: 3
+vendors: 3
+work_orders: 8
+messages: 4
+attachments: 1
+events: 13
+```
+
+## 2026-07-30 - v1.3 Technician Empty Queue Hardening
+
+Decision:
+
+- Treat the role UX pass as product hardening, not only screenshot capture.
+- Keep the technician landing queue limited to active assigned work when the
+  mobile app hits the generic `/work-orders` endpoint without filters.
+
+Changes:
+
+- Updated the backend technician `/work-orders` path so unfiltered requests use
+  the same active assigned queue behavior as `/work-orders/mine`.
+- Added regression coverage proving unfiltered technician listing calls the
+  active assigned queue and does not fall through to the generic filtered list.
+- Tightened narrow work-order detail summary tiles so two-line values can fit at
+  320px-class widths.
+- Updated role UX evidence docs with the live technician empty-state DOM proof
+  and the remaining manual screenshot/screen-reader evidence tasks.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Backend tests passed: `161 passed`, with one existing Pydantic `dict()`
+  deprecation warning.
+- Client tests passed: `7 passed suites`, `43 passed tests`.
+- Compile checks passed.
+- Diff hygiene passed with normal Windows LF/CRLF warnings.
+- Local browser DOM proof confirmed `lena.tech@demo.techsyncops.dev` sees
+  `Total work orders: 0` and `No assigned jobs`.

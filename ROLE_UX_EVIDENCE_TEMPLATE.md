@@ -26,10 +26,18 @@ the password here.
 |---|---|---|
 | org_admin | `admin.demo@demo.techsyncops.dev` | Tenant control, reports, dispatch, directory, work creation |
 | coordinator | `coordinator.demo@demo.techsyncops.dev` | Intake, assignment, client follow-up, closeout readiness |
-| technician | `lena.tech@demo.techsyncops.dev` | Assigned queue, status update, proof upload |
+| technician | `marco.tech@demo.techsyncops.dev` | Assigned active queue, status update, proof upload |
 | client | `client.demo@demo.techsyncops.dev` | Linked work, client-visible messages, approval decision |
 | viewer | `owner-group.demo@demo.techsyncops.dev` | Read-only linked owner/board snapshot |
 | vendor | `apex.demo@demo.techsyncops.dev` | Linked vendor work, vendor-visible messages, hidden internal/client context |
+
+Secondary empty-state logins:
+
+| Empty-State Proof | Synthetic Login | Purpose |
+|---|---|---|
+| technician empty queue | `lena.tech@demo.techsyncops.dev` | No assigned active jobs |
+| viewer empty snapshot | `quiet-owner.demo@demo.techsyncops.dev` | Linked viewer profile with no work |
+| vendor empty queue | `quiet-vendor.demo@demo.techsyncops.dev` | Linked vendor profile with no work |
 
 ## Screenshot Manifest
 
@@ -51,16 +59,16 @@ before manual capture.
 | coordinator | WorkOrderDetails | `techsync-ops-coordinator-04-detail.png` | Status, approval request, messages, and proof summary visible |
 | technician | WorkOrdersList | `techsync-ops-technician-01-assigned-queue.png` | Technician sees assigned work only |
 | technician | WorkOrderDetails | `techsync-ops-technician-02-detail-status.png` | Allowed status buttons, notes, messages, and proof controls visible |
-| technician | WorkOrdersList | `techsync-ops-technician-03-empty-assigned.png` | No assigned jobs empty state is clear when queue is empty |
+| technician | WorkOrdersList | `techsync-ops-technician-03-empty-assigned.png` | No assigned jobs empty state is clear when queue is empty; capture with `lena.tech@demo.techsyncops.dev` |
 | client | WorkOrdersList | `techsync-ops-client-01-client-queue.png` | Only linked client work is visible |
 | client | WorkOrderDetails | `techsync-ops-client-02-approval-detail.png` | Approval/decline controls show only when approval is pending |
 | client | WorkOrderDetails | `techsync-ops-client-03-client-messages.png` | Client-visible messages appear; internal tab is hidden |
 | viewer | WorkOrdersList | `techsync-ops-viewer-01-viewer-queue.png` | Only linked viewer work is visible |
 | viewer | WorkOrderDetails | `techsync-ops-viewer-02-readonly-detail.png` | Visible status/messages/proof context without action controls |
-| viewer | WorkOrdersList | `techsync-ops-viewer-03-viewer-empty.png` | No visible snapshot empty state is clear when scoped queue is empty |
+| viewer | WorkOrdersList | `techsync-ops-viewer-03-viewer-empty.png` | No visible snapshot empty state is clear when scoped queue is empty; capture with `quiet-owner.demo@demo.techsyncops.dev` |
 | vendor | WorkOrdersList | `techsync-ops-vendor-01-vendor-queue.png` | Only linked vendor work is visible |
 | vendor | WorkOrderDetails | `techsync-ops-vendor-02-vendor-detail.png` | Vendor-visible status, messages, attachments, and proof context appear |
-| vendor | WorkOrdersList | `techsync-ops-vendor-03-vendor-empty.png` | No linked vendor work empty state is clear when scoped queue is empty |
+| vendor | WorkOrdersList | `techsync-ops-vendor-03-vendor-empty.png` | No linked vendor work empty state is clear when scoped queue is empty; capture with `quiet-vendor.demo@demo.techsyncops.dev` |
 
 ## Per-Role Checks
 

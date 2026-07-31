@@ -52,6 +52,11 @@ function RoleEvidenceScreen() {
               </View>
               <Text style={styles.persona}>{role.persona}</Text>
               <Text style={styles.login}>{role.loginEmail}</Text>
+              {role.emptyStateLoginEmail ? (
+                <Text style={styles.emptyLogin}>
+                  Empty-state: {role.emptyStateLoginEmail}
+                </Text>
+              ) : null}
               <Text style={styles.objective}>{role.objective}</Text>
               <Text style={styles.guardrail}>
                 Visible: {role.visibleControls.length ? role.visibleControls.join(', ') : 'None'}
@@ -223,6 +228,11 @@ const styles = StyleSheet.create({
   },
   login: {
     color: '#cbd5e1',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  emptyLogin: {
+    color: '#fbbf24',
     fontSize: 12,
     marginTop: 4,
   },

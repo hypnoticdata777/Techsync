@@ -25,10 +25,28 @@ DEFAULT_PASSWORD = os.getenv("TECHSYNC_DEMO_PASSWORD", "DemoPass123!")
 ROLE_LOGINS = {
     "org_admin": "admin.demo@demo.techsyncops.dev",
     "coordinator": "coordinator.demo@demo.techsyncops.dev",
-    "technician": "lena.tech@demo.techsyncops.dev",
+    "technician": "marco.tech@demo.techsyncops.dev",
     "client": "client.demo@demo.techsyncops.dev",
     "viewer": "owner-group.demo@demo.techsyncops.dev",
     "vendor": "apex.demo@demo.techsyncops.dev",
+}
+
+EMPTY_STATE_LOGINS = {
+    "technician_empty": {
+        "email": "lena.tech@demo.techsyncops.dev",
+        "expected_role": "technician",
+        "queue_path": "/work-orders/mine",
+    },
+    "viewer_empty": {
+        "email": "quiet-owner.demo@demo.techsyncops.dev",
+        "expected_role": "viewer",
+        "queue_path": "/work-orders",
+    },
+    "vendor_empty": {
+        "email": "quiet-vendor.demo@demo.techsyncops.dev",
+        "expected_role": "vendor",
+        "queue_path": "/work-orders",
+    },
 }
 
 MANAGER_ROLES = {"org_admin", "coordinator"}
@@ -191,6 +209,45 @@ def _check_work_order_surface(base_url: str, role: str, token: str, checks: list
         )
 
 
+def _check_empty_state_surface(
+    base_url: str,
+    key: str,
+    login: dict[str, str],
+    password: str,
+    checks: list[dict[str, Any]],
+) -> None:
+    token, login_result = _login(base_url, login["email"], password)
+    _record(
+        checks,
+        f"{key}:login",
+        bool(token),
+        (
+            f"Login for {login['email']} returned {login_result['status_code']}"
+            f" after {login_result['attempts']} attempt(s)"
+        ),
+    )
+    if not token:
+        return
+
+    me = _request("GET", base_url, "/auth/me", token=token)
+    me_body = _safe_json(me) or {}
+    _record(
+        checks,
+        f"{key}:me",
+        me.ok and me_body.get("role") == login["expected_role"],
+        f"/auth/me returned role {me_body.get('role')} with status {me.status_code}",
+    )
+
+    response = _request("GET", base_url, login["queue_path"], token=token)
+    rows = _safe_json(response) or []
+    _record(
+        checks,
+        f"{key}:empty_queue",
+        response.ok and isinstance(rows, list) and len(rows) == 0,
+        f"{login['queue_path']} returned {response.status_code} with {len(rows) if isinstance(rows, list) else 'non-list'} rows; expected 0",
+    )
+
+
 def run_smoke(base_url: str, password: str) -> dict[str, Any]:
     evidence: dict[str, Any] = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -233,6 +290,19 @@ def run_smoke(base_url: str, password: str) -> dict[str, Any]:
             {
                 "role": role,
                 "email": email,
+                "passed": all(check["passed"] for check in checks),
+                "checks": checks,
+            }
+        )
+
+    for key, login in EMPTY_STATE_LOGINS.items():
+        checks = []
+        _check_empty_state_surface(base_url, key, login, password, checks)
+        all_checks.extend(checks)
+        evidence["roles"].append(
+            {
+                "role": key,
+                "email": login["email"],
                 "passed": all(check["passed"] for check in checks),
                 "checks": checks,
             }

@@ -17,10 +17,16 @@ export const ROLE_WALKTHROUGH_ORDER = [
 export const SYNTHETIC_ROLE_LOGINS = {
   org_admin: 'admin.demo@demo.techsyncops.dev',
   coordinator: 'coordinator.demo@demo.techsyncops.dev',
-  technician: 'lena.tech@demo.techsyncops.dev',
+  technician: 'marco.tech@demo.techsyncops.dev',
   client: 'client.demo@demo.techsyncops.dev',
   viewer: 'owner-group.demo@demo.techsyncops.dev',
   vendor: 'apex.demo@demo.techsyncops.dev',
+};
+
+export const SYNTHETIC_EMPTY_STATE_LOGINS = {
+  technician: 'lena.tech@demo.techsyncops.dev',
+  viewer: 'quiet-owner.demo@demo.techsyncops.dev',
+  vendor: 'quiet-vendor.demo@demo.techsyncops.dev',
 };
 
 const SAFETY_CHECKS = [
@@ -150,6 +156,7 @@ export const getRoleWalkthrough = role => {
     role,
     persona: base.persona,
     loginEmail: SYNTHETIC_ROLE_LOGINS[role] || null,
+    emptyStateLoginEmail: SYNTHETIC_EMPTY_STATE_LOGINS[role] || null,
     endpoint: getWorkOrdersEndpointForRole(role),
     home: getRoleHome(role),
     emptyState: getRoleEmptyState(role),
@@ -202,6 +209,7 @@ export const getRoleEvidenceDashboard = (roles = ROLE_WALKTHROUGH_ORDER) => {
       role: item.role,
       persona: item.persona,
       loginEmail: item.loginEmail,
+      emptyStateLoginEmail: item.emptyStateLoginEmail,
       objective: item.objective,
       screenshotCount: item.screens.length,
       visibleControls: item.visibleControls,
@@ -213,6 +221,11 @@ export const getRoleEvidenceDashboard = (roles = ROLE_WALKTHROUGH_ORDER) => {
 
 const allRolesHaveLogin = manifest =>
   manifest.every(item => Boolean(item.loginEmail));
+
+const emptyStateRolesHaveLogins = manifest =>
+  manifest
+    .filter(item => item.screens.some(screen => screen.key.includes('empty')))
+    .every(item => Boolean(item.emptyStateLoginEmail));
 
 const allRolesHaveScreens = manifest =>
   manifest.every(item => item.screens.length > 0);
@@ -297,6 +310,11 @@ export const getRoleEvidenceReadinessAudit = (roles = ROLE_WALKTHROUGH_ORDER) =>
       detail: 'Every role has at least one screenshot target.',
     },
     {
+      key: 'empty_state_login_coverage',
+      passed: emptyStateRolesHaveLogins(manifest),
+      detail: 'Every role with an empty-state screenshot has a secondary synthetic no-work login.',
+    },
+    {
       key: 'unique_screenshot_names',
       passed: screenshotNamesAreUnique(plan),
       detail: 'Screenshot filenames are deterministic and unique.',
@@ -375,6 +393,7 @@ export const getRoleEvidenceChecklistMarkdown = (roles = ROLE_WALKTHROUGH_ORDER)
 export default {
   ROLE_WALKTHROUGH_ORDER,
   SYNTHETIC_ROLE_LOGINS,
+  SYNTHETIC_EMPTY_STATE_LOGINS,
   getRoleWalkthrough,
   getRoleWalkthroughManifest,
   getScreenshotPlan,

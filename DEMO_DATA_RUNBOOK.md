@@ -25,6 +25,8 @@ The seed creates:
 
 - One PMC organization.
 - Admin, coordinator, client, viewer, vendor, and technician users.
+- Secondary no-work viewer and vendor users for deterministic empty-state
+  screenshot evidence.
 - Client records.
 - Property records.
 - Vendor records.
@@ -76,6 +78,8 @@ Synthetic login emails printed by the seed include:
 - `client.demo@demo.techsyncops.dev`
 - `owner-group.demo@demo.techsyncops.dev`
 - `apex.demo@demo.techsyncops.dev`
+- `quiet-owner.demo@demo.techsyncops.dev`
+- `quiet-vendor.demo@demo.techsyncops.dev`
 - three technician accounts
 
 ## Expected Seed Counts
@@ -83,11 +87,11 @@ Synthetic login emails printed by the seed include:
 Expected approximate counts after a clean seed:
 
 ```text
-users: 8
+users: 10
 technicians: 3
-clients: 2
+clients: 3
 properties: 3
-vendors: 2
+vendors: 3
 work_orders: 8
 messages: 4
 attachments: 1

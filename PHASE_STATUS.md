@@ -100,7 +100,9 @@ Completed:
   confirmed `alembic current` reports `0008 (head)`.
 - Seeded the synthetic TechSync Ops demo tenant against the Neon demo database
   with 8 users, 3 technicians, 2 clients, 3 properties, 2 vendors,
-  8 work orders, 4 messages, 1 attachment, and 13 events.
+  8 work orders, 4 messages, 1 attachment, and 13 events during the first live
+  role smoke. The next clean seed now expands this to 10 users, 3 clients, and
+  3 vendors by adding no-work viewer/vendor evidence personas.
 - Cleared `DATABASE_URL` from the local PowerShell session after migration.
 - Selected Vercel as the eventual backend host for portfolio alignment, now
   deferred to the end of v1.3.
@@ -220,6 +222,8 @@ Completed:
   actions.
 - Added tested role UX walkthrough manifest, screenshot evidence template, and
   viewer/vendor demo users for final role capture.
+- Added secondary no-work viewer/vendor seed personas so empty-state captures
+  are deterministic after each clean seed reset.
 - Added tested role UX evidence readiness audit for synthetic login coverage,
   screenshot-plan uniqueness, safety checks, manager/non-manager controls,
   technician assigned routing, client/viewer privacy, and linked-vendor scope.
@@ -269,7 +273,8 @@ Completed:
 - Updated synthetic demo login emails away from a reserved `.local` suffix so
   FastAPI/Pydantic email validation accepts every role login.
 - Ran the local role UX smoke script against the live local API and seeded
-  Neon demo tenant; all 67 sanitized role/API checks passed.
+  Neon demo tenant; all primary sanitized role/API checks passed. The next
+  clean seed adds secondary empty-state role checks.
 - Manually observed admin login, admin workspace, and admin work-order detail
   in Expo web.
 
@@ -279,8 +284,9 @@ Next:
   as complete as practical.
 - Continue the final local-only role-by-role UI/UX evidence pass: open Role
   Evidence, walk admin/coordinator/technician/client/viewer/vendor, capture the
-  21 screenshot targets, verify 390px and 320px widths, record manual
-  screen-reader notes, and complete screenshot safety review.
+  21 screenshot targets with primary and empty-state personas, verify 390px and
+  320px widths, record manual screen-reader notes, and complete screenshot
+  safety review.
 - Later, after the local product surface is complete, deploy only as the final
   gate, manually verify client invite/accept/approval from the hosted email/log
   path, run `scripts/smoke_v13.py`, and capture `V13_EVIDENCE_TEMPLATE.md`.
@@ -339,5 +345,7 @@ Stop when:
 Continue the local-only v1.3 evidence pass and leave hosting as the absolute
 final gate. The best next move is to open Role Evidence, walk all six synthetic
 roles in Expo web, capture the 21 screenshot targets, check 390px/320px layout
-comfort, and record manual screen-reader notes. Only after those non-hosting
-requirements are complete should the Vercel/portfolio showcase sequence resume.
+comfort, and record manual screen-reader notes. Use the secondary no-work
+personas for technician/viewer/vendor empty-state screenshots after a clean seed
+reset. Only after those non-hosting requirements are complete should the
+Vercel/portfolio showcase sequence resume.

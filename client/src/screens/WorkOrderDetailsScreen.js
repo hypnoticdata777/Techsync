@@ -503,7 +503,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
                     styles.summaryValue,
                     {color: getSummaryToneColor(item.tone)},
                   ]}
-                  numberOfLines={1}>
+                  numberOfLines={2}>
                   {item.value}
                 </Text>
               </View>
@@ -979,7 +979,7 @@ const styles = StyleSheet.create({
   summaryTile: {
     flexBasis: '47%',
     flexGrow: 1,
-    minHeight: 58,
+    minHeight: 64,
     justifyContent: 'center',
     backgroundColor: '#0f172a',
     borderWidth: 1,
@@ -994,8 +994,9 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   summaryValue: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '800',
+    lineHeight: 18,
     textTransform: 'capitalize',
     marginTop: 4,
   },

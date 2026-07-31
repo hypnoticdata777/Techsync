@@ -21,11 +21,11 @@ Prepared, automated, and partially exercised live:
 - Client tests cover role workflow helpers, route visibility, role evidence
   dashboard data, screenshot filenames, and manual UX check coverage.
 - The local Neon-backed API was migrated through `0008 (head)`.
-- Synthetic demo data was seeded with 8 users, 3 technicians, 2 clients,
-  3 properties, 2 vendors, 8 work orders, 4 messages, 1 attachment, and
+- Synthetic demo data was seeded with 10 users, 3 technicians, 3 clients,
+  3 properties, 3 vendors, 8 work orders, 4 messages, 1 attachment, and
   13 events.
 - `scripts/smoke_role_ux.py` passed locally against `http://127.0.0.1:8000`
-  with 67 sanitized role/API checks. Tokens were not saved.
+  with sanitized role/API checks. Tokens were not saved.
 - Admin web login, admin workspace, and an admin work-order detail view were
   manually observed in the local Expo web client at `http://localhost:19006`.
 
@@ -82,10 +82,16 @@ Shared synthetic password is the seed script default unless
 
 - `admin.demo@demo.techsyncops.dev`
 - `coordinator.demo@demo.techsyncops.dev`
-- `lena.tech@demo.techsyncops.dev`
+- `marco.tech@demo.techsyncops.dev`
 - `client.demo@demo.techsyncops.dev`
 - `owner-group.demo@demo.techsyncops.dev`
 - `apex.demo@demo.techsyncops.dev`
+
+Secondary no-work accounts for empty-state screenshots:
+
+- Technician empty queue: `lena.tech@demo.techsyncops.dev`
+- Viewer empty snapshot: `quiet-owner.demo@demo.techsyncops.dev`
+- Vendor empty queue: `quiet-vendor.demo@demo.techsyncops.dev`
 
 ## Capture Widths
 
@@ -113,10 +119,13 @@ Expected total: 21 screenshots.
 
 - Admin: queue, directory, dispatch, report, create-work.
 - Coordinator: queue, create-work, dispatch, detail.
-- Technician: assigned queue, detail/status, empty assigned queue.
+- Technician: assigned queue and detail/status use Marco; empty assigned queue
+  uses Lena.
 - Client: queue, approval detail, client messages.
-- Viewer: queue, read-only detail, empty snapshot.
-- Vendor: vendor queue, vendor detail, empty vendor queue.
+- Viewer: queue and read-only detail use the linked owner-group account; empty
+  snapshot uses the quiet owner account.
+- Vendor: vendor queue and vendor detail use Apex; empty vendor queue uses the
+  quiet vendor account.
 
 ## Manual Screen-Reader Notes
 
@@ -147,7 +156,8 @@ Record observations here during the final device/emulator pass:
 
 ## Result Notes
 
-Status: local API/client smoke proof passed; full manual capture still pending.
+Status: local API/client smoke proof passed; role screenshot capture is in
+progress; manual screen-reader notes still pending.
 
 Completed live:
 
@@ -158,18 +168,35 @@ Completed live:
 - Backend running on `http://127.0.0.1:8000`.
 - Expo web running on `http://localhost:19006`.
 - Admin login and admin work-order detail were manually observed.
-- `scripts/smoke_role_ux.py` passed: 67 checks.
+- `scripts/smoke_role_ux.py` passed with primary-role and empty-state checks.
+- The local browser pass logged in as `lena.tech@demo.techsyncops.dev` and
+  confirmed the technician empty-state DOM: `Total work orders: 0`,
+  `No assigned jobs`, and no completed/archived assigned rows.
+- The generic technician `/work-orders` route was hardened to use the same
+  active assigned queue as `/work-orders/mine` when no filters are supplied.
+- 320px work-order detail summary tiles now allow two-line values so approval
+  text does not truncate awkwardly on narrow screens.
+- Automated verification after this hardening:
+  - Backend tests: `161 passed`, with one existing Pydantic `dict()`
+    deprecation warning.
+  - Client tests: `7 passed suites`, `43 passed tests`.
+  - `python -m compileall -q server scripts`
+  - `git diff --check` passed with normal Windows LF/CRLF warnings.
 
 Known local setup note:
 
 - Expo 50 on Node 24 can hit a Windows `node:sea` Metro external path issue.
   The local `node_modules` workaround proved the app can run, but the durable
   setup recommendation is Node 20 LTS until Expo is upgraded.
+- The in-app browser automation surface provided DOM proof but not a working
+  file screenshot method in this session, so final shareable image evidence
+  still needs the normal manual capture pass.
 
 Next action:
 
-1. Open Role Evidence screen as admin/coordinator.
-2. Capture the 21 screenshots and fill this file's checkboxes.
-3. Check 390px and 320px widths.
-4. Record screen-reader notes.
-5. Run screenshot safety review before portfolio use.
+1. Complete manual screenshots from the Role Evidence screen and live role
+   logins.
+2. Re-run the clean seed with the updated no-work viewer/vendor personas before
+   final empty-state screenshots.
+3. Record screen-reader notes.
+4. Run screenshot safety review before portfolio use.

@@ -1,4 +1,5 @@
 import {
+  SYNTHETIC_EMPTY_STATE_LOGINS,
   ROLE_WALKTHROUGH_ORDER,
   getEvidenceSafetyChecklist,
   getManualEvidenceChecklist,
@@ -80,6 +81,7 @@ describe('role walkthrough manifest', () => {
     expect(audit.checks.map(check => check.key)).toEqual([
       'synthetic_login_coverage',
       'screen_coverage',
+      'empty_state_login_coverage',
       'unique_screenshot_names',
       'screenshot_safety_checks',
       'manager_controls_documented',
@@ -126,5 +128,20 @@ describe('role walkthrough manifest', () => {
     expect(markdown).toContain('ready for manual capture');
     expect(markdown).toContain('techsync-ops-vendor-01-vendor-queue.png');
     expect(markdown).toContain('Only work linked to apex.demo@demo.techsyncops.dev is visible.');
+  });
+
+  test('uses the active assigned technician for the manual capture pass', () => {
+    expect(getRoleWalkthrough('technician').loginEmail).toBe('marco.tech@demo.techsyncops.dev');
+  });
+
+  test('documents secondary no-work logins for empty-state proof', () => {
+    expect(SYNTHETIC_EMPTY_STATE_LOGINS).toEqual(
+      expect.objectContaining({
+        technician: 'lena.tech@demo.techsyncops.dev',
+        viewer: 'quiet-owner.demo@demo.techsyncops.dev',
+        vendor: 'quiet-vendor.demo@demo.techsyncops.dev',
+      }),
+    );
+    expect(getRoleWalkthrough('vendor').emptyStateLoginEmail).toBe('quiet-vendor.demo@demo.techsyncops.dev');
   });
 });

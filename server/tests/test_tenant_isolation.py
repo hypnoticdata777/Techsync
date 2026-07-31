@@ -469,6 +469,37 @@ def test_client_without_matching_record_sees_no_work_orders():
     assert mock_list.call_args.kwargs["client_id"] == -1
 
 
+def test_unfiltered_technician_work_order_list_uses_active_assigned_queue():
+    technician_user = User(
+        id=8,
+        organization_id=6,
+        email="lena.tech@example.com",
+        full_name="Lena Torres",
+        role="technician",
+        is_active=True,
+    )
+    active_rows = [_work_order_row(id=13, assigned_technician_id=4, status="open")]
+
+    with patch(
+        "routers.work_orders.technicians_repo.get_by_user_id",
+        return_value={"id": 4, "user_id": 8},
+    ):
+        with patch(
+            "routers.work_orders.work_orders_repo.list_for_technician",
+            return_value=active_rows,
+        ) as active_list:
+            with patch("routers.work_orders.work_orders_repo.list_filtered") as generic_list:
+                rows = work_orders_router.list_work_orders(
+                    status_filter=None,
+                    current_user=technician_user,
+                    organization={"id": 6},
+                )
+
+    assert [row.id for row in rows] == [13]
+    active_list.assert_called_once_with(6, 4)
+    generic_list.assert_not_called()
+
+
 def test_client_cannot_view_other_client_work_order():
     client_user = User(
         id=5,

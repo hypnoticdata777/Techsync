@@ -240,6 +240,18 @@ def list_work_orders(
     if current_user.role == "technician":
         technician = _load_caller_technician(current_user, organization["id"])
         technician_id = technician["id"] if technician else -1
+        if (
+            technician
+            and status_filter is None
+            and property_id is None
+            and client_id is None
+            and vendor_id is None
+            and customer_name is None
+            and date_from is None
+            and date_to is None
+        ):
+            rows = work_orders_repo.list_for_technician(organization["id"], technician["id"])
+            return [WorkOrder(**row) for row in rows]
     elif current_user.role in ("client", "viewer"):
         client = _load_caller_client(current_user, organization["id"])
         client_id = client["id"] if client else -1

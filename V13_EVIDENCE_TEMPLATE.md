@@ -48,11 +48,11 @@ Expected:
 
 ```text
 Demo org slug: techsync-ops-demo-pmc
-users: 8
+users: 10
 technicians: 3
-clients: 2
+clients: 3
 properties: 3
-vendors: 2
+vendors: 3
 work_orders: 8
 ```
 

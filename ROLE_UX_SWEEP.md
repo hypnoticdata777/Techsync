@@ -62,7 +62,8 @@ Implemented:
   controls, non-manager hidden controls, technician assigned routing,
   client/viewer privacy, and linked-vendor scope before manual screenshots.
 - Added `ROLE_UX_EVIDENCE_TEMPLATE.md` and expanded the synthetic seed to
-  include viewer/vendor logins for final role screenshots.
+  include viewer/vendor logins plus secondary no-work viewer/vendor profiles
+  for final empty-state screenshots.
 - Added tested accessibility labels/hints for role dashboard actions,
   work-order cards, dispatch chips, form inputs/selectors, approval controls,
   attachment controls, messages, and lifecycle actions.
@@ -86,6 +87,10 @@ Implemented:
   evidence worksheet.
 - Added `scripts/smoke_role_ux.py` to log in as every synthetic role and
   produce sanitized role-scope API evidence before screenshots.
+- Hardened unfiltered technician work-order listing so the mobile technician
+  queue cannot drift from the active assigned `/work-orders/mine` behavior.
+- Polished narrow work-order detail summary tiles so important values such as
+  approval state can wrap on 320px-class screens.
 
 Verification:
 
@@ -96,12 +101,17 @@ server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
 
 Result:
 
-- Client tests passed: `7 passed suites`, `36 passed tests`.
-- Backend tests passed: `143 passed`.
-- Latest role evidence audit helper test pass: `7 passed suites`, `38 passed
-  tests`.
-- Current capture-pass automation is prepared; live screenshots still require
-  local `DATABASE_URL`, `JWT_SECRET_KEY`, API runtime, and Expo web runtime.
+- Client tests passed: `7 passed suites`, `43 passed tests`.
+- Backend tests passed: `161 passed`, with one existing Pydantic `dict()`
+  deprecation warning.
+- Compile passed: `python -m compileall -q server scripts`.
+- Diff hygiene passed: `git diff --check`, with normal Windows LF/CRLF
+  warnings.
+- Local browser DOM proof confirmed `lena.tech@demo.techsyncops.dev` sees
+  `Total work orders: 0` and `No assigned jobs` after the technician route
+  hardening.
+- Current capture-pass automation is prepared; final shareable screenshots and
+  manual screen-reader notes remain local evidence tasks before hosting.
 
 ## Role Matrix
 
@@ -121,7 +131,9 @@ Result:
   checklist, and role UX smoke script are prepared; final screenshots still
   need a running local/demo API and client.
 - Verify role-specific empty states with seeded and empty queues.
-  Empty-state code/tests are implemented; final screenshot proof still needed.
+  Empty-state code/tests and secondary no-work screenshot personas are
+  implemented; technician empty-state DOM proof passed, while viewer/vendor
+  final screenshot proof still needs a clean seed reset with the updated script.
 - Verify client/viewer cannot see internal messages or unrelated work.
   Covered by backend regression tests; final screenshot proof still needed.
 - Verify vendors cannot see unrelated vendor work, internal messages, or
