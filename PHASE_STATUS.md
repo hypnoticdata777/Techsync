@@ -255,6 +255,11 @@ Completed:
 - Added a manager-only mobile Role Evidence screen for automated readiness
   checks, role capture plan, screenshot targets, and safety checklist before
   hosting.
+- Added manual UX proof checks to the Role Evidence screen for synthetic role
+  execution, 390px/320px width comfort, screen-reader notes, and screenshot
+  safety.
+- Added `ROLE_UX_CAPTURE_PASS.md` and `scripts/smoke_role_ux.py` to prepare the
+  final role-by-role local capture pass without hosting.
 
 Next:
 
@@ -263,7 +268,8 @@ Next:
 - Continue local-only product depth with the remaining role-by-role UI/UX
   friction sweep, accessibility evidence, screenshot-proof preparation, and
   remaining client/vendor portal polish. The manifest audit is now code-backed;
-  the in-app evidence screen is started; final manual screenshots still remain.
+  the in-app evidence screen and capture worksheet are prepared; final manual
+  screenshots still require local/demo API credentials and a running client.
 - Later, after the local product surface is complete, migrate/smoke-test the
   demo database through the latest v1.3 migrations, seed/reset the synthetic
   demo tenant with `scripts/seed_demo_data.py`, deploy only as the final gate,

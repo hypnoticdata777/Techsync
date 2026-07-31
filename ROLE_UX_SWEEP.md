@@ -79,6 +79,13 @@ Implemented:
   blocking.
 - Added tested in-app evidence dashboard data so the final local screenshot
   pass can be driven from the mobile UI, not only Markdown.
+- Added manual UX proof checks to the in-app Role Evidence screen for running
+  each synthetic role, 390px and 320px width comfort, manual screen-reader
+  notes, and screenshot safety review.
+- Added `ROLE_UX_CAPTURE_PASS.md` as the final local capture checklist and
+  evidence worksheet.
+- Added `scripts/smoke_role_ux.py` to log in as every synthetic role and
+  produce sanitized role-scope API evidence before screenshots.
 
 Verification:
 
@@ -93,6 +100,8 @@ Result:
 - Backend tests passed: `143 passed`.
 - Latest role evidence audit helper test pass: `7 passed suites`, `38 passed
   tests`.
+- Current capture-pass automation is prepared; live screenshots still require
+  local `DATABASE_URL`, `JWT_SECRET_KEY`, API runtime, and Expo web runtime.
 
 ## Role Matrix
 
@@ -108,8 +117,9 @@ Result:
 ## Remaining Sweep Items
 
 - Capture mobile screenshots for each role using synthetic demo data.
-  Walkthrough manifest/template and automated readiness audit are prepared;
-  final screenshots still needed.
+  Walkthrough manifest/template, automated readiness audit, in-app manual
+  checklist, and role UX smoke script are prepared; final screenshots still
+  need a running local/demo API and client.
 - Verify role-specific empty states with seeded and empty queues.
   Empty-state code/tests are implemented; final screenshot proof still needed.
 - Verify client/viewer cannot see internal messages or unrelated work.
@@ -125,11 +135,11 @@ Result:
 - Verify all primary screens have clear retry states after API failures.
   Implemented in code; final screenshot proof still needed.
 - Validate text wrapping and touch target comfort on small mobile widths.
-  Touch target polish is implemented in code; final screenshot proof still
-  needed.
+  Touch target polish and in-app 390px/320px checklist are implemented; final
+  screenshot proof still needed.
 - Validate screen-reader labels/hints for role dashboards, approvals,
   lifecycle actions, dispatch chips, and work-order forms.
-  Helper tests and primary control labels are implemented; manual proof still
-  needed.
+  Helper tests, primary control labels, and manual Role Evidence checklist are
+  implemented; manual proof still needed.
 - Run the final screenshot/walkthrough pass only after local product depth is
   otherwise complete.

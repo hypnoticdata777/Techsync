@@ -158,6 +158,13 @@ they have been verified in the relevant environment.
       privacy, technician routing, and linked-vendor scope.
 - [x] Manager-only in-app Role Evidence screen added for automated readiness
       checks, role capture plan, screenshot targets, and safety checklist.
+- [x] Role Evidence screen includes manual final-proof checks for each
+      synthetic role, 390px/320px width comfort, screen-reader notes, and
+      screenshot safety.
+- [x] Local role UX smoke script prepared to exercise synthetic role login,
+      role-scoped API surfaces, manager-only endpoint boundaries, viewer
+      read-only behavior, and vendor attachment blocking.
+- [x] Final local capture worksheet prepared in `ROLE_UX_CAPTURE_PASS.md`.
 - [x] Synthetic demo seed includes admin, coordinator, client, viewer, vendor,
       and technician login users for role capture.
 - [x] Work-order lifecycle now covers pause, escalate, cancel, and manager-only
@@ -170,6 +177,10 @@ they have been verified in the relevant environment.
 - [x] Accessibility evidence template added for manual screen-reader and
       small-width verification before hosting.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
+- [ ] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
+      `role-ux-smoke-evidence.json` reviewed.
+- [ ] Role Evidence screen opened locally as a manager and used to drive the
+      final capture pass.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.
 - [ ] Mobile/desktop screenshots captured for portfolio.

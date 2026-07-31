@@ -1723,3 +1723,54 @@ Result:
   deprecation warning.
 - Full client tests passed: `7 passed suites`, `39 passed tests`.
 - Compile check passed for `server` and `scripts`.
+
+## 2026-07-30 - v1.3 Role UX Capture Pass Prep
+
+Decision:
+
+- Finish as much of the role-by-role UX friction pass as possible before
+  hosting, without deploying or exposing provider credentials.
+- Keep the final live screenshot pass honest: it requires a local/demo API with
+  `DATABASE_URL` and `JWT_SECRET_KEY`, plus the Expo web client running.
+
+Changes:
+
+- Added manual proof checks to the manager-only Role Evidence screen for
+  running each synthetic role, checking 390px and 320px widths, recording
+  screen-reader notes, and reviewing screenshot safety.
+- Added `ROLE_UX_CAPTURE_PASS.md` as the final local capture worksheet with run
+  commands, synthetic logins, capture widths, 21 screenshot targets,
+  screen-reader notes, and safety review checkboxes.
+- Added `scripts/smoke_role_ux.py` to log in as admin, coordinator,
+  technician, client, viewer, and vendor synthetic users and write sanitized
+  role-scope API evidence.
+- Ignored local `role-ux-smoke-evidence*.json` artifacts.
+- Updated README, QA, roadmap, requirements, traceability, public readiness,
+  accessibility, role UX, and v1.3 evidence docs so future sessions know this
+  is prepared but live screenshot evidence is still pending.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m compileall -q scripts\smoke_role_ux.py
+server\venv\Scripts\python.exe scripts\smoke_role_ux.py --help
+cd client; node -e "const babel=require('@babel/core'); for (const f of ['App.js','src/screens/RoleEvidenceScreen.js','src/screens/WorkOrdersListScreen.js']) { babel.transformFileSync(f,{presets:['module:metro-react-native-babel-preset'],babelrc:false,configFile:false}); console.log(f,'parse ok'); }"
+cd client; npm.cmd run test:ci -- --runTestsByPath src/utils/roleWalkthrough.test.js
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client; npm.cmd run test:ci
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Smoke script compile and help checks passed.
+- App, Role Evidence screen, and work-order list Babel parse checks passed.
+- Focused role walkthrough tests passed: `1 passed suite`, `9 passed tests`.
+- Backend tests passed: `160 passed`, with one existing Pydantic `dict()`
+  deprecation warning.
+- Full client tests passed: `7 passed suites`, `41 passed tests`.
+- Full compile check passed for `server` and `scripts`.
+- `git diff --check` passed with Windows LF-to-CRLF warnings only.
+- Live role login/screenshot capture was not run in this Codex shell because
+  `DATABASE_URL` and `JWT_SECRET_KEY` are not present here.

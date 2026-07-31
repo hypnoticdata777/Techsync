@@ -31,6 +31,34 @@ const SAFETY_CHECKS = [
   'no-console-or-terminal-overlays',
 ];
 
+const MANUAL_EVIDENCE_CHECKS = [
+  {
+    key: 'run_each_role',
+    label: 'Run each synthetic role',
+    detail: 'Log in as admin, coordinator, technician, client, viewer, and vendor before screenshots.',
+  },
+  {
+    key: 'mobile_width',
+    label: 'Check mobile width',
+    detail: 'Verify 390px-class mobile width has no clipped buttons, hidden labels, or overlapping summary tiles.',
+  },
+  {
+    key: 'small_width',
+    label: 'Check narrow width',
+    detail: 'Verify 320px-class narrow width still wraps action labels and evidence rows cleanly.',
+  },
+  {
+    key: 'screen_reader',
+    label: 'Screen-reader notes',
+    detail: 'Confirm primary queues, detail controls, forms, dispatch chips, approvals, and evidence rows announce useful labels.',
+  },
+  {
+    key: 'screenshot_safety',
+    label: 'Screenshot safety review',
+    detail: 'Review every capture for real data, secrets, URLs, terminals, provider dashboards, and passwords.',
+  },
+];
+
 const WALKTHROUGH_BY_ROLE = {
   org_admin: {
     persona: 'PMC owner/operator',
@@ -157,15 +185,19 @@ export const getEvidenceSafetyChecklist = () => [
   'Review every screenshot before adding it to portfolio or investor materials.',
 ];
 
+export const getManualEvidenceChecklist = () => MANUAL_EVIDENCE_CHECKS;
+
 export const getRoleEvidenceDashboard = (roles = ROLE_WALKTHROUGH_ORDER) => {
   const manifest = getRoleWalkthroughManifest(roles);
   const plan = getScreenshotPlan(roles);
   const audit = getRoleEvidenceReadinessAudit(roles);
   const safetyChecklist = getEvidenceSafetyChecklist();
+  const manualChecklist = getManualEvidenceChecklist();
 
   return {
     audit,
     safetyChecklist,
+    manualChecklist,
     roleRows: manifest.map(item => ({
       role: item.role,
       persona: item.persona,
@@ -347,6 +379,7 @@ export default {
   getRoleWalkthroughManifest,
   getScreenshotPlan,
   getEvidenceSafetyChecklist,
+  getManualEvidenceChecklist,
   getRoleEvidenceDashboard,
   getRoleEvidenceReadinessAudit,
   getRoleEvidenceChecklistMarkdown,

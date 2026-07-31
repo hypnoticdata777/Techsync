@@ -1,6 +1,7 @@
 import {
   ROLE_WALKTHROUGH_ORDER,
   getEvidenceSafetyChecklist,
+  getManualEvidenceChecklist,
   getRoleEvidenceDashboard,
   getRoleEvidenceChecklistMarkdown,
   getRoleEvidenceReadinessAudit,
@@ -57,6 +58,19 @@ describe('role walkthrough manifest', () => {
     expect(checklist).toContain('Review every screenshot');
   });
 
+  test('keeps manual UX proof checks visible', () => {
+    const checklist = getManualEvidenceChecklist();
+
+    expect(checklist.map(item => item.key)).toEqual([
+      'run_each_role',
+      'mobile_width',
+      'small_width',
+      'screen_reader',
+      'screenshot_safety',
+    ]);
+    expect(checklist.map(item => item.detail).join(' ')).toContain('320px-class narrow width');
+  });
+
   test('audits role evidence readiness before manual screenshots', () => {
     const audit = getRoleEvidenceReadinessAudit();
 
@@ -88,6 +102,7 @@ describe('role walkthrough manifest', () => {
       }),
     );
     expect(dashboard.safetyChecklist).toHaveLength(5);
+    expect(dashboard.manualChecklist).toHaveLength(5);
     expect(dashboard.roleRows.find(item => item.role === 'vendor')).toEqual(
       expect.objectContaining({
         loginEmail: 'apex.demo@techsync.local',

@@ -82,6 +82,7 @@ tools/gitleaks*/
 # Local hosted-smoke evidence artifacts
 v12-smoke-evidence*.json
 v13-smoke-evidence*.json
+role-ux-smoke-evidence*.json
 
 # Adjacent project checkouts
 turnflow-mvp/

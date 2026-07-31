@@ -42,6 +42,9 @@ Latest verified CI run before this scan: success on main for 3c3f0ac
 - Portfolio case-study source copy added in `PORTFOLIO_TECHSYNC_OPS.md`.
 - v1.2 and v1.3 evidence capture templates added in
   `V12_EVIDENCE_TEMPLATE.md` and `V13_EVIDENCE_TEMPLATE.md`.
+- Role UX evidence workflow prepared with `ROLE_UX_SWEEP.md`,
+  `ROLE_UX_CAPTURE_PASS.md`, the manager-only Role Evidence screen, and
+  `scripts/smoke_role_ux.py`.
 
 ## Safety Sweep Notes
 
@@ -148,6 +151,8 @@ Continue v1.3 product depth before hosted public promotion:
    remaining non-hosting requirement buckets and UI/UX friction sweep are done.
 10. Use `ROLE_UX_SWEEP.md` to track role-by-role mobile UX evidence before the
     final hosted showcase.
+11. Use `ROLE_UX_CAPTURE_PASS.md` and `scripts/smoke_role_ux.py` for the final
+    local role pass once local/demo API credentials are available.
 
 ## Stop Point For This Phase
 

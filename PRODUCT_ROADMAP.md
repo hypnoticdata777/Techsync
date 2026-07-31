@@ -192,6 +192,8 @@ Likely scope:
     expectations
   - manager-only in-app role evidence screen now started for readiness checks,
     role capture plan, screenshot targets, and safety checklist
+  - final capture worksheet and local role UX smoke script now prepared for
+    synthetic role login/scope proof before screenshots
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions
@@ -245,10 +247,11 @@ v1.3 exit criteria:
   role walkthrough/screenshot evidence manifest is prepared with viewer/vendor
   synthetic logins plus an automated readiness audit for linked-vendor scope.
   A manager-only Role Evidence screen now exposes the readiness audit,
-  screenshot targets, and capture safety checklist inside the app.
-  Accessibility helper
-  coverage and a manual evidence template are now prepared for the final
-  screen-reader pass.
+  screenshot targets, manual proof checks, and capture safety checklist inside
+  the app. A local role UX smoke script and `ROLE_UX_CAPTURE_PASS.md` now
+  prepare the final synthetic role run, small-width/mobile comfort proof, and
+  manual screen-reader notes. Accessibility helper coverage and a manual
+  evidence template are now prepared for the final screen-reader pass.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data, while
   the client invite/accept/approval decision is manually verified from the
   hosted email/log path.

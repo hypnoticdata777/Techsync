@@ -272,6 +272,11 @@ Already represented in the codebase:
 - v1.3 manager-only mobile Role Evidence screen for the readiness audit,
   role capture plan, screenshot targets, and screenshot safety checklist before
   hosting.
+- v1.3 manual Role Evidence proof checklist and capture worksheet for
+  synthetic role execution, small-width/mobile comfort, screen-reader notes,
+  and screenshot safety before hosting.
+- v1.3 local role UX smoke script for synthetic role login and role-scope API
+  evidence before final screenshots.
 - v1.3 pause, escalate, cancel, and manager-only archive lifecycle states for
   work orders, with backend/mobile handling, dashboard counts, dispatch
   visibility, regression tests, and synthetic seed examples.

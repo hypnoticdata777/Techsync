@@ -13,7 +13,10 @@ implemented vs. deferred.
 Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`; hosting remains
 deferred until the local role walkthrough is complete. The walkthrough manifest
 now has a tested readiness audit for synthetic logins, screenshot targets,
-role controls, privacy expectations, and screenshot safety checks.
+role controls, privacy expectations, and screenshot safety checks. The final
+capture workflow is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
+`scripts/smoke_role_ux.py` can produce sanitized role-scope API evidence once a
+local/demo API is running.
 
 ## Overview
 
@@ -302,7 +305,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   capture. Role-specific empty queue panels and the role walkthrough/screenshot
   manifest are implemented and tested, including a role evidence readiness
   audit and manager-only in-app Role Evidence screen for the final manual
-  screenshot pass.
+  screenshot pass. The Role Evidence screen now includes final manual proof
+  checks for each synthetic role, small-width comfort, screen-reader notes, and
+  screenshot safety.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.
@@ -345,7 +350,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
 - Local/mobile accessibility evidence is tracked in `ACCESSIBILITY_EVIDENCE.md`;
   helper coverage now labels primary role dashboard, form, dispatch, approval,
   attachment, message, and lifecycle controls before the final manual
-  screen-reader pass.
+  screen-reader pass. `ROLE_UX_CAPTURE_PASS.md` is the local worksheet for the
+  final role screenshots, 390px/320px layout comfort check, and manual
+  accessibility notes.
 
 ## License
 

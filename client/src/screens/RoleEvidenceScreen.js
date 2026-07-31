@@ -5,7 +5,7 @@ import {getRoleEvidenceDashboard} from '../utils/roleWalkthrough';
 
 function RoleEvidenceScreen() {
   const dashboard = useMemo(() => getRoleEvidenceDashboard(), []);
-  const {audit, roleRows, safetyChecklist, screenshotRows} = dashboard;
+  const {audit, manualChecklist, roleRows, safetyChecklist, screenshotRows} = dashboard;
 
   return (
     <ScrollView style={styles.container}>
@@ -59,6 +59,15 @@ function RoleEvidenceScreen() {
               <Text style={styles.guardrail}>
                 Hidden: {role.hiddenControls.length ? role.hiddenControls.join(', ') : 'None'}
               </Text>
+            </View>
+          ))}
+        </Section>
+
+        <Section title="Manual UX Checks">
+          {manualChecklist.map(item => (
+            <View key={item.key} style={styles.manualRow}>
+              <Text style={styles.manualTitle}>{item.label}</Text>
+              <Text style={styles.manualDetail}>{item.detail}</Text>
             </View>
           ))}
         </Section>
@@ -233,6 +242,25 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1f2937',
     borderBottomWidth: 1,
     paddingVertical: 10,
+  },
+  manualRow: {
+    backgroundColor: '#020617',
+    borderColor: '#334155',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 8,
+    padding: 10,
+  },
+  manualTitle: {
+    color: '#fbbf24',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  manualDetail: {
+    color: '#d1d5db',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 4,
   },
   fileName: {
     color: '#f9fafb',

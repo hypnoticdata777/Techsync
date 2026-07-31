@@ -133,6 +133,10 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Verify client can approve or decline a pending approval request.
 - [ ] Capture sanitized screenshots for the portfolio sliver.
 - [ ] Complete `ROLE_UX_EVIDENCE_TEMPLATE.md` using synthetic demo users only.
+- [ ] Run `scripts/smoke_role_ux.py` against the local/demo API and review the
+      sanitized `role-ux-smoke-evidence.json` output.
+- [ ] Complete `ROLE_UX_CAPTURE_PASS.md`, including 390px/320px layout comfort
+      notes and manual screen-reader observations.
 
 ## Safe Evidence Notes
 
