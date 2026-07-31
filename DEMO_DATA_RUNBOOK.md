@@ -82,6 +82,25 @@ Synthetic login emails printed by the seed include:
 - `quiet-vendor.demo@demo.techsyncops.dev`
 - three technician accounts
 
+## Local v1.3 Invite and Approval Proof
+
+The normal invitation API does not return raw invite tokens. For a local/demo
+smoke proof, `scripts/smoke_v13.py` can use the direct synthetic demo database
+URL to insert a known hashed invitation token, then accept it through the public
+API and use the accepted client token to approve a pending work order.
+
+Use this only with synthetic/demo data:
+
+```powershell
+cd "C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync"
+$env:DATABASE_URL = (Get-Clipboard).Trim()
+server\venv\Scripts\python.exe scripts\smoke_v13.py --base-url "http://127.0.0.1:8000" --invite-database-url $env:DATABASE_URL --output v13-smoke-evidence.json
+Remove-Item Env:DATABASE_URL
+```
+
+The evidence file records only sanitized statuses and IDs. It does not write
+the database URL, raw invitation token, bearer token, or password.
+
 ## Expected Seed Counts
 
 Expected approximate counts after a clean seed:

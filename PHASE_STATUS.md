@@ -186,6 +186,10 @@ Completed:
   work-order entity links, internal/client-visible messages, staff approval
   request state, proof-gated completion, closeout package JSON, HTML/text
   exports, and operations reporting.
+- Added optional DB-assisted v1.3 smoke coverage that inserts a hashed
+  synthetic client invitation, accepts it through the public invitation API, and
+  approves pending work with the accepted client token while omitting raw
+  invite tokens, bearer tokens, passwords, and database URLs from evidence.
 - Added hosted v1.3 smoke coverage for the dispatch board shape and summary.
 - Added hosted v1.3 smoke coverage for duplicate-warning preflight.
 - Added CSV export endpoints for the operations report and dispatch board.
@@ -301,8 +305,11 @@ Next:
   `local-role-ux-manual-notes.json`, record manual screen-reader notes, and
   complete screenshot safety review.
 - Later, after the local product surface is complete, deploy only as the final
-  gate, manually verify client invite/accept/approval from the hosted email/log
-  path, run `scripts/smoke_v13.py`, and capture `V13_EVIDENCE_TEMPLATE.md`.
+  gate, manually verify the true hosted email/log invitation path, run
+  `scripts/smoke_v13.py` against the hosted backend, and capture
+  `V13_EVIDENCE_TEMPLATE.md`. The synthetic invite accept plus accepted-client
+  approval path can now be proven locally first with the optional
+  `--invite-database-url` flag.
 - Decide the demo surface only after the v1.3 product workflows are robust
   enough to show.
 

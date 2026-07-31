@@ -89,6 +89,9 @@ they have been verified in the relevant environment.
 - [x] Client/homeowner UI for client-visible communication implemented.
 - [x] Client approval/decline workflow implemented.
 - [x] Staff-side client approval request covered by v1.3 hosted smoke harness.
+- [x] DB-assisted v1.3 smoke path prepared for synthetic client invite accept
+      plus accepted-client approval proof without writing raw tokens to
+      evidence.
 - [ ] Client invite/accept plus client-side approve/decline workflow
       smoke-tested against a migrated hosted/demo database.
 - [x] Backend closeout proof requirement and manager override reason

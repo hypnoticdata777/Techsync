@@ -21,6 +21,7 @@ from uuid import uuid4
 
 
 DEFAULT_PASSWORD = "DemoPass123!"
+INVITE_EXPIRE_HOURS = 48
 
 
 @dataclass
@@ -92,7 +93,66 @@ def assert_detail(name: str, condition: bool, detail: Any) -> None:
         raise SmokeFailure(f"{name} assertion failed: {detail}")
 
 
-def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
+def hash_opaque_token(token: str) -> str:
+    import hashlib
+
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def create_known_client_invitation(
+    *,
+    database_url: str,
+    organization_id: int,
+    email: str,
+    invited_by: int,
+    raw_token: str,
+) -> int:
+    """Insert a known synthetic invitation for local/demo smoke proof.
+
+    The public invite endpoint intentionally never returns raw tokens. This
+    direct DB helper is opt-in and should only be used with synthetic demo data
+    when proving invitation acceptance before hosting.
+    """
+    try:
+        import psycopg2
+    except ImportError as exc:
+        raise SmokeFailure("psycopg2 is required for DB-assisted invite proof") from exc
+
+    with psycopg2.connect(database_url) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO invitations (
+                    organization_id,
+                    email,
+                    role,
+                    token_hash,
+                    invited_by,
+                    expires_at
+                )
+                VALUES (
+                    %s,
+                    %s,
+                    'client',
+                    %s,
+                    %s,
+                    NOW() + make_interval(hours => %s)
+                )
+                RETURNING id
+                """,
+                (
+                    organization_id,
+                    email,
+                    hash_opaque_token(raw_token),
+                    invited_by,
+                    INVITE_EXPIRE_HOURS,
+                ),
+            )
+            invitation_id = cursor.fetchone()[0]
+    return int(invitation_id)
+
+
+def run_smoke(base_url: str, output_path: Path, invite_database_url: str | None = None) -> dict[str, Any]:
     suffix = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S") + "-" + uuid4().hex[:8]
     admin_email = f"admin+v13-{suffix}@example.com"
     technician_email = f"tech+v13-{suffix}@example.com"
@@ -104,10 +164,13 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         "synthetic": True,
         "checks": [],
         "manual_follow_up": [
-            "Accept a synthetic client invitation from hosted email/log output, then verify client approve/decline with a real client token.",
             "Run Alembic current against the direct Neon URL and confirm the hosted/demo database is at 0007 or later.",
         ],
     }
+    if not invite_database_url:
+        evidence["manual_follow_up"].append(
+            "Run this smoke with --invite-database-url against synthetic demo data to prove invite accept plus client approve/decline with a real client token."
+        )
 
     def record(name: str, response: ApiResponse, summary: dict[str, Any] | None = None) -> None:
         evidence["checks"].append(
@@ -138,6 +201,7 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         expected=(201,),
     )
     admin_token = onboard.data["tokens"]["access_token"]
+    admin_user_id = onboard.data["user"]["id"]
     org_id = onboard.data["organization"]["id"]
     record("organization_onboarding", onboard, {"organization_id": org_id})
 
@@ -377,6 +441,64 @@ def run_smoke(base_url: str, output_path: Path) -> dict[str, Any]:
         approval_request.data,
     )
     record("client_approval_request", approval_request, {"status": approval_request.data.get("client_approval_status")})
+
+    if invite_database_url:
+        invite_token = f"synthetic-v13-invite-{suffix}"
+        invitation_id = create_known_client_invitation(
+            database_url=invite_database_url,
+            organization_id=org_id,
+            email=client_email,
+            invited_by=admin_user_id,
+            raw_token=invite_token,
+        )
+        invitation_accept = request(
+            base_url,
+            "POST",
+            "/invitations/accept",
+            {
+                "token": invite_token,
+                "full_name": "V1.3 Synthetic Invited Client",
+                "password": DEFAULT_PASSWORD,
+            },
+            expected=(201,),
+        )
+        client_token = invitation_accept.data["tokens"]["access_token"]
+        assert_detail(
+            "client_invitation_accept",
+            invitation_accept.data["user"].get("role") == "client"
+            and invitation_accept.data["user"].get("email") == client_email,
+            invitation_accept.data["user"],
+        )
+        record(
+            "client_invitation_accept",
+            invitation_accept,
+            {
+                "invitation_id": invitation_id,
+                "accepted_role": invitation_accept.data["user"].get("role"),
+            },
+        )
+
+        client_approval = request(
+            base_url,
+            "PATCH",
+            f"/work-orders/{work_order_id}/approval",
+            {"decision": "approved", "notes": "Synthetic invited client approval."},
+            client_token,
+        )
+        assert_detail(
+            "client_approval_decision",
+            client_approval.data.get("client_approval_status") == "approved"
+            and client_approval.data.get("client_approval_decision_by") == invitation_accept.data["user"].get("id"),
+            client_approval.data,
+        )
+        record(
+            "client_approval_decision",
+            client_approval,
+            {
+                "status": client_approval.data.get("client_approval_status"),
+                "used_invited_client_token": True,
+            },
+        )
 
     tech_login = request(
         base_url,
@@ -645,11 +767,20 @@ def main() -> int:
         default="v13-smoke-evidence.json",
         help="Sanitized evidence JSON path. Default: v13-smoke-evidence.json",
     )
+    parser.add_argument(
+        "--invite-database-url",
+        default=None,
+        help=(
+            "Optional direct demo database URL used only to insert a known synthetic "
+            "client invitation token before accepting it through the public API. "
+            "Never written to evidence."
+        ),
+    )
     args = parser.parse_args()
 
     output_path = Path(args.output)
     try:
-        evidence = run_smoke(args.base_url, output_path)
+        evidence = run_smoke(args.base_url, output_path, invite_database_url=args.invite_database_url)
     except SmokeFailure as exc:
         print(f"SMOKE FAILED: {exc}", file=sys.stderr)
         return 1

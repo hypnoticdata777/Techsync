@@ -2091,3 +2091,49 @@ server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
 server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --manual-notes local-role-ux-manual-notes.json --output role-ux-evidence-pack.md --environment local
 git diff --check
 ```
+
+## 2026-07-31 - v1.3 DB-Assisted Invite Approval Smoke Proof
+
+Decision:
+
+- Close the remaining pre-hosting proof gap for client invitation acceptance
+  and accepted-client approval without weakening the production invitation API.
+- Keep the raw invitation token private by inserting only a hashed synthetic
+  token directly into the demo database, then proving the user path through the
+  public invitation endpoint.
+- Keep hosted email/log verification as a final deployment-gate manual check.
+
+Changes:
+
+- Added optional `--invite-database-url` support to `scripts/smoke_v13.py`.
+- Added a DB-assisted synthetic invitation helper that stores a hashed token
+  and never writes the raw token, bearer token, password, or database URL to
+  evidence.
+- Extended the v1.3 smoke path to accept the synthetic client invitation
+  through `POST /invitations/accept`, then approve the pending work order with
+  the accepted client token.
+- Added isolated pytest coverage for stable opaque-token hashing and the safe
+  direct invitation insert shape.
+- Updated README, demo-data runbook, v1.3 evidence template, QA checklist,
+  roadmap, and phase-status docs to describe the local proof path and final
+  hosted follow-up boundary.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\smoke_v13.py --help
+git diff --check
+```
+
+Result:
+
+- Backend tests passed: `170 passed`.
+- Client tests passed: `7 passed suites`, `43 passed tests`.
+- Compile checks passed.
+- Smoke CLI help showed the optional `--invite-database-url` flag.
+- Diff hygiene passed with normal Windows LF/CRLF warnings.

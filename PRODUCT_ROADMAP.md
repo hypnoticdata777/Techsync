@@ -214,6 +214,9 @@ Likely scope:
   - hosted smoke-test evidence captured
   - v1.3 smoke evidence captured with `scripts/smoke_v13.py` and
     `V13_EVIDENCE_TEMPLATE.md`
+  - DB-assisted synthetic invite acceptance and accepted-client approval smoke
+    proof available locally before hosting, without writing raw invite tokens,
+    bearer tokens, passwords, or database URLs to evidence artifacts
   - portfolio sliver/showcase link connected only after the portfolio is live
 
 v1.3 exit criteria:
@@ -264,9 +267,10 @@ v1.3 exit criteria:
   smoke JSON plus screenshot inventory before the public showcase gate.
   Accessibility helper coverage and a manual evidence template are now prepared
   for the final screen-reader pass.
-- Hosted evidence shows the v1.3 API surface passes with synthetic data, while
-  the client invite/accept/approval decision is manually verified from the
-  hosted email/log path.
+- Hosted evidence shows the v1.3 API surface passes with synthetic data. The
+  client invite/accept/accepted-client approval path can now be proven locally
+  with a DB-assisted synthetic invitation before hosting, while the true hosted
+  email/log path remains a final deployment-gate manual check.
 
 ## Beyond v1.3
 

@@ -174,8 +174,9 @@ endpoint rate limiting, Stripe webhook handling, attachment upload validation,
 v1.3 communication/approval guardrails, operations reporting, and closeout
 package/export behavior, dispatch-board composition, and dashboard CSV export
 behavior including completion cycle-time export evidence, plus tenant JSON
-export scoping and sensitive-field omission. These run without a live database
-(repositories are mocked); the RLS
+export scoping and sensitive-field omission, plus the DB-assisted v1.3 smoke
+helper that proves invite acceptance without persisting raw invite tokens.
+These run without a live database (repositories are mocked); the RLS
 behavior described above was additionally verified by hand against a local
 Postgres instance.
 
@@ -218,6 +219,13 @@ immediately. Everyone else joins via an emailed invitation
 (`POST /organizations/invitations` → `POST /invitations/accept`, RF-07). In
 the mobile app: "Create Organization" on the login screen for the first
 flow, "Accept Invitation" for the second.
+
+For local/demo v1.3 evidence, `scripts/smoke_v13.py --invite-database-url`
+can insert a known synthetic invitation directly into the demo database, accept
+it through `POST /invitations/accept`, and use the returned client token to
+approve a pending work order. Use it only with synthetic data; the generated
+evidence omits database URLs, raw invitation tokens, bearer tokens, and
+passwords.
 
 ## API Surface
 

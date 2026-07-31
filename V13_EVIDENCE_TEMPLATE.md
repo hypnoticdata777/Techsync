@@ -70,6 +70,20 @@ Local:
 python scripts\smoke_v13.py --base-url "https://YOUR-HOSTED-API" --output v13-smoke-evidence.json
 ```
 
+Local/demo invite acceptance proof, when you are running against a synthetic
+demo database and have the direct database URL only in your shell:
+
+```powershell
+$env:DATABASE_URL = (Get-Clipboard).Trim()
+python scripts\smoke_v13.py --base-url "http://127.0.0.1:8000" --invite-database-url $env:DATABASE_URL --output v13-smoke-evidence.json
+Remove-Item Env:DATABASE_URL
+```
+
+This DB-assisted mode inserts a known synthetic client invitation directly into
+the demo database, accepts it through the public API, and uses the accepted
+client token to approve the pending work order. The raw invitation token and
+database URL are not written to the evidence file.
+
 GitHub Actions:
 
 ```text
@@ -103,6 +117,10 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 - [ ] Client-visible message filter returned only client messages.
 - [ ] Vendor-visible message path verified with linked synthetic vendor work.
 - [ ] Staff approval request created pending approval state.
+- [ ] DB-assisted synthetic client invitation accepted through public API, if
+      `--invite-database-url` was used.
+- [ ] Accepted synthetic client token approved the pending work order, if
+      `--invite-database-url` was used.
 - [ ] Technician login succeeded.
 - [ ] Status moved to `in_progress`.
 - [ ] Synthetic proof metadata attached.
@@ -123,14 +141,17 @@ Actions -> Hosted v1.3 smoke test -> Run workflow -> base_url=https://YOUR-HOSTE
 
 ## Manual Hosted Follow-Up
 
-- [ ] Accept a synthetic client invitation from the hosted email/log path.
-- [ ] Log in as that synthetic client.
+- [ ] Accept a synthetic client invitation from the hosted email/log path, or
+      run the DB-assisted local/demo invite proof above.
+- [ ] Log in as that synthetic client, or confirm the smoke accepted the
+      invitation and used the returned client token.
 - [ ] Verify client can only see linked client work orders.
 - [ ] Verify client can only see/add client-visible messages.
 - [ ] Verify vendor can only see linked vendor work orders.
 - [ ] Verify vendor can only see/add vendor-visible messages.
 - [ ] Verify vendor cannot add or upload attachments.
-- [ ] Verify client can approve or decline a pending approval request.
+- [ ] Verify client can approve or decline a pending approval request; DB-
+      assisted smoke covers approve, while manual UX can still cover decline.
 - [ ] Capture sanitized screenshots for the portfolio sliver.
 - [ ] Complete `ROLE_UX_EVIDENCE_TEMPLATE.md` using synthetic demo users only.
 - [ ] Run `scripts/smoke_role_ux.py` against the local/demo API and review the
