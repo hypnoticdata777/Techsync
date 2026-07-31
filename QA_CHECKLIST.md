@@ -178,6 +178,8 @@ they have been verified in the relevant environment.
       small-width verification before hosting.
 - [x] Local manual notes template and evidence-pack validation added for final
       screen-reader, small-width, role-scope, and screenshot safety proof.
+- [x] Local role UX capture prep helper added to generate the ignored screenshot
+      folder, manual notes copy, and capture manifest.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.
@@ -186,6 +188,8 @@ they have been verified in the relevant environment.
 - [ ] `local-role-ux-manual-notes.json` filled from
       `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` and included in the final local
       evidence pack.
+- [ ] `local-role-ux-capture-manifest.md` generated and used to close all
+      screenshot rows before strict evidence-pack validation.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.
 - [ ] Mobile/desktop screenshots captured for portfolio.

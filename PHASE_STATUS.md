@@ -233,6 +233,9 @@ Completed:
 - Added `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` so 390px/320px layout,
   screen-reader, role-scope, and screenshot safety observations can be filled
   locally and checked by the evidence-pack report without committing notes.
+- Added `scripts/prepare_role_ux_capture.py` so the local screenshot folder,
+  manual-notes copy, and missing-screenshot capture manifest can be prepared
+  repeatably before the final evidence pass.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and
@@ -290,9 +293,10 @@ Next:
   as complete as practical.
 - Continue the final local-only role-by-role UI/UX evidence pass: open Role
   Evidence, walk admin/coordinator/technician/client/viewer/vendor, capture the
-  21 screenshot targets with primary and empty-state personas, verify 390px and
-  320px widths, fill `local-role-ux-manual-notes.json`, record manual
-  screen-reader notes, and complete screenshot safety review.
+  21 screenshot targets with primary and empty-state personas using
+  `local-role-ux-capture-manifest.md`, verify 390px and 320px widths, fill
+  `local-role-ux-manual-notes.json`, record manual screen-reader notes, and
+  complete screenshot safety review.
 - Later, after the local product surface is complete, deploy only as the final
   gate, manually verify client invite/accept/approval from the hosted email/log
   path, run `scripts/smoke_v13.py`, and capture `V13_EVIDENCE_TEMPLATE.md`.

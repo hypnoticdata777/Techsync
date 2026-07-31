@@ -199,6 +199,9 @@ Likely scope:
     committing local evidence artifacts
   - local manual notes template now started for 390px/320px layout,
     screen-reader, role-scope, and screenshot safety evidence
+  - local role UX capture prep helper now started to create the ignored
+    screenshot folder, manual-notes copy, and capture manifest before final
+    evidence collection
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions

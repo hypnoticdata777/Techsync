@@ -19,6 +19,9 @@ Prepared, automated, and partially exercised live:
 - `scripts/build_role_ux_evidence_pack.py` can combine the sanitized smoke JSON
   local screenshot folder, and local manual notes JSON into a Markdown evidence
   report that lists missing screenshots and remaining manual checks.
+- `scripts/prepare_role_ux_capture.py` can create the local screenshot folder,
+  copy the manual notes template, and write a local capture manifest that lists
+  the remaining screenshot targets.
 - Backend role-scope tests cover client/viewer, vendor, and technician
   boundaries.
 - Client tests cover role workflow helpers, route visibility, role evidence
@@ -76,9 +79,10 @@ evidence report:
 
 ```powershell
 cd "C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync"
-Copy-Item ROLE_UX_MANUAL_NOTES_TEMPLATE.json local-role-ux-manual-notes.json
+server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
+# Use local-role-ux-capture-manifest.md as the screenshot checklist.
 # Fill local-role-ux-manual-notes.json after the manual layout, screen-reader,
-# and screenshot safety pass.
+# role-scope, and screenshot safety pass.
 server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --manual-notes local-role-ux-manual-notes.json --output role-ux-evidence-pack.md --environment local
 ```
 
@@ -193,6 +197,9 @@ Completed live:
 - `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` now gives the final reviewer a local
   fillable notes file for 390px/320px layout, screen-reader, role-scope, and
   screenshot safety evidence; filled copies stay ignored.
+- `scripts/prepare_role_ux_capture.py` now creates the ignored local capture
+  manifest and manual-notes copy so the final screenshot pass can resume
+  without rebuilding the plan by hand.
 - The local browser pass logged in as `lena.tech@demo.techsyncops.dev` and
   confirmed the technician empty-state DOM: `Total work orders: 0`,
   `No assigned jobs`, and no completed/archived assigned rows.
@@ -219,7 +226,7 @@ Known local setup note:
 Next action:
 
 1. Complete manual screenshots from the Role Evidence screen and live role
-   logins.
+   logins using `local-role-ux-capture-manifest.md`.
 2. Re-run the clean seed with the updated no-work viewer/vendor personas before
    final empty-state screenshots.
 3. Build `role-ux-evidence-pack.md` locally and resolve missing screenshot rows.

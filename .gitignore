@@ -84,6 +84,7 @@ v12-smoke-evidence*.json
 v13-smoke-evidence*.json
 role-ux-smoke-evidence*.json
 role-ux-evidence-pack*.md
+local-role-ux-capture-manifest*.md
 local-role-ux-manual-notes*.json
 local-role-ux-evidence/
 

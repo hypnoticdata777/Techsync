@@ -18,6 +18,7 @@ evidence path; it does not mean the demo has been deployed.
 - Screenshot storage location:
 - Evidence pack report:
 - Manual notes file: `local-role-ux-manual-notes.json`
+- Local capture manifest: `local-role-ux-capture-manifest.md`
 
 ## Synthetic Login Set
 
@@ -112,12 +113,12 @@ Before the final report, copy the tracked template and fill the local ignored
 copy:
 
 ```powershell
-Copy-Item ROLE_UX_MANUAL_NOTES_TEMPLATE.json local-role-ux-manual-notes.json
+server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
 ```
 
 Set each `passed` field to `true` only after the check is actually observed,
-and add a short note for every check. The local notes file is intentionally not
-committed.
+and add a short note for every check. The generated manifest and local notes
+file are intentionally not committed.
 
 ## Notes
 

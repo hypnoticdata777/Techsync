@@ -1996,6 +1996,20 @@ git diff --check
 
 Result:
 
+- Backend tests passed: `167 passed`.
+- Client tests passed: `7 passed suites`, `43 passed tests`.
+- Compile checks passed.
+- Capture prep generated local ignored files successfully:
+  - `local-role-ux-evidence`
+  - `local-role-ux-manual-notes.json`
+  - `local-role-ux-capture-manifest.md`
+- Capture prep reported `18/21` screenshots present and `3` still missing.
+- Evidence-pack dry run generated `role-ux-evidence-pack.md` and confirmed the
+  same `3` missing screenshots.
+- Diff hygiene passed with normal Windows LF/CRLF warnings.
+
+Result:
+
 - Backend tests passed: `165 passed`; the prior Pydantic `dict()` warning no
   longer appears.
 - Client tests passed: `7 passed suites`, `43 passed tests`.
@@ -2004,3 +2018,41 @@ Result:
   `3` missing screenshots and pending local manual notes until the final
   capture pass is filled.
 - Diff hygiene passed with normal Windows LF/CRLF warnings.
+
+## 2026-07-30 - v1.3 Role UX Capture Prep Helper
+
+Decision:
+
+- Keep reducing the final non-hosting evidence blocker by turning screenshot
+  capture setup into one repeatable local command.
+- Make the helper safe by preserving any existing filled manual notes unless
+  overwrite is explicitly requested.
+
+Changes:
+
+- Added `scripts/prepare_role_ux_capture.py`.
+- The helper creates `local-role-ux-evidence`, copies
+  `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` to
+  `local-role-ux-manual-notes.json` when missing, and writes
+  `local-role-ux-capture-manifest.md`.
+- The generated manifest groups all 21 screenshot targets by role, marks
+  present/missing files, and includes the strict evidence-pack command for the
+  final local gate.
+- Updated `.gitignore` so the generated capture manifest stays local-only.
+- Added pytest coverage proving the helper creates capture files, preserves
+  existing notes by default, and overwrites only when requested.
+- Updated role UX, accessibility, roadmap, QA, and phase docs to point the
+  final manual capture pass through the helper.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
+server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --manual-notes local-role-ux-manual-notes.json --output role-ux-evidence-pack.md --environment local
+git diff --check
+```

@@ -27,6 +27,8 @@ Implemented in this pass:
 - `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` and
   `scripts/build_role_ux_evidence_pack.py --manual-notes` now turn those
   manual checks into local report evidence without committing the filled notes.
+- `scripts/prepare_role_ux_capture.py` now prepares the ignored local notes
+  file and capture manifest before the final screen-reader pass.
 
 ## Manual Evidence Pass
 
@@ -53,7 +55,8 @@ Use synthetic demo data only.
 - Run the manual screen-reader pass on device or emulator using
   `ROLE_UX_CAPTURE_PASS.md`.
 - Fill `local-role-ux-manual-notes.json` from
-  `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` during the final pass.
+  `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` during the final pass; use
+  `scripts/prepare_role_ux_capture.py` to create the local copy safely.
 - Capture final role screenshots after all non-hosting local product depth is
   complete.
 - Add deeper automated component-level accessibility tests if the app later adds
