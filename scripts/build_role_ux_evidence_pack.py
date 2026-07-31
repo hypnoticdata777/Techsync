@@ -345,9 +345,57 @@ def build_report(
         "smoke_clean": smoke.clean,
         "screenshots_complete": screenshots.complete,
         "manual_clean": manual.clean,
+        "expected_screenshot_count": screenshots.expected_count,
+        "present_screenshot_count": len(screenshots.present),
+        "extra_pngs": screenshots.extra_pngs,
+        "unsafe_names": screenshots.unsafe_names,
         "missing_screenshots": screenshots.missing,
+        "manual_failed_checks": manual.failed_checks,
+        "manual_missing_notes": manual.missing_notes,
+        "manual_malformed_checks": manual.malformed_checks,
         "output_path": str(output_path),
     }
+
+
+def write_summary_json(*, summary_path: Path, result: dict[str, Any], environment: str) -> None:
+    payload = {
+        "environment": environment,
+        "smoke_clean": result["smoke_clean"],
+        "screenshots_complete": result["screenshots_complete"],
+        "manual_clean": result["manual_clean"],
+        "expected_screenshot_count": result["expected_screenshot_count"],
+        "present_screenshot_count": result["present_screenshot_count"],
+        "missing_screenshot_count": len(result["missing_screenshots"]),
+        "missing_screenshots": result["missing_screenshots"],
+        "extra_pngs": result["extra_pngs"],
+        "unsafe_names": result["unsafe_names"],
+        "manual_failed_checks": result["manual_failed_checks"],
+        "manual_missing_notes": result["manual_missing_notes"],
+        "manual_malformed_checks": result["manual_malformed_checks"],
+        "evidence_report": result["output_path"],
+    }
+    summary_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def print_blockers(result: dict[str, Any]) -> None:
+    if result["missing_screenshots"]:
+        print("Missing screenshot files:")
+        for filename in result["missing_screenshots"]:
+            print(f"- {filename}")
+
+    manual_blockers = (
+        result["manual_failed_checks"]
+        or result["manual_missing_notes"]
+        or result["manual_malformed_checks"]
+    )
+    if manual_blockers:
+        print("Manual note blockers:")
+        for check in result["manual_failed_checks"]:
+            print(f"- pending: {check}")
+        for check in result["manual_missing_notes"]:
+            print(f"- missing note: {check}")
+        for check in result["manual_malformed_checks"]:
+            print(f"- malformed: {check}")
 
 
 def main() -> int:
@@ -356,6 +404,11 @@ def main() -> int:
     parser.add_argument("--screenshots", default=DEFAULT_SCREENSHOT_DIR)
     parser.add_argument("--manual-notes", default=DEFAULT_MANUAL_NOTES_PATH)
     parser.add_argument("--output", default=DEFAULT_OUTPUT_PATH)
+    parser.add_argument(
+        "--summary-json",
+        default=None,
+        help="Write a sanitized machine-readable readiness summary.",
+    )
     parser.add_argument("--environment", default="local")
     parser.add_argument("--commit", default=None)
     parser.add_argument(
@@ -375,6 +428,15 @@ def main() -> int:
     )
     print(f"Role UX evidence pack written to {result['output_path']}")
     print(f"Missing screenshots: {len(result['missing_screenshots'])}")
+    print_blockers(result)
+
+    if args.summary_json:
+        write_summary_json(
+            summary_path=Path(args.summary_json),
+            result=result,
+            environment=args.environment,
+        )
+        print(f"Role UX summary JSON written to {args.summary_json}")
 
     if args.strict and (
         not result["smoke_clean"]

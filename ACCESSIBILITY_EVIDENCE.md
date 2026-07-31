@@ -29,6 +29,8 @@ Implemented in this pass:
   manual checks into local report evidence without committing the filled notes.
 - `scripts/prepare_role_ux_capture.py` now prepares the ignored local notes
   file and capture manifest before the final screen-reader pass.
+- `scripts/build_role_ux_evidence_pack.py --summary-json` now writes a local
+  sanitized summary of manual note blockers for the final gate.
 
 ## Manual Evidence Pass
 

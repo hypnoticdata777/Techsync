@@ -190,6 +190,8 @@ they have been verified in the relevant environment.
       evidence pack.
 - [ ] `local-role-ux-capture-manifest.md` generated and used to close all
       screenshot rows before strict evidence-pack validation.
+- [ ] `role-ux-evidence-summary.json` generated locally and shows no
+      screenshot/manual blockers before hosting.
 - [ ] No real organization, user, technician, customer, work-order, location, or
       attachment data appears in public screenshots.
 - [ ] Mobile/desktop screenshots captured for portfolio.

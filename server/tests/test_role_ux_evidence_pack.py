@@ -139,3 +139,37 @@ def test_build_report_writes_sanitized_markdown_with_missing_screenshot_list(tmp
     assert "All manual checks passed with notes recorded" in body
     assert "Bearer" not in body
     assert "postgresql://" not in body
+
+
+def test_summary_json_writes_sanitized_machine_readable_blockers(tmp_path):
+    smoke_path = tmp_path / "role-ux-smoke-evidence.json"
+    screenshot_dir = tmp_path / "screenshots"
+    manual_notes_path = tmp_path / "local-role-ux-manual-notes.json"
+    output_path = tmp_path / "role-ux-evidence-pack.md"
+    summary_path = tmp_path / "role-ux-evidence-summary.json"
+    screenshot_dir.mkdir()
+    _write_smoke(smoke_path)
+    _write_manual_notes(manual_notes_path, passed=False, missing_notes=True)
+
+    result = evidence_pack.build_report(
+        smoke_path=smoke_path,
+        screenshot_dir=screenshot_dir,
+        manual_notes_path=manual_notes_path,
+        output_path=output_path,
+        environment="local",
+        git_commit=None,
+    )
+    evidence_pack.write_summary_json(
+        summary_path=summary_path,
+        result=result,
+        environment="local",
+    )
+
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    assert summary["environment"] == "local"
+    assert summary["missing_screenshot_count"] == len(evidence_pack.EXPECTED_SCREENSHOTS)
+    assert summary["manual_clean"] is False
+    assert summary["manual_failed_checks"] == ["mobile_layout_390"]
+    assert summary["manual_missing_notes"] == ["mobile_layout_390"]
+    assert "postgresql://" not in summary_path.read_text(encoding="utf-8")
+    assert "bearer" not in summary_path.read_text(encoding="utf-8").lower()

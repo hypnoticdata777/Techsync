@@ -202,6 +202,8 @@ Likely scope:
   - local role UX capture prep helper now started to create the ignored
     screenshot folder, manual-notes copy, and capture manifest before final
     evidence collection
+  - local evidence summary JSON now started so screenshot/manual blockers can
+    be reviewed by a machine-readable final gate before hosting
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions

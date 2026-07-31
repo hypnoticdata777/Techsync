@@ -83,7 +83,7 @@ server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
 # Use local-role-ux-capture-manifest.md as the screenshot checklist.
 # Fill local-role-ux-manual-notes.json after the manual layout, screen-reader,
 # role-scope, and screenshot safety pass.
-server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --manual-notes local-role-ux-manual-notes.json --output role-ux-evidence-pack.md --environment local
+server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --manual-notes local-role-ux-manual-notes.json --output role-ux-evidence-pack.md --summary-json role-ux-evidence-summary.json --environment local
 ```
 
 Use `--strict` only when the report is expected to be complete; strict mode
@@ -200,6 +200,9 @@ Completed live:
 - `scripts/prepare_role_ux_capture.py` now creates the ignored local capture
   manifest and manual-notes copy so the final screenshot pass can resume
   without rebuilding the plan by hand.
+- `scripts/build_role_ux_evidence_pack.py` now prints exact screenshot/manual
+  blockers and can write ignored `role-ux-evidence-summary.json` for a
+  machine-readable final gate.
 - The local browser pass logged in as `lena.tech@demo.techsyncops.dev` and
   confirmed the technician empty-state DOM: `Total work orders: 0`,
   `No assigned jobs`, and no completed/archived assigned rows.

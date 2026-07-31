@@ -96,6 +96,8 @@ Implemented:
 - Added `scripts/prepare_role_ux_capture.py` so the ignored screenshot folder,
   manual-notes copy, and capture manifest can be generated without overwriting
   filled notes by default.
+- Added exact blocker printing and optional sanitized summary JSON output to
+  the evidence-pack builder.
 - Replaced remaining Pydantic v1-style payload `.dict()` calls with
   `.model_dump()` in create/update paths to remove the known backend warning.
 - Hardened unfiltered technician work-order listing so the mobile technician
@@ -141,7 +143,7 @@ Result:
 - Capture mobile screenshots for each role using synthetic demo data.
   Walkthrough manifest/template, automated readiness audit, in-app manual
   checklist, role UX smoke script, manual notes template, capture prep helper,
-  and evidence-pack builder are prepared;
+  evidence-pack builder, and summary JSON output are prepared;
   final screenshots still need a running local/demo API and client.
 - Verify role-specific empty states with seeded and empty queues.
   Empty-state code/tests and secondary no-work screenshot personas are

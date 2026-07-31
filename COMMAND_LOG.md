@@ -2008,6 +2008,41 @@ Result:
   same `3` missing screenshots.
 - Diff hygiene passed with normal Windows LF/CRLF warnings.
 
+## 2026-07-30 - v1.3 Evidence Gate Blocker Summary
+
+Decision:
+
+- Make the final local evidence gate more actionable before hosting by printing
+  exact screenshot and manual-note blockers instead of only counts.
+- Add sanitized machine-readable evidence output for the future final gate
+  without committing local evidence artifacts.
+
+Changes:
+
+- Extended `scripts/build_role_ux_evidence_pack.py` to return exact screenshot
+  gaps, manual failed checks, missing notes, malformed checks, unsafe filenames,
+  and screenshot counts.
+- Added CLI blocker printing so the terminal lists the exact remaining
+  screenshot filenames and manual note keys.
+- Added `--summary-json` support to write ignored
+  `role-ux-evidence-summary.json` output.
+- Updated `.gitignore` so generated summary JSON remains local-only.
+- Added pytest coverage for sanitized summary JSON output.
+- Updated role UX capture, evidence, accessibility, roadmap, QA, sweep, and
+  phase docs to include the summary JSON final gate.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --manual-notes local-role-ux-manual-notes.json --output role-ux-evidence-pack.md --summary-json role-ux-evidence-summary.json --environment local
+git diff --check
+```
+
 Result:
 
 - Backend tests passed: `165 passed`; the prior Pydantic `dict()` warning no

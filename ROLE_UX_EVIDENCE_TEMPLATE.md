@@ -19,6 +19,7 @@ evidence path; it does not mean the demo has been deployed.
 - Evidence pack report:
 - Manual notes file: `local-role-ux-manual-notes.json`
 - Local capture manifest: `local-role-ux-capture-manifest.md`
+- Local summary JSON: `role-ux-evidence-summary.json`
 
 ## Synthetic Login Set
 
@@ -119,6 +120,10 @@ server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
 Set each `passed` field to `true` only after the check is actually observed,
 and add a short note for every check. The generated manifest and local notes
 file are intentionally not committed.
+
+The final evidence-pack command should also include
+`--summary-json role-ux-evidence-summary.json` so screenshot/manual blockers
+are easy to review without scraping the Markdown report.
 
 ## Notes
 

@@ -236,6 +236,9 @@ Completed:
 - Added `scripts/prepare_role_ux_capture.py` so the local screenshot folder,
   manual-notes copy, and missing-screenshot capture manifest can be prepared
   repeatably before the final evidence pass.
+- Added evidence-pack blocker printing and optional sanitized
+  `role-ux-evidence-summary.json` output so remaining screenshot/manual gaps
+  are exact and machine-readable before hosting.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and
