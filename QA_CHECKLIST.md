@@ -201,6 +201,8 @@ they have been verified in the relevant environment.
 - [x] Role UX smoke stale-seed diagnosis added so blocked quiet viewer/vendor
       empty-state evidence points to the seed reset and strict-status recovery
       path.
+- [x] Failed role smoke CLI output now prints failed checks and stale-seed
+      recovery guidance inline.
 - [x] Capture prep and readiness doctor now name exact missing
       role/screen/filename screenshot rows before the final manual evidence
       pass.

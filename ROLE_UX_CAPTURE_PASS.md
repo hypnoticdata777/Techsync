@@ -82,7 +82,8 @@ server\venv\Scripts\python.exe scripts\smoke_role_ux.py --base-url "http://127.0
 ```
 
 If the role smoke is blocked and an older `role-ux-smoke-evidence.json`
-exists, diagnose it before reseeding:
+exists, the smoke command now prints failed checks and stale-seed guidance
+inline. You can also diagnose the existing file before reseeding:
 
 ```powershell
 server\venv\Scripts\python.exe scripts\smoke_role_ux.py --diagnose role-ux-smoke-evidence.json

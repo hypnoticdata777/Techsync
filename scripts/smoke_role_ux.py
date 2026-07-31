@@ -182,6 +182,41 @@ def print_diagnosis(diagnosis: dict[str, Any]) -> None:
         print(f"- {step}")
 
 
+def _failed_checks_with_details(evidence: dict[str, Any], *, limit: int = 8) -> list[str]:
+    rows: list[str] = []
+    for role in evidence.get("roles", []):
+        for check in role.get("checks", []):
+            if check.get("passed"):
+                continue
+            key = str(check.get("key", "unknown_check"))
+            detail = str(check.get("detail", "No detail recorded."))
+            rows.append(f"{key}: {detail}")
+
+    hidden_count = max(len(rows) - limit, 0)
+    visible = rows[:limit]
+    if hidden_count:
+        visible.append(f"+{hidden_count} more failed check(s); inspect the sanitized JSON for full details.")
+    return visible
+
+
+def print_smoke_result(evidence: dict[str, Any], output_path: str) -> None:
+    status = "passed" if evidence["passed"] else "failed"
+    print(f"Role UX smoke {status}: {evidence['check_count']} checks -> {output_path}")
+    if evidence["passed"]:
+        return
+
+    failed_rows = _failed_checks_with_details(evidence)
+    if failed_rows:
+        print("Failed checks:")
+        for row in failed_rows:
+            print(f"- {row}")
+
+    diagnosis = evidence.get("diagnostics") or diagnose_role_smoke_evidence(evidence)
+    if diagnosis["stale_seed_suspected"]:
+        print("")
+        print_diagnosis(diagnosis)
+
+
 def _record(checks: list[dict[str, Any]], key: str, passed: bool, detail: str) -> None:
     checks.append({"key": key, "passed": passed, "detail": detail})
 
@@ -566,10 +601,7 @@ def main() -> int:
         return 1
 
     Path(args.output).write_text(json.dumps(evidence, indent=2), encoding="utf-8")
-    print(
-        f"Role UX smoke {'passed' if evidence['passed'] else 'failed'}: "
-        f"{evidence['check_count']} checks -> {args.output}"
-    )
+    print_smoke_result(evidence, args.output)
     return 0 if evidence["passed"] else 1
 
 

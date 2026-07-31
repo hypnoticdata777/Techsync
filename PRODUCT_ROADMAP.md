@@ -219,6 +219,8 @@ Likely scope:
     evidence summary JSON before the final Vercel gate
   - role UX smoke now diagnoses stale quiet viewer/vendor empty-state seed
     failures and points to reset, strict status, and smoke rerun recovery
+  - failed role UX smoke output now prints failed checks and recovery guidance
+    inline before the final manual capture pass
   - capture prep and the readiness doctor now name missing screenshot
     role/screen/filename rows so the final manual pass is exact
   - role-aware navigator gating now started for manager-only mobile screens

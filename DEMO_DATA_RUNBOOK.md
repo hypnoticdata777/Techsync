@@ -125,7 +125,8 @@ The final role UX smoke expects both secondary empty-state accounts:
 If `scripts/smoke_role_ux.py` reports `401` for either account, or if
 `python scripts\seed_demo_data.py status --strict` exits non-zero, the demo
 database is using an older or incomplete seed. Run the seed command again with
-`--reset-existing` before final screenshots.
+`--reset-existing` before final screenshots. A failed role smoke now prints the
+failed checks plus stale-seed recovery guidance inline.
 
 To diagnose an existing smoke evidence file without rerunning the API probe:
 

@@ -2407,3 +2407,44 @@ Result:
   - `vendor / WorkOrdersList: techsync-ops-vendor-03-vendor-empty.png`
 - Readiness doctor still blocks hosting as expected, but the screenshot blocker
   now names the exact remaining capture files.
+
+## 2026-07-31 - v1.3 Inline Role Smoke Failure Guidance
+
+Decision:
+
+- Improve the next local evidence run by making a failed role smoke print the
+  failed checks and stale-seed recovery hint immediately.
+- Keep the separate `--diagnose` path for existing smoke JSON, but avoid making
+  the user run it as a second step after an ordinary failed smoke.
+
+Changes:
+
+- Added a sanitized failed-check printer to `scripts/smoke_role_ux.py`.
+- Failed role smoke output now includes the failed check keys/details and, when
+  the quiet viewer/vendor pattern is detected, the stale-seed diagnosis plus
+  reset/status/smoke recovery path.
+- Added stdout regression coverage so stale-seed recovery guidance stays
+  visible in the CLI output.
+- Updated role capture, demo data, QA, roadmap, and phase-status docs.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_smoke_role_ux.py -p no:cacheprovider
+server\venv\Scripts\python.exe scripts\smoke_role_ux.py --help
+server\venv\Scripts\python.exe scripts\smoke_role_ux.py --diagnose role-ux-smoke-evidence.json
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+```
+
+Result:
+
+- Focused smoke tests passed: `7 passed`.
+- Backend tests passed: `187 passed`.
+- Client tests passed: `7 passed suites`, `45 passed tests`.
+- Compile checks passed.
+- Existing local smoke evidence diagnosis still points to the stale quiet
+  viewer/vendor seed and the reseed recovery path.

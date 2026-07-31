@@ -262,6 +262,8 @@ Completed:
 - Added stale-seed diagnostics to the role UX smoke/readiness flow so blocked
   quiet viewer/vendor empty-state evidence gives the exact reseed recovery path
   before the final local capture pass.
+- Added inline failed-check and stale-seed recovery output to the role UX smoke
+  CLI so the live local smoke run explains its own next step.
 - Added named missing-screenshot output to capture prep and the readiness
   doctor so the remaining local evidence blocker identifies the exact
   role/screen/filename rows to capture.

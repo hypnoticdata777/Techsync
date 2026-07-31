@@ -153,3 +153,44 @@ def test_smoke_diagnosis_stays_clean_for_passed_evidence():
     assert diagnosis["stale_seed_suspected"] is False
     assert diagnosis["stale_seed_login_keys"] == []
     assert diagnosis["missing_empty_state_logins"] == []
+
+
+def test_failed_smoke_output_prints_stale_seed_recovery(capsys):
+    evidence = {
+        "passed": False,
+        "check_count": 2,
+        "roles": [
+            {
+                "role": "viewer_empty",
+                "checks": [
+                    {
+                        "key": "viewer_empty:login",
+                        "passed": False,
+                        "detail": "Login for quiet-owner.demo@demo.techsyncops.dev returned 401",
+                    }
+                ],
+            },
+            {
+                "role": "vendor_empty",
+                "checks": [
+                    {
+                        "key": "vendor_empty:login",
+                        "passed": False,
+                        "detail": "Login for quiet-vendor.demo@demo.techsyncops.dev returned 401",
+                    }
+                ],
+            },
+        ],
+    }
+    evidence["diagnostics"] = smoke_role_ux.diagnose_role_smoke_evidence(evidence)
+
+    smoke_role_ux.print_smoke_result(evidence, "role-ux-smoke-evidence.json")
+
+    output = capsys.readouterr().out
+    assert "Role UX smoke failed: 2 checks -> role-ux-smoke-evidence.json" in output
+    assert "viewer_empty:login" in output
+    assert "vendor_empty:login" in output
+    assert "Stale seed suspected: True" in output
+    assert "seed --reset-existing" in output
+    assert "password" not in output.lower()
+    assert "bearer" not in output.lower()
