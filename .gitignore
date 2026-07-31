@@ -88,6 +88,7 @@ role-ux-evidence-summary*.json
 local-role-ux-capture-manifest*.md
 local-role-ux-manual-notes*.json
 local-role-ux-evidence/
+pre-hosting-readiness*.json
 
 # Adjacent project checkouts
 turnflow-mvp/

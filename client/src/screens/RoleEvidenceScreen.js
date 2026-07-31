@@ -5,7 +5,16 @@ import {getRoleEvidenceDashboard} from '../utils/roleWalkthrough';
 
 function RoleEvidenceScreen() {
   const dashboard = useMemo(() => getRoleEvidenceDashboard(), []);
-  const {audit, manualChecklist, roleRows, safetyChecklist, screenshotRows} = dashboard;
+  const {
+    audit,
+    capturePreflightRows,
+    captureStatusRows,
+    captureViewportRows,
+    manualChecklist,
+    roleRows,
+    safetyChecklist,
+    screenshotRows,
+  } = dashboard;
 
   return (
     <ScrollView style={styles.container}>
@@ -32,6 +41,33 @@ function RoleEvidenceScreen() {
           </View>
         </View>
 
+        <Section title="Capture Preflight">
+          {capturePreflightRows.map((step, index) => (
+            <View key={step.key} style={styles.preflightRow}>
+              <View style={styles.stepBadge}>
+                <Text style={styles.stepNumber}>{index + 1}</Text>
+              </View>
+              <View style={styles.stepBody}>
+                <View style={styles.rowHeader}>
+                  <Text style={styles.stepTitle}>{step.label}</Text>
+                  <Text style={styles.stepOwner}>{step.owner}</Text>
+                </View>
+                <Text style={styles.manualDetail}>{step.detail}</Text>
+              </View>
+            </View>
+          ))}
+        </Section>
+
+        <Section title="Viewport Gates">
+          {captureViewportRows.map(viewport => (
+            <View key={viewport.key} style={styles.viewportRow}>
+              <Text style={styles.manualTitle}>{viewport.label}</Text>
+              <Text style={styles.viewportSize}>{viewport.size}</Text>
+              <Text style={styles.manualDetail}>{viewport.proof}</Text>
+            </View>
+          ))}
+        </Section>
+
         <Section title="Automated Checks">
           {audit.checks.map(check => (
             <View key={check.key} style={styles.checkRow}>
@@ -39,6 +75,24 @@ function RoleEvidenceScreen() {
                 {check.passed ? 'PASS' : 'FIX'}
               </Text>
               <Text style={styles.rowText}>{check.detail}</Text>
+            </View>
+          ))}
+        </Section>
+
+        <Section title="Role Friction Focus">
+          {captureStatusRows.map(role => (
+            <View key={role.role} style={styles.roleRow}>
+              <View style={styles.rowHeader}>
+                <Text style={styles.roleName}>{role.role.replace(/_/g, ' ')}</Text>
+                <Text style={styles.shotCount}>{role.screenshotCount} shots</Text>
+              </View>
+              <Text style={styles.login}>Primary: {role.primaryLoginEmail}</Text>
+              {role.emptyStateLoginEmail ? (
+                <Text style={styles.emptyLogin}>Empty-state: {role.emptyStateLoginEmail}</Text>
+              ) : null}
+              {role.focusChecks.map(check => (
+                <Text key={check} style={styles.focusItem}>- {check}</Text>
+              ))}
             </View>
           ))}
         </Section>
@@ -183,6 +237,60 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     minWidth: 34,
   },
+  preflightRow: {
+    alignItems: 'flex-start',
+    backgroundColor: '#020617',
+    borderColor: '#334155',
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 8,
+    padding: 10,
+  },
+  stepBadge: {
+    alignItems: 'center',
+    backgroundColor: '#0ea5e9',
+    borderRadius: 7,
+    height: 32,
+    justifyContent: 'center',
+    width: 32,
+  },
+  stepNumber: {
+    color: '#020617',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  stepBody: {
+    flex: 1,
+  },
+  stepTitle: {
+    color: '#f9fafb',
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  stepOwner: {
+    color: '#fbbf24',
+    fontSize: 11,
+    fontWeight: '800',
+    textAlign: 'right',
+    textTransform: 'uppercase',
+  },
+  viewportRow: {
+    backgroundColor: '#020617',
+    borderColor: '#1e40af',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 8,
+    padding: 10,
+  },
+  viewportSize: {
+    color: '#38bdf8',
+    fontSize: 12,
+    fontWeight: '900',
+    marginTop: 4,
+  },
   readyText: {
     color: '#a3e635',
   },
@@ -235,6 +343,12 @@ const styles = StyleSheet.create({
     color: '#fbbf24',
     fontSize: 12,
     marginTop: 4,
+  },
+  focusItem: {
+    color: '#d1d5db',
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 6,
   },
   objective: {
     color: '#e5e7eb',

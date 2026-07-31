@@ -209,6 +209,14 @@ Likely scope:
     viewer scope, linked vendor work, and vendor-visible messages
   - demo seed status now supports strict capture-readiness checks before the
     final local screenshot pass
+  - Role Evidence and the generated capture manifest now show the final
+    preflight order and viewport gates for 390px, 320px, and desktop review
+    before hosting
+  - strict evidence-pack validation now requires checklist, role-by-role, and
+    viewport manual notes before the final local gate can pass
+  - pre-hosting readiness doctor now summarizes tracked readiness tooling,
+    ignored local artifacts, role smoke, screenshots, manual notes, and
+    evidence summary JSON before the final Vercel gate
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions

@@ -76,13 +76,17 @@ before manual capture.
 
 ## Per-Role Checks
 
+- [ ] `scripts\seed_demo_data.py status --strict` passes against the local/demo
+      database before screenshots are captured.
 - [ ] `getRoleEvidenceReadinessAudit()` passes before screenshots are captured.
 - [ ] `getRoleEvidenceChecklistMarkdown()` output matches this screenshot plan.
 - [ ] `scripts/build_role_ux_evidence_pack.py` has been run against the final
-      smoke JSON, screenshot folder, and local manual notes JSON.
+      smoke JSON, screenshot folder, and local manual notes JSON with
+      `--strict`.
 - [ ] Evidence pack report shows smoke passed, tokens not saved, and expected
       screenshots present.
-- [ ] Evidence pack report shows manual notes passed with notes recorded.
+- [ ] Evidence pack report shows manual checklist, role, and viewport notes
+      passed with notes recorded.
 - [ ] Admin sees Directory, Dispatch, Report, and New Work actions.
 - [ ] Coordinator sees Directory, Dispatch, Report, and New Work actions.
 - [ ] Technician does not see Directory, Dispatch, Report, or New Work actions.
@@ -118,8 +122,8 @@ server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
 ```
 
 Set each `passed` field to `true` only after the check is actually observed,
-and add a short note for every check. The generated manifest and local notes
-file are intentionally not committed.
+and add a short note for every checklist item, role note, and viewport note.
+The generated manifest and local notes file are intentionally not committed.
 
 The final evidence-pack command should also include
 `--summary-json role-ux-evidence-summary.json` so screenshot/manual blockers

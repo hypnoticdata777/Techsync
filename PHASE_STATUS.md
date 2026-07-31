@@ -250,6 +250,15 @@ Completed:
 - Added strict demo-seed status readiness checks so
   `scripts/seed_demo_data.py status --strict` fails before final screenshots
   when the demo database is stale or missing synthetic users/scenarios.
+- Added final capture preflight and viewport gates to the Role Evidence screen
+  and generated capture manifest so the manual screenshot pass follows the
+  same strict seed, smoke, manifest, role walkthrough, evidence-pack, and
+  safety-review order.
+- Tightened strict evidence-pack validation so final manual notes must include
+  non-empty checklist, role-by-role, and viewport evidence before hosting.
+- Added `scripts/pre_hosting_readiness.py` so the last local gate can summarize
+  tracked readiness tooling, ignored local artifacts, role smoke, screenshot
+  inventory, manual notes, and evidence summary JSON before any hosting work.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and
@@ -309,8 +318,10 @@ Next:
   Evidence, walk admin/coordinator/technician/client/viewer/vendor, capture the
   21 screenshot targets with primary and empty-state personas using
   `local-role-ux-capture-manifest.md`, verify 390px and 320px widths, fill
-  `local-role-ux-manual-notes.json`, record manual screen-reader notes, and
-  complete screenshot safety review.
+  `local-role-ux-manual-notes.json` with checklist, role, and viewport notes,
+  record manual screen-reader notes, build the evidence pack, run
+  `scripts/pre_hosting_readiness.py --strict`, and complete screenshot safety
+  review.
 - Later, after the local product surface is complete, deploy only as the final
   gate, manually verify the true hosted email/log invitation path, run
   `scripts/smoke_v13.py` against the hosted backend, and capture

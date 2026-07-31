@@ -40,6 +40,11 @@ before real customer data goes in, **Nice-to-have** can trail behind launch.
       `V13_EVIDENCE_TEMPLATE.md`, `ROLE_UX_EVIDENCE_TEMPLATE.md`, and
       `PORTFOLIO_TECHSYNC_OPS.md` define the hosted proof path, role screenshot
       proof path, and portfolio source copy.
+- [x] **Add the local pre-hosting readiness doctor.**
+      `scripts/pre_hosting_readiness.py --strict` summarizes tracked tooling,
+      ignored local artifacts, role smoke, screenshots, manual notes, and
+      evidence summary JSON. It should pass only after the final local evidence
+      pass is complete.
 - [x] **Wire up real password-reset and invitation emails.** The backend
       now sends reset and invitation emails through `services/email_service.py`.
       Local development can use `EMAIL_DELIVERY_METHOD=log`; production

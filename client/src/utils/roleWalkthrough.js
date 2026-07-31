@@ -65,6 +65,66 @@ const MANUAL_EVIDENCE_CHECKS = [
   },
 ];
 
+export const CAPTURE_VIEWPORTS = [
+  {
+    key: 'mobile_390',
+    label: '390px mobile',
+    size: '390 x 844',
+    proof: 'Primary queues, cards, and action rows remain readable without clipped labels.',
+  },
+  {
+    key: 'narrow_320',
+    label: '320px narrow',
+    size: '320 x 740',
+    proof: 'Compact controls wrap cleanly and no evidence rows overlap.',
+  },
+  {
+    key: 'desktop_review',
+    label: 'Desktop review',
+    size: '1365 x 768 or wider',
+    proof: 'Screenshots are free of terminals, provider dashboards, secrets, and browser devtools.',
+  },
+];
+
+const CAPTURE_PREFLIGHT_STEPS = [
+  {
+    key: 'seed_status_strict',
+    label: 'Strict seed status',
+    owner: 'local API terminal',
+    detail: 'Run the demo seed status gate with --strict before role login screenshots.',
+  },
+  {
+    key: 'smoke_role_ux',
+    label: 'Role smoke evidence',
+    owner: 'repo terminal',
+    detail: 'Run scripts/smoke_role_ux.py against the local API and review sanitized role/API evidence.',
+  },
+  {
+    key: 'prepare_capture',
+    label: 'Capture manifest',
+    owner: 'repo terminal',
+    detail: 'Generate the ignored screenshot folder, manual notes copy, and capture manifest.',
+  },
+  {
+    key: 'manual_walkthrough',
+    label: 'Manual role pass',
+    owner: 'browser',
+    detail: 'Walk every synthetic role, capture required views, and record 390px/320px comfort notes.',
+  },
+  {
+    key: 'strict_evidence_pack',
+    label: 'Strict evidence pack',
+    owner: 'repo terminal',
+    detail: 'Build the evidence pack with --strict and resolve every screenshot/manual blocker.',
+  },
+  {
+    key: 'safety_review',
+    label: 'Screenshot safety',
+    owner: 'reviewer',
+    detail: 'Confirm every image is synthetic and contains no terminals, provider pages, URLs, tokens, or passwords.',
+  },
+];
+
 const WALKTHROUGH_BY_ROLE = {
   org_admin: {
     persona: 'PMC owner/operator',
@@ -137,6 +197,39 @@ const WALKTHROUGH_BY_ROLE = {
   },
 };
 
+const CAPTURE_FOCUS_BY_ROLE = {
+  org_admin: [
+    'Manager controls are visible.',
+    'Directory, dispatch, reports, evidence, and linked work creation are reachable.',
+    'No provider dashboards, URLs, or terminal overlays appear in captures.',
+  ],
+  coordinator: [
+    'Coordinator can create linked work and review duplicate-warning context.',
+    'Dispatch and detail follow-through are visible without admin-only tenant settings.',
+    'Approval request and client/vendor communication paths are understandable.',
+  ],
+  technician: [
+    'Assigned queue shows active assigned work only.',
+    'Status, notes, and proof controls are touch-friendly at narrow widths.',
+    'Manager-only screens and internal admin controls remain hidden.',
+  ],
+  client: [
+    'Only linked client work is visible.',
+    'Pending approval decisions are obvious and internal notes remain hidden.',
+    'Client-visible messages read like updates, not internal operations chatter.',
+  ],
+  viewer: [
+    'Read-only scope is obvious.',
+    'No mutation, proof-upload, or manager controls are visible.',
+    'Empty-state capture proves unrelated work stays hidden.',
+  ],
+  vendor: [
+    'Only linked vendor work is visible.',
+    'Vendor-visible messages appear without client/internal message leakage.',
+    'Empty-state capture proves unrelated vendor work stays hidden.',
+  ],
+};
+
 const withScreenshotName = (role, screen, index) => ({
   ...screen,
   screenshotName: `techsync-ops-${role}-${String(index + 1).padStart(2, '0')}-${screen.key}.png`,
@@ -194,6 +287,22 @@ export const getEvidenceSafetyChecklist = () => [
 
 export const getManualEvidenceChecklist = () => MANUAL_EVIDENCE_CHECKS;
 
+export const getCaptureViewportPlan = () => CAPTURE_VIEWPORTS;
+
+export const getCapturePreflightSteps = () => CAPTURE_PREFLIGHT_STEPS;
+
+export const getRoleCaptureStatusRows = (roles = ROLE_WALKTHROUGH_ORDER) =>
+  getRoleWalkthroughManifest(roles).map(item => ({
+    role: item.role,
+    persona: item.persona,
+    primaryLoginEmail: item.loginEmail,
+    emptyStateLoginEmail: item.emptyStateLoginEmail,
+    screenshotCount: item.screens.length,
+    screenshots: item.screens.map(screen => screen.screenshotName),
+    focusChecks: CAPTURE_FOCUS_BY_ROLE[item.role] || [],
+    viewportKeys: CAPTURE_VIEWPORTS.map(viewport => viewport.key),
+  }));
+
 export const getRoleEvidenceDashboard = (roles = ROLE_WALKTHROUGH_ORDER) => {
   const manifest = getRoleWalkthroughManifest(roles);
   const plan = getScreenshotPlan(roles);
@@ -205,6 +314,9 @@ export const getRoleEvidenceDashboard = (roles = ROLE_WALKTHROUGH_ORDER) => {
     audit,
     safetyChecklist,
     manualChecklist,
+    capturePreflightRows: getCapturePreflightSteps(),
+    captureViewportRows: getCaptureViewportPlan(),
+    captureStatusRows: getRoleCaptureStatusRows(roles),
     roleRows: manifest.map(item => ({
       role: item.role,
       persona: item.persona,
@@ -292,6 +404,24 @@ const vendorScopeIsDocumented = manifest => {
   );
 };
 
+const capturePreflightHasStrictSeed = () =>
+  CAPTURE_PREFLIGHT_STEPS.some(
+    step => step.key === 'seed_status_strict' && step.detail.includes('--strict'),
+  );
+
+const capturePreflightHasStrictEvidencePack = () =>
+  CAPTURE_PREFLIGHT_STEPS.some(
+    step => step.key === 'strict_evidence_pack' && step.detail.includes('--strict'),
+  );
+
+const captureWidthsAreDocumented = () =>
+  ['mobile_390', 'narrow_320'].every(key =>
+    CAPTURE_VIEWPORTS.some(viewport => viewport.key === key),
+  );
+
+const everyRoleHasCaptureFocus = manifest =>
+  manifest.every(item => (CAPTURE_FOCUS_BY_ROLE[item.role] || []).length >= 2);
+
 const roleNotRequestedOr = (manifest, role, assertion) =>
   !manifest.some(item => item.role === role) || assertion(manifest);
 
@@ -354,6 +484,26 @@ export const getRoleEvidenceReadinessAudit = (roles = ROLE_WALKTHROUGH_ORDER) =>
       passed: roleNotRequestedOr(manifest, 'vendor', vendorScopeIsDocumented),
       detail: 'Vendor evidence calls out linked-work scope and hidden internal/client context.',
     },
+    {
+      key: 'strict_seed_preflight',
+      passed: capturePreflightHasStrictSeed(),
+      detail: 'Capture preflight requires strict demo seed status before screenshots.',
+    },
+    {
+      key: 'strict_evidence_pack_preflight',
+      passed: capturePreflightHasStrictEvidencePack(),
+      detail: 'Capture preflight ends with a strict evidence-pack gate.',
+    },
+    {
+      key: 'small_width_viewports_documented',
+      passed: captureWidthsAreDocumented(),
+      detail: '390px and 320px viewport checks are explicit before hosting.',
+    },
+    {
+      key: 'role_capture_focus_documented',
+      passed: everyRoleHasCaptureFocus(manifest),
+      detail: 'Every role has manual capture focus checks for friction review.',
+    },
   ];
 
   return {
@@ -385,6 +535,18 @@ export const getRoleEvidenceChecklistMarkdown = (roles = ROLE_WALKTHROUGH_ORDER)
       item =>
         `- ${item.role} / ${item.route}: \`${item.screenshotName}\` - ${item.proof}`,
     ),
+    '',
+    '## Capture Preflight',
+    '',
+    ...CAPTURE_PREFLIGHT_STEPS.map(
+      step => `- ${step.label}: ${step.detail}`,
+    ),
+    '',
+    '## Viewport Checks',
+    '',
+    ...CAPTURE_VIEWPORTS.map(
+      viewport => `- ${viewport.label} (${viewport.size}): ${viewport.proof}`,
+    ),
   ];
 
   return `${lines.join('\n')}\n`;
@@ -399,6 +561,9 @@ export default {
   getScreenshotPlan,
   getEvidenceSafetyChecklist,
   getManualEvidenceChecklist,
+  getCaptureViewportPlan,
+  getCapturePreflightSteps,
+  getRoleCaptureStatusRows,
   getRoleEvidenceDashboard,
   getRoleEvidenceReadinessAudit,
   getRoleEvidenceChecklistMarkdown,

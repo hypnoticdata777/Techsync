@@ -16,10 +16,15 @@ now has a tested readiness audit for synthetic logins, screenshot targets,
 role controls, privacy expectations, and screenshot safety checks. The final
 capture workflow is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
 `scripts/smoke_role_ux.py` can produce sanitized role-scope API evidence once a
-local/demo API is running. The latest local capture-prep run proved the
-Neon-backed API through all six synthetic roles with 67 passing smoke checks;
-the remaining evidence work is the manual 21-screenshot, small-width, and
-screen-reader pass.
+local/demo API is running. The Role Evidence screen and capture manifest now
+show the strict preflight order plus 390px, 320px, and desktop viewport gates.
+The strict evidence pack requires checklist, role-by-role, and viewport notes
+before hosting. `scripts/pre_hosting_readiness.py` now summarizes the final
+local blockers across tracked tooling, ignored evidence artifacts, role smoke,
+screenshots, manual notes, and evidence summary JSON. The latest local
+capture-prep run proved the Neon-backed API through all six synthetic roles
+with 67 passing smoke checks; the remaining evidence work is the manual
+21-screenshot, small-width, and screen-reader pass.
 
 ## Overview
 
@@ -318,7 +323,11 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   audit and manager-only in-app Role Evidence screen for the final manual
   screenshot pass. The Role Evidence screen now includes final manual proof
   checks for each synthetic role, small-width comfort, screen-reader notes, and
-  screenshot safety.
+  screenshot safety, plus the strict preflight order and viewport gates used by
+  the generated local capture manifest. The local evidence pack now requires
+  checklist, role-by-role, and viewport notes before strict mode can pass. The
+  pre-hosting readiness doctor can be run locally to confirm no smoke,
+  screenshot, manual-note, or evidence-summary blockers remain before Vercel.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),
   RF-24 (status update with notes). RF-23 (offline sync) is deferred per
   spec scope note.
@@ -368,7 +377,12 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   work, client pending approval, viewer scope, linked vendor work, and vendor-
   visible messages. Before final captures, run
   `scripts\seed_demo_data.py status --strict` against the local/demo database
-  to confirm the seed is current.
+  to confirm the seed is current. The local evidence-pack strict gate also
+  requires completed checklist, role-by-role, and viewport notes before any
+  public screenshot set is considered ready.
+- Run `scripts\pre_hosting_readiness.py --strict` after the final evidence pack
+  is built; it should pass only when the local non-hosting evidence gate is
+  actually complete.
 - Local Expo web note: Expo 50 on Node 24 can hit a Windows Metro external path
   issue involving `node:sea`; use Node 20 LTS for the durable local-web setup
   until Expo is upgraded.

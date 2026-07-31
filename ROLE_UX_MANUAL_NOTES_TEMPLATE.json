@@ -57,5 +57,66 @@
       "passed": false,
       "notes": ""
     }
+  ],
+  "role_notes": [
+    {
+      "role": "org_admin",
+      "label": "Admin role walkthrough",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "role": "coordinator",
+      "label": "Coordinator role walkthrough",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "role": "technician",
+      "label": "Technician role walkthrough",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "role": "client",
+      "label": "Client role walkthrough",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "role": "viewer",
+      "label": "Viewer role walkthrough",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "role": "vendor",
+      "label": "Vendor role walkthrough",
+      "passed": false,
+      "notes": ""
+    }
+  ],
+  "viewport_notes": [
+    {
+      "key": "mobile_390",
+      "label": "390px mobile layout",
+      "size": "390 x 844",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "narrow_320",
+      "label": "320px narrow layout",
+      "size": "320 x 740",
+      "passed": false,
+      "notes": ""
+    },
+    {
+      "key": "desktop_review",
+      "label": "Desktop screenshot safety review",
+      "size": "1365 x 768 or wider",
+      "passed": false,
+      "notes": ""
+    }
   ]
 }

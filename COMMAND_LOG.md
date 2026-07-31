@@ -2223,3 +2223,91 @@ Result:
 - Secret scan only matched documented placeholders and prior scan commands; no
   live-looking provider token, database URL, or private key was found in this
   batch.
+
+## 2026-07-31 - v1.3 Final Role Evidence Gate Hardening
+
+Decision:
+
+- Make the final local UX evidence pass harder to miss or half-complete before
+  any Vercel/portfolio hosting work begins.
+- Keep the pass local-only and avoid storing screenshots, credentials, database
+  URLs, or filled manual notes in tracked files.
+
+Changes:
+
+- Added capture preflight steps, viewport gates, and role-specific friction
+  focus rows to the shared role walkthrough model and the manager-only Role
+  Evidence screen.
+- Updated the generated local capture manifest so it shows the same strict seed,
+  role smoke, capture prep, manual walkthrough, strict evidence-pack, and
+  screenshot-safety order.
+- Expanded `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` with per-role and per-viewport
+  note sections.
+- Tightened `scripts/build_role_ux_evidence_pack.py --strict` so final manual
+  evidence requires checklist notes, role-by-role notes, and viewport notes.
+- Updated README, QA checklist, phase status, roadmap, accessibility evidence,
+  role capture pass notes, and role evidence template with the stricter final
+  local gate.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py --help
+server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --help
+git diff --check
+```
+
+Result:
+
+- Backend tests passed: `179 passed`.
+- Client tests passed: `7 passed suites`, `45 passed tests`.
+- Compile checks passed.
+- Capture-prep and evidence-pack helper CLIs both showed help successfully.
+- Diff hygiene passed with normal Windows LF/CRLF warnings.
+
+## 2026-07-31 - v1.3 Pre-Hosting Readiness Doctor
+
+Decision:
+
+- Add one local command that answers "what still blocks hosting?" before any
+  Vercel or portfolio showcase work is started.
+- Keep the readiness summary local/ignored and avoid contacting external
+  providers or storing secrets.
+
+Changes:
+
+- Added `scripts/pre_hosting_readiness.py` to summarize tracked readiness
+  files, ignored local evidence artifacts, manual-notes template coverage,
+  screenshot plan integrity, capture manifest presence, role smoke evidence,
+  screenshot inventory, manual notes, and evidence summary JSON.
+- Added pytest coverage for both a tooling-ready but evidence-blocked repo and
+  a fully complete local evidence set.
+- Added `pre-hosting-readiness*.json` to `.gitignore`.
+- Updated README, QA checklist, phase status, roadmap, pre-launch checklist,
+  and role capture pass docs with the new final local readiness command.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_pre_hosting_readiness.py server\tests\test_role_ux_evidence_pack.py server\tests\test_prepare_role_ux_capture.py -p no:cacheprovider
+server\venv\Scripts\python.exe scripts\pre_hosting_readiness.py --summary-json pre-hosting-readiness-summary.json
+git check-ignore pre-hosting-readiness-summary.json role-ux-evidence-summary.json local-role-ux-manual-notes.json local-role-ux-capture-manifest.md
+```
+
+Result:
+
+- Backend tests passed: `181 passed`.
+- Client tests passed: `7 passed suites`, `45 passed tests`.
+- Compile checks passed.
+- Readiness helper CLI help displayed successfully.
+- Readiness doctor ran locally and reported `Ready for hosting gate: False`
+  with 4 expected blockers: stale/blocked role smoke, 18/21 screenshots
+  present, incomplete manual notes, and evidence summary blockers.
+- Git ignore check confirmed local readiness and role-evidence artifacts remain
+  ignored.
+- Diff hygiene passed with normal Windows LF/CRLF warnings.

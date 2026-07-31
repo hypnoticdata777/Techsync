@@ -188,6 +188,16 @@ they have been verified in the relevant environment.
       approval, viewer scope, linked vendor work, and vendor-visible messages.
 - [x] Demo seed status supports `--strict` capture-readiness checks for exact
       counts, synthetic users, empty-state personas, and screenshot scenarios.
+- [x] Role Evidence screen now shows the final capture preflight order,
+      390px/320px/desktop viewport gates, and role-specific friction focus
+      checks before screenshot capture.
+- [x] Strict local evidence-pack validation now requires filled manual notes
+      for every checklist item, every synthetic role, and every required
+      viewport before hosting.
+- [x] Local pre-hosting readiness doctor added to summarize tracked tooling,
+      ignored local evidence artifacts, smoke status, screenshot inventory,
+      manual notes, and evidence summary blockers before the final hosting
+      gate.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.
@@ -195,7 +205,7 @@ they have been verified in the relevant environment.
       final capture pass.
 - [ ] `local-role-ux-manual-notes.json` filled from
       `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` and included in the final local
-      evidence pack.
+      evidence pack with checklist, role, and viewport notes.
 - [ ] `local-role-ux-capture-manifest.md` generated and used to close all
       screenshot rows before strict evidence-pack validation.
 - [ ] `role-ux-evidence-summary.json` generated locally and shows no

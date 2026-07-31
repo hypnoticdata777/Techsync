@@ -36,7 +36,28 @@ def test_prepare_capture_creates_folder_notes_and_manifest(tmp_path):
     body = manifest_path.read_text(encoding="utf-8")
     assert "TechSync Ops Local Role UX Capture Manifest" in body
     assert "Progress: 0/" in body
+    assert "## Preflight" in body
+    assert "Strict seed status" in body
+    assert "## Viewport Gates" in body
+    assert "390px mobile" in body
+    assert "320px narrow" in body
     assert "--strict" in body
+
+
+def test_capture_manifest_constants_keep_final_gate_order():
+    assert [step[0] for step in prepare_capture_module.CAPTURE_PREFLIGHT_STEPS] == [
+        "Strict seed status",
+        "Role smoke evidence",
+        "Capture prep",
+        "Manual walkthrough",
+        "Strict evidence pack",
+        "Screenshot safety",
+    ]
+    assert [viewport[1] for viewport in prepare_capture_module.CAPTURE_VIEWPORTS] == [
+        "390 x 844",
+        "320 x 740",
+        "1365 x 768 or wider",
+    ]
 
 
 def test_prepare_capture_keeps_existing_manual_notes_without_overwrite(tmp_path):

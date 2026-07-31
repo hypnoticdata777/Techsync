@@ -23,6 +23,51 @@ from build_role_ux_evidence_pack import (
 DEFAULT_TEMPLATE_PATH = "ROLE_UX_MANUAL_NOTES_TEMPLATE.json"
 DEFAULT_CAPTURE_MANIFEST_PATH = "local-role-ux-capture-manifest.md"
 
+CAPTURE_PREFLIGHT_STEPS = [
+    (
+        "Strict seed status",
+        "Run `python scripts\\seed_demo_data.py status --strict` against the local/demo database.",
+    ),
+    (
+        "Role smoke evidence",
+        "Run `scripts\\smoke_role_ux.py` against the local API and review sanitized role/API evidence.",
+    ),
+    (
+        "Capture prep",
+        "Generate this manifest, the ignored screenshot folder, and the manual notes copy.",
+    ),
+    (
+        "Manual walkthrough",
+        "Walk every synthetic role and capture each missing screenshot filename below.",
+    ),
+    (
+        "Strict evidence pack",
+        "Build `role-ux-evidence-pack.md` with `--strict` and resolve every blocker.",
+    ),
+    (
+        "Screenshot safety",
+        "Review all images for terminals, secrets, provider pages, real data, URLs, and passwords.",
+    ),
+]
+
+CAPTURE_VIEWPORTS = [
+    (
+        "390px mobile",
+        "390 x 844",
+        "Primary queues, cards, and action rows remain readable without clipped labels.",
+    ),
+    (
+        "320px narrow",
+        "320 x 740",
+        "Compact controls wrap cleanly and evidence rows do not overlap.",
+    ),
+    (
+        "Desktop review",
+        "1365 x 768 or wider",
+        "Images are free of terminals, provider dashboards, secrets, and browser devtools.",
+    ),
+]
+
 
 @dataclass(frozen=True)
 class CapturePrepResult:
@@ -62,9 +107,31 @@ def _write_manifest(
         f"Progress: {present_count}/{expected_count} screenshots present",
         f"Missing: {len(missing_screenshots)}",
         "",
-        "## Capture Order",
+        "## Preflight",
         "",
     ]
+
+    for index, (label, detail) in enumerate(CAPTURE_PREFLIGHT_STEPS, start=1):
+        lines.append(f"{index}. [ ] {label}: {detail}")
+
+    lines.extend(
+        [
+            "",
+            "## Viewport Gates",
+            "",
+        ]
+    )
+
+    for label, size, detail in CAPTURE_VIEWPORTS:
+        lines.append(f"- [ ] {label} (`{size}`): {detail}")
+
+    lines.extend(
+        [
+            "",
+            "## Capture Order",
+            "",
+        ]
+    )
 
     for role, steps in _role_steps().items():
         lines.extend([f"### {role}", ""])
@@ -78,7 +145,7 @@ def _write_manifest(
             "## Final Local Gate",
             "",
             "- [ ] All 21 screenshots are present in the screenshot folder.",
-            "- [ ] `local-role-ux-manual-notes.json` is filled with `passed: true` and notes.",
+            "- [ ] `local-role-ux-manual-notes.json` has `passed: true` plus notes for every check, role, and viewport.",
             "- [ ] Evidence pack is rebuilt with `--strict` and exits cleanly.",
             "- [ ] Screenshot safety review confirms no terminals, secrets, provider dashboards, or real data.",
             "",

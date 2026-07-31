@@ -56,6 +56,9 @@ MANUAL_CHECKS = [
     "Screenshot safety review confirms no terminals, secrets, provider dashboards, or real data.",
 ]
 
+REQUIRED_ROLE_NOTES = ["org_admin", "coordinator", "technician", "client", "viewer", "vendor"]
+REQUIRED_VIEWPORT_NOTES = ["mobile_390", "narrow_320", "desktop_review"]
+
 UNSAFE_ARTIFACT_TERMS = (
     "database_url",
     "jwt_secret",
@@ -101,6 +104,8 @@ class ManualSummary:
     failed_checks: list[str]
     missing_notes: list[str]
     malformed_checks: list[str]
+    missing_role_notes: list[str]
+    missing_viewport_notes: list[str]
 
     @property
     def clean(self) -> bool:
@@ -110,6 +115,8 @@ class ManualSummary:
             and not self.failed_checks
             and not self.missing_notes
             and not self.malformed_checks
+            and not self.missing_role_notes
+            and not self.missing_viewport_notes
         )
 
 
@@ -180,6 +187,8 @@ def summarize_manual_notes(manual_notes_path: Path) -> ManualSummary:
             failed_checks=["Manual notes file was not found."],
             missing_notes=[],
             malformed_checks=[],
+            missing_role_notes=REQUIRED_ROLE_NOTES,
+            missing_viewport_notes=REQUIRED_VIEWPORT_NOTES,
         )
 
     checks = evidence.get("checks")
@@ -190,6 +199,8 @@ def summarize_manual_notes(manual_notes_path: Path) -> ManualSummary:
             failed_checks=[],
             missing_notes=[],
             malformed_checks=["checks must be a list"],
+            missing_role_notes=REQUIRED_ROLE_NOTES,
+            missing_viewport_notes=REQUIRED_VIEWPORT_NOTES,
         )
 
     failed_checks: list[str] = []
@@ -207,12 +218,49 @@ def summarize_manual_notes(manual_notes_path: Path) -> ManualSummary:
         if not str(check.get("notes") or "").strip():
             missing_notes.append(key)
 
+    role_notes = evidence.get("role_notes")
+    viewport_notes = evidence.get("viewport_notes")
+
+    if not isinstance(role_notes, list):
+        missing_role_notes = REQUIRED_ROLE_NOTES.copy()
+    else:
+        role_note_by_key = {
+            str(item.get("role")): item
+            for item in role_notes
+            if isinstance(item, dict) and item.get("role")
+        }
+        missing_role_notes = [
+            role
+            for role in REQUIRED_ROLE_NOTES
+            if role not in role_note_by_key
+            or role_note_by_key[role].get("passed") is not True
+            or not str(role_note_by_key[role].get("notes") or "").strip()
+        ]
+
+    if not isinstance(viewport_notes, list):
+        missing_viewport_notes = REQUIRED_VIEWPORT_NOTES.copy()
+    else:
+        viewport_note_by_key = {
+            str(item.get("key")): item
+            for item in viewport_notes
+            if isinstance(item, dict) and item.get("key")
+        }
+        missing_viewport_notes = [
+            key
+            for key in REQUIRED_VIEWPORT_NOTES
+            if key not in viewport_note_by_key
+            or viewport_note_by_key[key].get("passed") is not True
+            or not str(viewport_note_by_key[key].get("notes") or "").strip()
+        ]
+
     return ManualSummary(
         exists=True,
         check_count=len(checks),
         failed_checks=failed_checks,
         missing_notes=missing_notes,
         malformed_checks=malformed_checks,
+        missing_role_notes=missing_role_notes,
+        missing_viewport_notes=missing_viewport_notes,
     )
 
 
@@ -299,6 +347,8 @@ def build_report(
             f"- Failed/manual-pending checks: {len(manual.failed_checks)}",
             f"- Checks missing notes: {len(manual.missing_notes)}",
             f"- Malformed checks: {len(manual.malformed_checks)}",
+            f"- Role notes missing/incomplete: {len(manual.missing_role_notes)}",
+            f"- Viewport notes missing/incomplete: {len(manual.missing_viewport_notes)}",
             "",
         ]
     )
@@ -311,6 +361,10 @@ def build_report(
             lines.extend(f"- Missing notes: `{check}`" for check in manual.missing_notes)
         if manual.malformed_checks:
             lines.extend(f"- Malformed: `{check}`" for check in manual.malformed_checks)
+        if manual.missing_role_notes:
+            lines.extend(f"- Missing role note: `{role}`" for role in manual.missing_role_notes)
+        if manual.missing_viewport_notes:
+            lines.extend(f"- Missing viewport note: `{viewport}`" for viewport in manual.missing_viewport_notes)
         if manual.clean:
             lines.append("- All manual checks passed with notes recorded.")
     else:
@@ -353,6 +407,8 @@ def build_report(
         "manual_failed_checks": manual.failed_checks,
         "manual_missing_notes": manual.missing_notes,
         "manual_malformed_checks": manual.malformed_checks,
+        "manual_missing_role_notes": manual.missing_role_notes,
+        "manual_missing_viewport_notes": manual.missing_viewport_notes,
         "output_path": str(output_path),
     }
 
@@ -372,6 +428,8 @@ def write_summary_json(*, summary_path: Path, result: dict[str, Any], environmen
         "manual_failed_checks": result["manual_failed_checks"],
         "manual_missing_notes": result["manual_missing_notes"],
         "manual_malformed_checks": result["manual_malformed_checks"],
+        "manual_missing_role_notes": result["manual_missing_role_notes"],
+        "manual_missing_viewport_notes": result["manual_missing_viewport_notes"],
         "evidence_report": result["output_path"],
     }
     summary_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -387,6 +445,8 @@ def print_blockers(result: dict[str, Any]) -> None:
         result["manual_failed_checks"]
         or result["manual_missing_notes"]
         or result["manual_malformed_checks"]
+        or result["manual_missing_role_notes"]
+        or result["manual_missing_viewport_notes"]
     )
     if manual_blockers:
         print("Manual note blockers:")
@@ -396,6 +456,10 @@ def print_blockers(result: dict[str, Any]) -> None:
             print(f"- missing note: {check}")
         for check in result["manual_malformed_checks"]:
             print(f"- malformed: {check}")
+        for role in result["manual_missing_role_notes"]:
+            print(f"- missing role note: {role}")
+        for viewport in result["manual_missing_viewport_notes"]:
+            print(f"- missing viewport note: {viewport}")
 
 
 def main() -> int:

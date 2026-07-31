@@ -1,4 +1,6 @@
 import {
+  getCapturePreflightSteps,
+  getCaptureViewportPlan,
   SYNTHETIC_EMPTY_STATE_LOGINS,
   ROLE_WALKTHROUGH_ORDER,
   getEvidenceSafetyChecklist,
@@ -6,6 +8,7 @@ import {
   getRoleEvidenceDashboard,
   getRoleEvidenceChecklistMarkdown,
   getRoleEvidenceReadinessAudit,
+  getRoleCaptureStatusRows,
   getRoleWalkthrough,
   getRoleWalkthroughManifest,
   getScreenshotPlan,
@@ -90,6 +93,10 @@ describe('role walkthrough manifest', () => {
       'client_privacy_documented',
       'viewer_readonly_documented',
       'vendor_scope_documented',
+      'strict_seed_preflight',
+      'strict_evidence_pack_preflight',
+      'small_width_viewports_documented',
+      'role_capture_focus_documented',
     ]);
   });
 
@@ -105,6 +112,19 @@ describe('role walkthrough manifest', () => {
     );
     expect(dashboard.safetyChecklist).toHaveLength(5);
     expect(dashboard.manualChecklist).toHaveLength(5);
+    expect(dashboard.capturePreflightRows.map(item => item.key)).toEqual([
+      'seed_status_strict',
+      'smoke_role_ux',
+      'prepare_capture',
+      'manual_walkthrough',
+      'strict_evidence_pack',
+      'safety_review',
+    ]);
+    expect(dashboard.captureViewportRows.map(item => item.key)).toEqual([
+      'mobile_390',
+      'narrow_320',
+      'desktop_review',
+    ]);
     expect(dashboard.roleRows.find(item => item.role === 'vendor')).toEqual(
       expect.objectContaining({
         loginEmail: 'apex.demo@demo.techsyncops.dev',
@@ -128,6 +148,9 @@ describe('role walkthrough manifest', () => {
     expect(markdown).toContain('ready for manual capture');
     expect(markdown).toContain('techsync-ops-vendor-01-vendor-queue.png');
     expect(markdown).toContain('Only work linked to apex.demo@demo.techsyncops.dev is visible.');
+    expect(markdown).toContain('## Capture Preflight');
+    expect(markdown).toContain('Strict seed status');
+    expect(markdown).toContain('390px mobile');
   });
 
   test('uses the active assigned technician for the manual capture pass', () => {
@@ -143,5 +166,39 @@ describe('role walkthrough manifest', () => {
       }),
     );
     expect(getRoleWalkthrough('vendor').emptyStateLoginEmail).toBe('quiet-vendor.demo@demo.techsyncops.dev');
+  });
+
+  test('keeps preflight gates and viewport checks explicit', () => {
+    const preflight = getCapturePreflightSteps();
+    const viewports = getCaptureViewportPlan();
+
+    expect(preflight[0]).toEqual(
+      expect.objectContaining({
+        key: 'seed_status_strict',
+        detail: expect.stringContaining('--strict'),
+      }),
+    );
+    expect(preflight.find(item => item.key === 'strict_evidence_pack').detail).toContain('--strict');
+    expect(viewports).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({key: 'mobile_390', size: '390 x 844'}),
+        expect.objectContaining({key: 'narrow_320', size: '320 x 740'}),
+      ]),
+    );
+  });
+
+  test('builds role capture status rows with focus checks', () => {
+    const rows = getRoleCaptureStatusRows();
+    const viewer = rows.find(item => item.role === 'viewer');
+
+    expect(rows).toHaveLength(6);
+    expect(viewer.emptyStateLoginEmail).toBe('quiet-owner.demo@demo.techsyncops.dev');
+    expect(viewer.focusChecks).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Read-only'),
+        expect.stringContaining('Empty-state'),
+      ]),
+    );
+    expect(viewer.viewportKeys).toEqual(['mobile_390', 'narrow_320', 'desktop_review']);
   });
 });

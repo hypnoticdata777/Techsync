@@ -23,10 +23,12 @@ Implemented in this pass:
 - Dispatch board work chips and summary tiles expose meaningful labels.
 - The manager-only Role Evidence screen now includes visible manual evidence
   checks for each synthetic role, 390px/320px width comfort, screen-reader
-  notes, and screenshot safety.
+  notes, screenshot safety, final preflight order, and viewport gates.
 - `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` and
   `scripts/build_role_ux_evidence_pack.py --manual-notes` now turn those
   manual checks into local report evidence without committing the filled notes.
+  Strict mode now requires notes for every checklist item, every synthetic role,
+  and every required viewport.
 - `scripts/prepare_role_ux_capture.py` now prepares the ignored local notes
   file and capture manifest before the final screen-reader pass.
 - `scripts/build_role_ux_evidence_pack.py --summary-json` now writes a local
@@ -58,7 +60,9 @@ Use synthetic demo data only.
   `ROLE_UX_CAPTURE_PASS.md`.
 - Fill `local-role-ux-manual-notes.json` from
   `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` during the final pass; use
-  `scripts/prepare_role_ux_capture.py` to create the local copy safely.
+  `scripts/prepare_role_ux_capture.py` to create the local copy safely. The
+  local copy must include checklist, role-by-role, and viewport notes before
+  strict evidence validation can pass.
 - Capture final role screenshots after all non-hosting local product depth is
   complete.
 - Add deeper automated component-level accessibility tests if the app later adds

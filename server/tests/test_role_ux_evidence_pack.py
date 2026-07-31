@@ -50,6 +50,24 @@ def _write_manual_notes(path: Path, *, passed=True, missing_notes=False):
                         "notes": "No secrets, terminals, or provider dashboards visible.",
                     },
                 ],
+                "role_notes": [
+                    {
+                        "role": role,
+                        "label": f"{role} walkthrough",
+                        "passed": True,
+                        "notes": f"Verified {role}.",
+                    }
+                    for role in evidence_pack.REQUIRED_ROLE_NOTES
+                ],
+                "viewport_notes": [
+                    {
+                        "key": key,
+                        "label": f"{key} viewport",
+                        "passed": True,
+                        "notes": f"Verified {key}.",
+                    }
+                    for key in evidence_pack.REQUIRED_VIEWPORT_NOTES
+                ],
             }
         ),
         encoding="utf-8",
@@ -84,6 +102,8 @@ def test_manual_notes_require_passed_checks_and_notes(tmp_path):
     assert summary.check_count == 2
     assert summary.failed_checks == []
     assert summary.missing_notes == []
+    assert summary.missing_role_notes == []
+    assert summary.missing_viewport_notes == []
 
     _write_manual_notes(manual_notes_path, passed=False, missing_notes=True)
     summary = evidence_pack.summarize_manual_notes(manual_notes_path)
@@ -91,6 +111,23 @@ def test_manual_notes_require_passed_checks_and_notes(tmp_path):
     assert summary.clean is False
     assert summary.failed_checks == ["mobile_layout_390"]
     assert summary.missing_notes == ["mobile_layout_390"]
+
+
+def test_manual_notes_require_each_role_and_viewport_note(tmp_path):
+    manual_notes_path = tmp_path / "local-role-ux-manual-notes.json"
+    _write_manual_notes(manual_notes_path)
+    evidence = json.loads(manual_notes_path.read_text(encoding="utf-8"))
+    evidence["role_notes"] = [
+        item for item in evidence["role_notes"] if item["role"] != "vendor"
+    ]
+    evidence["viewport_notes"][0]["notes"] = ""
+    manual_notes_path.write_text(json.dumps(evidence), encoding="utf-8")
+
+    summary = evidence_pack.summarize_manual_notes(manual_notes_path)
+
+    assert summary.clean is False
+    assert summary.missing_role_notes == ["vendor"]
+    assert summary.missing_viewport_notes == ["mobile_390"]
 
 
 def test_screenshot_inventory_tracks_expected_missing_extra_and_unsafe_names(tmp_path):
@@ -171,5 +208,7 @@ def test_summary_json_writes_sanitized_machine_readable_blockers(tmp_path):
     assert summary["manual_clean"] is False
     assert summary["manual_failed_checks"] == ["mobile_layout_390"]
     assert summary["manual_missing_notes"] == ["mobile_layout_390"]
+    assert summary["manual_missing_role_notes"] == []
+    assert summary["manual_missing_viewport_notes"] == []
     assert "postgresql://" not in summary_path.read_text(encoding="utf-8")
     assert "bearer" not in summary_path.read_text(encoding="utf-8").lower()

@@ -13,15 +13,17 @@ Prepared, automated, and partially exercised live:
 - Role walkthrough manifest covers admin, coordinator, technician, client,
   viewer, and vendor.
 - In-app Role Evidence screen shows automated readiness checks, role capture
-  rows, screenshot targets, manual UX checks, and safety checklist.
+  rows, screenshot targets, manual UX checks, preflight order, viewport gates,
+  role-specific friction focus, and safety checklist.
 - `scripts/smoke_role_ux.py` can log in as each synthetic role and produce
   sanitized role-scope evidence JSON.
 - `scripts/build_role_ux_evidence_pack.py` can combine the sanitized smoke JSON
   local screenshot folder, and local manual notes JSON into a Markdown evidence
-  report that lists missing screenshots and remaining manual checks.
+  report that lists missing screenshots and remaining manual checks. Strict
+  mode now also requires role notes and viewport notes.
 - `scripts/prepare_role_ux_capture.py` can create the local screenshot folder,
   copy the manual notes template, and write a local capture manifest that lists
-  the remaining screenshot targets.
+  the preflight order, viewport gates, and remaining screenshot targets.
 - Backend role-scope tests cover client/viewer, vendor, and technician
   boundaries.
 - Client tests cover role workflow helpers, route visibility, role evidence
@@ -86,14 +88,21 @@ evidence report:
 cd "C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync"
 server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
 # Use local-role-ux-capture-manifest.md as the screenshot checklist.
-# Fill local-role-ux-manual-notes.json after the manual layout, screen-reader,
-# role-scope, and screenshot safety pass.
+# Fill local-role-ux-manual-notes.json after the manual layout, role-by-role,
+# screen-reader, viewport, and screenshot safety pass.
 server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --smoke role-ux-smoke-evidence.json --screenshots local-role-ux-evidence --manual-notes local-role-ux-manual-notes.json --output role-ux-evidence-pack.md --summary-json role-ux-evidence-summary.json --environment local
+server\venv\Scripts\python.exe scripts\pre_hosting_readiness.py --summary-json pre-hosting-readiness-summary.json
 ```
 
 Use `--strict` only when the report is expected to be complete; strict mode
 returns non-zero if smoke evidence failed, screenshots are missing, or manual
-notes are incomplete.
+notes are incomplete. Manual notes are incomplete until every checklist item,
+every synthetic role note, and every required viewport note has `passed: true`
+and non-empty notes.
+
+Use `scripts\pre_hosting_readiness.py --strict` only at the end of the local
+evidence pass. It should remain blocked until role smoke, all screenshots,
+manual notes, and the evidence summary are clean.
 
 After capture:
 
@@ -201,13 +210,20 @@ Completed live:
   evidence-pack Markdown.
 - `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` now gives the final reviewer a local
   fillable notes file for 390px/320px layout, screen-reader, role-scope, and
-  screenshot safety evidence; filled copies stay ignored.
+  screenshot safety evidence; filled copies stay ignored. The template now
+  includes explicit per-role and per-viewport note rows required by strict
+  evidence-pack validation.
 - `scripts/prepare_role_ux_capture.py` now creates the ignored local capture
   manifest and manual-notes copy so the final screenshot pass can resume
-  without rebuilding the plan by hand.
+  without rebuilding the plan by hand. The manifest now includes the final
+  preflight order and viewport gates before the screenshot checklist.
 - `scripts/build_role_ux_evidence_pack.py` now prints exact screenshot/manual
   blockers and can write ignored `role-ux-evidence-summary.json` for a
-  machine-readable final gate.
+  machine-readable final gate. It now fails strict mode when role notes or
+  viewport notes are missing or incomplete.
+- `scripts/pre_hosting_readiness.py` now summarizes the final local readiness
+  blockers across tracked tooling, ignored local artifacts, role smoke,
+  screenshot inventory, manual notes, and evidence summary JSON.
 - `scripts/smoke_role_ux.py` now validates screenshot-ready seeded scenarios
   for manager lifecycle depth, technician active assigned work, client pending
   approval, viewer scope, linked vendor work, and vendor-visible messages.
@@ -250,4 +266,5 @@ Next action:
    final empty-state screenshots.
 3. Build `role-ux-evidence-pack.md` locally and resolve missing screenshot rows.
 4. Record screen-reader notes.
-5. Run screenshot safety review before portfolio use.
+5. Run `scripts\pre_hosting_readiness.py --strict`.
+6. Run screenshot safety review before portfolio use.
