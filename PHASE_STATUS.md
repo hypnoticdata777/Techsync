@@ -243,6 +243,10 @@ Completed:
 - Added evidence-pack blocker printing and optional sanitized
   `role-ux-evidence-summary.json` output so remaining screenshot/manual gaps
   are exact and machine-readable before hosting.
+- Added seeded scenario checks to `scripts/smoke_role_ux.py` so the final
+  screenshot pass fails early if manager lifecycle depth, technician assigned
+  work, client pending approval, viewer scope, linked vendor work, or
+  vendor-visible messages are missing.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and

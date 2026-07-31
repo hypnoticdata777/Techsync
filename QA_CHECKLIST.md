@@ -183,6 +183,9 @@ they have been verified in the relevant environment.
       screen-reader, small-width, role-scope, and screenshot safety proof.
 - [x] Local role UX capture prep helper added to generate the ignored screenshot
       folder, manual notes copy, and capture manifest.
+- [x] Role UX smoke verifies screenshot-ready seeded scenarios for manager
+      lifecycle depth, technician active assigned work, client pending
+      approval, viewer scope, linked vendor work, and vendor-visible messages.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.

@@ -204,6 +204,9 @@ Likely scope:
     evidence collection
   - local evidence summary JSON now started so screenshot/manual blockers can
     be reviewed by a machine-readable final gate before hosting
+  - local role UX smoke now verifies seeded screenshot scenarios for manager
+    lifecycle depth, technician active assigned work, client pending approval,
+    viewer scope, linked vendor work, and vendor-visible messages
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions

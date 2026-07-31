@@ -117,6 +117,15 @@ attachments: 1
 events: 13
 ```
 
+The final role UX smoke expects both secondary empty-state accounts:
+
+- `quiet-owner.demo@demo.techsyncops.dev`
+- `quiet-vendor.demo@demo.techsyncops.dev`
+
+If `scripts/smoke_role_ux.py` reports `401` for either account, the demo
+database is using an older seed. Run the seed command again with
+`--reset-existing` before final screenshots.
+
 ## Reset Only
 
 ```powershell

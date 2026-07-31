@@ -31,7 +31,10 @@ Prepared, automated, and partially exercised live:
   3 properties, 3 vendors, 8 work orders, 4 messages, 1 attachment, and
   13 events.
 - `scripts/smoke_role_ux.py` passed locally against `http://127.0.0.1:8000`
-  with sanitized role/API checks. Tokens were not saved.
+  with sanitized role/API checks. Tokens were not saved. It now also fails
+  early when the seeded demo tenant is missing screenshot-ready scenarios such
+  as manager lifecycle depth, technician active assigned work, client pending
+  approval, viewer scope, linked vendor work, or vendor-visible messages.
 - Admin web login, admin workspace, and an admin work-order detail view were
   manually observed in the local Expo web client at `http://localhost:19006`.
 
@@ -203,11 +206,20 @@ Completed live:
 - `scripts/build_role_ux_evidence_pack.py` now prints exact screenshot/manual
   blockers and can write ignored `role-ux-evidence-summary.json` for a
   machine-readable final gate.
+- `scripts/smoke_role_ux.py` now validates screenshot-ready seeded scenarios
+  for manager lifecycle depth, technician active assigned work, client pending
+  approval, viewer scope, linked vendor work, and vendor-visible messages.
 - The local browser pass logged in as `lena.tech@demo.techsyncops.dev` and
   confirmed the technician empty-state DOM: `Total work orders: 0`,
   `No assigned jobs`, and no completed/archived assigned rows.
 - The generic technician `/work-orders` route was hardened to use the same
   active assigned queue as `/work-orders/mine` when no filters are supplied.
+- A live strict role smoke against the current local API reached primary roles
+  but reported `401` for `quiet-owner.demo@demo.techsyncops.dev` and
+  `quiet-vendor.demo@demo.techsyncops.dev`, which indicates the current demo
+  database was seeded before the secondary empty-state personas were added.
+  Run `python ..\scripts\seed_demo_data.py seed --reset-existing` against the
+  local/demo database before final screenshot capture.
 - 320px work-order detail summary tiles now allow two-line values so approval
   text does not truncate awkwardly on narrow screens.
 - Automated verification after this hardening:

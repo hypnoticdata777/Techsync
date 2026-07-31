@@ -2137,3 +2137,46 @@ Result:
 - Compile checks passed.
 - Smoke CLI help showed the optional `--invite-database-url` flag.
 - Diff hygiene passed with normal Windows LF/CRLF warnings.
+
+## 2026-07-31 - v1.3 Role UX Scenario-Ready Smoke Checks
+
+Decision:
+
+- Turn the local role UX smoke from a broad access check into a screenshot-
+  readiness gate before the final manual capture pass.
+- Keep the final screenshots and screen-reader notes local/manual, but fail
+  earlier when the seeded demo tenant is not ready to tell the role-by-role
+  story.
+
+Changes:
+
+- Extended `scripts/smoke_role_ux.py` with seeded scenario checks for:
+  manager lifecycle depth, technician active assigned work, client pending
+  approval, viewer scoped/read-only work, linked Apex vendor work, and vendor-
+  visible message evidence.
+- Added pytest coverage for the client, vendor, and manager scenario gates.
+- Updated README, role UX capture notes, QA checklist, roadmap, and phase
+  status so the final non-hosting evidence pass includes screenshot-ready seed
+  validation.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+cd client
+npm.cmd run test:ci
+cd ..
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\smoke_role_ux.py --base-url http://127.0.0.1:8000 --output role-ux-smoke-evidence.json
+git diff --check
+```
+
+Result:
+
+- Backend tests passed: `174 passed`.
+- Client tests passed: `7 passed suites`, `43 passed tests`.
+- Compile checks passed.
+- Live role UX smoke reached the local API and wrote sanitized evidence, but
+  failed the strict gate because the current demo database is from an older
+  seed and the secondary empty-state accounts returned `401`.
+- Diff hygiene passed with normal Windows LF/CRLF warnings.

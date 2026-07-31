@@ -363,7 +363,10 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   attachment, message, and lifecycle controls before the final manual
   screen-reader pass. `ROLE_UX_CAPTURE_PASS.md` is the local worksheet for the
   final role screenshots, 390px/320px layout comfort check, and manual
-  accessibility notes.
+  accessibility notes. The role UX smoke also verifies screenshot-ready seeded
+  scenarios before capture: manager lifecycle depth, technician active assigned
+  work, client pending approval, viewer scope, linked vendor work, and vendor-
+  visible messages.
 - Local Expo web note: Expo 50 on Node 24 can hit a Windows Metro external path
   issue involving `node:sea`; use Node 20 LTS for the durable local-web setup
   until Expo is upgraded.
