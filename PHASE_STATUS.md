@@ -323,8 +323,8 @@ Next:
 - Keep hosting deferred until every non-hosting requirement bucket is locally
   as complete as practical.
 - Continue the final local-only role-by-role UI/UX evidence pass: open Role
-  Evidence, walk admin/coordinator/technician/client/viewer/vendor, capture the
-  21 screenshot targets with primary and empty-state personas using
+  Evidence, walk admin/coordinator/technician/client/viewer/vendor, verify the
+  21 captured screenshot filenames with primary and empty-state personas using
   `local-role-ux-capture-manifest.md`, verify 390px and 320px widths, fill
   `local-role-ux-manual-notes.json` with checklist, role, and viewport notes,
   record manual screen-reader notes, build the evidence pack, run
@@ -389,9 +389,9 @@ Stop when:
 ## Current Recommended Next Move
 
 Continue the local-only v1.3 evidence pass and leave hosting as the absolute
-final gate. The best next move is to open Role Evidence, walk all six synthetic
-roles in Expo web, capture the 21 screenshot targets, check 390px/320px layout
-comfort, and record manual screen-reader notes. Use the secondary no-work
-personas for technician/viewer/vendor empty-state screenshots after a clean seed
-reset. Only after those non-hosting requirements are complete should the
-Vercel/portfolio showcase sequence resume.
+final gate. The 21 role screenshot filenames are now present locally, and Expo
+web logout is fixed for role switching. The best next move is to finish
+`local-role-ux-manual-notes.json`, check 390px/320px layout comfort, record
+manual screen-reader notes, build the evidence pack, and run the strict
+pre-hosting readiness doctor. Only after those non-hosting requirements are
+complete should the Vercel/portfolio showcase sequence resume.

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Platform,
   RefreshControl,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
@@ -17,6 +18,7 @@ import {
   summaryA11yLabel,
   workOrderButtonA11y,
 } from '../utils/accessibility';
+import {LOGOUT_CONFIRMATION, shouldLogoutImmediately} from '../utils/logoutFlow';
 import {
   buildQueueSummary,
   canManageOperations,
@@ -124,8 +126,13 @@ function WorkOrdersListScreen({navigation}) {
     </TouchableOpacity>
   );
 
-  const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
+  const handleLogout = async () => {
+    if (shouldLogoutImmediately(Platform.OS)) {
+      await logout();
+      return;
+    }
+
+    Alert.alert(LOGOUT_CONFIRMATION.title, LOGOUT_CONFIRMATION.message, [
       {text: 'Cancel', style: 'cancel'},
       {
         text: 'Logout',

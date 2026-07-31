@@ -2448,3 +2448,46 @@ Result:
 - Compile checks passed.
 - Existing local smoke evidence diagnosis still points to the stale quiet
   viewer/vendor seed and the reseed recovery path.
+
+## 2026-07-31 - v1.3 Expo Web Logout and Screenshot Inventory Closeout
+
+Decision:
+
+- Fix the role-capture logout blocker before continuing manual evidence.
+- Keep mobile/native logout confirmation, but make Expo web logout immediate
+  because the web `Alert.alert` confirmation path was not reliably firing.
+- Treat the `quiet-*` users as local synthetic empty-state personas only.
+
+Changes:
+
+- Added `client/src/utils/logoutFlow.js` and focused Jest coverage.
+- Updated `WorkOrdersListScreen` so Expo web logout clears the local session
+  immediately, while iOS/Android still use the confirmation prompt.
+- Confirmed the three previously missing local screenshot filenames now exist:
+  - `techsync-ops-org_admin-05-create-work.png`
+  - `techsync-ops-viewer-03-viewer-empty.png`
+  - `techsync-ops-vendor-03-vendor-empty.png`
+- Updated QA, phase status, and role UX capture docs so screenshot inventory is
+  closed and remaining work is manual notes/evidence-pack validation.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- logoutFlow.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe scripts\pre_hosting_readiness.py --summary-json pre-hosting-readiness-summary.json
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused logout tests passed: `1 passed suite`, `3 passed tests`.
+- Client tests passed: `8 passed suites`, `48 passed tests`.
+- Backend tests passed: `187 passed`.
+- Compile checks passed.
+- `git diff --check` reported only existing Windows LF-to-CRLF warnings.
+- Readiness doctor still blocks hosting as expected on manual notes and the
+  final evidence summary, but `screenshot_inventory` is now `PASS` with all
+  21 expected screenshots present.

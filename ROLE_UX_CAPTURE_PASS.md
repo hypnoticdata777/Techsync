@@ -39,10 +39,14 @@ Prepared, automated, and partially exercised live:
   approval, viewer scope, linked vendor work, or vendor-visible messages.
 - Admin web login, admin workspace, and an admin work-order detail view were
   manually observed in the local Expo web client at `http://localhost:19006`.
+- All 21 required role screenshot filenames are now present in the ignored
+  `local-role-ux-evidence` folder, including the admin create-work, quiet
+  viewer empty-state, and quiet vendor empty-state captures.
+- Expo web logout now clears the local session immediately for role switching;
+  native/mobile keeps the confirmation prompt.
 
 Still pending for the final evidence pack:
 
-- Full 21-screenshot capture using the manifest below.
 - Explicit 390px and 320px layout comfort notes.
 - Manual screen-reader/accessibility notes for each role.
 - Final screenshot safety review before any portfolio or investor use.
@@ -142,6 +146,9 @@ Secondary no-work accounts for empty-state screenshots:
 - Viewer empty snapshot: `quiet-owner.demo@demo.techsyncops.dev`
 - Vendor empty queue: `quiet-vendor.demo@demo.techsyncops.dev`
 
+The `quiet-*` names are synthetic local empty-state personas only. They are not
+production customer/vendor labels.
+
 ## Capture Widths
 
 Capture or inspect each critical screen at:
@@ -205,8 +212,9 @@ Record observations here during the final device/emulator pass:
 
 ## Result Notes
 
-Status: local API/client smoke proof passed; role screenshot capture is in
-progress; manual screen-reader notes still pending.
+Status: local API/client smoke proof passed; 21/21 role screenshot filenames are
+present locally; manual screen-reader notes and evidence-pack completion still
+pending.
 
 Completed live:
 
@@ -218,6 +226,9 @@ Completed live:
 - Expo web running on `http://localhost:19006`.
 - Admin login and admin work-order detail were manually observed.
 - `scripts/smoke_role_ux.py` passed with primary-role and empty-state checks.
+- Expo web logout was fixed to clear the session immediately so admin,
+  coordinator, technician, client, viewer, and vendor captures can switch roles
+  without opening extra tabs.
 - `scripts/build_role_ux_evidence_pack.py` was added so final role evidence can
   be summarized without committing generated smoke JSON, screenshots, or local
   evidence-pack Markdown.

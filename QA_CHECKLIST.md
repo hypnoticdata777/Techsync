@@ -206,6 +206,11 @@ they have been verified in the relevant environment.
 - [x] Capture prep and readiness doctor now name exact missing
       role/screen/filename screenshot rows before the final manual evidence
       pass.
+- [x] Required local role screenshot filenames are present in
+      `local-role-ux-evidence`, including admin create-work, viewer empty
+      snapshot, and vendor empty snapshot.
+- [x] Expo web logout clears the current session immediately for role capture;
+      native/mobile still keeps the confirmation prompt.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.
@@ -214,7 +219,7 @@ they have been verified in the relevant environment.
 - [ ] `local-role-ux-manual-notes.json` filled from
       `ROLE_UX_MANUAL_NOTES_TEMPLATE.json` and included in the final local
       evidence pack with checklist, role, and viewport notes.
-- [ ] `local-role-ux-capture-manifest.md` generated and used to close all
+- [x] `local-role-ux-capture-manifest.md` generated and used to close all
       screenshot rows before strict evidence-pack validation.
 - [ ] `role-ux-evidence-summary.json` generated locally and shows no
       screenshot/manual blockers before hosting.
