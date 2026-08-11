@@ -8,6 +8,7 @@ screenshots are still missing.
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,6 +17,8 @@ from build_role_ux_evidence_pack import (
     DEFAULT_MANUAL_NOTES_PATH,
     DEFAULT_SCREENSHOT_DIR,
     EXPECTED_SCREENSHOTS,
+    REQUIRED_ROLE_NOTES,
+    REQUIRED_VIEWPORT_NOTES,
     inventory_screenshots,
 )
 
@@ -75,6 +78,7 @@ class CapturePrepResult:
     manual_notes_path: Path
     manifest_path: Path
     manual_notes_created: bool
+    manual_notes_repaired: bool
     missing_screenshots: list[str]
     present_count: int
     expected_count: int
@@ -97,6 +101,89 @@ def describe_missing_screenshots(missing_screenshots: list[str]) -> list[str]:
         role, screen = expected.get(filename, ("unknown", "Unknown screen"))
         descriptions.append(f"{role} / {screen}: {filename}")
     return descriptions
+
+
+def _load_json(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _merge_rows(
+    template_rows: list[dict],
+    existing_rows: list[dict] | None,
+    *,
+    key_name: str,
+) -> list[dict]:
+    existing_by_key = {
+        str(row.get(key_name)): row
+        for row in existing_rows or []
+        if isinstance(row, dict) and row.get(key_name)
+    }
+    merged: list[dict] = []
+    for template_row in template_rows:
+        row = dict(template_row)
+        existing = existing_by_key.get(str(row.get(key_name)))
+        if existing:
+            row.update(
+                {
+                    key: value
+                    for key, value in existing.items()
+                    if key not in {"key", "role", "label", "size"}
+                }
+            )
+        merged.append(row)
+    return merged
+
+
+def _manual_notes_shape_is_current(notes: dict) -> bool:
+    role_keys = {
+        str(row.get("role"))
+        for row in notes.get("role_notes", [])
+        if isinstance(row, dict) and row.get("role")
+    }
+    viewport_keys = {
+        str(row.get("key"))
+        for row in notes.get("viewport_notes", [])
+        if isinstance(row, dict) and row.get("key")
+    }
+    return set(REQUIRED_ROLE_NOTES).issubset(role_keys) and set(REQUIRED_VIEWPORT_NOTES).issubset(
+        viewport_keys
+    )
+
+
+def _repair_manual_notes(*, template_path: Path, manual_notes_path: Path) -> bool:
+    template = _load_json(template_path)
+    existing = _load_json(manual_notes_path)
+    if not isinstance(template, dict) or not isinstance(existing, dict):
+        return False
+    if not _manual_notes_shape_is_current(template):
+        return False
+    if _manual_notes_shape_is_current(existing):
+        return False
+
+    repaired = dict(template)
+    for key in ("environment", "reviewer", "completed_at"):
+        if existing.get(key):
+            repaired[key] = existing[key]
+
+    repaired["checks"] = _merge_rows(
+        template.get("checks", []),
+        existing.get("checks") if isinstance(existing.get("checks"), list) else [],
+        key_name="key",
+    )
+    repaired["role_notes"] = _merge_rows(
+        template.get("role_notes", []),
+        existing.get("role_notes") if isinstance(existing.get("role_notes"), list) else [],
+        key_name="role",
+    )
+    repaired["viewport_notes"] = _merge_rows(
+        template.get("viewport_notes", []),
+        existing.get("viewport_notes") if isinstance(existing.get("viewport_notes"), list) else [],
+        key_name="key",
+    )
+    manual_notes_path.write_text(json.dumps(repaired, indent=2) + "\n", encoding="utf-8")
+    return True
 
 
 def _write_manifest(
@@ -183,9 +270,15 @@ def prepare_capture(
     screenshot_dir.mkdir(parents=True, exist_ok=True)
 
     manual_notes_created = False
+    manual_notes_repaired = False
     if overwrite_manual_notes or not manual_notes_path.exists():
         shutil.copyfile(template_path, manual_notes_path)
         manual_notes_created = True
+    else:
+        manual_notes_repaired = _repair_manual_notes(
+            template_path=template_path,
+            manual_notes_path=manual_notes_path,
+        )
 
     inventory = inventory_screenshots(screenshot_dir)
     _write_manifest(
@@ -202,6 +295,7 @@ def prepare_capture(
         manual_notes_path=manual_notes_path,
         manifest_path=manifest_path,
         manual_notes_created=manual_notes_created,
+        manual_notes_repaired=manual_notes_repaired,
         missing_screenshots=inventory.missing,
         present_count=len(inventory.present),
         expected_count=inventory.expected_count,
@@ -231,6 +325,7 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"Screenshot folder ready: {result.screenshot_dir}")
     print(f"Manual notes ready: {result.manual_notes_path}")
+    print(f"Manual notes repaired: {result.manual_notes_repaired}")
     print(f"Capture manifest written: {result.manifest_path}")
     print(f"Screenshots present: {result.present_count}/{result.expected_count}")
     print(f"Missing screenshots: {len(result.missing_screenshots)}")

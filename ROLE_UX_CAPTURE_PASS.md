@@ -255,6 +255,9 @@ Completed live:
   manifest and manual-notes copy so the final screenshot pass can resume
   without rebuilding the plan by hand. The manifest now includes the final
   preflight order and viewport gates before the screenshot checklist.
+- `scripts/prepare_role_ux_capture.py` now repairs stale local manual-notes
+  files into the current checklist, role-note, and viewport-note shape while
+  preserving any existing reviewer notes.
 - `scripts/build_role_ux_evidence_pack.py` now prints exact screenshot/manual
   blockers and can write ignored `role-ux-evidence-summary.json` for a
   machine-readable final gate. It now fails strict mode when role notes or
@@ -292,17 +295,18 @@ Known local setup note:
 - Expo 50 on Node 24 can hit a Windows `node:sea` Metro external path issue.
   The local `node_modules` workaround proved the app can run, but the durable
   setup recommendation is Node 20 LTS until Expo is upgraded.
-- The in-app browser automation surface provided DOM proof but not a working
-  file screenshot method in this session, so final shareable image evidence
-  still needs the normal manual capture pass.
+- The ignored local screenshot inventory now has all 21 expected screenshots
+  present and safely named. The final gate is down to manual notes, viewport
+  comfort notes, screen-reader notes, and screenshot safety review.
 
 Next action:
 
-1. Complete manual screenshots from the Role Evidence screen and live role
-   logins using `local-role-ux-capture-manifest.md`.
-2. Re-run the clean seed with the updated no-work viewer/vendor personas before
-   final empty-state screenshots.
-3. Build `role-ux-evidence-pack.md` locally and resolve missing screenshot rows.
+1. Finish `local-role-ux-manual-notes.json` using the repaired checklist,
+   role-note, and viewport-note rows.
+2. Build `role-ux-evidence-pack.md` with `--summary-json` and verify it reports
+   `manual_clean: true`.
+3. Run `scripts/pre_hosting_readiness.py --strict` before opening the final
+   Vercel/portfolio hosting gate.
 4. Record screen-reader notes.
 5. Run `scripts\pre_hosting_readiness.py --strict`.
 6. Run screenshot safety review before portfolio use.

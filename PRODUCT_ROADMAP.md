@@ -202,6 +202,9 @@ Likely scope:
   - local role UX capture prep helper now started to create the ignored
     screenshot folder, manual-notes copy, and capture manifest before final
     evidence collection
+  - local role UX capture prep now repairs stale manual-notes files into the
+    current checklist, role-note, and viewport-note shape while preserving any
+    existing reviewer notes
   - local evidence summary JSON now started so screenshot/manual blockers can
     be reviewed by a machine-readable final gate before hosting
   - local role UX smoke now verifies seeded screenshot scenarios for manager
@@ -223,6 +226,9 @@ Likely scope:
     inline before the final manual capture pass
   - capture prep and the readiness doctor now name missing screenshot
     role/screen/filename rows so the final manual pass is exact
+  - local screenshot inventory now reaches all 21 expected images; the final
+    evidence gate is narrowed to manual checklist, role, viewport, and
+    screen-reader notes
   - role landing now locates the active user with role badge, visible scope,
     next-move guidance, and privacy/operations guardrails before queue
     interaction

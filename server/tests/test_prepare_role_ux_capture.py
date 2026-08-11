@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -102,3 +103,69 @@ def test_prepare_capture_keeps_existing_manual_notes_without_overwrite(tmp_path)
 
     assert overwritten.manual_notes_created is True
     assert manual_notes_path.read_text(encoding="utf-8") == '{"checks": []}'
+
+
+def test_prepare_capture_repairs_stale_manual_notes_shape(tmp_path):
+    screenshot_dir = tmp_path / "local-role-ux-evidence"
+    manual_notes_path = tmp_path / "local-role-ux-manual-notes.json"
+    template_path = tmp_path / "ROLE_UX_MANUAL_NOTES_TEMPLATE.json"
+    manifest_path = tmp_path / "local-role-ux-capture-manifest.md"
+    template = {
+        "environment": "local",
+        "reviewer": "",
+        "completed_at": "",
+        "checks": [
+            {
+                "key": "mobile_layout_390",
+                "label": "390px layout",
+                "passed": False,
+                "notes": "",
+            }
+        ],
+        "role_notes": [
+            {"role": role, "label": role, "passed": False, "notes": ""}
+            for role in prepare_capture_module.REQUIRED_ROLE_NOTES
+        ],
+        "viewport_notes": [
+            {"key": key, "label": key, "passed": False, "notes": ""}
+            for key in prepare_capture_module.REQUIRED_VIEWPORT_NOTES
+        ],
+    }
+    template_path.write_text(json.dumps(template), encoding="utf-8")
+    manual_notes_path.write_text(
+        json.dumps(
+            {
+                "environment": "local",
+                "reviewer": "Carlos",
+                "checks": [
+                    {
+                        "key": "mobile_layout_390",
+                        "label": "old label",
+                        "passed": True,
+                        "notes": "Already checked.",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = prepare_capture_module.prepare_capture(
+        screenshot_dir=screenshot_dir,
+        manual_notes_path=manual_notes_path,
+        template_path=template_path,
+        manifest_path=manifest_path,
+    )
+    repaired = json.loads(manual_notes_path.read_text(encoding="utf-8"))
+
+    assert result.manual_notes_created is False
+    assert result.manual_notes_repaired is True
+    assert repaired["reviewer"] == "Carlos"
+    assert repaired["checks"][0]["notes"] == "Already checked."
+    assert repaired["checks"][0]["passed"] is True
+    assert {row["role"] for row in repaired["role_notes"]} == set(
+        prepare_capture_module.REQUIRED_ROLE_NOTES
+    )
+    assert {row["key"] for row in repaired["viewport_notes"]} == set(
+        prepare_capture_module.REQUIRED_VIEWPORT_NOTES
+    )

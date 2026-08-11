@@ -2623,3 +2623,53 @@ Result:
   files, ignored local artifacts, manual-notes template, screenshot plan,
   capture manifest, role smoke, and all 21 screenshots pass.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-11 - v1.3 Role UX Manual Evidence Prep Repair
+
+Decision:
+
+- Remove friction from the final evidence gate by letting capture prep repair
+  stale local manual-note files into the current checklist, role-note, and
+  viewport-note schema without deleting any existing reviewer notes.
+- Keep generated screenshots, smoke JSON, evidence packs, manual notes, and
+  readiness summaries ignored/local-only.
+
+Changes:
+
+- Updated `scripts/prepare_role_ux_capture.py` to detect older
+  `local-role-ux-manual-notes.json` files, merge them with the current tracked
+  template, and preserve existing reviewer/check notes by key.
+- Added regression coverage for stale manual-note repair and unchanged
+  screenshot manifest behavior.
+- Ran capture prep locally; it repaired the manual notes schema and confirmed
+  all 21 expected role screenshots are present.
+- Rebuilt the ignored local role UX evidence summary and pre-hosting readiness
+  summary; the only remaining blocker is manual note completion.
+- Updated roadmap, phase status, QA checklist, and role capture docs to record
+  the narrowed evidence blocker.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_prepare_role_ux_capture.py server\tests\test_role_ux_evidence_pack.py -p no:cacheprovider
+server\venv\Scripts\python.exe scripts\prepare_role_ux_capture.py
+server\venv\Scripts\python.exe scripts\build_role_ux_evidence_pack.py --summary-json role-ux-evidence-summary.json
+server\venv\Scripts\python.exe scripts\pre_hosting_readiness.py --summary-json pre-hosting-readiness-summary.json
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused evidence tooling tests passed: `11 passed`.
+- Full client tests passed: `8 passed suites`, `53 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- Capture prep repaired local manual notes and reported `21/21` screenshots
+  present with `0` missing.
+- Evidence pack reports no screenshot blocker; manual checklist, role,
+  viewport, screen-reader, and screenshot-safety notes remain pending.
+- Pre-hosting readiness remains correctly blocked only by `manual_clean`.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

@@ -269,6 +269,9 @@ Completed:
 - Added named missing-screenshot output to capture prep and the readiness
   doctor so the remaining local evidence blocker identifies the exact
   role/screen/filename rows to capture.
+- Updated capture prep so stale local manual-notes files are repaired to the
+  current checklist, role-note, and viewport-note shape while preserving any
+  existing reviewer notes.
 - Added Alembic migration `0006` for paused, escalated, and archived work-order
   lifecycle states.
 - Added backend/mobile lifecycle handling for pause, escalate, cancel, and
@@ -319,17 +322,19 @@ Completed:
   clean seed adds secondary empty-state role checks.
 - Manually observed admin login, admin workspace, and admin work-order detail
   in Expo web.
+- Ran the current capture prep and evidence-pack flow locally; all 21 expected
+  screenshot filenames are present and safely named, leaving manual
+  checklist/role/viewport notes as the only evidence blocker before the final
+  pre-hosting readiness gate.
 
 Next:
 
 - Keep hosting deferred until every non-hosting requirement bucket is locally
   as complete as practical.
-- Continue the final local-only role-by-role UI/UX evidence pass: open Role
-  Evidence, walk admin/coordinator/technician/client/viewer/vendor, verify the
-  21 captured screenshot filenames with primary and empty-state personas using
-  `local-role-ux-capture-manifest.md`, verify 390px and 320px widths, fill
-  `local-role-ux-manual-notes.json` with checklist, role, and viewport notes,
-  record manual screen-reader notes, build the evidence pack, run
+- Continue the final local-only role-by-role UI/UX evidence pass: use the
+  repaired `local-role-ux-manual-notes.json` to finish checklist, role, and
+  viewport observations, verify 390px and 320px widths, record manual
+  screen-reader notes, rebuild the evidence pack with summary JSON, run
   `scripts/pre_hosting_readiness.py --strict`, and complete screenshot safety
   review.
 - Continue maturing the role-specific experience before hosting: each account
@@ -398,8 +403,9 @@ final gate. The 21 role screenshot filenames are now present locally, Expo web
 logout is fixed for role switching, role landing locates the active user, and
 work-order detail/form screens now explain scope, current action, guardrails,
 handoff ownership, visible audiences, and linked/manual context before the user
-mutates work. The best next move is to finish
+mutates work. Capture prep now repairs stale manual-note files and the local
+screenshot inventory is complete at 21/21. The best next move is to finish
 `local-role-ux-manual-notes.json`, check 390px/320px layout comfort, record
-manual screen-reader notes, build the evidence pack, and run the strict
+manual screen-reader notes, rebuild the evidence summary, and run the strict
 pre-hosting readiness doctor. Only after those non-hosting requirements are
 complete should the Vercel/portfolio showcase sequence resume.

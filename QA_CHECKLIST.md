@@ -223,6 +223,9 @@ they have been verified in the relevant environment.
       interoperability cues for next owner, waiting-on state, and visible
       audiences so role handoffs are understandable before opening or mutating
       work.
+- [x] Role UX capture prep now repairs stale local manual-notes files to the
+      current checklist/role/viewport schema, and the local screenshot
+      inventory reports all 21 expected images present.
 - [x] Synthetic empty-state display names use no-work personas while preserving
       stable `quiet-*` login emails for repeatable role proof.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
