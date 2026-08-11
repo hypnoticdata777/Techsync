@@ -2578,3 +2578,48 @@ Result:
   final evidence summary; tracked readiness files, ignored local evidence,
   screenshot plan, capture manifest, role smoke, and all 21 screenshots pass.
 - `git diff --check` reported only existing Windows LF-to-CRLF warnings.
+
+## 2026-08-11 - v1.3 Work-Order Handoff Interoperability Pass
+
+Decision:
+
+- Make TechSync Ops feel more like a SaaS collaboration system by showing who
+  owns the next move, what the work order is waiting on, and which audiences
+  are connected to the work.
+- Keep this local-only and pre-hosting; the goal is user maturity before the
+  final Vercel/portfolio gate.
+
+Changes:
+
+- Added tested work-order flow rows for `Next Owner`, `Waiting On`, and
+  `Visible To`, derived from assignment, approval, status, proof, client links,
+  and vendor links.
+- Updated work-order queue cards with compact handoff chips so every role can
+  scan ownership and visibility before opening a detail page.
+- Updated work-order detail command panels with a fuller interoperability strip
+  before role guidance, approval, messages, proof, and lifecycle controls.
+- Kept message visibility language explicit: broad work-order audience does
+  not weaken internal/client/vendor message separation.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\pre_hosting_readiness.py --summary-json pre-hosting-readiness-summary.json
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `14 passed tests`.
+- Full client tests passed: `8 passed suites`, `53 passed tests`.
+- Backend tests passed: `187 passed`.
+- Python compile checks passed.
+- Pre-hosting readiness remains correctly blocked only by final manual evidence:
+  local notes and evidence summary still need completion; tracked readiness
+  files, ignored local artifacts, manual-notes template, screenshot plan,
+  capture manifest, role smoke, and all 21 screenshots pass.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

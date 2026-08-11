@@ -462,6 +462,128 @@ export const buildDetailGuidanceRows = (role, workOrder = {}, capability = {}) =
   ];
 };
 
+const terminalStatuses = ['completed', 'cancelled', 'archived'];
+
+const hasLinkedClient = workOrder => Boolean(workOrder?.client_id || workOrder?.client_display_name);
+const hasLinkedVendor = workOrder => Boolean(workOrder?.vendor_id || workOrder?.vendor_name);
+const hasAssignedTechnician = workOrder => Boolean(workOrder?.assigned_technician_id);
+const hasCompletionProof = workOrder =>
+  Boolean(workOrder?.completion_proof_verified_at || workOrder?.completion_override_reason);
+
+const getNextOwner = workOrder => {
+  if (workOrder?.client_approval_status === 'pending') {
+    return {
+      value: 'Client',
+      detail: 'Approval decision is the next handoff.',
+      tone: 'pending',
+    };
+  }
+
+  if (workOrder?.status === 'open' && !hasAssignedTechnician(workOrder)) {
+    return {
+      value: 'Coordinator',
+      detail: 'Needs assignment or dispatch review.',
+      tone: 'open',
+    };
+  }
+
+  if (['in_progress', 'paused', 'escalated'].includes(workOrder?.status)) {
+    return {
+      value: hasAssignedTechnician(workOrder) ? 'Technician' : 'Coordinator',
+      detail: hasAssignedTechnician(workOrder)
+        ? 'Field update, proof, or status movement is next.'
+        : 'Needs assignment before field progress can continue.',
+      tone: workOrder?.status || 'active',
+    };
+  }
+
+  if (workOrder?.status === 'completed' && !hasCompletionProof(workOrder)) {
+    return {
+      value: 'Coordinator',
+      detail: 'Closeout needs proof review or override.',
+      tone: 'missing',
+    };
+  }
+
+  if (terminalStatuses.includes(workOrder?.status)) {
+    return {
+      value: 'Operations',
+      detail: 'No active field handoff remains.',
+      tone: 'default',
+    };
+  }
+
+  return {
+    value: hasAssignedTechnician(workOrder) ? 'Technician' : 'Coordinator',
+    detail: 'Review the work-order state before the next action.',
+    tone: 'default',
+  };
+};
+
+const getWaitingOn = workOrder => {
+  if (workOrder?.client_approval_status === 'pending') {
+    return 'Client approval';
+  }
+  if (workOrder?.status === 'open' && !hasAssignedTechnician(workOrder)) {
+    return 'Assignment';
+  }
+  if (workOrder?.status === 'in_progress') {
+    return hasCompletionProof(workOrder) ? 'Status closeout' : 'Proof upload';
+  }
+  if (workOrder?.status === 'paused') {
+    return 'Resume decision';
+  }
+  if (workOrder?.status === 'escalated') {
+    return 'Coordinator review';
+  }
+  if (workOrder?.status === 'completed') {
+    return hasCompletionProof(workOrder) ? 'Archive review' : 'Proof review';
+  }
+  if (terminalStatuses.includes(workOrder?.status)) {
+    return 'Nothing active';
+  }
+  return 'Triage';
+};
+
+const getVisibleTo = workOrder => {
+  const audiences = ['Internal'];
+  if (hasLinkedClient(workOrder)) {
+    audiences.push('Client');
+  }
+  if (hasLinkedVendor(workOrder)) {
+    audiences.push('Vendor');
+  }
+  return audiences.join(' + ');
+};
+
+export const buildWorkOrderFlowRows = (workOrder = {}) => {
+  const nextOwner = getNextOwner(workOrder);
+
+  return [
+    {
+      key: 'owner',
+      label: 'Next Owner',
+      value: nextOwner.value,
+      detail: nextOwner.detail,
+      tone: nextOwner.tone,
+    },
+    {
+      key: 'waiting',
+      label: 'Waiting On',
+      value: getWaitingOn(workOrder),
+      detail: 'Use this to understand the current handoff.',
+      tone: nextOwner.tone,
+    },
+    {
+      key: 'visible',
+      label: 'Visible To',
+      value: getVisibleTo(workOrder),
+      detail: 'Messages still respect internal/client/vendor visibility.',
+      tone: hasLinkedClient(workOrder) || hasLinkedVendor(workOrder) ? 'active' : 'default',
+    },
+  ];
+};
+
 export default {
   canManageOperations,
   getAvailableMainRoutes,
@@ -476,5 +598,6 @@ export default {
   getDetailRoleContext,
   buildDetailSummary,
   buildDetailGuidanceRows,
+  buildWorkOrderFlowRows,
   getRoleUserExperience,
 };

@@ -255,6 +255,9 @@ Already represented in the codebase:
   technician, client, viewer, and vendor users, covering visible scope,
   current action, and guardrails before approval, messaging, proof, and
   lifecycle controls.
+- v1.3 work-order interoperability cues for next owner, waiting-on state, and
+  visible audiences so admin, coordinator, technician, client, viewer, and
+  vendor users understand handoffs before taking action.
 - v1.3 work-order create/edit guidance for linked/manual intake states so
   client, property, vendor, and address context gaps are visible before save.
 - v1.3 manager-only mobile navigation gating for directory, dispatch,

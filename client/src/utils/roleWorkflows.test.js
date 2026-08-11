@@ -3,6 +3,7 @@ import {
   buildDetailSummary,
   buildRoleGuidanceRows,
   buildQueueSummary,
+  buildWorkOrderFlowRows,
   canAccessMainRoute,
   canManageOperations,
   getAvailableMainRoutes,
@@ -196,5 +197,54 @@ describe('role workflow helpers', () => {
     expect(
       buildDetailSummary({completion_override_reason: 'Manager approved'})[2],
     ).toEqual(expect.objectContaining({value: 'Override', tone: 'override'}));
+  });
+
+  test('builds interoperable work-order handoff rows', () => {
+    expect(
+      buildWorkOrderFlowRows({
+        status: 'open',
+        client_approval_status: 'pending',
+        client_id: 10,
+        vendor_id: 11,
+      }),
+    ).toEqual([
+      expect.objectContaining({
+        key: 'owner',
+        value: 'Client',
+        detail: expect.stringContaining('Approval decision'),
+      }),
+      expect.objectContaining({
+        key: 'waiting',
+        value: 'Client approval',
+      }),
+      expect.objectContaining({
+        key: 'visible',
+        value: 'Internal + Client + Vendor',
+      }),
+    ]);
+
+    expect(
+      buildWorkOrderFlowRows({
+        status: 'open',
+        client_approval_status: 'not_required',
+      })[0],
+    ).toEqual(
+      expect.objectContaining({
+        value: 'Coordinator',
+        detail: expect.stringContaining('assignment'),
+      }),
+    );
+
+    expect(
+      buildWorkOrderFlowRows({
+        status: 'in_progress',
+        assigned_technician_id: 12,
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({key: 'owner', value: 'Technician'}),
+        expect.objectContaining({key: 'waiting', value: 'Proof upload'}),
+      ]),
+    );
   });
 });

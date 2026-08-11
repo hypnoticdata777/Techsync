@@ -22,6 +22,7 @@ import {LOGOUT_CONFIRMATION, shouldLogoutImmediately} from '../utils/logoutFlow'
 import {
   buildQueueSummary,
   buildRoleGuidanceRows,
+  buildWorkOrderFlowRows,
   canManageOperations,
   getRoleAccessMessage,
   getRoleActions,
@@ -116,22 +117,45 @@ function WorkOrdersListScreen({navigation}) {
     return unsubscribe;
   }, [navigation, fetchWorkOrders]);
 
-  const renderWorkOrder = ({item}) => (
-    <TouchableOpacity
-      style={styles.workOrderCard}
-      {...workOrderButtonA11y(item)}
-      onPress={() => navigation.navigate('WorkOrderDetails', {workOrder: item})}>
-      <Text style={styles.workOrderTitle}>{item.title}</Text>
-      {item.description ? (
-        <Text style={styles.workOrderDescription} numberOfLines={2}>
-          {item.description}
+  const renderWorkOrder = ({item}) => {
+    const flowRows = buildWorkOrderFlowRows(item);
+
+    return (
+      <TouchableOpacity
+        style={styles.workOrderCard}
+        {...workOrderButtonA11y(item)}
+        onPress={() => navigation.navigate('WorkOrderDetails', {workOrder: item})}>
+        <Text style={styles.workOrderTitle}>{item.title}</Text>
+        {item.description ? (
+          <Text style={styles.workOrderDescription} numberOfLines={2}>
+            {item.description}
+          </Text>
+        ) : null}
+        <Text style={[styles.workOrderMeta, {color: getStatusColor(item.status)}]}>
+          Status: {item.status.replace('_', ' ')}
         </Text>
-      ) : null}
-      <Text style={[styles.workOrderMeta, {color: getStatusColor(item.status)}]}>
-        Status: {item.status.replace('_', ' ')}
-      </Text>
-    </TouchableOpacity>
-  );
+        <View style={styles.flowChipRow}>
+          {flowRows.map(row => (
+            <View
+              key={row.key}
+              style={styles.flowChip}
+              accessible
+              accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
+              <Text style={styles.flowChipLabel}>{row.label}</Text>
+              <Text
+                style={[
+                  styles.flowChipValue,
+                  {color: row.key === 'owner' ? getStatusColor(item.status) : '#e5e7eb'},
+                ]}
+                numberOfLines={1}>
+                {row.value}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const handleLogout = async () => {
     if (shouldLogoutImmediately(Platform.OS)) {
@@ -490,6 +514,36 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#a3e635',
     marginTop: 6,
+  },
+  flowChipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+  },
+  flowChip: {
+    flexGrow: 1,
+    flexBasis: '31%',
+    minHeight: 48,
+    justifyContent: 'center',
+    backgroundColor: '#0f172a',
+    borderWidth: 1,
+    borderColor: '#1e293b',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  flowChipLabel: {
+    color: '#94a3b8',
+    fontSize: 9,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  flowChipValue: {
+    fontSize: 12,
+    fontWeight: '800',
+    lineHeight: 16,
+    marginTop: 3,
   },
   emptyPanel: {
     backgroundColor: '#020617',

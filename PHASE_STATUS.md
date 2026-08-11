@@ -211,6 +211,8 @@ Completed:
   start the exhaustive pre-hosting UX sweep.
 - Added role-aware work-order detail command panel for status, approval, proof,
   and message summary.
+- Added work-order queue/detail handoff cues for Next Owner, Waiting On, and
+  Visible To so each role can understand collaboration state before acting.
 - Added mobile work-order form before-save context review for linked/manual/open
   client, property, vendor, and address state.
 - Added tested mobile navigator gating so manager-only screens are mounted only
@@ -395,8 +397,9 @@ Continue the local-only v1.3 evidence pass and leave hosting as the absolute
 final gate. The 21 role screenshot filenames are now present locally, Expo web
 logout is fixed for role switching, role landing locates the active user, and
 work-order detail/form screens now explain scope, current action, guardrails,
-and linked/manual context before the user mutates work. The best next move is
-to finish `local-role-ux-manual-notes.json`, check 390px/320px layout comfort,
-record manual screen-reader notes, build the evidence pack, and run the strict
+handoff ownership, visible audiences, and linked/manual context before the user
+mutates work. The best next move is to finish
+`local-role-ux-manual-notes.json`, check 390px/320px layout comfort, record
+manual screen-reader notes, build the evidence pack, and run the strict
 pre-hosting readiness doctor. Only after those non-hosting requirements are
 complete should the Vercel/portfolio showcase sequence resume.

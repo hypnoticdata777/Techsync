@@ -240,6 +240,9 @@ Completed live:
 - Work-order create/edit was matured so linked/manual intake context is
   explained before save, including open client, property, vendor, and address
   gaps.
+- Work-order queue cards and detail command panels now expose Next Owner,
+  Waiting On, and Visible To cues so role-capture reviewers can validate
+  cross-role handoffs before screenshots.
 - `scripts/build_role_ux_evidence_pack.py` was added so final role evidence can
   be summarized without committing generated smoke JSON, screenshots, or local
   evidence-pack Markdown.

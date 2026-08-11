@@ -228,6 +228,9 @@ Likely scope:
     interaction
   - work-order detail now gives each role scope, current-action, and guardrail
     guidance before approval, messaging, proof, or lifecycle interaction
+  - work-order queue and detail surfaces now show Next Owner, Waiting On, and
+    Visible To cues so role handoffs and cross-user collaboration are clear
+    before action
   - work-order create/edit now gives linked/manual context guidance before save
     so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while
@@ -296,7 +299,8 @@ v1.3 exit criteria:
   landing now orients each user with role, scope, next-step, and guardrail
   guidance before they interact with the queue, and work-order detail/form
   screens now carry the same role-aware guidance into approval, messaging,
-  proof, lifecycle, and linked/manual intake decisions.
+  proof, lifecycle, handoff ownership, visible-audience, and linked/manual
+  intake decisions.
   Accessibility helper coverage and a manual evidence template are now prepared
   for the final screen-reader pass.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data. The

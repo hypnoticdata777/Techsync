@@ -22,6 +22,7 @@ import {
 import {
   buildDetailGuidanceRows,
   buildDetailSummary,
+  buildWorkOrderFlowRows,
   getDetailRoleContext,
 } from '../utils/roleWorkflows';
 
@@ -219,6 +220,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
       user?.role,
       workOrder,
     ],
+  );
+  const workOrderFlowRows = useMemo(
+    () => buildWorkOrderFlowRows(workOrder),
+    [workOrder],
   );
 
   const loadAttachments = useCallback(async () => {
@@ -533,6 +538,25 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   numberOfLines={2}>
                   {item.value}
                 </Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.flowPanel}>
+            {workOrderFlowRows.map(row => (
+              <View
+                key={row.key}
+                style={styles.flowItem}
+                accessible
+                accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
+                <Text style={styles.flowLabel}>{row.label}</Text>
+                <Text
+                  style={[
+                    styles.flowValue,
+                    {color: getSummaryToneColor(row.tone)},
+                  ]}>
+                  {row.value}
+                </Text>
+                <Text style={styles.flowDetail}>{row.detail}</Text>
               </View>
             ))}
           </View>
@@ -1033,6 +1057,40 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     lineHeight: 18,
     textTransform: 'capitalize',
+    marginTop: 4,
+  },
+  flowPanel: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+  },
+  flowItem: {
+    flexBasis: '31%',
+    flexGrow: 1,
+    minHeight: 78,
+    backgroundColor: '#07111f',
+    borderWidth: 1,
+    borderColor: '#243449',
+    borderRadius: 8,
+    padding: 10,
+  },
+  flowLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  flowValue: {
+    fontSize: 15,
+    fontWeight: '900',
+    lineHeight: 20,
+    marginTop: 4,
+  },
+  flowDetail: {
+    color: '#94a3b8',
+    fontSize: 11,
+    lineHeight: 16,
     marginTop: 4,
   },
   guidanceStack: {
