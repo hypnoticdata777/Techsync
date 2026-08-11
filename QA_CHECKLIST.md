@@ -223,6 +223,8 @@ they have been verified in the relevant environment.
       interoperability cues for next owner, waiting-on state, and visible
       audiences so role handoffs are understandable before opening or mutating
       work.
+- [x] Role-lane UX contract added in code/docs, with home queue lane maps and
+      detail-page `Can Do` / `Not In This Lane` boundaries for all six roles.
 - [x] Role UX capture prep now repairs stale local manual-notes files to the
       current checklist/role/viewport schema, and the local screenshot
       inventory reports all 21 expected images present.

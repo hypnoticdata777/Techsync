@@ -10,23 +10,23 @@ This repository implements the POC scope defined in
 `PRODUCT_ROADMAP.md`. See [Spec Coverage](#spec-coverage) below for what's
 implemented vs. deferred.
 
-Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`; hosting remains
-deferred until the local role walkthrough is complete. The walkthrough manifest
-now has a tested readiness audit for synthetic logins, screenshot targets,
-role controls, privacy expectations, and screenshot safety checks. The final
-capture workflow is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
+Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`, and the current
+role-lane contract lives in `ROLE_LANE_UX.md`. The walkthrough manifest now has
+a tested readiness audit for synthetic logins, screenshot targets, role
+controls, privacy expectations, and screenshot safety checks. The final capture
+workflow is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
 `scripts/smoke_role_ux.py` can produce sanitized role-scope API evidence once a
-local/demo API is running. The Role Evidence screen and capture manifest now
-show the strict preflight order plus 390px, 320px, and desktop viewport gates.
+local/demo API is running. The Role Evidence screen and capture manifest show
+the strict preflight order plus 390px, 320px, and desktop viewport gates.
 The strict evidence pack requires checklist, role-by-role, and viewport notes
-before hosting. `scripts/pre_hosting_readiness.py` now summarizes the final
-local blockers across tracked tooling, ignored evidence artifacts, role smoke,
-screenshots, manual notes, and evidence summary JSON; screenshot blockers now
-name the exact role/screen/filename rows still needed. The role smoke helper
-can also diagnose stale empty-state seed evidence before a reseed. The latest local
-capture-prep run proved the Neon-backed API through all six synthetic roles
-with 67 passing smoke checks; the remaining evidence work is the manual
-21-screenshot, small-width, and screen-reader pass.
+before a public screenshot set is considered clean. `scripts/pre_hosting_readiness.py`
+now summarizes the final local blockers across tracked tooling, ignored
+evidence artifacts, role smoke, screenshots, manual notes, and evidence summary
+JSON; screenshot blockers now name the exact role/screen/filename rows still
+needed. The role smoke helper can also diagnose stale empty-state seed evidence
+before a reseed. The latest local capture-prep run proved the Neon-backed API
+through all six synthetic roles with 67 passing smoke checks; the remaining
+evidence work is the manual 21-screenshot, small-width, and screen-reader pass.
 
 ## Overview
 
@@ -386,9 +386,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   requires completed checklist, role-by-role, and viewport notes before any
   public screenshot set is considered ready.
 - Run `scripts\pre_hosting_readiness.py --strict` after the final evidence pack
-  is built; it should pass only when the local non-hosting evidence gate is
-  actually complete. When screenshots are missing, the readiness doctor and
-  capture prep helper now name the exact role/screen/filename rows to capture.
+  is built; it should pass only when the local evidence gate is actually
+  complete. When screenshots are missing, the readiness doctor and capture prep
+  helper now name the exact role/screen/filename rows to capture.
 - Local Expo web note: Expo 50 on Node 24 can hit a Windows Metro external path
   issue involving `node:sea`; use Node 20 LTS for the durable local-web setup
   until Expo is upgraded.

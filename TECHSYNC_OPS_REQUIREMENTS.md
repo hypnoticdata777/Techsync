@@ -312,6 +312,9 @@ Already represented in the codebase:
   evidence.
 - React Native/Expo mobile client for onboarding, auth, work-order list,
   details, creation, invitation acceptance, and password reset.
+- Role-lane UX contract for org admin, coordinator, technician, client,
+  viewer, and vendor users, including each lane's job, handoffs, success
+  signal, allowed controls, and intentionally hidden controls.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,
   storage, and Stripe where intentionally configured.
 - Synthetic demo seed/reset tooling for a repeatable tenant story covering
@@ -337,8 +340,8 @@ Important gaps for the PMC operations product:
   tenant-scoped, demo-database ready, and clearly positioned as TechSync Ops for
   PMC maintenance operations.
 - v1.3 is the next productization pass: properties, clients, vendors, approvals,
-  communication separation, closeout packages, richer reporting, and the final
-  Vercel/portfolio showcase gate.
+  communication separation, closeout packages, richer reporting, role-lane UX,
+  and later public showcase delivery.
 
 See `PRODUCT_ROADMAP.md` for version scope and exit criteria.
 See `TECHSYNC_OPS_TRACEABILITY.md` for the requirement-by-requirement mapping

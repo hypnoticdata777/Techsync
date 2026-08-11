@@ -8,9 +8,11 @@ or portfolio-integration slice so future sessions can resume without guessing.
 ## Current Position
 
 TechSync Ops is moving from a local/public code POC into a robust,
-investor-safe PMC maintenance operations POC. Vercel and portfolio linking are
-now intentionally held until the end of v1.3 so the product is stronger before
-it is promoted publicly.
+investor-safe PMC maintenance operations POC. Current work is centered on
+product maturity: every user role needs a clear lane, predictable controls,
+safe visibility boundaries, and smooth handoffs across the shared work-order
+system. Deployment remains a later delivery option, not a blocker to continue
+hardening the tool.
 
 Current verified repo state:
 
@@ -21,6 +23,33 @@ Latest local HEAD before this v1.3 smoke-harness pass: 550d24a Refresh TechSync 
 Latest known CI evidence in this tracker: success on main for 3c3f0ac
 Working clone: C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync
 ```
+
+## Current Product Maturity Focus
+
+Status: active
+
+Completed in the latest lane UX pass:
+
+- Added `ROLE_LANE_UX.md` as the source of truth for org admin, coordinator,
+  technician, client, viewer, and vendor lanes.
+- Added tested role-lane helpers that define each role's job, handoffs, success
+  signal, allowed actions, and out-of-lane guardrails.
+- Updated the work-order home queue to show lane, handoff, and success context
+  before the list so users can orient quickly.
+- Updated the work-order detail command panel with explicit `Can Do` and
+  `Not In This Lane` boundaries so hidden controls feel intentional.
+- Kept the shared work-order shape consistent: next owner, waiting state,
+  visible audience, messages, proof, approval, and lifecycle all remain tied
+  to role permissions.
+
+Next product maturity targets:
+
+- Continue role-by-role walkthrough polish against synthetic admin,
+  coordinator, technician, client, viewer, and vendor accounts.
+- Strengthen client and vendor empty/zero states so they feel like real portals,
+  not just restricted pages.
+- Keep improving mobile/narrow-width comfort for the lanes that work from the
+  detail page most often.
 
 ## Phase Map
 

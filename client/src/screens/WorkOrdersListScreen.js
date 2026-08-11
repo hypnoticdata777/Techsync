@@ -22,6 +22,7 @@ import {LOGOUT_CONFIRMATION, shouldLogoutImmediately} from '../utils/logoutFlow'
 import {
   buildQueueSummary,
   buildRoleGuidanceRows,
+  buildRoleLaneRows,
   buildWorkOrderFlowRows,
   canManageOperations,
   getRoleAccessMessage,
@@ -70,6 +71,7 @@ function WorkOrdersListScreen({navigation}) {
   const roleEmptyState = useMemo(() => getRoleEmptyState(user?.role), [user?.role]);
   const roleActions = useMemo(() => getRoleActions(user?.role), [user?.role]);
   const queueSummary = useMemo(() => buildQueueSummary(workOrders), [workOrders]);
+  const roleLaneRows = useMemo(() => buildRoleLaneRows(user?.role), [user?.role]);
   const roleGuidanceRows = useMemo(
     () => buildRoleGuidanceRows(user?.role, queueSummary),
     [user?.role, queueSummary],
@@ -231,6 +233,19 @@ function WorkOrdersListScreen({navigation}) {
             <Text style={styles.summaryValue}>{queueSummary.pendingApproval}</Text>
             <Text style={styles.summaryLabel}>Approvals</Text>
           </View>
+        </View>
+
+        <View style={styles.laneMap}>
+          {roleLaneRows.map(row => (
+            <View
+              key={row.key}
+              style={styles.laneRow}
+              accessible
+              accessibilityLabel={`${row.label}. ${row.value}`}>
+              <Text style={styles.laneLabel}>{row.label}</Text>
+              <Text style={styles.laneValue}>{row.value}</Text>
+            </View>
+          ))}
         </View>
 
         <View style={styles.guidanceStack}>
@@ -417,6 +432,36 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     marginTop: 2,
+  },
+  laneMap: {
+    borderTopColor: '#1f2937',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    paddingTop: 10,
+    marginBottom: 10,
+  },
+  laneRow: {
+    borderLeftColor: '#38bdf8',
+    borderLeftWidth: 2,
+    flexBasis: '31%',
+    flexGrow: 1,
+    minHeight: 62,
+    paddingLeft: 9,
+    paddingRight: 6,
+  },
+  laneLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  laneValue: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 4,
   },
   guidanceStack: {
     borderTopColor: '#1f2937',

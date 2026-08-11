@@ -7,7 +7,9 @@ Date: July 29, 2026
 TechSync Ops should advance in checkpoints that are easy to demo, easy to
 verify, and honest about what is production-ready versus POC-ready. The next
 checkpoint is v1.2: product-foundation completion. v1.3 is the deeper PMC
-operations expansion and public showcase gate.
+operations expansion and product-maturity gate. Delivery and hosting remain
+separate from product hardening so the tool can keep improving before any
+public showcase.
 
 ## v1.2 - Product Foundation Completion Checkpoint
 
@@ -237,6 +239,13 @@ Likely scope:
   - work-order queue and detail surfaces now show Next Owner, Waiting On, and
     Visible To cues so role handoffs and cross-user collaboration are clear
     before action
+  - role-lane UX contract now defines org admin, coordinator, technician,
+    client, viewer, and vendor jobs, handoffs, success signals, allowed
+    actions, and out-of-lane guardrails in code and documentation
+  - work-order home queues now show lane, handoff, and success context before
+    the list so each user understands their operating lane immediately
+  - work-order detail now shows explicit `Can Do` and `Not In This Lane`
+    boundaries so missing controls feel intentional instead of broken
   - work-order create/edit now gives linked/manual context guidance before save
     so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while

@@ -2,6 +2,8 @@ import {
   buildDetailGuidanceRows,
   buildDetailSummary,
   buildRoleGuidanceRows,
+  buildRoleBoundaryRows,
+  buildRoleLaneRows,
   buildQueueSummary,
   buildWorkOrderFlowRows,
   canAccessMainRoute,
@@ -11,6 +13,7 @@ import {
   getRoleEmptyState,
   getRoleActions,
   getRoleHome,
+  getRoleLane,
   getRoleUserExperience,
   getWorkOrdersEndpointForRole,
 } from './roleWorkflows';
@@ -78,6 +81,43 @@ describe('role workflow helpers', () => {
       }),
     );
     expect(getRoleUserExperience('vendor').scopeDetail).toContain('vendor-visible');
+  });
+
+  test('defines every SaaS user lane with handoffs and success signals', () => {
+    [
+      'org_admin',
+      'coordinator',
+      'technician',
+      'client',
+      'viewer',
+      'vendor',
+    ].forEach(role => {
+      const lane = getRoleLane(role);
+      const rows = buildRoleLaneRows(role);
+
+      expect(lane.laneLabel).toBeTruthy();
+      expect(lane.handoff).toBeTruthy();
+      expect(lane.success).toBeTruthy();
+      expect(rows.map(row => row.key)).toEqual(['lane', 'handoff', 'success']);
+      expect(rows.every(row => row.value.length > 20)).toBe(true);
+    });
+  });
+
+  test('keeps role boundaries explicit on detail screens', () => {
+    expect(buildRoleBoundaryRows('coordinator')).toEqual([
+      expect.objectContaining({
+        label: 'Can Do',
+        value: expect.stringContaining('Assign technicians'),
+      }),
+      expect.objectContaining({
+        label: 'Not In This Lane',
+        value: expect.stringContaining('internal notes'),
+      }),
+    ]);
+
+    expect(buildRoleBoundaryRows('viewer')[1].value).toContain('mutation controls');
+    expect(buildRoleBoundaryRows('vendor')[1].value).toContain('internal/client messages');
+    expect(buildRoleBoundaryRows('technician')[1].value).toContain('unrelated jobs');
   });
 
   test('builds role guidance from queue state', () => {

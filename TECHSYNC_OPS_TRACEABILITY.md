@@ -21,8 +21,8 @@ All 10 requirement batches are captured. v1.2 proves the tenant-safe
 intake/dispatch/technician workflow, demo database path, and documentation
 backbone with synthetic data. v1.3 now carries the deeper PMC-specific
 operations model: properties, clients, vendors, approvals, communication
-separation, closeout proof, stronger reporting, and the final Vercel/portfolio
-showcase gate.
+separation, closeout proof, stronger reporting, role-lane UX, and a later
+public showcase path.
 
 ## Batch-Level Traceability
 
@@ -37,7 +37,7 @@ showcase gate.
 | 7 | Nonfunctional Requirements | Partially proven: app-layer tenant isolation, RLS policies, audit trail, structured logs, hosted-demo config. | Local/demo backup/restore/export/monitoring runbook and admin tenant JSON export are now started, and primary mobile accessibility labels/hints now have helper coverage; performance targets, retry/offline resilience, provider backup evidence, monitoring, and final manual accessibility evidence remain v1.2/v1.3 operational work. |
 | 8 | Quality Attributes | Partially proven: security, auditability, maintainability, and core reliability boundaries. | Scalability, operational observability, and field usability evidence mature through hosted smoke tests and v1.3 workflows. |
 | 9 | System Requirements | Partially proven: multi-tenant backend API, relational model for current core entities, mobile client, object storage boundary, deployment pipeline. | Properties, clients, vendors, and work-order messages are v1.3 foundation work; approvals, background jobs, monitoring, backups, and web admin dashboard expand in v1.3+. |
-| 10 | User Requirements | Partially proven: coordinator/admin/dispatcher/technician flows are represented in API/mobile POC. | Operations-manager reporting and dispatch board now have backend endpoints and mobile admin/coordinator views in v1.3; role-specific landing states, active-user role/scope/next-move guidance, role-aware work-order detail guidance, work-order handoff/interoperability cues, linked/manual work-order form guidance, empty queue panels, walkthrough manifest, manager-only navigator gating, and in-app role evidence dashboard are started; client/homeowner scoped visibility, comments, and approval decisions are started; vendor scoped visibility and vendor-visible messages are started; client/viewer/vendor/technician synthetic role logins are prepared; client/viewer/vendor and technician scope boundaries now have regression proof; the local role UX smoke script and capture worksheet are prepared for final screenshot/accessibility evidence, with fuller portal UX later. |
+| 10 | User Requirements | Partially proven: coordinator/admin/dispatcher/technician flows are represented in API/mobile POC. | Operations-manager reporting and dispatch board now have backend endpoints and mobile admin/coordinator views in v1.3; role-specific landing states, active-user role/scope/next-move guidance, role-aware work-order detail guidance, role-lane UX contract, home queue lane map, detail-page role boundaries, work-order handoff/interoperability cues, linked/manual work-order form guidance, empty queue panels, walkthrough manifest, manager-only navigator gating, and in-app role evidence dashboard are started; client/homeowner scoped visibility, comments, and approval decisions are started; vendor scoped visibility and vendor-visible messages are started; client/viewer/vendor/technician synthetic role logins are prepared; client/viewer/vendor and technician scope boundaries now have regression proof; the local role UX smoke script and capture worksheet are prepared for final screenshot/accessibility evidence, with fuller portal UX later. |
 
 ## v1.2 Must Be True Before Calling The Checkpoint Complete
 
@@ -100,16 +100,18 @@ v1.3 should focus on the highest-value PMC product gaps:
 10. Repeatable synthetic demo seed/reset tooling for the hosted/demo tenant.
 11. Final local role UX capture evidence using `scripts/smoke_role_ux.py`,
    `ROLE_UX_CAPTURE_PASS.md`, the in-app Role Evidence screen, synthetic demo
-   users, and the role-aware landing/detail/form handoff guidance before
-   hosting.
-12. End-of-v1.3 Vercel deployment, hosted smoke evidence, and portfolio sliver
-   link after the product feels robust enough to show.
+   users, and the role-aware landing/detail/form handoff guidance during local
+   product-maturity review.
+12. Role-lane UX maturity for org admin, coordinator, technician, client,
+   viewer, and vendor so each user understands their job, handoff partners,
+   allowed controls, and intentionally hidden controls.
+13. Later Vercel deployment, hosted smoke evidence, and portfolio sliver link
+   only after the product feels robust enough to show.
 
 ## Confidence Statement
 
 The requirement set is complete as an input and roadmap baseline. The v1.2 scope
 is intentionally narrower than the full product: it proves the tenant-safe
 command-platform backbone and creates portfolio/investor-safe evidence. The
-remaining PMC operations depth is captured for v1.3+, with a v1.3 hosted smoke
-harness now available and Vercel hosting held until the end of v1.3 instead of
-driving the product sequence too early.
+remaining PMC operations depth is captured for v1.3+, with role-lane UX now
+treated as an active product-maturity track instead of waiting on deployment.

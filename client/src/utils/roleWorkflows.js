@@ -124,6 +124,107 @@ const DEFAULT_USER_EXPERIENCE = {
 export const getRoleUserExperience = role =>
   ROLE_USER_EXPERIENCES[role] || DEFAULT_USER_EXPERIENCE;
 
+const ROLE_LANE_EXPERIENCES = {
+  org_admin: {
+    laneLabel: 'Tenant Command',
+    job: 'Own the full operating picture across people, properties, vendors, work, proof, and risk.',
+    handoff: 'Coordinator, technician, client, vendor, and read-only owner stakeholders.',
+    success: 'The tenant story is explainable: queue health, risk, proof, and closeout are visible.',
+    canDo: ['Create linked work', 'Manage directory data', 'Review reports', 'Archive closeouts'],
+    cannotDo: ['Mix synthetic proof with real data', 'Blur internal/client/vendor message lanes'],
+  },
+  coordinator: {
+    laneLabel: 'Dispatch Control',
+    job: 'Turn intake into assigned, visible, and approval-ready work without losing context.',
+    handoff: 'Admin oversight, technicians, client approvals, and vendor-visible updates.',
+    success: 'Every active item has an owner, waiting state, visibility lane, and next action.',
+    canDo: ['Create work', 'Assign technicians', 'Request approval', 'Coordinate vendor/client updates'],
+    cannotDo: ['Expose internal notes externally', 'Leave linked work without an owner'],
+  },
+  technician: {
+    laneLabel: 'Field Execution',
+    job: 'Work the assigned queue, update status, leave notes, and attach proof.',
+    handoff: 'Coordinator receives status movement, proof, and field notes.',
+    success: 'Assigned jobs move cleanly from open to completed with proof and notes.',
+    canDo: ['Update assigned status', 'Add internal notes', 'Attach proof', 'Escalate blockers'],
+    cannotDo: ['Edit directory records', 'See unrelated jobs', 'Request client approval'],
+  },
+  client: {
+    laneLabel: 'Client Decision',
+    job: 'Review linked work, visible updates, proof, and approval requests.',
+    handoff: 'Coordinator receives approval decisions and client-visible feedback.',
+    success: 'Approvals and concerns are captured without exposing internal operations context.',
+    canDo: ['Review linked work', 'Approve or decline requests', 'Send client-visible messages'],
+    cannotDo: ['See internal notes', 'See vendor-only context', 'Change operations status'],
+  },
+  viewer: {
+    laneLabel: 'Owner Snapshot',
+    job: 'Inspect visible work status and proof without changing the record.',
+    handoff: 'Client-facing updates and proof flow into a read-only owner view.',
+    success: 'Stakeholders understand progress without edit, approval, or dispatch controls.',
+    canDo: ['Read linked status', 'Review visible messages', 'Review proof context'],
+    cannotDo: ['Use mutation controls', 'See internal notes', 'See unrelated client work'],
+  },
+  vendor: {
+    laneLabel: 'Vendor Delivery',
+    job: 'Track linked vendor work and respond through the vendor-visible path.',
+    handoff: 'Coordinator receives vendor updates while client/internal lanes stay protected.',
+    success: 'Vendor work is clear, scoped, and separated from client and internal messages.',
+    canDo: ['Review linked vendor work', 'Send vendor-visible messages', 'Track proof context'],
+    cannotDo: ['See internal/client messages', 'See other vendor work', 'Change client approvals'],
+  },
+};
+
+const DEFAULT_ROLE_LANE = {
+  laneLabel: 'Authenticated Lane',
+  job: 'Review the work orders and actions available to this account.',
+  handoff: 'The visible queue determines the next role handoff.',
+  success: 'The account can understand available work without seeing unrelated context.',
+  canDo: ['Review visible work'],
+  cannotDo: ['Assume access outside the authenticated lane'],
+};
+
+export const getRoleLane = role => ROLE_LANE_EXPERIENCES[role] || DEFAULT_ROLE_LANE;
+
+export const buildRoleLaneRows = role => {
+  const lane = getRoleLane(role);
+
+  return [
+    {
+      key: 'lane',
+      label: lane.laneLabel,
+      value: lane.job,
+    },
+    {
+      key: 'handoff',
+      label: 'Works With',
+      value: lane.handoff,
+    },
+    {
+      key: 'success',
+      label: 'Done When',
+      value: lane.success,
+    },
+  ];
+};
+
+export const buildRoleBoundaryRows = role => {
+  const lane = getRoleLane(role);
+
+  return [
+    {
+      key: 'can',
+      label: 'Can Do',
+      value: lane.canDo.join(' | '),
+    },
+    {
+      key: 'cannot',
+      label: 'Not In This Lane',
+      value: lane.cannotDo.join(' | '),
+    },
+  ];
+};
+
 export const buildRoleGuidanceRows = (role, queueSummary = {}) => {
   const experience = getRoleUserExperience(role);
   const total = queueSummary.total || 0;
@@ -600,4 +701,7 @@ export default {
   buildDetailGuidanceRows,
   buildWorkOrderFlowRows,
   getRoleUserExperience,
+  getRoleLane,
+  buildRoleLaneRows,
+  buildRoleBoundaryRows,
 };

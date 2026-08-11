@@ -20,6 +20,7 @@ import {
   statusActionA11y,
 } from '../utils/accessibility';
 import {
+  buildRoleBoundaryRows,
   buildDetailGuidanceRows,
   buildDetailSummary,
   buildWorkOrderFlowRows,
@@ -224,6 +225,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const workOrderFlowRows = useMemo(
     () => buildWorkOrderFlowRows(workOrder),
     [workOrder],
+  );
+  const roleBoundaryRows = useMemo(
+    () => buildRoleBoundaryRows(user?.role),
+    [user?.role],
   );
 
   const loadAttachments = useCallback(async () => {
@@ -565,6 +570,18 @@ function WorkOrderDetailsScreen({route, navigation}) {
               <View key={row.key} style={styles.guidanceRow}>
                 <Text style={styles.guidanceLabel}>{row.label}</Text>
                 <Text style={styles.guidanceValue}>{row.value}</Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.boundaryStack}>
+            {roleBoundaryRows.map(row => (
+              <View
+                key={row.key}
+                style={styles.boundaryRow}
+                accessible
+                accessibilityLabel={`${row.label}. ${row.value}`}>
+                <Text style={styles.boundaryLabel}>{row.label}</Text>
+                <Text style={styles.boundaryValue}>{row.value}</Text>
               </View>
             ))}
           </View>
@@ -1118,6 +1135,36 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     fontSize: 12,
     lineHeight: 17,
+  },
+  boundaryStack: {
+    borderTopColor: '#1e293b',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 12,
+    paddingTop: 10,
+  },
+  boundaryRow: {
+    borderLeftColor: '#a3e635',
+    borderLeftWidth: 2,
+    flexBasis: '47%',
+    flexGrow: 1,
+    minHeight: 58,
+    paddingLeft: 9,
+    paddingRight: 6,
+  },
+  boundaryLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  boundaryValue: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 4,
   },
   section: {
     marginBottom: 20,

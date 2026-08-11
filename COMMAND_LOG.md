@@ -2673,3 +2673,44 @@ Result:
   viewport, screen-reader, and screenshot-safety notes remain pending.
 - Pre-hosting readiness remains correctly blocked only by `manual_clean`.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-11 - v1.3 Role Lane UX Contract Pass
+
+Decision:
+
+- Treat TechSync Ops as a multi-lane SaaS workflow where every role understands
+  its job, handoff partners, allowed controls, and intentional visibility
+  boundaries.
+- Keep deployment out of the product-maturity sequence; continue hardening
+  role UX locally until the tool feels predictable for each user lane.
+
+Changes:
+
+- Added `ROLE_LANE_UX.md` to define the org admin, coordinator, technician,
+  client, viewer, and vendor lanes.
+- Added tested `getRoleLane`, `buildRoleLaneRows`, and
+  `buildRoleBoundaryRows` helpers.
+- Updated the work-order home queue with lane, handoff, and success context
+  above the list.
+- Updated the work-order detail command panel with `Can Do` and
+  `Not In This Lane` boundary rows.
+- Updated README, roadmap, traceability, requirements, phase status, and QA
+  docs to track the lane UX maturity pass.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `16 passed tests`.
+- Full client tests passed: `8 passed suites`, `55 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.
