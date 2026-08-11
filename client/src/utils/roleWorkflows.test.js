@@ -3,6 +3,7 @@ import {
   buildDetailSummary,
   buildRoleGuidanceRows,
   buildRoleBoundaryRows,
+  buildRoleCardRows,
   buildRoleLaneRows,
   buildQueueSummary,
   buildWorkOrderFlowRows,
@@ -342,6 +343,72 @@ describe('role workflow helpers', () => {
         expect.objectContaining({key: 'owner', value: 'Technician'}),
         expect.objectContaining({key: 'waiting', value: 'Proof upload'}),
       ]),
+    );
+  });
+
+  test('builds role-specific work-order card scan cues', () => {
+    const pendingApprovalWork = {
+      status: 'open',
+      priority: 'high',
+      service_type: 'plumbing',
+      client_id: 10,
+      client_display_name: 'Riverside HOA',
+      property_name: 'Riverside Tower',
+      vendor_name: 'Apex Plumbing',
+      client_approval_status: 'pending',
+    };
+
+    expect(buildRoleCardRows('client', pendingApprovalWork)).toEqual([
+      expect.objectContaining({
+        label: 'Client Action',
+        value: 'Review approval',
+        detail: expect.stringContaining('waiting on this client lane'),
+      }),
+      expect.objectContaining({
+        label: 'Proof',
+        value: 'Proof pending',
+      }),
+    ]);
+
+    expect(buildRoleCardRows('coordinator', {status: 'open'})).toEqual([
+      expect.objectContaining({
+        label: 'Coordination Need',
+        value: 'Assign owner',
+      }),
+      expect.objectContaining({
+        label: 'Handoff Target',
+        value: 'Coordinator',
+      }),
+    ]);
+
+    expect(buildRoleCardRows('viewer', pendingApprovalWork)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Mode', value: 'Read only'}),
+      ]),
+    );
+
+    expect(buildRoleCardRows('vendor', pendingApprovalWork)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: 'Visible Thread',
+          value: 'Vendor only',
+          detail: expect.stringContaining('Client and internal messages'),
+        }),
+      ]),
+    );
+
+    expect(
+      buildRoleCardRows('technician', {
+        status: 'in_progress',
+        priority: 'emergency',
+        service_type: 'electrical',
+      })[0],
+    ).toEqual(
+      expect.objectContaining({
+        label: 'Field Focus',
+        value: 'Capture proof',
+        detail: expect.stringContaining('emergency priority'),
+      }),
     );
   });
 });

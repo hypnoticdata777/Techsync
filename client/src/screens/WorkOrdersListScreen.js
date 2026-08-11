@@ -22,6 +22,7 @@ import {LOGOUT_CONFIRMATION, shouldLogoutImmediately} from '../utils/logoutFlow'
 import {
   buildQueueSummary,
   buildRoleGuidanceRows,
+  buildRoleCardRows,
   buildRoleLaneRows,
   buildWorkOrderFlowRows,
   canManageOperations,
@@ -51,6 +52,14 @@ const getStatusColor = (status) => {
       return '#ef4444'; // red
     case 'archived':
       return '#94a3b8'; // slate
+    case 'pending':
+      return '#fbbf24';
+    case 'missing':
+      return '#fb7185';
+    case 'verified':
+      return '#a3e635';
+    case 'active':
+      return '#38bdf8';
     default:
       return '#9ca3af'; // gray
   }
@@ -126,6 +135,7 @@ function WorkOrdersListScreen({navigation}) {
 
   const renderWorkOrder = ({item}) => {
     const flowRows = buildWorkOrderFlowRows(item);
+    const cardRows = buildRoleCardRows(user?.role, item);
 
     return (
       <TouchableOpacity
@@ -141,6 +151,28 @@ function WorkOrdersListScreen({navigation}) {
         <Text style={[styles.workOrderMeta, {color: getStatusColor(item.status)}]}>
           Status: {item.status.replace('_', ' ')}
         </Text>
+        <View style={styles.cardSignalRow}>
+          {cardRows.map(row => (
+            <View
+              key={row.key}
+              style={styles.cardSignal}
+              accessible
+              accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
+              <Text style={styles.cardSignalLabel}>{row.label}</Text>
+              <Text
+                style={[
+                  styles.cardSignalValue,
+                  {color: getStatusColor(row.tone || item.status)},
+                ]}
+                numberOfLines={1}>
+                {row.value}
+              </Text>
+              <Text style={styles.cardSignalDetail} numberOfLines={2}>
+                {row.detail}
+              </Text>
+            </View>
+          ))}
+        </View>
         <View style={styles.flowChipRow}>
           {flowRows.map(row => (
             <View
@@ -644,6 +676,42 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
     marginTop: 10,
+  },
+  cardSignalRow: {
+    borderTopColor: '#111827',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+    paddingTop: 10,
+  },
+  cardSignal: {
+    flexBasis: '47%',
+    flexGrow: 1,
+    minHeight: 64,
+    borderLeftColor: '#38bdf8',
+    borderLeftWidth: 2,
+    paddingLeft: 9,
+    paddingRight: 6,
+  },
+  cardSignalLabel: {
+    color: '#bfdbfe',
+    fontSize: 9,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  cardSignalValue: {
+    fontSize: 12,
+    fontWeight: '900',
+    lineHeight: 16,
+    marginTop: 3,
+  },
+  cardSignalDetail: {
+    color: '#94a3b8',
+    fontSize: 11,
+    lineHeight: 15,
+    marginTop: 2,
   },
   flowChip: {
     flexGrow: 1,

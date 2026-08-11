@@ -46,6 +46,9 @@ Completed in the latest lane UX pass:
 - Added communication-lane notices to work-order detail pages so users know
   whether they are in the internal, client-visible, vendor-visible, or
   read-only channel.
+- Added role-aware queue-card scan cues so every work order explains the
+  active user's immediate action, proof state, scope, or visibility lane before
+  they open the detail screen.
 
 Next product maturity targets:
 
@@ -53,6 +56,8 @@ Next product maturity targets:
   coordinator, technician, client, viewer, and vendor accounts.
 - Continue strengthening client/viewer/vendor empty and detail states so they
   feel like full user lanes, not restricted admin pages.
+- Continue tightening role-specific action follow-through after queue scan,
+  especially approval, vendor response, and technician proof flows.
 - Keep improving mobile/narrow-width comfort for the lanes that work from the
   detail page most often.
 
@@ -247,6 +252,8 @@ Completed:
   and message summary.
 - Added work-order queue/detail handoff cues for Next Owner, Waiting On, and
   Visible To so each role can understand collaboration state before acting.
+- Added role-aware queue-card scan cues for admin, coordinator, technician,
+  client, viewer, and vendor users before they open a work-order detail page.
 - Added mobile work-order form before-save context review for linked/manual/open
   client, property, vendor, and address state.
 - Added tested mobile navigator gating so manager-only screens are mounted only

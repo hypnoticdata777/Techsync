@@ -791,6 +791,201 @@ export const buildWorkOrderFlowRows = (workOrder = {}) => {
   ];
 };
 
+const formatStatus = value => (value || 'unknown').replace(/_/g, ' ');
+
+const getProofSignal = workOrder => {
+  if (workOrder?.completion_proof_verified_at) {
+    return 'Verified proof';
+  }
+  if (workOrder?.completion_override_reason) {
+    return 'Manager override';
+  }
+  if (workOrder?.status === 'completed') {
+    return 'Proof review needed';
+  }
+  return 'Proof pending';
+};
+
+const getWorkContext = workOrder => {
+  const context = [];
+  if (workOrder?.client_display_name) {
+    context.push(workOrder.client_display_name);
+  }
+  if (workOrder?.property_name) {
+    context.push(workOrder.property_name);
+  }
+  if (workOrder?.vendor_name) {
+    context.push(workOrder.vendor_name);
+  }
+
+  return context.length > 0 ? context.join(' | ') : 'Manual intake context';
+};
+
+const getCoordinatorCardAction = workOrder => {
+  if (workOrder?.client_approval_status === 'pending') {
+    return 'Monitor approval';
+  }
+  if (workOrder?.status === 'open' && !hasAssignedTechnician(workOrder)) {
+    return 'Assign owner';
+  }
+  if (workOrder?.status === 'completed' && !hasCompletionProof(workOrder)) {
+    return 'Review closeout';
+  }
+  if (['paused', 'escalated'].includes(workOrder?.status)) {
+    return 'Resolve blocker';
+  }
+  return 'Move handoff';
+};
+
+const getTechnicianCardAction = workOrder => {
+  if (workOrder?.status === 'open') {
+    return 'Start work';
+  }
+  if (workOrder?.status === 'in_progress') {
+    return hasCompletionProof(workOrder) ? 'Finish closeout' : 'Capture proof';
+  }
+  if (workOrder?.status === 'paused') {
+    return 'Update blocker';
+  }
+  if (workOrder?.status === 'escalated') {
+    return 'Sync with ops';
+  }
+  if (workOrder?.status === 'completed') {
+    return 'Review proof';
+  }
+  return 'Review job';
+};
+
+const getClientCardAction = workOrder =>
+  workOrder?.client_approval_status === 'pending' ? 'Review approval' : 'Review update';
+
+export const buildRoleCardRows = (role, workOrder = {}) => {
+  const nextOwner = getNextOwner(workOrder);
+  const waitingOn = getWaitingOn(workOrder);
+  const proofSignal = getProofSignal(workOrder);
+  const status = formatStatus(workOrder.status);
+  const priority = workOrder.priority || 'normal';
+  const serviceType = workOrder.service_type || 'general';
+
+  switch (role) {
+    case 'org_admin':
+      return [
+        {
+          key: 'risk',
+          label: 'Operational Signal',
+          value: `${priority} ${serviceType}`,
+          detail: `${status}; ${waitingOn.toLowerCase()}.`,
+          tone: workOrder.status || 'default',
+        },
+        {
+          key: 'context',
+          label: 'Tenant Context',
+          value: getWorkContext(workOrder),
+          detail: 'Client, property, and vendor links stay inspectable from detail.',
+          tone: hasLinkedClient(workOrder) || hasLinkedVendor(workOrder) ? 'active' : 'missing',
+        },
+      ];
+    case 'coordinator':
+      return [
+        {
+          key: 'coordination',
+          label: 'Coordination Need',
+          value: getCoordinatorCardAction(workOrder),
+          detail: nextOwner.detail,
+          tone: nextOwner.tone,
+        },
+        {
+          key: 'handoff',
+          label: 'Handoff Target',
+          value: nextOwner.value,
+          detail: `Waiting on ${waitingOn.toLowerCase()}.`,
+          tone: nextOwner.tone,
+        },
+      ];
+    case 'technician':
+      return [
+        {
+          key: 'field',
+          label: 'Field Focus',
+          value: getTechnicianCardAction(workOrder),
+          detail: `${priority} priority; ${serviceType} service.`,
+          tone: workOrder.status || 'default',
+        },
+        {
+          key: 'proof',
+          label: 'Proof',
+          value: proofSignal,
+          detail: 'Completion depends on clear proof or manager override.',
+          tone: hasCompletionProof(workOrder) ? 'verified' : 'missing',
+        },
+      ];
+    case 'client':
+      return [
+        {
+          key: 'client-action',
+          label: 'Client Action',
+          value: getClientCardAction(workOrder),
+          detail:
+            workOrder?.client_approval_status === 'pending'
+              ? 'Approval is waiting on this client lane.'
+              : 'Review visible updates and proof context.',
+          tone: workOrder?.client_approval_status === 'pending' ? 'pending' : 'active',
+        },
+        {
+          key: 'proof',
+          label: 'Proof',
+          value: proofSignal,
+          detail: 'Only client-visible proof context is shown here.',
+          tone: hasCompletionProof(workOrder) ? 'verified' : 'default',
+        },
+      ];
+    case 'viewer':
+      return [
+        {
+          key: 'snapshot',
+          label: 'Snapshot',
+          value: status,
+          detail: 'Read-only review of linked client-visible progress.',
+          tone: workOrder.status || 'default',
+        },
+        {
+          key: 'mode',
+          label: 'Mode',
+          value: 'Read only',
+          detail: 'No mutation controls are available in this lane.',
+          tone: 'default',
+        },
+      ];
+    case 'vendor':
+      return [
+        {
+          key: 'vendor-action',
+          label: 'Vendor Action',
+          value: workOrder?.status === 'in_progress' ? 'Track active work' : 'Review scope',
+          detail: 'Use vendor-visible messages for external updates only.',
+          tone: workOrder.status || 'default',
+        },
+        {
+          key: 'visibility',
+          label: 'Visible Thread',
+          value: 'Vendor only',
+          detail: 'Client and internal messages stay out of this lane.',
+          tone: hasLinkedVendor(workOrder) ? 'active' : 'missing',
+        },
+      ];
+    default:
+      return [
+        {
+          key: 'status',
+          label: 'Status',
+          value: status,
+          detail: `Waiting on ${waitingOn.toLowerCase()}.`,
+          tone: workOrder.status || 'default',
+        },
+      ];
+  }
+};
+
 export default {
   canManageOperations,
   getAvailableMainRoutes,
@@ -806,6 +1001,7 @@ export default {
   buildDetailSummary,
   buildDetailGuidanceRows,
   buildWorkOrderFlowRows,
+  buildRoleCardRows,
   getRoleUserExperience,
   getRoleLane,
   buildRoleLaneRows,

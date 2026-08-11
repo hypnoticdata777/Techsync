@@ -14,7 +14,9 @@ Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`, and the current
 role-lane contract lives in `ROLE_LANE_UX.md`. Client, viewer, and vendor lanes
 now have purpose-built portal summaries and communication-channel notices so
 external users can tell what they can see, where replies go, and which controls
-are intentionally unavailable. The walkthrough manifest now has a tested
+are intentionally unavailable. Work-order queue cards now add role-specific
+scan cues so admin, coordinator, technician, client, viewer, and vendor users
+can tell why a visible job matters before opening it. The walkthrough manifest now has a tested
 readiness audit for synthetic logins, screenshot targets, role controls,
 privacy expectations, and screenshot safety checks. The final capture workflow
 is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
@@ -330,7 +332,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   checks for each synthetic role, small-width comfort, screen-reader notes, and
   screenshot safety, plus the strict preflight order and viewport gates used by
   the generated local capture manifest. The local evidence pack now requires
-  checklist, role-by-role, and viewport notes before strict mode can pass. The
+  checklist, role-by-role, and viewport notes before strict mode can pass.
+  Work-order cards now add role-specific scan cues for immediate action,
+  proof state, scope, or visibility lane before a user opens the detail page. The
   pre-hosting readiness doctor can be run locally to confirm no smoke,
   screenshot, manual-note, or evidence-summary blockers remain before Vercel.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),

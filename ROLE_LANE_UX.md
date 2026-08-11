@@ -66,11 +66,14 @@ TechSync Ops is one workflow with separated lanes:
 ## UX Rules
 
 - Every home queue must show the user's lane, handoff partners, and success signal before the list.
+- Every work-order queue card must explain why the item matters to the active role before the user opens it.
 - Every work-order detail page must show what the role can do and what is intentionally unavailable.
 - Empty states should still explain the lane, not just say there is no data.
 - Controls must disappear by role when they are not valid, but the page should still explain why the lane is limited.
 - Message visibility must remain explicit: internal, client-visible, and vendor-visible are separate product paths.
 - The next owner, waiting state, and visible audience should be available anywhere a work order is reviewed.
+- Queue cards should keep the shared handoff model, but use role-specific scan cues:
+  admin sees operational signal and tenant context; coordinator sees coordination need and handoff target; technician sees field focus and proof; client sees client action and proof; viewer sees snapshot and read-only mode; vendor sees vendor action and visible thread.
 
 ## Portal Surface Rules
 

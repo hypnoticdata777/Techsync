@@ -258,6 +258,9 @@ Already represented in the codebase:
 - v1.3 work-order interoperability cues for next owner, waiting-on state, and
   visible audiences so admin, coordinator, technician, client, viewer, and
   vendor users understand handoffs before taking action.
+- v1.3 role-specific queue-card scan cues so admin, coordinator, technician,
+  client, viewer, and vendor users understand why each visible work order
+  matters to their lane before opening it.
 - v1.3 work-order create/edit guidance for linked/manual intake states so
   client, property, vendor, and address context gaps are visible before save.
 - v1.3 manager-only mobile navigation gating for directory, dispatch,

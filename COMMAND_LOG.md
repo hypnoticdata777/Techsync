@@ -2753,3 +2753,40 @@ Result:
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-11 - v1.3 Role-Aware Queue Card Scan Pass
+
+Decision:
+
+- Make every visible work-order card explain why that item matters to the
+  active user's lane before the detail page opens.
+- Keep the shared handoff model in place while adding role-specific scan cues
+  for admins, coordinators, technicians, clients, viewers, and vendors.
+
+Changes:
+
+- Added tested `buildRoleCardRows` helper for role-specific card cues.
+- Updated work-order list cards with compact `Operational Signal`,
+  `Coordination Need`, `Field Focus`, `Client Action`, `Snapshot`, and
+  `Vendor Action` style rows depending on the active role.
+- Added accessible labels for the new card cues and mobile-safe text wrapping.
+- Updated README, roadmap, phase status, QA, requirements, traceability, and
+  role-lane docs to track the queue-card scan expectation.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `19 passed tests`.
+- Full client tests passed: `8 passed suites`, `58 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

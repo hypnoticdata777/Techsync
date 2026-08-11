@@ -252,6 +252,10 @@ Likely scope:
   - work-order detail communication now names the active channel before
     message entry or read-only review so external users know which lane they
     are operating in
+  - work-order queue cards now include role-specific scan cues so admin,
+    coordinator, technician, client, viewer, and vendor users can see their
+    immediate action, proof state, scope, or visibility lane before opening a
+    job
   - work-order create/edit now gives linked/manual context guidance before save
     so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while

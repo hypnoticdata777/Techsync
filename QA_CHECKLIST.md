@@ -223,6 +223,9 @@ they have been verified in the relevant environment.
       interoperability cues for next owner, waiting-on state, and visible
       audiences so role handoffs are understandable before opening or mutating
       work.
+- [x] Work-order queue cards now show role-specific scan cues for admin,
+      coordinator, technician, client, viewer, and vendor users before opening
+      the detail page.
 - [x] Role-lane UX contract added in code/docs, with home queue lane maps and
       detail-page `Can Do` / `Not In This Lane` boundaries for all six roles.
 - [x] Client, viewer, and vendor home queues now include portal summaries for
