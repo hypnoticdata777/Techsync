@@ -225,6 +225,112 @@ export const buildRoleBoundaryRows = role => {
   ];
 };
 
+export const getRolePortalSummary = (role, queueSummary = {}) => {
+  const total = queueSummary.total || 0;
+  const open = queueSummary.open || 0;
+  const active = queueSummary.inProgress || 0;
+  const approvals = queueSummary.pendingApproval || 0;
+
+  switch (role) {
+    case 'client':
+      return {
+        title: 'Client Portal',
+        subtitle: 'Approvals, visible updates, and closeout proof for linked work.',
+        rows: [
+          {
+            key: 'approvals',
+            label: 'Needs Review',
+            value: `${approvals} approval${approvals === 1 ? '' : 's'}`,
+          },
+          {
+            key: 'visible',
+            label: 'Visible Work',
+            value: `${total} linked item${total === 1 ? '' : 's'}`,
+          },
+          {
+            key: 'path',
+            label: 'Reply Path',
+            value: 'Client-visible messages only',
+          },
+        ],
+      };
+    case 'viewer':
+      return {
+        title: 'Owner Snapshot',
+        subtitle: 'Read-only status and proof context for linked client records.',
+        rows: [
+          {
+            key: 'visible',
+            label: 'Visible Work',
+            value: `${total} linked item${total === 1 ? '' : 's'}`,
+          },
+          {
+            key: 'open',
+            label: 'Open Items',
+            value: `${open} open`,
+          },
+          {
+            key: 'mode',
+            label: 'Mode',
+            value: 'Read-only review',
+          },
+        ],
+      };
+    case 'vendor':
+      return {
+        title: 'Vendor Desk',
+        subtitle: 'Linked vendor work, vendor-visible messages, and proof context.',
+        rows: [
+          {
+            key: 'linked',
+            label: 'Linked Work',
+            value: `${total} vendor item${total === 1 ? '' : 's'}`,
+          },
+          {
+            key: 'active',
+            label: 'Active',
+            value: `${active} active`,
+          },
+          {
+            key: 'path',
+            label: 'Reply Path',
+            value: 'Vendor-visible messages only',
+          },
+        ],
+      };
+    default:
+      return null;
+  }
+};
+
+export const getCommunicationLaneNotice = (role, visibility = 'internal') => {
+  if (role === 'client') {
+    return {
+      title: 'Client-visible channel',
+      detail: 'Replies go to operations and stay separate from internal and vendor-only messages.',
+    };
+  }
+
+  if (role === 'viewer') {
+    return {
+      title: 'Read-only channel',
+      detail: 'Visible updates and proof can be reviewed here; replies are intentionally disabled.',
+    };
+  }
+
+  if (role === 'vendor') {
+    return {
+      title: 'Vendor-visible channel',
+      detail: 'Replies go to operations through the vendor lane and stay separate from client/internal messages.',
+    };
+  }
+
+  return {
+    title: `${visibility.replace('_', ' ')} channel`,
+    detail: 'Choose the audience before sending so internal, client, and vendor updates stay separated.',
+  };
+};
+
 export const buildRoleGuidanceRows = (role, queueSummary = {}) => {
   const experience = getRoleUserExperience(role);
   const total = queueSummary.total || 0;
@@ -704,4 +810,6 @@ export default {
   getRoleLane,
   buildRoleLaneRows,
   buildRoleBoundaryRows,
+  getRolePortalSummary,
+  getCommunicationLaneNotice,
 };

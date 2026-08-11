@@ -25,6 +25,7 @@ import {
   buildDetailSummary,
   buildWorkOrderFlowRows,
   getDetailRoleContext,
+  getCommunicationLaneNotice,
 } from '../utils/roleWorkflows';
 
 // Helper function to get status color
@@ -229,6 +230,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const roleBoundaryRows = useMemo(
     () => buildRoleBoundaryRows(user?.role),
     [user?.role],
+  );
+  const communicationNotice = useMemo(
+    () => getCommunicationLaneNotice(user?.role, messageVisibility),
+    [messageVisibility, user?.role],
   );
 
   const loadAttachments = useCallback(async () => {
@@ -706,6 +711,14 @@ function WorkOrderDetailsScreen({route, navigation}) {
           <View style={styles.rowHeader}>
             <Text style={styles.label}>Communication</Text>
             {messagesLoading ? <ActivityIndicator color="#38bdf8" size="small" /> : null}
+          </View>
+
+          <View
+            style={styles.communicationNotice}
+            accessible
+            accessibilityLabel={`${communicationNotice.title}. ${communicationNotice.detail}`}>
+            <Text style={styles.communicationNoticeTitle}>{communicationNotice.title}</Text>
+            <Text style={styles.communicationNoticeDetail}>{communicationNotice.detail}</Text>
           </View>
 
           {canUseInternalMessages ? (
@@ -1267,6 +1280,27 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
     marginBottom: 10,
+  },
+  communicationNotice: {
+    backgroundColor: '#07111f',
+    borderLeftColor: '#38bdf8',
+    borderLeftWidth: 2,
+    borderRadius: 8,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+  },
+  communicationNoticeTitle: {
+    color: '#bfdbfe',
+    fontSize: 11,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  communicationNoticeDetail: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 3,
   },
   visibilityTab: {
     minHeight: 44,

@@ -11,10 +11,13 @@ This repository implements the POC scope defined in
 implemented vs. deferred.
 
 Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`, and the current
-role-lane contract lives in `ROLE_LANE_UX.md`. The walkthrough manifest now has
-a tested readiness audit for synthetic logins, screenshot targets, role
-controls, privacy expectations, and screenshot safety checks. The final capture
-workflow is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
+role-lane contract lives in `ROLE_LANE_UX.md`. Client, viewer, and vendor lanes
+now have purpose-built portal summaries and communication-channel notices so
+external users can tell what they can see, where replies go, and which controls
+are intentionally unavailable. The walkthrough manifest now has a tested
+readiness audit for synthetic logins, screenshot targets, role controls,
+privacy expectations, and screenshot safety checks. The final capture workflow
+is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
 `scripts/smoke_role_ux.py` can produce sanitized role-scope API evidence once a
 local/demo API is running. The Role Evidence screen and capture manifest show
 the strict preflight order plus 390px, 320px, and desktop viewport gates.

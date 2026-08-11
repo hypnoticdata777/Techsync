@@ -14,6 +14,8 @@ import {
   getRoleActions,
   getRoleHome,
   getRoleLane,
+  getRolePortalSummary,
+  getCommunicationLaneNotice,
   getRoleUserExperience,
   getWorkOrdersEndpointForRole,
 } from './roleWorkflows';
@@ -118,6 +120,61 @@ describe('role workflow helpers', () => {
     expect(buildRoleBoundaryRows('viewer')[1].value).toContain('mutation controls');
     expect(buildRoleBoundaryRows('vendor')[1].value).toContain('internal/client messages');
     expect(buildRoleBoundaryRows('technician')[1].value).toContain('unrelated jobs');
+  });
+
+  test('builds purpose-built portal summaries for external lanes', () => {
+    const clientPortal = getRolePortalSummary('client', {
+      total: 3,
+      pendingApproval: 2,
+    });
+    expect(clientPortal).toEqual(
+      expect.objectContaining({
+        title: 'Client Portal',
+        subtitle: expect.stringContaining('Approvals'),
+      }),
+    );
+    expect(clientPortal.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Needs Review', value: '2 approvals'}),
+        expect.objectContaining({label: 'Reply Path', value: 'Client-visible messages only'}),
+      ]),
+    );
+
+    expect(getRolePortalSummary('viewer', {total: 1}).rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Mode', value: 'Read-only review'}),
+      ]),
+    );
+    expect(getRolePortalSummary('vendor', {total: 2, inProgress: 1}).rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Reply Path', value: 'Vendor-visible messages only'}),
+      ]),
+    );
+    expect(getRolePortalSummary('coordinator', {total: 2})).toBeNull();
+  });
+
+  test('explains communication lanes for internal and external roles', () => {
+    expect(getCommunicationLaneNotice('client')).toEqual(
+      expect.objectContaining({
+        title: 'Client-visible channel',
+        detail: expect.stringContaining('vendor-only messages'),
+      }),
+    );
+    expect(getCommunicationLaneNotice('viewer')).toEqual(
+      expect.objectContaining({
+        title: 'Read-only channel',
+        detail: expect.stringContaining('replies are intentionally disabled'),
+      }),
+    );
+    expect(getCommunicationLaneNotice('vendor')).toEqual(
+      expect.objectContaining({
+        title: 'Vendor-visible channel',
+        detail: expect.stringContaining('client/internal messages'),
+      }),
+    );
+    expect(getCommunicationLaneNotice('coordinator', 'client').detail).toContain(
+      'Choose the audience',
+    );
   });
 
   test('builds role guidance from queue state', () => {

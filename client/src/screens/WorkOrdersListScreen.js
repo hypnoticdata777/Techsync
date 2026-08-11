@@ -29,6 +29,7 @@ import {
   getRoleActions,
   getRoleEmptyState,
   getRoleHome,
+  getRolePortalSummary,
   getRoleUserExperience,
   getWorkOrdersEndpointForRole,
 } from '../utils/roleWorkflows';
@@ -72,6 +73,10 @@ function WorkOrdersListScreen({navigation}) {
   const roleActions = useMemo(() => getRoleActions(user?.role), [user?.role]);
   const queueSummary = useMemo(() => buildQueueSummary(workOrders), [workOrders]);
   const roleLaneRows = useMemo(() => buildRoleLaneRows(user?.role), [user?.role]);
+  const portalSummary = useMemo(
+    () => getRolePortalSummary(user?.role, queueSummary),
+    [user?.role, queueSummary],
+  );
   const roleGuidanceRows = useMemo(
     () => buildRoleGuidanceRows(user?.role, queueSummary),
     [user?.role, queueSummary],
@@ -282,6 +287,30 @@ function WorkOrdersListScreen({navigation}) {
           </View>
         )}
       </View>
+
+      {portalSummary ? (
+        <View
+          style={styles.portalPanel}
+          accessible
+          accessibilityLabel={`${portalSummary.title}. ${portalSummary.subtitle}`}>
+          <View style={styles.portalHeader}>
+            <Text style={styles.portalTitle}>{portalSummary.title}</Text>
+            <Text style={styles.portalSubtitle}>{portalSummary.subtitle}</Text>
+          </View>
+          <View style={styles.portalRow}>
+            {portalSummary.rows.map(row => (
+              <View
+                key={row.key}
+                style={styles.portalMetric}
+                accessible
+                accessibilityLabel={`${row.label}. ${row.value}`}>
+                <Text style={styles.portalMetricLabel}>{row.label}</Text>
+                <Text style={styles.portalMetricValue}>{row.value}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      ) : null}
 
       {loading && <ActivityIndicator style={styles.loader} />}
       {error && (
@@ -528,6 +557,56 @@ const styles = StyleSheet.create({
   },
   primaryActionLabel: {
     color: '#050816',
+  },
+  portalPanel: {
+    backgroundColor: '#07111f',
+    borderColor: '#243449',
+    borderRadius: 8,
+    borderWidth: 1,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 12,
+  },
+  portalHeader: {
+    marginBottom: 10,
+  },
+  portalTitle: {
+    color: '#f9fafb',
+    fontSize: 16,
+    fontWeight: '900',
+  },
+  portalSubtitle: {
+    color: '#94a3b8',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 3,
+  },
+  portalRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  portalMetric: {
+    borderLeftColor: '#a3e635',
+    borderLeftWidth: 2,
+    flexBasis: '31%',
+    flexGrow: 1,
+    minHeight: 48,
+    paddingLeft: 9,
+    paddingRight: 6,
+  },
+  portalMetricLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  portalMetricValue: {
+    color: '#e5e7eb',
+    fontSize: 12,
+    fontWeight: '800',
+    lineHeight: 17,
+    marginTop: 4,
   },
   listContent: {
     paddingHorizontal: 16,

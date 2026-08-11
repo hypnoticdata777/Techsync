@@ -2714,3 +2714,42 @@ Result:
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-11 - v1.3 External Portal UX Maturity Pass
+
+Decision:
+
+- Make client, viewer, and vendor lanes feel like purpose-built SaaS portals
+  instead of restricted versions of the internal operations workspace.
+- Keep each external lane explicit about visible work, reply path, read-only
+  mode, and channel boundaries.
+
+Changes:
+
+- Added tested portal summary helpers for client, viewer, and vendor lanes.
+- Added a client/viewer/vendor portal panel above the queue with approval,
+  visible-work, active-work, read-only, and reply-path context.
+- Added tested communication-lane notices for internal, client-visible,
+  vendor-visible, and read-only detail-page communication states.
+- Updated the work-order detail communication section to name the active
+  channel before messages or read-only review.
+- Updated role-lane, roadmap, phase, QA, README, requirements, and traceability
+  docs to record the external portal maturity pass.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `18 passed tests`.
+- Full client tests passed: `8 passed suites`, `57 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

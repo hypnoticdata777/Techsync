@@ -41,13 +41,18 @@ Completed in the latest lane UX pass:
 - Kept the shared work-order shape consistent: next owner, waiting state,
   visible audience, messages, proof, approval, and lifecycle all remain tied
   to role permissions.
+- Added client, viewer, and vendor portal summaries so external lanes show
+  purpose-built approval/read-only/vendor context before the queue.
+- Added communication-lane notices to work-order detail pages so users know
+  whether they are in the internal, client-visible, vendor-visible, or
+  read-only channel.
 
 Next product maturity targets:
 
 - Continue role-by-role walkthrough polish against synthetic admin,
   coordinator, technician, client, viewer, and vendor accounts.
-- Strengthen client and vendor empty/zero states so they feel like real portals,
-  not just restricted pages.
+- Continue strengthening client/viewer/vendor empty and detail states so they
+  feel like full user lanes, not restricted admin pages.
 - Keep improving mobile/narrow-width comfort for the lanes that work from the
   detail page most often.
 

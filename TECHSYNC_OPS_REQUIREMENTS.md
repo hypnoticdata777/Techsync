@@ -315,6 +315,9 @@ Already represented in the codebase:
 - Role-lane UX contract for org admin, coordinator, technician, client,
   viewer, and vendor users, including each lane's job, handoffs, success
   signal, allowed controls, and intentionally hidden controls.
+- Purpose-built client, viewer, and vendor portal summaries for external user
+  lanes, including approval attention, read-only review mode, linked vendor
+  work, and channel-specific reply paths.
 - `APP_ENV=demo` for hosted investor-safe POC deployment with deferred SMTP,
   storage, and Stripe where intentionally configured.
 - Synthetic demo seed/reset tooling for a repeatable tenant story covering
@@ -327,9 +330,9 @@ Important gaps for the PMC operations product:
 - Property/client/vendor records are now first-class v1.3 entities with
   backend APIs and a mobile directory workflow; deeper role-specific list
   filtering, bulk import/export, and richer relationship views remain.
-- Full client/homeowner portal UI is not built yet; scoped work-order
-  visibility, client-visible comments, and approval/decline actions have
-  started in v1.3.
+- Full client/homeowner portal depth still has room to mature; scoped
+  work-order visibility, client-visible comments, approval/decline actions,
+  and first portal summary treatment have started in v1.3.
 - Calendar/maps, background jobs, final role screenshot evidence, deep
   accounting integrations, and provider-level binary storage export automation
   remain roadmap items.

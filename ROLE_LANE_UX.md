@@ -71,3 +71,12 @@ TechSync Ops is one workflow with separated lanes:
 - Controls must disappear by role when they are not valid, but the page should still explain why the lane is limited.
 - Message visibility must remain explicit: internal, client-visible, and vendor-visible are separate product paths.
 - The next owner, waiting state, and visible audience should be available anywhere a work order is reviewed.
+
+## Portal Surface Rules
+
+- Client, viewer, and vendor home queues must feel like purpose-built portals, not reduced admin pages.
+- The client portal should emphasize pending approvals, linked visible work, and the client-visible reply path.
+- The viewer portal should emphasize read-only mode, visible linked work, and open item awareness.
+- The vendor portal should emphasize linked vendor work, active vendor items, and the vendor-visible reply path.
+- Work-order detail communication should always name the active channel before message entry or read-only review.
+- External users should understand both what they can do and why unavailable controls are intentionally absent.

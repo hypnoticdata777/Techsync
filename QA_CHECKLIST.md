@@ -225,6 +225,10 @@ they have been verified in the relevant environment.
       work.
 - [x] Role-lane UX contract added in code/docs, with home queue lane maps and
       detail-page `Can Do` / `Not In This Lane` boundaries for all six roles.
+- [x] Client, viewer, and vendor home queues now include portal summaries for
+      approvals, read-only snapshot mode, linked vendor work, and reply path.
+- [x] Work-order detail communication now names the active channel before
+      message entry or read-only review.
 - [x] Role UX capture prep now repairs stale local manual-notes files to the
       current checklist/role/viewport schema, and the local screenshot
       inventory reports all 21 expected images present.

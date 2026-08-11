@@ -246,6 +246,12 @@ Likely scope:
     the list so each user understands their operating lane immediately
   - work-order detail now shows explicit `Can Do` and `Not In This Lane`
     boundaries so missing controls feel intentional instead of broken
+  - client, viewer, and vendor home queues now include purpose-built portal
+    summaries for approval attention, read-only snapshot mode, linked vendor
+    work, and the correct reply path
+  - work-order detail communication now names the active channel before
+    message entry or read-only review so external users know which lane they
+    are operating in
   - work-order create/edit now gives linked/manual context guidance before save
     so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while
