@@ -2533,3 +2533,48 @@ Result:
 - Pre-hosting readiness remains correctly blocked only by manual notes and the
   final evidence summary; role smoke and all 21 screenshot filenames still
   pass.
+
+## 2026-08-11 - v1.3 Detail and Form Guidance Maturity Pass
+
+Decision:
+
+- Continue maturing the role-by-role experience locally before hosting by
+  reducing ambiguity inside the two highest-friction workflows: work-order
+  detail review and work-order create/edit.
+- Keep Vercel/portfolio hosting deferred until local role UX evidence is
+  complete.
+
+Changes:
+
+- Added tested role-aware detail guidance rows for admin, coordinator,
+  technician, client, viewer, and vendor users.
+- Updated the work-order detail command panel with scope, current action, and
+  guardrail copy derived from role and available capabilities.
+- Added tested work-order form guidance rows for linked and manual intake
+  states.
+- Updated the create/edit work-order form with pre-save guidance that explains
+  intent, linked/manual context, and open context before saving.
+- Updated roadmap, requirements, traceability, QA, phase status, and role UX
+  capture docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js workOrderContextSummary.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+server\venv\Scripts\python.exe scripts\pre_hosting_readiness.py --summary-json pre-hosting-readiness-summary.json
+git diff --check
+```
+
+Result:
+
+- Focused client tests passed: `2 passed suites`, `18 passed tests`.
+- Full client tests passed: `8 passed suites`, `52 passed tests`.
+- Backend tests passed: `187 passed`.
+- Compile checks passed.
+- Pre-hosting readiness remains correctly blocked only by manual notes and the
+  final evidence summary; tracked readiness files, ignored local evidence,
+  screenshot plan, capture manifest, role smoke, and all 21 screenshots pass.
+- `git diff --check` reported only existing Windows LF-to-CRLF warnings.

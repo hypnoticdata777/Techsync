@@ -226,6 +226,10 @@ Likely scope:
   - role landing now locates the active user with role badge, visible scope,
     next-move guidance, and privacy/operations guardrails before queue
     interaction
+  - work-order detail now gives each role scope, current-action, and guardrail
+    guidance before approval, messaging, proof, or lifecycle interaction
+  - work-order create/edit now gives linked/manual context guidance before save
+    so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while
     preserving stable `quiet-*` login emails for repeatable proof
   - role-aware navigator gating now started for manager-only mobile screens
@@ -290,7 +294,9 @@ v1.3 exit criteria:
   manual screen-reader notes. A local evidence-pack builder now summarizes
   smoke JSON plus screenshot inventory before the public showcase gate. Role
   landing now orients each user with role, scope, next-step, and guardrail
-  guidance before they interact with the queue.
+  guidance before they interact with the queue, and work-order detail/form
+  screens now carry the same role-aware guidance into approval, messaging,
+  proof, lifecycle, and linked/manual intake decisions.
   Accessibility helper coverage and a manual evidence template are now prepared
   for the final screen-reader pass.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data. The

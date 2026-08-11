@@ -12,6 +12,7 @@ import {
 import {useAuth} from '../context/AuthContext';
 import {actionButtonA11y, inputA11y} from '../utils/accessibility';
 import {
+  buildFormGuidanceRows,
   buildWorkOrderContextSummary,
   summarizeContextStates,
 } from '../utils/workOrderContextSummary';
@@ -119,6 +120,13 @@ const ContextSummaryRow = ({row}) => (
   </View>
 );
 
+const GuidanceRow = ({row}) => (
+  <View style={styles.guidanceRow}>
+    <Text style={styles.guidanceLabel}>{row.label}</Text>
+    <Text style={styles.guidanceValue}>{row.value}</Text>
+  </View>
+);
+
 function WorkOrderFormScreen({route, navigation}) {
   const {authFetch} = useAuth();
   const existingWorkOrder = route.params?.workOrder;
@@ -170,6 +178,17 @@ function WorkOrderFormScreen({route, navigation}) {
   const contextStateSummary = useMemo(
     () => summarizeContextStates(contextSummaryRows),
     [contextSummaryRows],
+  );
+  const formGuidanceRows = useMemo(
+    () =>
+      buildFormGuidanceRows({
+        isEditing,
+        contextStateSummary,
+        hasTitle: !!title.trim(),
+        hasLinkedContext: contextSummaryRows.some(row => row.state === 'linked'),
+        hasManualAddress: !!address.trim(),
+      }),
+    [address, contextStateSummary, contextSummaryRows, isEditing, title],
   );
 
   const loadDirectory = useCallback(async () => {
@@ -329,6 +348,12 @@ function WorkOrderFormScreen({route, navigation}) {
         <Text style={styles.pageTitle}>
           {isEditing ? 'Edit Work Order' : 'New Work Order'}
         </Text>
+
+        <View style={styles.guidancePanel}>
+          {formGuidanceRows.map(row => (
+            <GuidanceRow key={row.key} row={row} />
+          ))}
+        </View>
 
         <View style={styles.field}>
           <Text style={styles.label}>Title *</Text>
@@ -524,7 +549,35 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: '#f9fafb',
-    marginBottom: 24,
+    marginBottom: 14,
+  },
+  guidancePanel: {
+    backgroundColor: '#020617',
+    borderWidth: 1,
+    borderColor: '#1f2937',
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
+    marginBottom: 20,
+  },
+  guidanceRow: {
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'flex-start',
+  },
+  guidanceLabel: {
+    width: 118,
+    color: '#bfdbfe',
+    fontSize: 11,
+    fontWeight: '800',
+    lineHeight: 16,
+    textTransform: 'uppercase',
+  },
+  guidanceValue: {
+    flex: 1,
+    color: '#cbd5e1',
+    fontSize: 12,
+    lineHeight: 17,
   },
   field: {
     marginBottom: 20,

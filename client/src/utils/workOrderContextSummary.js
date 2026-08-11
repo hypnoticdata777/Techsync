@@ -125,3 +125,41 @@ export const summarizeContextStates = rows => {
     label: `${totals.linked} linked, ${totals.manual} manual, ${totals.missing} open`,
   };
 };
+
+export const buildFormGuidanceRows = ({
+  isEditing = false,
+  contextStateSummary = {},
+  hasTitle = false,
+  hasLinkedContext = false,
+  hasManualAddress = false,
+} = {}) => {
+  const missing = contextStateSummary.missingLabels || [];
+  const openLabel = missing.length ? missing.join(', ') : 'none';
+
+  return [
+    {
+      key: 'intent',
+      label: isEditing ? 'Editing existing work' : 'Creating new work',
+      value: hasTitle
+        ? 'The request has a title; keep the rest focused on dispatch and proof readiness.'
+        : 'Start with a clear work title so duplicate checks and dispatch review have a useful anchor.',
+    },
+    {
+      key: 'context',
+      label: hasLinkedContext ? 'Linked context' : 'Manual context',
+      value: hasLinkedContext
+        ? `${contextStateSummary.linked || 0} directory link${contextStateSummary.linked === 1 ? '' : 's'} selected; open items: ${openLabel}.`
+        : hasManualAddress
+          ? 'Manual address is enough for intake, but linked client/property records make the demo stronger.'
+          : 'Add a linked property or a manual address before saving if dispatch needs location clarity.',
+    },
+    {
+      key: 'before-save',
+      label: 'Before save',
+      value:
+        (contextStateSummary.missing || 0) > 1
+          ? 'Open context is allowed, but review the summary so missing links are intentional.'
+          : 'Review client, property, vendor, and address context before creating the request.',
+    },
+  ];
+};

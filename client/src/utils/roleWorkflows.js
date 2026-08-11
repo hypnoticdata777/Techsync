@@ -353,6 +353,115 @@ export const buildDetailSummary = (workOrder = {}, attachments = [], messages = 
   ];
 };
 
+const DETAIL_SCOPE = {
+  org_admin: {
+    label: 'Full control',
+    value: 'Review tenant impact, client approval, proof readiness, and lifecycle actions from one place.',
+    guardrail: 'Internal, client, and vendor communication channels must stay intentionally separated.',
+  },
+  coordinator: {
+    label: 'Coordinator pass',
+    value: 'Confirm assignment, client context, approval state, and vendor handoff before moving the job.',
+    guardrail: 'Use client/vendor-visible notes only when the recipient should see the update.',
+  },
+  technician: {
+    label: 'Field execution',
+    value: 'Update status, leave work notes, and attach proof from assigned jobs only.',
+    guardrail: 'Directory edits, approval requests, and unrelated work stay out of technician flow.',
+  },
+  client: {
+    label: 'Client decision',
+    value: 'Review visible status, messages, and closeout proof before approving or declining requests.',
+    guardrail: 'Only client-visible messages and linked work-order proof should be visible here.',
+  },
+  viewer: {
+    label: 'Read-only review',
+    value: 'Check status, visible messages, and proof context without changing the work order.',
+    guardrail: 'Mutation controls, internal notes, and unrelated client work must remain hidden.',
+  },
+  vendor: {
+    label: 'Vendor scope',
+    value: 'Review linked vendor work and reply only through the vendor-visible message path.',
+    guardrail: 'Internal/client messages and other vendor work must remain hidden.',
+  },
+};
+
+const getDetailActionRow = (role, workOrder = {}, capability = {}) => {
+  if (capability.canDecideApproval) {
+    return {
+      key: 'action',
+      label: 'Approval decision',
+      value: 'Use the approval panel to approve or decline with an optional decision note.',
+    };
+  }
+
+  if (capability.canRequestApproval) {
+    return {
+      key: 'action',
+      label:
+        workOrder.client_approval_status === 'pending'
+          ? 'Approval pending'
+          : 'Approval path',
+      value:
+        workOrder.client_approval_status === 'pending'
+          ? 'Client approval has already been requested; keep client-visible updates clean.'
+          : 'Request approval after the client-facing context and proof are ready.',
+    };
+  }
+
+  if (capability.canUpdateStatus && capability.nextStatusCount > 0) {
+    return {
+      key: 'action',
+      label: 'Lifecycle controls',
+      value: 'Use the status actions below when the visible work state truly changes.',
+    };
+  }
+
+  if (role === 'vendor') {
+    return {
+      key: 'action',
+      label: 'Vendor update',
+      value: 'Send vendor-visible updates only when the message belongs outside the internal thread.',
+    };
+  }
+
+  if (role === 'client') {
+    return {
+      key: 'action',
+      label: 'Client visibility',
+      value: 'Review client-visible updates; approvals appear here when the operations team requests one.',
+    };
+  }
+
+  return {
+    key: 'action',
+    label: 'No direct action',
+    value: 'This role is intentionally limited to review for this work-order state.',
+  };
+};
+
+export const buildDetailGuidanceRows = (role, workOrder = {}, capability = {}) => {
+  const scope = DETAIL_SCOPE[role] || {
+    label: 'Work-order scope',
+    value: 'Review status, communication, proof, and next steps available to this account.',
+    guardrail: 'Refresh or sign out if the visible controls do not match this account.',
+  };
+
+  return [
+    {
+      key: 'scope',
+      label: scope.label,
+      value: scope.value,
+    },
+    getDetailActionRow(role, workOrder, capability),
+    {
+      key: 'guardrail',
+      label: 'Guardrail',
+      value: scope.guardrail,
+    },
+  ];
+};
+
 export default {
   canManageOperations,
   getAvailableMainRoutes,
@@ -366,5 +475,6 @@ export default {
   buildRoleGuidanceRows,
   getDetailRoleContext,
   buildDetailSummary,
+  buildDetailGuidanceRows,
   getRoleUserExperience,
 };

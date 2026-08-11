@@ -392,11 +392,11 @@ Stop when:
 ## Current Recommended Next Move
 
 Continue the local-only v1.3 evidence pass and leave hosting as the absolute
-final gate. The 21 role screenshot filenames are now present locally, and Expo
-web logout is fixed for role switching. Role landing now locates the active
-user with role, scope, next-move, and guardrail guidance. The best next move is
-to mature the work-order detail/form interaction guidance, then finish
-`local-role-ux-manual-notes.json`, check 390px/320px layout comfort, record
-manual screen-reader notes, build the evidence pack, and run the strict
+final gate. The 21 role screenshot filenames are now present locally, Expo web
+logout is fixed for role switching, role landing locates the active user, and
+work-order detail/form screens now explain scope, current action, guardrails,
+and linked/manual context before the user mutates work. The best next move is
+to finish `local-role-ux-manual-notes.json`, check 390px/320px layout comfort,
+record manual screen-reader notes, build the evidence pack, and run the strict
 pre-hosting readiness doctor. Only after those non-hosting requirements are
 complete should the Vercel/portfolio showcase sequence resume.

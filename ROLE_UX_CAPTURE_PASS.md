@@ -234,6 +234,12 @@ Completed live:
 - Role landing was matured so admin, coordinator, technician, client, viewer,
   and vendor accounts show role identity, scope, next move, and guardrail copy
   before any queue interaction.
+- Work-order details were matured so each role sees scope, current-action, and
+  guardrail guidance before approval, messaging, proof, or lifecycle
+  interaction.
+- Work-order create/edit was matured so linked/manual intake context is
+  explained before save, including open client, property, vendor, and address
+  gaps.
 - `scripts/build_role_ux_evidence_pack.py` was added so final role evidence can
   be summarized without committing generated smoke JSON, screenshots, or local
   evidence-pack Markdown.

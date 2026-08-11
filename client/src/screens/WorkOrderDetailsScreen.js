@@ -19,7 +19,11 @@ import {
   inputA11y,
   statusActionA11y,
 } from '../utils/accessibility';
-import {buildDetailSummary, getDetailRoleContext} from '../utils/roleWorkflows';
+import {
+  buildDetailGuidanceRows,
+  buildDetailSummary,
+  getDetailRoleContext,
+} from '../utils/roleWorkflows';
 
 // Helper function to get status color
 const getStatusColor = status => {
@@ -192,6 +196,29 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const detailSummary = useMemo(
     () => buildDetailSummary(workOrder, attachments, messages),
     [attachments, messages, workOrder],
+  );
+  const detailGuidanceRows = useMemo(
+    () =>
+      buildDetailGuidanceRows(user?.role, workOrder, {
+        canEdit,
+        canUpdateStatus,
+        canUploadAttachments,
+        canSendMessages,
+        canRequestApproval,
+        canDecideApproval,
+        nextStatusCount: nextStatuses.length,
+      }),
+    [
+      canDecideApproval,
+      canEdit,
+      canRequestApproval,
+      canSendMessages,
+      canUpdateStatus,
+      canUploadAttachments,
+      nextStatuses.length,
+      user?.role,
+      workOrder,
+    ],
   );
 
   const loadAttachments = useCallback(async () => {
@@ -506,6 +533,14 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   numberOfLines={2}>
                   {item.value}
                 </Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.guidanceStack}>
+            {detailGuidanceRows.map(row => (
+              <View key={row.key} style={styles.guidanceRow}>
+                <Text style={styles.guidanceLabel}>{row.label}</Text>
+                <Text style={styles.guidanceValue}>{row.value}</Text>
               </View>
             ))}
           </View>
@@ -999,6 +1034,32 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     textTransform: 'capitalize',
     marginTop: 4,
+  },
+  guidanceStack: {
+    borderTopWidth: 1,
+    borderTopColor: '#1e293b',
+    marginTop: 12,
+    paddingTop: 10,
+    gap: 8,
+  },
+  guidanceRow: {
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'flex-start',
+  },
+  guidanceLabel: {
+    width: 112,
+    color: '#bfdbfe',
+    fontSize: 11,
+    fontWeight: '800',
+    lineHeight: 16,
+    textTransform: 'uppercase',
+  },
+  guidanceValue: {
+    flex: 1,
+    color: '#cbd5e1',
+    fontSize: 12,
+    lineHeight: 17,
   },
   section: {
     marginBottom: 20,

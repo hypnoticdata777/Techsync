@@ -214,6 +214,11 @@ they have been verified in the relevant environment.
 - [x] Role landing now locates the active user with a role badge, visible
       scope, next-move guidance, and privacy/operations guardrail copy before
       queue interaction.
+- [x] Work-order details now show role-aware scope, current action, and
+      guardrail guidance for admin, coordinator, technician, client, viewer,
+      and vendor users before approval, messaging, proof, or lifecycle actions.
+- [x] Work-order create/edit form now shows linked/manual intake guidance before
+      save so client, property, vendor, and address context gaps are explicit.
 - [x] Synthetic empty-state display names use no-work personas while preserving
       stable `quiet-*` login emails for repeatable role proof.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.

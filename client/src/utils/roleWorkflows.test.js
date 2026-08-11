@@ -1,4 +1,5 @@
 import {
+  buildDetailGuidanceRows,
   buildDetailSummary,
   buildRoleGuidanceRows,
   buildQueueSummary,
@@ -154,6 +155,38 @@ describe('role workflow helpers', () => {
       expect.objectContaining({key: 'proof', value: '2 files'}),
       expect.objectContaining({key: 'messages', value: '1'}),
     ]);
+  });
+
+  test('builds detail guidance from role capability state', () => {
+    const clientRows = buildDetailGuidanceRows(
+      'client',
+      {client_approval_status: 'pending'},
+      {canDecideApproval: true},
+    );
+    expect(clientRows).toEqual([
+      expect.objectContaining({label: 'Client decision'}),
+      expect.objectContaining({
+        label: 'Approval decision',
+        value: expect.stringContaining('approve or decline'),
+      }),
+      expect.objectContaining({label: 'Guardrail'}),
+    ]);
+
+    const managerRows = buildDetailGuidanceRows(
+      'coordinator',
+      {client_approval_status: 'not_required'},
+      {canRequestApproval: true},
+    );
+    expect(managerRows[1]).toEqual(
+      expect.objectContaining({
+        label: 'Approval path',
+        value: expect.stringContaining('Request approval'),
+      }),
+    );
+
+    const vendorRows = buildDetailGuidanceRows('vendor', {}, {});
+    expect(vendorRows[1].label).toBe('Vendor update');
+    expect(vendorRows[2].value).toContain('Internal/client messages');
   });
 
   test('marks verified and override proof states clearly', () => {

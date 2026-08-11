@@ -1,4 +1,5 @@
 import {
+  buildFormGuidanceRows,
   buildWorkOrderContextSummary,
   formatPropertyAddress,
   summarizeContextStates,
@@ -114,5 +115,53 @@ describe('work order context summary helpers', () => {
       missingLabels: ['Vendor'],
       label: '1 linked, 1 manual, 1 open',
     });
+  });
+
+  test('builds form guidance for linked and manual intake states', () => {
+    const linkedRows = buildFormGuidanceRows({
+      isEditing: false,
+      hasTitle: true,
+      hasLinkedContext: true,
+      hasManualAddress: false,
+      contextStateSummary: {
+        linked: 2,
+        manual: 0,
+        missing: 2,
+        missingLabels: ['Vendor', 'Address'],
+      },
+    });
+
+    expect(linkedRows).toEqual([
+      expect.objectContaining({label: 'Creating new work'}),
+      expect.objectContaining({
+        label: 'Linked context',
+        value: expect.stringContaining('2 directory links selected'),
+      }),
+      expect.objectContaining({
+        label: 'Before save',
+        value: expect.stringContaining('Open context is allowed'),
+      }),
+    ]);
+
+    const manualRows = buildFormGuidanceRows({
+      isEditing: true,
+      hasTitle: false,
+      hasLinkedContext: false,
+      hasManualAddress: true,
+      contextStateSummary: {
+        linked: 0,
+        manual: 1,
+        missing: 3,
+        missingLabels: ['Client', 'Property', 'Vendor'],
+      },
+    });
+
+    expect(manualRows[0].label).toBe('Editing existing work');
+    expect(manualRows[1]).toEqual(
+      expect.objectContaining({
+        label: 'Manual context',
+        value: expect.stringContaining('Manual address is enough'),
+      }),
+    );
   });
 });

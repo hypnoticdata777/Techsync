@@ -251,6 +251,12 @@ Already represented in the codebase:
 - v1.3 active-user orientation on the role landing screen: role badge, visible
   scope, next move, and privacy/operations guardrails for admin, coordinator,
   technician, client, viewer, and vendor users.
+- v1.3 role-aware work-order detail guidance for admin, coordinator,
+  technician, client, viewer, and vendor users, covering visible scope,
+  current action, and guardrails before approval, messaging, proof, and
+  lifecycle controls.
+- v1.3 work-order create/edit guidance for linked/manual intake states so
+  client, property, vendor, and address context gaps are visible before save.
 - v1.3 manager-only mobile navigation gating for directory, dispatch,
   operations report, and work-order creation screens.
 - v1.3 role-scope regression coverage for client/viewer unrelated-work
