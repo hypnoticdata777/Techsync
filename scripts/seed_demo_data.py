@@ -54,10 +54,10 @@ EXPECTED_SCENARIO_LABELS = {
     "technician_active_targets": "technician screenshot targets include active assigned work",
     "client_pending_approval": "client screenshot target includes pending approval work",
     "viewer_scoped_work": "viewer screenshot target includes linked owner-group work",
-    "quiet_viewer_empty": "quiet viewer account has no linked work",
+    "quiet_viewer_empty": "no-work viewer account has no linked work",
     "vendor_linked_work": "vendor screenshot target includes linked Apex work",
     "vendor_visible_message": "vendor screenshot target includes a vendor-visible message",
-    "quiet_vendor_empty": "quiet vendor account has no linked work",
+    "quiet_vendor_empty": "no-work vendor account has no linked work",
 }
 
 
@@ -374,14 +374,14 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
         organization_id,
         "quiet-owner.demo@demo.techsyncops.dev",
         password_hash,
-        "Quiet Owner Group",
+        "No-Work Owner Group",
         "viewer",
     )
     empty_vendor_user = app.users_repo.create_user(
         organization_id,
         "quiet-vendor.demo@demo.techsyncops.dev",
         password_hash,
-        "Quiet Vendor Desk",
+        "No-Work Vendor Desk",
         "vendor",
     )
 
@@ -472,8 +472,8 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
     quiet_client = app.clients_repo.create(
         organization_id,
         {
-            "display_name": "Quiet Owner Group",
-            "contact_name": "Quiet Owner Group",
+            "display_name": "No-Work Owner Group",
+            "contact_name": "No-Work Owner Group",
             "email": empty_viewer_user["email"],
             "phone": "555-0102",
             "client_type": "owner",
@@ -557,8 +557,8 @@ def seed_demo_org(*, reset_existing: bool = False) -> dict[str, Any]:
     quiet_vendor = app.vendors_repo.create(
         organization_id,
         {
-            "name": "Quiet Demo Vendor",
-            "contact_name": "Quiet Vendor Desk",
+            "name": "No-Work Demo Vendor",
+            "contact_name": "No-Work Vendor Desk",
             "email": empty_vendor_user["email"],
             "phone": "555-0112",
             "service_types": ["general"],

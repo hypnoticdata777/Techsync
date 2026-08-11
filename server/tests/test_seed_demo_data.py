@@ -37,7 +37,7 @@ def test_evaluate_demo_readiness_reports_stale_empty_state_seed():
     assert readiness["ready"] is False
     assert "users count is 8; expected 10." in readiness["failures"]
     assert "Missing synthetic login user: quiet-owner.demo@demo.techsyncops.dev." in readiness["failures"]
-    assert "Missing scenario: quiet viewer account has no linked work." in readiness["failures"]
+    assert "Missing scenario: no-work viewer account has no linked work." in readiness["failures"]
 
 
 def test_evaluate_demo_readiness_reports_unseeded_database():

@@ -21,11 +21,13 @@ import {
 import {LOGOUT_CONFIRMATION, shouldLogoutImmediately} from '../utils/logoutFlow';
 import {
   buildQueueSummary,
+  buildRoleGuidanceRows,
   canManageOperations,
   getRoleAccessMessage,
   getRoleActions,
   getRoleEmptyState,
   getRoleHome,
+  getRoleUserExperience,
   getWorkOrdersEndpointForRole,
 } from '../utils/roleWorkflows';
 
@@ -63,9 +65,14 @@ function WorkOrdersListScreen({navigation}) {
   // client/viewer scoping is enforced by the backend list endpoint (RF-21).
   const endpoint = getWorkOrdersEndpointForRole(user?.role);
   const roleHome = useMemo(() => getRoleHome(user?.role), [user?.role]);
+  const roleExperience = useMemo(() => getRoleUserExperience(user?.role), [user?.role]);
   const roleEmptyState = useMemo(() => getRoleEmptyState(user?.role), [user?.role]);
   const roleActions = useMemo(() => getRoleActions(user?.role), [user?.role]);
   const queueSummary = useMemo(() => buildQueueSummary(workOrders), [workOrders]);
+  const roleGuidanceRows = useMemo(
+    () => buildRoleGuidanceRows(user?.role, queueSummary),
+    [user?.role, queueSummary],
+  );
 
   const fetchWorkOrders = useCallback(async () => {
     try {
@@ -151,7 +158,10 @@ function WorkOrdersListScreen({navigation}) {
   return (
     <View style={styles.container}>
       <View style={styles.userBar}>
-        <Text style={styles.userName}>{user?.full_name || 'User'}</Text>
+        <View style={styles.userIdentity}>
+          <Text style={styles.userName}>{user?.full_name || 'User'}</Text>
+          <Text style={styles.roleBadge}>{roleExperience.roleLabel}</Text>
+        </View>
         <TouchableOpacity
           onPress={handleLogout}
           {...actionButtonA11y('Logout', 'Signs out of TechSync Ops.')}>
@@ -163,6 +173,7 @@ function WorkOrdersListScreen({navigation}) {
         <View style={styles.titleBlock}>
           <Text style={styles.sectionTitle}>{roleHome.title}</Text>
           <Text style={styles.sectionSubtitle}>{roleHome.subtitle}</Text>
+          <Text style={styles.scopeLine}>{roleExperience.scopeLabel}</Text>
         </View>
       </View>
 
@@ -196,6 +207,19 @@ function WorkOrdersListScreen({navigation}) {
             <Text style={styles.summaryValue}>{queueSummary.pendingApproval}</Text>
             <Text style={styles.summaryLabel}>Approvals</Text>
           </View>
+        </View>
+
+        <View style={styles.guidanceStack}>
+          {roleGuidanceRows.map(row => (
+            <View
+              key={row.key}
+              style={styles.guidanceRow}
+              accessible
+              accessibilityLabel={`${row.label}. ${row.value}`}>
+              <Text style={styles.guidanceLabel}>{row.label}</Text>
+              <Text style={styles.guidanceValue}>{row.value}</Text>
+            </View>
+          ))}
         </View>
 
         {canManageWorkOrders && (
@@ -282,9 +306,27 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 4,
   },
+  userIdentity: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 8,
+    paddingRight: 12,
+  },
   userName: {
     fontSize: 12,
     color: '#9ca3af',
+  },
+  roleBadge: {
+    borderColor: '#334155',
+    borderRadius: 999,
+    borderWidth: 1,
+    color: '#c4b5fd',
+    fontSize: 11,
+    fontWeight: '800',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
   logoutText: {
     fontSize: 12,
@@ -308,6 +350,14 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     fontSize: 12,
     lineHeight: 17,
+  },
+  scopeLine: {
+    alignSelf: 'flex-start',
+    color: '#a3e635',
+    fontSize: 11,
+    fontWeight: '800',
+    marginTop: 4,
+    textTransform: 'uppercase',
   },
   rolePanel: {
     marginHorizontal: 16,
@@ -343,6 +393,27 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     marginTop: 2,
+  },
+  guidanceStack: {
+    borderTopColor: '#1f2937',
+    borderTopWidth: 1,
+    marginBottom: 10,
+  },
+  guidanceRow: {
+    borderBottomColor: '#111827',
+    borderBottomWidth: 1,
+    paddingVertical: 9,
+  },
+  guidanceLabel: {
+    color: '#e5e7eb',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  guidanceValue: {
+    color: '#94a3b8',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 3,
   },
   actionGrid: {
     flexDirection: 'row',

@@ -2491,3 +2491,45 @@ Result:
 - Readiness doctor still blocks hosting as expected on manual notes and the
   final evidence summary, but `screenshot_inventory` is now `PASS` with all
   21 expected screenshots present.
+
+## 2026-08-11 - v1.3 Active User Orientation Pass
+
+Decision:
+
+- Mature the role landing experience before hosting by helping each logged-in
+  user immediately understand their role, visible scope, next move, and
+  guardrail.
+- Replace awkward synthetic empty-state display names with clearer no-work
+  personas while keeping stable `quiet-*` emails for repeatable role proof.
+
+Changes:
+
+- Added tested role user-experience helpers for admin, coordinator,
+  technician, client, viewer, and vendor personas.
+- Updated the work-order landing screen with a role badge, scope line, and
+  guidance rows that respond to queue counts, pending approvals, active work,
+  and empty-state guardrails.
+- Renamed synthetic empty-state display names from Quiet Owner/Vendor to
+  No-Work Owner/Vendor personas in the demo seed.
+- Updated requirements, traceability, roadmap, phase status, QA checklist, and
+  role capture docs.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+server\venv\Scripts\python.exe -m pytest server\tests\test_seed_demo_data.py -p no:cacheprovider
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe scripts\pre_hosting_readiness.py --summary-json pre-hosting-readiness-summary.json
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `12 passed tests`.
+- Focused seed tests passed: `3 passed`.
+- Client tests passed: `8 passed suites`, `50 passed tests`.
+- Backend tests passed: `187 passed`.
+- Pre-hosting readiness remains correctly blocked only by manual notes and the
+  final evidence summary; role smoke and all 21 screenshot filenames still
+  pass.

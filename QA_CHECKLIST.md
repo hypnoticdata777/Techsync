@@ -211,6 +211,11 @@ they have been verified in the relevant environment.
       snapshot, and vendor empty snapshot.
 - [x] Expo web logout clears the current session immediately for role capture;
       native/mobile still keeps the confirmation prompt.
+- [x] Role landing now locates the active user with a role badge, visible
+      scope, next-move guidance, and privacy/operations guardrail copy before
+      queue interaction.
+- [x] Synthetic empty-state display names use no-work personas while preserving
+      stable `quiet-*` login emails for repeatable role proof.
 - [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.

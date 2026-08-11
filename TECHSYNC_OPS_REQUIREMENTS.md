@@ -248,6 +248,9 @@ Already represented in the codebase:
   client, property, vendor, and address context.
 - v1.3 role-specific mobile work-order landing band for admin, coordinator,
   technician, client, viewer, and vendor states.
+- v1.3 active-user orientation on the role landing screen: role badge, visible
+  scope, next move, and privacy/operations guardrails for admin, coordinator,
+  technician, client, viewer, and vendor users.
 - v1.3 manager-only mobile navigation gating for directory, dispatch,
   operations report, and work-order creation screens.
 - v1.3 role-scope regression coverage for client/viewer unrelated-work

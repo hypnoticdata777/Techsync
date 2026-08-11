@@ -330,6 +330,9 @@ Next:
   record manual screen-reader notes, build the evidence pack, run
   `scripts/pre_hosting_readiness.py --strict`, and complete screenshot safety
   review.
+- Continue maturing the role-specific experience before hosting: each account
+  now lands with a role badge, scope explanation, next move, and guardrail, and
+  the next polish should make detail/form interactions feel equally guided.
 - Later, after the local product surface is complete, deploy only as the final
   gate, manually verify the true hosted email/log invitation path, run
   `scripts/smoke_v13.py` against the hosted backend, and capture
@@ -390,7 +393,9 @@ Stop when:
 
 Continue the local-only v1.3 evidence pass and leave hosting as the absolute
 final gate. The 21 role screenshot filenames are now present locally, and Expo
-web logout is fixed for role switching. The best next move is to finish
+web logout is fixed for role switching. Role landing now locates the active
+user with role, scope, next-move, and guardrail guidance. The best next move is
+to mature the work-order detail/form interaction guidance, then finish
 `local-role-ux-manual-notes.json`, check 390px/320px layout comfort, record
 manual screen-reader notes, build the evidence pack, and run the strict
 pre-hosting readiness doctor. Only after those non-hosting requirements are

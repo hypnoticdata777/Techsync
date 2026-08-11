@@ -1,5 +1,6 @@
 import {
   buildDetailSummary,
+  buildRoleGuidanceRows,
   buildQueueSummary,
   canAccessMainRoute,
   canManageOperations,
@@ -8,6 +9,7 @@ import {
   getRoleEmptyState,
   getRoleActions,
   getRoleHome,
+  getRoleUserExperience,
   getWorkOrdersEndpointForRole,
 } from './roleWorkflows';
 
@@ -58,6 +60,43 @@ describe('role workflow helpers', () => {
   test('provides role-specific home copy', () => {
     expect(getRoleHome('technician').title).toBe('Technician Queue');
     expect(getRoleHome('client').emptyState).toContain('linked to this client');
+  });
+
+  test('locates each user role with clear scope and guardrails', () => {
+    expect(getRoleUserExperience('org_admin')).toEqual(
+      expect.objectContaining({
+        roleLabel: 'Org Admin',
+        scopeLabel: 'Full tenant command',
+      }),
+    );
+    expect(getRoleUserExperience('viewer')).toEqual(
+      expect.objectContaining({
+        roleLabel: 'Read-Only Viewer',
+        guardrail: expect.stringContaining('Read-only mode'),
+      }),
+    );
+    expect(getRoleUserExperience('vendor').scopeDetail).toContain('vendor-visible');
+  });
+
+  test('builds role guidance from queue state', () => {
+    const withApproval = buildRoleGuidanceRows('client', {
+      total: 2,
+      inProgress: 0,
+      pendingApproval: 1,
+    });
+    expect(withApproval[1]).toEqual(
+      expect.objectContaining({
+        label: 'Approval attention',
+        value: '1 pending approval need review.',
+      }),
+    );
+
+    const emptyTechnician = buildRoleGuidanceRows('technician', {
+      total: 0,
+      inProgress: 0,
+      pendingApproval: 0,
+    });
+    expect(emptyTechnician[2].value).toContain('Status updates');
   });
 
   test('provides screenshot-ready role empty states', () => {

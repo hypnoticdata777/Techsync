@@ -223,6 +223,11 @@ Likely scope:
     inline before the final manual capture pass
   - capture prep and the readiness doctor now name missing screenshot
     role/screen/filename rows so the final manual pass is exact
+  - role landing now locates the active user with role badge, visible scope,
+    next-move guidance, and privacy/operations guardrails before queue
+    interaction
+  - synthetic no-work empty-state personas now have clearer display names while
+    preserving stable `quiet-*` login emails for repeatable proof
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions
@@ -283,7 +288,9 @@ v1.3 exit criteria:
   the app. A local role UX smoke script and `ROLE_UX_CAPTURE_PASS.md` now
   prepare the final synthetic role run, small-width/mobile comfort proof, and
   manual screen-reader notes. A local evidence-pack builder now summarizes
-  smoke JSON plus screenshot inventory before the public showcase gate.
+  smoke JSON plus screenshot inventory before the public showcase gate. Role
+  landing now orients each user with role, scope, next-step, and guardrail
+  guidance before they interact with the queue.
   Accessibility helper coverage and a manual evidence template are now prepared
   for the final screen-reader pass.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data. The

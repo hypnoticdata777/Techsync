@@ -68,6 +68,95 @@ export const getRoleHome = role => {
   }
 };
 
+const ROLE_USER_EXPERIENCES = {
+  org_admin: {
+    roleLabel: 'Org Admin',
+    scopeLabel: 'Full tenant command',
+    scopeDetail: 'Can see every synthetic client, property, vendor, technician, and work order.',
+    nextMove: 'Use Dispatch or Report to spot risk, then create or tune linked work.',
+    guardrail: 'Investor captures must stay synthetic and avoid provider or terminal windows.',
+  },
+  coordinator: {
+    roleLabel: 'Coordinator',
+    scopeLabel: 'Operations follow-through',
+    scopeDetail: 'Can coordinate tenant work, client updates, vendor context, and proof readiness.',
+    nextMove: 'Triage open work, assign the right technician/vendor, and request approvals when needed.',
+    guardrail: 'Keep internal notes separate from client and vendor-visible updates.',
+  },
+  technician: {
+    roleLabel: 'Technician',
+    scopeLabel: 'Assigned field queue',
+    scopeDetail: 'Sees only assigned work in priority order, with status, notes, and proof actions.',
+    nextMove: 'Open the highest-risk assigned job, update status, and attach completion proof.',
+    guardrail: 'Manager screens, unrelated jobs, and directory/report controls stay hidden.',
+  },
+  client: {
+    roleLabel: 'Client',
+    scopeLabel: 'Linked request view',
+    scopeDetail: 'Sees work tied to this client profile, visible updates, approvals, and proof.',
+    nextMove: 'Review pending approvals and respond from the work-order detail page.',
+    guardrail: 'Internal notes, unrelated clients, and vendor-only context stay hidden.',
+  },
+  viewer: {
+    roleLabel: 'Read-Only Viewer',
+    scopeLabel: 'Owner snapshot',
+    scopeDetail: 'Sees linked client records without mutation, dispatch, or closeout controls.',
+    nextMove: 'Review status, visible messages, and proof context without changing work.',
+    guardrail: 'Read-only mode should never expose edit, approval, proof-upload, or manager controls.',
+  },
+  vendor: {
+    roleLabel: 'Vendor',
+    scopeLabel: 'Linked vendor work',
+    scopeDetail: 'Sees work assigned to this vendor and vendor-visible communication only.',
+    nextMove: 'Open linked jobs, read vendor updates, and respond through the vendor message path.',
+    guardrail: 'Internal/client messages and unrelated vendor work stay hidden.',
+  },
+};
+
+const DEFAULT_USER_EXPERIENCE = {
+  roleLabel: 'User',
+  scopeLabel: 'Authenticated queue',
+  scopeDetail: 'Sees the work orders available to this account.',
+  nextMove: 'Open a work order to review status, communication, and proof context.',
+  guardrail: 'Refresh or sign out if the visible queue does not match this account.',
+};
+
+export const getRoleUserExperience = role =>
+  ROLE_USER_EXPERIENCES[role] || DEFAULT_USER_EXPERIENCE;
+
+export const buildRoleGuidanceRows = (role, queueSummary = {}) => {
+  const experience = getRoleUserExperience(role);
+  const total = queueSummary.total || 0;
+  const active = queueSummary.inProgress || 0;
+  const approvals = queueSummary.pendingApproval || 0;
+
+  return [
+    {
+      key: 'scope',
+      label: experience.scopeLabel,
+      value: experience.scopeDetail,
+    },
+    {
+      key: 'next',
+      label: approvals > 0 ? 'Approval attention' : 'Next move',
+      value:
+        approvals > 0
+          ? `${approvals} pending approval${approvals === 1 ? '' : 's'} need review.`
+          : experience.nextMove,
+    },
+    {
+      key: 'watch',
+      label: active > 0 || total === 0 ? 'Watch point' : 'Guardrail',
+      value:
+        active > 0
+          ? `${active} active job${active === 1 ? '' : 's'} need status and proof follow-through.`
+          : total === 0
+            ? getRoleEmptyState(role).detail
+            : experience.guardrail,
+    },
+  ];
+};
+
 export const getRoleEmptyState = role => {
   switch (role) {
     case 'org_admin':
@@ -274,6 +363,8 @@ export default {
   getRoleActions,
   getRoleAccessMessage,
   buildQueueSummary,
+  buildRoleGuidanceRows,
   getDetailRoleContext,
   buildDetailSummary,
+  getRoleUserExperience,
 };

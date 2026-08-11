@@ -40,10 +40,12 @@ Prepared, automated, and partially exercised live:
 - Admin web login, admin workspace, and an admin work-order detail view were
   manually observed in the local Expo web client at `http://localhost:19006`.
 - All 21 required role screenshot filenames are now present in the ignored
-  `local-role-ux-evidence` folder, including the admin create-work, quiet
-  viewer empty-state, and quiet vendor empty-state captures.
+  `local-role-ux-evidence` folder, including the admin create-work, no-work
+  viewer empty-state, and no-work vendor empty-state captures.
 - Expo web logout now clears the local session immediately for role switching;
   native/mobile keeps the confirmation prompt.
+- Role landing now identifies each user's role, visible scope, next move, and
+  privacy/operations guardrail before the queue list.
 
 Still pending for the final evidence pack:
 
@@ -93,7 +95,7 @@ inline. You can also diagnose the existing file before reseeding:
 server\venv\Scripts\python.exe scripts\smoke_role_ux.py --diagnose role-ux-smoke-evidence.json
 ```
 
-If the diagnosis says the quiet viewer/vendor empty-state users are missing,
+If the diagnosis says the no-work viewer/vendor empty-state users are missing,
 rerun `python ..\scripts\seed_demo_data.py seed --reset-existing` from the
 server terminal, confirm `status --strict`, then rerun role smoke.
 
@@ -146,8 +148,8 @@ Secondary no-work accounts for empty-state screenshots:
 - Viewer empty snapshot: `quiet-owner.demo@demo.techsyncops.dev`
 - Vendor empty queue: `quiet-vendor.demo@demo.techsyncops.dev`
 
-The `quiet-*` names are synthetic local empty-state personas only. They are not
-production customer/vendor labels.
+The `quiet-*` emails are stable synthetic local empty-state logins only. Their
+display names are no-work personas, not production customer/vendor labels.
 
 ## Capture Widths
 
@@ -179,9 +181,9 @@ Expected total: 21 screenshots.
   uses Lena.
 - Client: queue, approval detail, client messages.
 - Viewer: queue and read-only detail use the linked owner-group account; empty
-  snapshot uses the quiet owner account.
+  snapshot uses the no-work owner account.
 - Vendor: vendor queue and vendor detail use Apex; empty vendor queue uses the
-  quiet vendor account.
+  no-work vendor account.
 
 ## Manual Screen-Reader Notes
 
@@ -229,6 +231,9 @@ Completed live:
 - Expo web logout was fixed to clear the session immediately so admin,
   coordinator, technician, client, viewer, and vendor captures can switch roles
   without opening extra tabs.
+- Role landing was matured so admin, coordinator, technician, client, viewer,
+  and vendor accounts show role identity, scope, next move, and guardrail copy
+  before any queue interaction.
 - `scripts/build_role_ux_evidence_pack.py` was added so final role evidence can
   be summarized without committing generated smoke JSON, screenshots, or local
   evidence-pack Markdown.
