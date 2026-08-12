@@ -75,6 +75,7 @@ TechSync Ops is one workflow with separated lanes:
 - Queue cards should keep the shared handoff model, but use role-specific scan cues:
   admin sees operational signal and tenant context; coordinator sees coordination need and handoff target; technician sees field focus and proof; client sees client action and proof; viewer sees snapshot and read-only mode; vendor sees vendor action and visible thread.
 - Work-order detail pages should carry the queue scan forward with a role-specific action path for approval, communication, proof, and lifecycle so each user knows the next useful move inside their lane.
+- Detail pages should also explain the active event pattern for the role, such as approval requested, proof needed, vendor thread active, escalation raised, pause resolution, completed closeout, or read-only snapshot review.
 
 ## Portal Surface Rules
 

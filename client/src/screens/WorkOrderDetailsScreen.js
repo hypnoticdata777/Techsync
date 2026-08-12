@@ -24,6 +24,7 @@ import {
   buildDetailActionPathRows,
   buildDetailGuidanceRows,
   buildDetailSummary,
+  buildRoleEventPlaybookRows,
   buildWorkOrderFlowRows,
   getDetailRoleContext,
   getCommunicationLaneNotice,
@@ -256,6 +257,14 @@ function WorkOrderDetailsScreen({route, navigation}) {
       user?.role,
       workOrder,
     ],
+  );
+  const roleEventPlaybookRows = useMemo(
+    () =>
+      buildRoleEventPlaybookRows(user?.role, workOrder, {
+        attachmentCount: attachments.length,
+        messageCount: messages.length,
+      }),
+    [attachments.length, messages.length, user?.role, workOrder],
   );
   const workOrderFlowRows = useMemo(
     () => buildWorkOrderFlowRows(workOrder),
@@ -621,6 +630,28 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   {row.value}
                 </Text>
                 <Text style={styles.actionPathDetail} numberOfLines={2}>
+                  {row.detail}
+                </Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.eventPlaybook}>
+            {roleEventPlaybookRows.map(row => (
+              <View
+                key={row.key}
+                style={styles.eventPlaybookItem}
+                accessible
+                accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
+                <Text style={styles.eventPlaybookLabel}>{row.label}</Text>
+                <Text
+                  style={[
+                    styles.eventPlaybookValue,
+                    {color: getSummaryToneColor(row.tone)},
+                  ]}
+                  numberOfLines={2}>
+                  {row.value}
+                </Text>
+                <Text style={styles.eventPlaybookDetail} numberOfLines={3}>
                   {row.detail}
                 </Text>
               </View>
@@ -1214,6 +1245,36 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 16,
     marginTop: 3,
+  },
+  eventPlaybook: {
+    backgroundColor: '#07111f',
+    borderColor: '#243449',
+    borderRadius: 8,
+    borderWidth: 1,
+    gap: 10,
+    marginTop: 12,
+    padding: 12,
+  },
+  eventPlaybookItem: {
+    minHeight: 64,
+  },
+  eventPlaybookLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  eventPlaybookValue: {
+    fontSize: 14,
+    fontWeight: '900',
+    lineHeight: 18,
+    marginTop: 3,
+  },
+  eventPlaybookDetail: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 4,
   },
   guidanceStack: {
     borderTopWidth: 1,

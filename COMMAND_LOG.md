@@ -2828,3 +2828,42 @@ Result:
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - v1.3 Role Event Playbook UX Pass
+
+Decision:
+
+- Mature the work-order detail experience from static role permissions into
+  recurring event handling so each SaaS user knows how to respond when common
+  operating events happen.
+- Start with the detail page because approval, proof, vendor updates,
+  escalations, pauses, closeout, and read-only review all converge there.
+
+Changes:
+
+- Added tested `buildRoleEventPlaybookRows` helper for role-specific recurring
+  event guidance.
+- Updated the work-order detail command panel with event and response rows for
+  admin, coordinator, technician, client, viewer, and vendor lanes.
+- Covered approval requested, proof needed, vendor thread active, escalation,
+  pause/completion/read-only review, and admin control checkpoint patterns.
+- Updated README, roadmap, phase status, QA, requirements, traceability, and
+  role-lane docs so event handling is part of the role UX maturity contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `21 passed tests`.
+- Full client tests passed: `8 passed suites`, `60 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

@@ -5,6 +5,7 @@ import {
   buildRoleGuidanceRows,
   buildRoleBoundaryRows,
   buildRoleCardRows,
+  buildRoleEventPlaybookRows,
   buildRoleLaneRows,
   buildQueueSummary,
   buildWorkOrderFlowRows,
@@ -365,6 +366,87 @@ describe('role workflow helpers', () => {
         expect.objectContaining({label: 'Communication', value: 'Read only'}),
         expect.objectContaining({label: 'Proof', value: 'Verified proof'}),
       ]),
+    );
+  });
+
+  test('builds role event playbooks for repeated work-order events', () => {
+    expect(
+      buildRoleEventPlaybookRows(
+        'client',
+        {status: 'open', client_approval_status: 'pending'},
+        {messageCount: 2},
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        label: 'Event',
+        value: 'Approval requested',
+        tone: 'pending',
+      }),
+      expect.objectContaining({
+        label: 'Your Response',
+        value: expect.stringContaining('approve or decline'),
+        detail: expect.stringContaining('back to operations'),
+      }),
+    ]);
+
+    expect(
+      buildRoleEventPlaybookRows(
+        'technician',
+        {status: 'in_progress', client_approval_status: 'not_required'},
+        {attachmentCount: 0},
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Event', value: 'Proof needed'}),
+        expect.objectContaining({
+          label: 'Your Response',
+          value: expect.stringContaining('Attach field evidence'),
+        }),
+      ]),
+    );
+
+    expect(
+      buildRoleEventPlaybookRows(
+        'coordinator',
+        {status: 'escalated', client_approval_status: 'not_required'},
+        {},
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: 'Event',
+          value: 'Escalation needs owner',
+          tone: 'escalated',
+        }),
+      ]),
+    );
+
+    expect(
+      buildRoleEventPlaybookRows('vendor', {status: 'open'}, {messageCount: 1}),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: 'Event',
+          value: 'Vendor thread active',
+        }),
+        expect.objectContaining({
+          label: 'Your Response',
+          detail: expect.stringContaining('without exposing internal or client threads'),
+        }),
+      ]),
+    );
+
+    expect(
+      buildRoleEventPlaybookRows('viewer', {status: 'completed'}, {messageCount: 0})[1],
+    ).toEqual(
+      expect.objectContaining({
+        value: expect.stringContaining('without changing the record'),
+      }),
+    );
+    expect(buildRoleEventPlaybookRows('org_admin', {status: 'paused'})[1]).toEqual(
+      expect.objectContaining({
+        value: expect.stringContaining('auditability'),
+      }),
     );
   });
 

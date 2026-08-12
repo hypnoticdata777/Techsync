@@ -259,6 +259,10 @@ Likely scope:
   - work-order detail pages now continue the queue scan with role-specific
     action-path cues for approval, communication, proof, and lifecycle
     follow-through
+  - work-order detail pages now include role event playbook cues for recurring
+    SaaS events such as approval requested, proof needed, vendor thread active,
+    escalation, pause resolution, completed closeout, and read-only snapshot
+    review
   - work-order create/edit now gives linked/manual context guidance before save
     so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while

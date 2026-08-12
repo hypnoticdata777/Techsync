@@ -791,6 +791,176 @@ export const buildWorkOrderFlowRows = (workOrder = {}) => {
   ];
 };
 
+const EVENT_PLAYBOOK_BY_STATUS = {
+  open: {
+    event: 'Intake open',
+    response: 'Confirm context, owner, and first action.',
+    handoff: 'Coordinator keeps assignment and client/vendor links clean.',
+    tone: 'open',
+  },
+  in_progress: {
+    event: 'Field work active',
+    response: 'Track field progress and proof readiness.',
+    handoff: 'Technician updates status, notes, and attachments.',
+    tone: 'active',
+  },
+  paused: {
+    event: 'Work paused',
+    response: 'Name the blocker and decide what resumes the job.',
+    handoff: 'Coordinator or technician records the next resume condition.',
+    tone: 'paused',
+  },
+  escalated: {
+    event: 'Escalation raised',
+    response: 'Review risk, ownership, and client/vendor communication.',
+    handoff: 'Coordinator drives the recovery plan and keeps the lane visible.',
+    tone: 'escalated',
+  },
+  completed: {
+    event: 'Completion reported',
+    response: 'Review proof, messages, and closeout readiness.',
+    handoff: 'Manager confirms proof or override before archive.',
+    tone: 'completed',
+  },
+  cancelled: {
+    event: 'Work cancelled',
+    response: 'Keep the cancellation reason visible for audit review.',
+    handoff: 'Operations can archive when the record no longer needs action.',
+    tone: 'cancelled',
+  },
+  archived: {
+    event: 'Record archived',
+    response: 'Use as historical evidence only.',
+    handoff: 'No active handoff remains.',
+    tone: 'archived',
+  },
+};
+
+const getBaseEventPlaybook = workOrder =>
+  EVENT_PLAYBOOK_BY_STATUS[workOrder?.status] || {
+    event: 'Work-order review',
+    response: 'Read the current state before acting.',
+    handoff: 'Use the role lane and visibility cues to choose the next move.',
+    tone: 'default',
+  };
+
+const getRoleEventResponse = (role, workOrder, context) => {
+  const approvalStatus = workOrder?.client_approval_status || 'not_required';
+  const attachmentCount = context.attachmentCount || 0;
+  const messageCount = context.messageCount || 0;
+  const proofSatisfied = hasCompletionProof(workOrder);
+
+  if (role === 'client') {
+    if (approvalStatus === 'pending') {
+      return {
+        event: 'Approval requested',
+        response: 'Review visible details, proof context, and notes, then approve or decline.',
+        handoff: 'Your decision sends the next handoff back to operations.',
+        tone: 'pending',
+      };
+    }
+    return {
+      event: 'Client update available',
+      response: 'Review status, visible messages, and proof context.',
+      handoff: 'Use client-visible replies when operations needs feedback.',
+      tone: 'active',
+    };
+  }
+
+  if (role === 'viewer') {
+    return {
+      event: messageCount > 0 ? 'Snapshot updated' : 'Read-only snapshot',
+      response: 'Review visible status, proof, and client-facing notes without changing the record.',
+      handoff: 'Questions flow back through the client or operations team outside this lane.',
+      tone: 'default',
+    };
+  }
+
+  if (role === 'vendor') {
+    return {
+      event: messageCount > 0 ? 'Vendor thread active' : 'Vendor scope review',
+      response: 'Review linked work and respond only through vendor-visible messages.',
+      handoff: 'Operations receives vendor updates without exposing internal or client threads.',
+      tone: workOrder?.status || 'active',
+    };
+  }
+
+  if (role === 'technician') {
+    if (workOrder?.status === 'in_progress' && !proofSatisfied && attachmentCount === 0) {
+      return {
+        event: 'Proof needed',
+        response: 'Attach field evidence before trying to complete the work.',
+        handoff: 'Coordinator receives proof and status notes for closeout.',
+        tone: 'missing',
+      };
+    }
+    return {
+      event: workOrder?.status === 'open' ? 'Assigned work ready' : getBaseEventPlaybook(workOrder).event,
+      response: 'Move the job only when field reality changes and keep notes clear.',
+      handoff: 'Operations relies on technician status, notes, and proof to update clients.',
+      tone: workOrder?.status || 'active',
+    };
+  }
+
+  if (role === 'coordinator') {
+    if (approvalStatus === 'pending') {
+      return {
+        event: 'Client decision pending',
+        response: 'Monitor the approval and keep visible messages focused on the decision.',
+        handoff: 'Client decision returns the job to dispatch or closeout.',
+        tone: 'pending',
+      };
+    }
+    if (['paused', 'escalated'].includes(workOrder?.status)) {
+      return {
+        event: workOrder.status === 'paused' ? 'Pause needs resolution' : 'Escalation needs owner',
+        response: 'Clarify blocker, owner, and next recovery action.',
+        handoff: 'Technician, vendor, or client receives the next explicit update.',
+        tone: workOrder.status,
+      };
+    }
+    return {
+      event: 'Coordination checkpoint',
+      response: 'Check assignment, visibility lane, approval state, and proof readiness.',
+      handoff: 'Route the next action to technician, client, vendor, or admin as needed.',
+      tone: workOrder?.status || 'active',
+    };
+  }
+
+  if (role === 'org_admin') {
+    return {
+      event: 'Tenant control checkpoint',
+      response: 'Review risk, auditability, proof, cost, and handoff clarity.',
+      handoff: 'Use reports, dispatch, archive, or directory cleanup when the record shows friction.',
+      tone: workOrder?.status || 'active',
+    };
+  }
+
+  return getBaseEventPlaybook(workOrder);
+};
+
+export const buildRoleEventPlaybookRows = (role, workOrder = {}, context = {}) => {
+  const roleResponse = getRoleEventResponse(role, workOrder, context);
+  const baseResponse = getBaseEventPlaybook(workOrder);
+
+  return [
+    {
+      key: 'event',
+      label: 'Event',
+      value: roleResponse.event || baseResponse.event,
+      detail: baseResponse.response,
+      tone: roleResponse.tone || baseResponse.tone,
+    },
+    {
+      key: 'response',
+      label: 'Your Response',
+      value: roleResponse.response,
+      detail: roleResponse.handoff,
+      tone: roleResponse.tone || baseResponse.tone,
+    },
+  ];
+};
+
 const formatStatus = value => (value || 'unknown').replace(/_/g, ' ');
 
 const getProofSignal = workOrder => {
@@ -1154,6 +1324,7 @@ export default {
   buildWorkOrderFlowRows,
   buildRoleCardRows,
   buildDetailActionPathRows,
+  buildRoleEventPlaybookRows,
   getRoleUserExperience,
   getRoleLane,
   buildRoleLaneRows,

@@ -265,6 +265,10 @@ Already represented in the codebase:
   communication, proof, and lifecycle so admin, coordinator, technician,
   client, viewer, and vendor users understand the next available step after
   opening a work order.
+- v1.3 role event playbook cues for recurring work-order events such as
+  approval requested, proof needed, vendor thread active, escalation raised,
+  pause resolution, completed closeout, and read-only snapshot review, with
+  response and handoff guidance by role.
 - v1.3 work-order create/edit guidance for linked/manual intake states so
   client, property, vendor, and address context gaps are visible before save.
 - v1.3 manager-only mobile navigation gating for directory, dispatch,

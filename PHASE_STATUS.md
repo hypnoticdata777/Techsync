@@ -52,6 +52,10 @@ Completed in the latest lane UX pass:
 - Added role-specific detail action-path cues for approval, communication,
   proof, and lifecycle follow-through so the detail page makes the next move
   predictable after a queue card is opened.
+- Added role event playbook cues on work-order detail pages so repeated SaaS
+  events such as approval requested, proof needed, vendor thread active,
+  escalation, pause resolution, completed closeout, and read-only snapshot
+  review tell each role how to respond and who receives the handoff.
 
 Next product maturity targets:
 
@@ -64,6 +68,9 @@ Next product maturity targets:
 - Continue polishing the detail action path with live role walkthrough
   observations, especially where a user expects a visible confirmation after
   taking an action.
+- Continue maturing event follow-through after the first visible response:
+  success confirmation, refreshed messages/proof, and clear next-state feedback
+  should feel consistent across all six roles.
 - Keep improving mobile/narrow-width comfort for the lanes that work from the
   detail page most often.
 
@@ -264,6 +271,9 @@ Completed:
   communication, proof, and lifecycle so admin, coordinator, technician,
   client, viewer, and vendor users can understand their next available step
   after opening a work order.
+- Added role-specific event playbook rows to the work-order detail page so
+  admin, coordinator, technician, client, viewer, and vendor users can handle
+  repeated operating events with predictable response and handoff guidance.
 - Added mobile work-order form before-save context review for linked/manual/open
   client, property, vendor, and address state.
 - Added tested mobile navigator gating so manager-only screens are mounted only
