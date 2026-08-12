@@ -120,6 +120,9 @@ function WorkOrdersListScreen({navigation}) {
     () => filterWorkOrdersForRoleQueue(user?.role, activeQueueFilter, workOrders),
     [activeQueueFilter, user?.role, workOrders],
   );
+  const isQueueFocused = activeQueueFilter !== 'all';
+  const activeFilterTone = activeFilterRow?.tone || roleNextBestAction.tone || 'active';
+  const activeFilterColor = getStatusColor(activeFilterTone);
 
   useEffect(() => {
     if (!queueFilterRows.some(row => row.key === activeQueueFilter)) {
@@ -267,6 +270,10 @@ function WorkOrdersListScreen({navigation}) {
     setActiveQueueFilter(roleNextBestAction.filterKey || 'all');
   };
 
+  const handleClearFocus = () => {
+    setActiveQueueFilter('all');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.userBar}>
@@ -365,17 +372,18 @@ function WorkOrdersListScreen({navigation}) {
                 style={[
                   styles.nextActionSecondary,
                   activeQueueFilter === roleNextBestAction.filterKey &&
-                    styles.nextActionSecondaryDisabled,
+                    styles.nextActionSecondaryActive,
                 ]}
                 onPress={handleNextBestFocus}
-                disabled={activeQueueFilter === roleNextBestAction.filterKey}
                 {...actionButtonA11y(
-                  roleNextBestAction.filterLabel,
-                  `Filters the queue to ${roleNextBestAction.filterKey || 'all'}.`,
+                  activeQueueFilter === roleNextBestAction.filterKey
+                    ? `${roleNextBestAction.filterLabel} active`
+                    : roleNextBestAction.filterLabel,
+                  `Shows only ${roleNextBestAction.filterKey || 'all'} queue records.`,
                 )}>
                 <Text style={styles.nextActionSecondaryText}>
                   {activeQueueFilter === roleNextBestAction.filterKey
-                    ? 'Focused'
+                    ? `Showing ${activeFilterRow?.label || 'Focus'}`
                     : roleNextBestAction.filterLabel}
                 </Text>
               </TouchableOpacity>
@@ -439,6 +447,32 @@ function WorkOrdersListScreen({navigation}) {
         <View style={styles.queueFilterPanel}>
           <Text style={styles.queueFilterTitle}>Focus Queue</Text>
           <Text style={styles.queueFilterHint}>{activeFilterRow?.detail}</Text>
+          {isQueueFocused ? (
+            <View
+              style={[styles.focusStatusPanel, {borderLeftColor: activeFilterColor}]}
+              accessible
+              accessibilityLabel={`${activeFilterRow?.label} focus is active. ${visibleWorkOrders.length} of ${workOrders.length} records are shown. ${activeFilterRow?.detail}`}>
+              <View style={styles.focusStatusCopy}>
+                <Text style={styles.focusStatusLabel}>Active Focus</Text>
+                <Text style={[styles.focusStatusTitle, {color: activeFilterColor}]}>
+                  Showing {activeFilterRow?.label}
+                </Text>
+                <Text style={styles.focusStatusDetail}>
+                  {visibleWorkOrders.length} of {workOrders.length} visible records match this lane.
+                  Clear focus to restore the full queue.
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.focusClearButton}
+                onPress={handleClearFocus}
+                {...actionButtonA11y(
+                  'Clear Focus',
+                  'Restores all visible work orders for this role.',
+                )}>
+                <Text style={styles.focusClearText}>Clear Focus</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
           <View style={styles.queueFilterRow}>
             {queueFilterRows.map(row => {
               const selected = row.key === activeQueueFilter;
@@ -450,10 +484,12 @@ function WorkOrdersListScreen({navigation}) {
                     selected && styles.queueFilterChipSelected,
                     selected && {borderColor: getStatusColor(row.tone)},
                   ]}
-                  onPress={() => setActiveQueueFilter(row.key)}
+                  onPress={() => setActiveQueueFilter(selected && row.key !== 'all' ? 'all' : row.key)}
                   accessibilityRole="button"
                   accessibilityState={{selected}}
-                  accessibilityLabel={`${row.label} queue filter. ${row.value}. ${row.detail}`}>
+                  accessibilityLabel={`${row.label} queue filter. ${row.value}. ${row.detail}${
+                    selected && row.key !== 'all' ? ' Tap again to clear focus.' : ''
+                  }`}>
                   <Text
                     style={[
                       styles.queueFilterLabel,
@@ -776,8 +812,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 12,
   },
-  nextActionSecondaryDisabled: {
-    opacity: 0.62,
+  nextActionSecondaryActive: {
+    backgroundColor: '#111827',
+    borderColor: '#38bdf8',
   },
   nextActionSecondaryText: {
     color: '#e5e7eb',
@@ -902,6 +939,56 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 16,
     marginTop: 3,
+  },
+  focusStatusPanel: {
+    alignItems: 'center',
+    backgroundColor: '#07111f',
+    borderColor: '#243449',
+    borderLeftWidth: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 8,
+    padding: 10,
+  },
+  focusStatusCopy: {
+    flex: 1,
+    minWidth: 210,
+  },
+  focusStatusLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  focusStatusTitle: {
+    fontSize: 14,
+    fontWeight: '900',
+    lineHeight: 18,
+    marginTop: 3,
+  },
+  focusStatusDetail: {
+    color: '#cbd5e1',
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 3,
+  },
+  focusClearButton: {
+    alignItems: 'center',
+    backgroundColor: '#0f172a',
+    borderColor: '#334155',
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 40,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  focusClearText: {
+    color: '#f9fafb',
+    fontSize: 12,
+    fontWeight: '900',
   },
   queueFilterRow: {
     flexDirection: 'row',

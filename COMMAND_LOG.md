@@ -3254,3 +3254,32 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
+
+## 2026-08-12 - Hosted Admin Risk Focus UX Fix
+
+Decision:
+
+- The hosted web app logged out correctly, but the admin `Show Risk` action
+  only changed the button to `Focused`, leaving testers without a visible
+  explanation or reset path.
+- Make queue focus explicit and reversible so the admin risk tool behaves like
+  an operator-facing filter, not a silent state change.
+
+Changes:
+
+- Replaced the disabled `Focused` state with `Showing Risk` style language.
+- Added an active focus summary with matching record count and `Clear Focus`.
+- Made selected non-`All` queue chips toggle back to the full visible queue.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+```
+
+Result:
+
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.
