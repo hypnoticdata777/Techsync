@@ -275,6 +275,10 @@ Likely scope:
   - work-order detail actions now show dismissible outcome notices after
     messages, approval requests/decisions, proof uploads, and lifecycle
     transitions so successful work does not feel silent
+  - work-order home queues now include an operable role-aware
+    next-best-action tool that ranks visible work by role, priority, status,
+    approval, assignment, blocker, and proof state, then lets users open the
+    recommended work order or focus the matching queue loop
   - work-order create/edit now gives linked/manual context guidance before save
     so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while

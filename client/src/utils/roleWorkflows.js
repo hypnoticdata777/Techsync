@@ -380,6 +380,205 @@ const isQueueRiskEvent = item =>
   isBlockedStatus(item) ||
   needsCompletionProof(item);
 
+export const buildRoleOutcomeRows = (role, queueSummary = {}, workOrders = []) => {
+  const rows = workOrders || [];
+  const total = queueSummary.total ?? rows.length;
+  const open = queueSummary.open ?? countWhere(rows, item => item?.status === 'open');
+  const active = queueSummary.inProgress ?? countWhere(rows, item => item?.status === 'in_progress');
+  const pendingApprovals =
+    queueSummary.pendingApproval ?? countWhere(rows, needsApprovalDecision);
+  const unassigned = countWhere(rows, needsAssignment);
+  const blockers = countWhere(rows, isBlockedStatus);
+  const completed = countWhere(rows, item => item?.status === 'completed');
+  const completedNeedsProof = countWhere(rows, needsCompletionProof);
+  const completedReady = completed - completedNeedsProof;
+  const openOrActive = countWhere(rows, isOpenOrActiveStatus);
+  const riskEvents = countWhere(rows, isQueueRiskEvent);
+
+  switch (role) {
+    case 'org_admin':
+      return [
+        {
+          key: 'promise',
+          label: 'Primary Win',
+          value: 'Control tenant risk',
+          detail: 'Every visible record should explain owner, waiting state, audience, proof, and audit trail.',
+          tone: riskEvents > 0 ? 'pending' : 'verified',
+        },
+        {
+          key: 'proof',
+          label: 'Queue Proof',
+          value: pluralize(riskEvents, 'risk signal'),
+          detail: `${pluralize(total, 'record')} visible across the tenant operating story.`,
+          tone: riskEvents > 0 ? 'pending' : 'verified',
+        },
+        {
+          key: 'next',
+          label: 'Best Next Move',
+          value: riskEvents > 0 ? 'Open Risk focus' : 'Review clean queue',
+          detail: riskEvents > 0
+            ? 'Start with work missing an owner, decision, recovery path, or proof.'
+            : 'Use reports and closeout review to keep the demo story explainable.',
+          tone: riskEvents > 0 ? 'pending' : 'active',
+        },
+      ];
+    case 'coordinator':
+      return [
+        {
+          key: 'promise',
+          label: 'Primary Win',
+          value: 'Clear the handoff',
+          detail: 'Turn open requests into assigned, visible, approval-ready work with the right next owner.',
+          tone: unassigned > 0 || pendingApprovals > 0 || blockers > 0 ? 'pending' : 'verified',
+        },
+        {
+          key: 'proof',
+          label: 'Queue Proof',
+          value: `${unassigned} assign, ${pendingApprovals} approve, ${blockers} blocked`,
+          detail: 'These are the coordination loops that usually create follow-up noise.',
+          tone: unassigned > 0 || pendingApprovals > 0 || blockers > 0 ? 'pending' : 'verified',
+        },
+        {
+          key: 'next',
+          label: 'Best Next Move',
+          value: unassigned > 0
+            ? 'Assign next request'
+            : pendingApprovals > 0
+              ? 'Follow approval'
+              : blockers > 0
+                ? 'Recover blocker'
+                : 'Watch stable queue',
+          detail: 'Use the matching focus filter, then open the work order and move the handoff forward.',
+          tone: unassigned > 0 ? 'open' : pendingApprovals > 0 ? 'pending' : blockers > 0 ? 'escalated' : 'verified',
+        },
+      ];
+    case 'technician':
+      return [
+        {
+          key: 'promise',
+          label: 'Primary Win',
+          value: 'Know the field move',
+          detail: 'Assigned work should make the next status, note, blocker, or proof step obvious.',
+          tone: openOrActive > 0 ? 'active' : 'verified',
+        },
+        {
+          key: 'proof',
+          label: 'Queue Proof',
+          value: pluralize(open + active + blockers, 'assigned action'),
+          detail: 'Open, active, paused, and escalated assigned jobs are the technician work lane.',
+          tone: open + active + blockers > 0 ? 'active' : 'verified',
+        },
+        {
+          key: 'next',
+          label: 'Best Next Move',
+          value: active > 0
+            ? 'Update proof/status'
+            : open > 0
+              ? 'Start open job'
+              : blockers > 0
+                ? 'Clarify blocker'
+                : 'Queue is clear',
+          detail: 'Open the highest-priority assigned job and leave the field record cleaner than you found it.',
+          tone: active > 0 ? 'missing' : open > 0 ? 'open' : blockers > 0 ? 'escalated' : 'verified',
+        },
+      ];
+    case 'client':
+      return [
+        {
+          key: 'promise',
+          label: 'Primary Win',
+          value: 'Decide without calls',
+          detail: 'Linked work should show status, visible updates, approval requests, and proof context in one place.',
+          tone: pendingApprovals > 0 ? 'pending' : 'active',
+        },
+        {
+          key: 'proof',
+          label: 'Queue Proof',
+          value: `${pendingApprovals} approvals, ${completed} completed`,
+          detail: `${pluralize(total, 'linked item')} visible without exposing internal or vendor-only notes.`,
+          tone: pendingApprovals > 0 ? 'pending' : completed > 0 ? 'verified' : 'active',
+        },
+        {
+          key: 'next',
+          label: 'Best Next Move',
+          value: pendingApprovals > 0
+            ? 'Decide approval'
+            : completed > 0
+              ? 'Review proof'
+              : 'Read visible update',
+          detail: 'Use client-visible replies only when operations needs feedback.',
+          tone: pendingApprovals > 0 ? 'pending' : completed > 0 ? 'verified' : 'active',
+        },
+      ];
+    case 'viewer':
+      return [
+        {
+          key: 'promise',
+          label: 'Primary Win',
+          value: 'See progress safely',
+          detail: 'The snapshot should explain linked progress without mutation controls or private operations context.',
+          tone: total > 0 ? 'active' : 'default',
+        },
+        {
+          key: 'proof',
+          label: 'Queue Proof',
+          value: pluralize(total, 'visible snapshot'),
+          detail: `${pluralize(openOrActive, 'active item')} and ${pluralize(completedReady, 'proof-ready closeout')} available for review.`,
+          tone: total > 0 ? 'active' : 'default',
+        },
+        {
+          key: 'next',
+          label: 'Best Next Move',
+          value: openOrActive > 0
+            ? 'Review progress'
+            : completedReady > 0
+              ? 'Review closeout'
+              : 'Monitor snapshot',
+          detail: 'Use the page as read-only visibility; operational changes stay with the active team.',
+          tone: openOrActive > 0 ? 'open' : completedReady > 0 ? 'verified' : 'default',
+        },
+      ];
+    case 'vendor':
+      return [
+        {
+          key: 'promise',
+          label: 'Primary Win',
+          value: 'Work the vendor lane',
+          detail: 'Only linked vendor work and vendor-visible messages should appear here.',
+          tone: total > 0 ? 'active' : 'default',
+        },
+        {
+          key: 'proof',
+          label: 'Queue Proof',
+          value: `${openOrActive} active, ${blockers} blocked`,
+          detail: `${pluralize(total, 'vendor item')} scoped to this vendor profile.`,
+          tone: blockers > 0 ? 'escalated' : openOrActive > 0 ? 'active' : 'default',
+        },
+        {
+          key: 'next',
+          label: 'Best Next Move',
+          value: blockers > 0
+            ? 'Respond to blocker'
+            : openOrActive > 0
+              ? 'Send vendor update'
+              : 'Review scope',
+          detail: 'Use vendor-visible replies; client and internal threads stay out of this lane.',
+          tone: blockers > 0 ? 'escalated' : openOrActive > 0 ? 'active' : 'default',
+        },
+      ];
+    default:
+      return [
+        {
+          key: 'promise',
+          label: 'Primary Win',
+          value: 'Review visible work',
+          detail: 'Open a work order to understand status, owner, messages, proof, and next action.',
+          tone: total > 0 ? 'active' : 'default',
+        },
+      ];
+  }
+};
+
 const QUEUE_FILTERS_BY_ROLE = {
   org_admin: [
     {
@@ -557,6 +756,312 @@ export const filterWorkOrdersForRoleQueue = (role, filterKey, workOrders = []) =
   }
   const filter = getQueueFiltersForRole(role).find(row => row.key === filterKey);
   return filter ? rows.filter(filter.match) : rows;
+};
+
+const PRIORITY_SCORE = {
+  emergency: 50,
+  urgent: 40,
+  high: 30,
+  medium: 20,
+  normal: 10,
+  low: 5,
+};
+
+const STATUS_SCORE = {
+  escalated: 25,
+  paused: 20,
+  open: 15,
+  in_progress: 12,
+  completed: 8,
+};
+
+const scoreWorkOrder = item =>
+  (PRIORITY_SCORE[item?.priority] || 0) +
+  (STATUS_SCORE[item?.status] || 0) +
+  (needsApprovalDecision(item) ? 18 : 0) +
+  (needsAssignment(item) ? 14 : 0) +
+  (needsCompletionProof(item) ? 10 : 0);
+
+const pickHighestImpact = (rows, predicate) =>
+  rows
+    .filter(predicate)
+    .slice()
+    .sort((left, right) => {
+      const scoreDelta = scoreWorkOrder(right) - scoreWorkOrder(left);
+      if (scoreDelta !== 0) {
+        return scoreDelta;
+      }
+      return (left?.id || 0) - (right?.id || 0);
+    })[0] || null;
+
+const buildNextAction = ({
+  key,
+  label,
+  value,
+  detail,
+  workOrder,
+  filterKey = 'all',
+  actionLabel = 'Open Work Order',
+  filterLabel = 'Focus Queue',
+  tone = 'active',
+}) => ({
+  key,
+  label,
+  value,
+  detail,
+  workOrderId: workOrder?.id || null,
+  workOrderTitle: workOrder?.title || 'No specific work order',
+  filterKey,
+  actionLabel,
+  filterLabel,
+  tone,
+});
+
+const buildClearQueueAction = role => {
+  const roleExperience = getRoleUserExperience(role);
+  return buildNextAction({
+    key: 'clear',
+    label: 'Queue Clear',
+    value: 'Refresh or review',
+    detail: `${roleExperience.roleLabel} has no urgent visible action. Refresh the queue or review all visible work.`,
+    workOrder: null,
+    filterKey: 'all',
+    actionLabel: 'Refresh Queue',
+    filterLabel: 'Show All',
+    tone: 'verified',
+  });
+};
+
+export const buildRoleNextBestAction = (role, workOrders = []) => {
+  const rows = workOrders || [];
+
+  if (rows.length === 0) {
+    return buildClearQueueAction(role);
+  }
+
+  switch (role) {
+    case 'org_admin': {
+      const risk = pickHighestImpact(rows, isQueueRiskEvent);
+      if (risk) {
+        return buildNextAction({
+          key: 'admin-risk',
+          label: 'Tenant Risk Tool',
+          value: 'Resolve highest-risk item',
+          detail: 'Ranks approvals, unassigned work, blockers, proof gaps, priority, and status so the admin opens the operating risk first.',
+          workOrder: risk,
+          filterKey: 'risk',
+          actionLabel: 'Open Risk Item',
+          filterLabel: 'Show Risk',
+          tone: 'pending',
+        });
+      }
+      const closeout = pickHighestImpact(rows, item => item?.status === 'completed');
+      return buildNextAction({
+        key: 'admin-closeout',
+        label: 'Tenant Review Tool',
+        value: closeout ? 'Review closeout' : 'Inspect operating queue',
+        detail: closeout
+          ? 'No urgent risk found; review completed work for proof and archive readiness.'
+          : 'No urgent risk found; review the full tenant queue for operating narrative.',
+        workOrder: closeout || pickHighestImpact(rows, () => true),
+        filterKey: closeout ? 'closeout' : 'all',
+        actionLabel: closeout ? 'Open Closeout' : 'Open Queue Item',
+        filterLabel: closeout ? 'Show Closeout' : 'Show All',
+        tone: closeout ? 'verified' : 'active',
+      });
+    }
+    case 'coordinator': {
+      const unassigned = pickHighestImpact(rows, needsAssignment);
+      if (unassigned) {
+        return buildNextAction({
+          key: 'coordinator-assign',
+          label: 'Dispatch Tool',
+          value: 'Assign the next request',
+          detail: 'Chooses the highest-impact open request without a technician so the handoff can start.',
+          workOrder: unassigned,
+          filterKey: 'unassigned',
+          actionLabel: 'Assign This Work',
+          filterLabel: 'Show Assignments',
+          tone: 'open',
+        });
+      }
+      const approval = pickHighestImpact(rows, needsApprovalDecision);
+      if (approval) {
+        return buildNextAction({
+          key: 'coordinator-approval',
+          label: 'Approval Follow-Up',
+          value: 'Move client decision',
+          detail: 'Finds the pending approval most likely to block work so the coordinator can add context or follow up.',
+          workOrder: approval,
+          filterKey: 'approvals',
+          actionLabel: 'Open Approval',
+          filterLabel: 'Show Approvals',
+          tone: 'pending',
+        });
+      }
+      const blocker = pickHighestImpact(rows, isBlockedStatus);
+      if (blocker) {
+        return buildNextAction({
+          key: 'coordinator-blocker',
+          label: 'Recovery Tool',
+          value: 'Recover blocker',
+          detail: 'Surfaces paused or escalated work before it becomes stale client noise.',
+          workOrder: blocker,
+          filterKey: 'blockers',
+          actionLabel: 'Open Blocker',
+          filterLabel: 'Show Blockers',
+          tone: 'escalated',
+        });
+      }
+      return buildNextAction({
+        key: 'coordinator-watch',
+        label: 'Stable Queue Tool',
+        value: 'Review active handoffs',
+        detail: 'No assignment, approval, or blocker is waiting; open the most important active item for status follow-through.',
+        workOrder: pickHighestImpact(rows, isOpenOrActiveStatus) || pickHighestImpact(rows, () => true),
+        filterKey: 'all',
+        actionLabel: 'Open Work Item',
+        filterLabel: 'Show All',
+        tone: 'verified',
+      });
+    }
+    case 'technician': {
+      const proof = pickHighestImpact(
+        rows,
+        item => item?.status === 'in_progress' || needsCompletionProof(item),
+      );
+      if (proof) {
+        return buildNextAction({
+          key: 'technician-proof',
+          label: 'Field Proof Tool',
+          value: 'Update status or proof',
+          detail: 'Picks active or proof-missing assigned work so the field record moves toward clean closeout.',
+          workOrder: proof,
+          filterKey: 'proof',
+          actionLabel: 'Open Field Update',
+          filterLabel: 'Show Proof Work',
+          tone: 'missing',
+        });
+      }
+      const starter = pickHighestImpact(rows, item => item?.status === 'open');
+      if (starter) {
+        return buildNextAction({
+          key: 'technician-start',
+          label: 'Start Work Tool',
+          value: 'Start next job',
+          detail: 'Selects the highest-priority assigned open job so the technician has one clear first move.',
+          workOrder: starter,
+          filterKey: 'start',
+          actionLabel: 'Open Job',
+          filterLabel: 'Show Start Work',
+          tone: 'open',
+        });
+      }
+      const blocker = pickHighestImpact(rows, isBlockedStatus);
+      return blocker
+        ? buildNextAction({
+            key: 'technician-blocker',
+            label: 'Blocker Tool',
+            value: 'Clarify blocker',
+            detail: 'Paused or escalated assigned work needs notes before someone else can unblock it.',
+            workOrder: blocker,
+            filterKey: 'blockers',
+            actionLabel: 'Open Blocker',
+            filterLabel: 'Show Blockers',
+            tone: 'escalated',
+          })
+        : buildClearQueueAction(role);
+    }
+    case 'client': {
+      const approval = pickHighestImpact(rows, needsApprovalDecision);
+      if (approval) {
+        return buildNextAction({
+          key: 'client-decision',
+          label: 'Decision Tool',
+          value: 'Approve or decline',
+          detail: 'Finds the pending approval tied to this client so the client can decide without calling operations.',
+          workOrder: approval,
+          filterKey: 'decisions',
+          actionLabel: 'Open Decision',
+          filterLabel: 'Show Decisions',
+          tone: 'pending',
+        });
+      }
+      const proof = pickHighestImpact(rows, item => item?.status === 'completed');
+      return buildNextAction({
+        key: proof ? 'client-proof' : 'client-update',
+        label: proof ? 'Proof Review Tool' : 'Update Review Tool',
+        value: proof ? 'Review closeout proof' : 'Read latest update',
+        detail: proof
+          ? 'No approval is waiting; review completed linked work for proof and closeout clarity.'
+          : 'No approval is waiting; open the most active linked work item for visible status context.',
+        workOrder: proof || pickHighestImpact(rows, isOpenOrActiveStatus) || pickHighestImpact(rows, () => true),
+        filterKey: proof ? 'proof' : 'updates',
+        actionLabel: proof ? 'Open Proof' : 'Open Update',
+        filterLabel: proof ? 'Show Proof' : 'Show Updates',
+        tone: proof ? 'verified' : 'active',
+      });
+    }
+    case 'viewer': {
+      const active = pickHighestImpact(rows, isOpenOrActiveStatus);
+      const completed = pickHighestImpact(rows, item => item?.status === 'completed');
+      return buildNextAction({
+        key: active ? 'viewer-progress' : 'viewer-closeout',
+        label: 'Read-Only Review Tool',
+        value: active ? 'Review progress' : 'Review closeout',
+        detail: active
+          ? 'Opens the most important visible active record while keeping the viewer read-only.'
+          : 'No active work is visible; review completed visible work and proof context.',
+        workOrder: active || completed || pickHighestImpact(rows, () => true),
+        filterKey: active ? 'active' : 'completed',
+        actionLabel: 'Open Snapshot',
+        filterLabel: active ? 'Show Active' : 'Show Complete',
+        tone: active ? 'active' : 'verified',
+      });
+    }
+    case 'vendor': {
+      const blocker = pickHighestImpact(rows, isBlockedStatus);
+      if (blocker) {
+        return buildNextAction({
+          key: 'vendor-blocker',
+          label: 'Vendor Response Tool',
+          value: 'Respond to blocker',
+          detail: 'Finds blocked vendor-linked work so the vendor can reply in the right message lane.',
+          workOrder: blocker,
+          filterKey: 'blocked',
+          actionLabel: 'Open Blocker',
+          filterLabel: 'Show Blocked',
+          tone: 'escalated',
+        });
+      }
+      const active = pickHighestImpact(rows, isOpenOrActiveStatus);
+      return buildNextAction({
+        key: active ? 'vendor-active' : 'vendor-complete',
+        label: 'Vendor Lane Tool',
+        value: active ? 'Send vendor update' : 'Review completed scope',
+        detail: active
+          ? 'Opens the highest-impact linked vendor job while keeping client/internal context separate.'
+          : 'No active vendor-linked work is waiting; review completed vendor scope.',
+        workOrder: active || pickHighestImpact(rows, item => item?.status === 'completed') || pickHighestImpact(rows, () => true),
+        filterKey: active ? 'active' : 'complete',
+        actionLabel: active ? 'Open Vendor Work' : 'Open Completed Work',
+        filterLabel: active ? 'Show Active' : 'Show Complete',
+        tone: active ? 'active' : 'verified',
+      });
+    }
+    default:
+      return buildNextAction({
+        key: 'default-open',
+        label: 'Queue Tool',
+        value: 'Open visible work',
+        detail: 'Opens the highest-impact visible record for this authenticated account.',
+        workOrder: pickHighestImpact(rows, () => true),
+        filterKey: 'all',
+        actionLabel: 'Open Work Order',
+        filterLabel: 'Show All',
+        tone: 'active',
+      });
+  }
 };
 
 export const buildRoleEventLaneRows = (role, workOrders = []) => {

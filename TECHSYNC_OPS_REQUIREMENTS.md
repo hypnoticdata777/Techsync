@@ -194,6 +194,8 @@ All 10 batches are captured below.
   what proof is required.
 - As each role, I want my home queue to show the operating events I own so I
   know what to monitor before opening individual work orders.
+- As each role, I want the system to recommend the next best work item and give
+  me a direct action so I can move without manually scanning the whole queue.
 - As a PMC admin, I want role permissions and tenant controls so staff and
   clients only see appropriate data.
 - As a client/homeowner, I want to see approval status and proof without needing
@@ -282,6 +284,9 @@ Already represented in the codebase:
 - v1.3 role-aware queue focus filters for risk, assignment, approval, proof,
   blocker, read-only, and vendor delivery loops so users can narrow visible
   work by their next operating event.
+- v1.3 role-aware next-best-action queue tool that scores visible work by role,
+  priority, status, approval, assignment, blocker, and proof state, then lets
+  users open the recommended work order or focus the matching queue loop.
 - v1.3 work-order create/edit guidance for linked/manual intake states so
   client, property, vendor, and address context gaps are visible before save.
 - v1.3 manager-only mobile navigation gating for directory, dispatch,

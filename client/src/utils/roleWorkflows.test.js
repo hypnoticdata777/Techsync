@@ -10,6 +10,7 @@ import {
   buildRoleEventLaneRows,
   buildRoleEventPlaybookRows,
   buildRoleLaneRows,
+  buildRoleNextBestAction,
   buildRoleQueueFilterRows,
   buildQueueSummary,
   buildWorkOrderFlowRows,
@@ -343,6 +344,109 @@ describe('role workflow helpers', () => {
     expect(filterWorkOrdersForRoleQueue('vendor', 'blocked', queue).map(item => item.id))
       .toEqual([4, 5]);
     expect(filterWorkOrdersForRoleQueue('vendor', 'unknown', queue)).toBe(queue);
+  });
+
+  test('selects an operable next-best queue action for each role', () => {
+    const queue = [
+      {
+        id: 11,
+        title: 'Low pending approval',
+        status: 'open',
+        priority: 'low',
+        assigned_technician_id: 7,
+        client_approval_status: 'pending',
+      },
+      {
+        id: 12,
+        title: 'Emergency unassigned leak',
+        status: 'open',
+        priority: 'emergency',
+        client_approval_status: 'not_required',
+      },
+      {
+        id: 13,
+        title: 'Escalated vendor access',
+        status: 'escalated',
+        priority: 'high',
+        assigned_technician_id: 9,
+        client_approval_status: 'not_required',
+      },
+      {
+        id: 14,
+        title: 'Active proof follow-up',
+        status: 'in_progress',
+        priority: 'medium',
+        assigned_technician_id: 9,
+        client_approval_status: 'not_required',
+      },
+      {
+        id: 15,
+        title: 'Completed proof package',
+        status: 'completed',
+        priority: 'normal',
+        completion_proof_verified_at: '2026-08-12T00:00:00Z',
+        client_approval_status: 'approved',
+      },
+    ];
+
+    expect(buildRoleNextBestAction('org_admin', queue)).toEqual(
+      expect.objectContaining({
+        key: 'admin-risk',
+        workOrderId: 12,
+        filterKey: 'risk',
+        actionLabel: 'Open Risk Item',
+      }),
+    );
+    expect(buildRoleNextBestAction('coordinator', queue)).toEqual(
+      expect.objectContaining({
+        key: 'coordinator-assign',
+        workOrderId: 12,
+        filterKey: 'unassigned',
+        actionLabel: 'Assign This Work',
+      }),
+    );
+    expect(buildRoleNextBestAction('technician', queue)).toEqual(
+      expect.objectContaining({
+        key: 'technician-proof',
+        workOrderId: 14,
+        filterKey: 'proof',
+      }),
+    );
+    expect(buildRoleNextBestAction('client', queue)).toEqual(
+      expect.objectContaining({
+        key: 'client-decision',
+        workOrderId: 11,
+        filterKey: 'decisions',
+        actionLabel: 'Open Decision',
+      }),
+    );
+    expect(buildRoleNextBestAction('viewer', queue)).toEqual(
+      expect.objectContaining({
+        key: 'viewer-progress',
+        workOrderId: 12,
+        filterKey: 'active',
+        actionLabel: 'Open Snapshot',
+      }),
+    );
+    expect(buildRoleNextBestAction('vendor', queue)).toEqual(
+      expect.objectContaining({
+        key: 'vendor-blocker',
+        workOrderId: 13,
+        filterKey: 'blocked',
+        actionLabel: 'Open Blocker',
+      }),
+    );
+  });
+
+  test('returns a refresh action when the visible role queue is empty', () => {
+    expect(buildRoleNextBestAction('viewer', [])).toEqual(
+      expect.objectContaining({
+        key: 'clear',
+        workOrderId: null,
+        actionLabel: 'Refresh Queue',
+        filterKey: 'all',
+      }),
+    );
   });
 
   test('provides detail role context for clients with pending approval', () => {

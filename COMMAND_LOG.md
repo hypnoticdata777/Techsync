@@ -3059,3 +3059,43 @@ Result:
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - v1.3 Role Next-Best-Action Queue Tool
+
+Decision:
+
+- Convert the role home-queue maturity pass from passive guidance into an
+  operable tool that recommends one concrete next work item for the active
+  role.
+
+Changes:
+
+- Added `buildRoleNextBestAction`, a deterministic queue-ranking helper that
+  scores visible work by role, priority, status, approval, assignment, blocker,
+  and proof state.
+- Updated the work-order home queue with a next-best-action panel that opens
+  the recommended work order or focuses the matching queue filter.
+- Kept compact outcome cards as supporting role proof, with the operable
+  recommendation and buttons as the primary queue surface.
+- Covered admin, coordinator, technician, client, viewer, vendor, and empty
+  queue next-action selection in role workflow tests.
+- Updated README, roadmap, phase status, QA, requirements, traceability, and
+  role-lane docs so operable role tooling is part of the UX contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `27 passed tests`.
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

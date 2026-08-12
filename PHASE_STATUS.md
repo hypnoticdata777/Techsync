@@ -70,6 +70,10 @@ Completed in the latest lane UX pass:
   recurring operating loops are visible before they choose a job.
 - Added role-aware queue focus filters so users can narrow the visible queue
   by the operating loop they need to handle next.
+- Added an operable role-aware next-best-action tool on the home queue that
+  ranks visible work by role, priority, status, approval, assignment, blocker,
+  and proof state, then lets the user open the recommended work order or focus
+  the matching queue loop.
 
 Next product maturity targets:
 
@@ -93,6 +97,9 @@ Next product maturity targets:
   expects to monitor at the queue level.
 - Continue refining queue focus filters as live walkthroughs reveal which
   operating loops should be easier to isolate.
+- Continue turning role guidance into executable tools where possible, with
+  queue ranking, direct navigation, and state-changing workflows preferred over
+  descriptive panels alone.
 - Continue tightening action outcomes where deeper workflows need richer
   follow-through, especially closeout package review, cost review, and
   assignment changes.

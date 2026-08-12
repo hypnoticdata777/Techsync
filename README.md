@@ -21,6 +21,10 @@ role event-lane cards for each user's recurring operating loops, such as risk,
 intake, assignment, approval, proof, read-only review, and vendor delivery; the
 same operating loops can now be tapped as queue focus filters so each user can
 shrink the list to the work that needs their lane next.
+The home queue also includes a tested role-aware next-best-action tool that
+ranks visible work by role, priority, status, approval, assignment, blocker, and
+proof state, then gives users direct controls to open the recommended work order
+or focus the queue on that operating loop.
 Detail pages carry that forward with approval, communication, proof, and
 lifecycle action-path cues that jump to the matching work sections. Each of
 those sections now opens with role-aware readiness guidance so unavailable

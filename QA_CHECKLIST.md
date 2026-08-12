@@ -247,6 +247,9 @@ they have been verified in the relevant environment.
 - [x] Work-order home queues now include role-aware focus filters so admin,
       coordinator, technician, client, viewer, and vendor users can isolate the
       operating loop that needs their lane next.
+- [x] Work-order home queues now include a tested role-aware next-best-action
+      tool with real controls to open the recommended work order or focus the
+      matching queue loop.
 - [x] Role-lane UX contract added in code/docs, with home queue lane maps and
       detail-page `Can Do` / `Not In This Lane` boundaries for all six roles.
 - [x] Client, viewer, and vendor home queues now include portal summaries for

@@ -106,7 +106,10 @@ v1.3 should focus on the highest-value PMC product gaps:
    viewer, and vendor so each user understands their job, handoff partners,
    allowed controls, queue-level event lanes, section-level readiness, and
    intentionally hidden controls.
-13. Later Vercel deployment, hosted smoke evidence, and portfolio sliver link
+13. Operable role UX maturity so guidance becomes clickable tooling, starting
+   with a tested next-best-action queue engine that picks a specific visible
+   work order and lets each role open it or focus the relevant queue loop.
+14. Later Vercel deployment, hosted smoke evidence, and portfolio sliver link
    only after the product feels robust enough to show.
 
 ## Confidence Statement

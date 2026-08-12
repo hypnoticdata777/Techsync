@@ -24,6 +24,8 @@ import {
   buildRoleGuidanceRows,
   buildRoleCardRows,
   buildRoleEventLaneRows,
+  buildRoleNextBestAction,
+  buildRoleOutcomeRows,
   buildRoleQueueFilterRows,
   buildRoleLaneRows,
   buildWorkOrderFlowRows,
@@ -93,6 +95,14 @@ function WorkOrdersListScreen({navigation}) {
   const roleGuidanceRows = useMemo(
     () => buildRoleGuidanceRows(user?.role, queueSummary),
     [user?.role, queueSummary],
+  );
+  const roleOutcomeRows = useMemo(
+    () => buildRoleOutcomeRows(user?.role, queueSummary, workOrders),
+    [queueSummary, user?.role, workOrders],
+  );
+  const roleNextBestAction = useMemo(
+    () => buildRoleNextBestAction(user?.role, workOrders),
+    [user?.role, workOrders],
   );
   const roleEventLaneRows = useMemo(
     () => buildRoleEventLaneRows(user?.role, workOrders),
@@ -244,6 +254,19 @@ function WorkOrdersListScreen({navigation}) {
     }
   };
 
+  const handleNextBestOpen = () => {
+    const target = workOrders.find(item => item.id === roleNextBestAction.workOrderId);
+    if (target) {
+      navigation.navigate('WorkOrderDetails', {workOrder: target});
+      return;
+    }
+    fetchWorkOrders();
+  };
+
+  const handleNextBestFocus = () => {
+    setActiveQueueFilter(roleNextBestAction.filterKey || 'all');
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.userBar}>
@@ -309,6 +332,75 @@ function WorkOrdersListScreen({navigation}) {
               <Text style={styles.laneValue}>{row.value}</Text>
             </View>
           ))}
+        </View>
+
+        <View
+          style={[styles.nextActionPanel, {borderLeftColor: getStatusColor(roleNextBestAction.tone)}]}
+          accessible
+          accessibilityLabel={`Next best action. ${roleNextBestAction.label}. ${roleNextBestAction.value}. Target: ${roleNextBestAction.workOrderTitle}. ${roleNextBestAction.detail}`}>
+          <View style={styles.nextActionHeader}>
+            <View style={styles.nextActionCopy}>
+              <Text style={styles.nextActionEyebrow}>{roleNextBestAction.label}</Text>
+              <Text style={styles.nextActionTitle}>{roleNextBestAction.value}</Text>
+              <Text style={styles.nextActionTarget} numberOfLines={2}>
+                {roleNextBestAction.workOrderTitle}
+              </Text>
+              <Text style={styles.nextActionDetail}>{roleNextBestAction.detail}</Text>
+            </View>
+            <View style={styles.nextActionButtons}>
+              <TouchableOpacity
+                style={styles.nextActionPrimary}
+                onPress={handleNextBestOpen}
+                {...actionButtonA11y(
+                  roleNextBestAction.actionLabel,
+                  roleNextBestAction.workOrderId
+                    ? `Opens ${roleNextBestAction.workOrderTitle}.`
+                    : 'Refreshes the visible queue.',
+                )}>
+                <Text style={styles.nextActionPrimaryText}>
+                  {roleNextBestAction.actionLabel}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.nextActionSecondary,
+                  activeQueueFilter === roleNextBestAction.filterKey &&
+                    styles.nextActionSecondaryDisabled,
+                ]}
+                onPress={handleNextBestFocus}
+                disabled={activeQueueFilter === roleNextBestAction.filterKey}
+                {...actionButtonA11y(
+                  roleNextBestAction.filterLabel,
+                  `Filters the queue to ${roleNextBestAction.filterKey || 'all'}.`,
+                )}>
+                <Text style={styles.nextActionSecondaryText}>
+                  {activeQueueFilter === roleNextBestAction.filterKey
+                    ? 'Focused'
+                    : roleNextBestAction.filterLabel}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.outcomeRow}>
+            {roleOutcomeRows.map(row => (
+              <View
+                key={row.key}
+                style={[
+                  styles.outcomeCard,
+                  {borderLeftColor: getStatusColor(row.tone)},
+                ]}>
+                <Text style={styles.outcomeLabel}>{row.label}</Text>
+                <Text
+                  style={[styles.outcomeValue, {color: getStatusColor(row.tone)}]}
+                  numberOfLines={2}>
+                  {row.value}
+                </Text>
+                <Text style={styles.outcomeDetail} numberOfLines={3}>
+                  {row.detail}
+                </Text>
+              </View>
+            ))}
+          </View>
         </View>
 
         <View style={styles.guidanceStack}>
@@ -607,6 +699,129 @@ const styles = StyleSheet.create({
     color: '#cbd5e1',
     fontSize: 12,
     lineHeight: 17,
+    marginTop: 4,
+  },
+  nextActionPanel: {
+    backgroundColor: '#07111f',
+    borderColor: '#243449',
+    borderLeftWidth: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 10,
+    padding: 10,
+  },
+  nextActionHeader: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  nextActionCopy: {
+    flex: 1,
+    minWidth: 220,
+  },
+  nextActionEyebrow: {
+    color: '#f9fafb',
+    fontSize: 12,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  nextActionTitle: {
+    color: '#38bdf8',
+    fontSize: 20,
+    fontWeight: '900',
+    lineHeight: 25,
+    marginTop: 4,
+  },
+  nextActionTarget: {
+    color: '#f9fafb',
+    fontSize: 14,
+    fontWeight: '800',
+    lineHeight: 18,
+    marginTop: 5,
+  },
+  nextActionDetail: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 5,
+  },
+  nextActionButtons: {
+    flexBasis: 210,
+    flexGrow: 1,
+    gap: 8,
+    justifyContent: 'center',
+  },
+  nextActionPrimary: {
+    alignItems: 'center',
+    backgroundColor: '#38bdf8',
+    borderColor: '#38bdf8',
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  nextActionPrimaryText: {
+    color: '#020617',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  nextActionSecondary: {
+    alignItems: 'center',
+    backgroundColor: '#0f172a',
+    borderColor: '#334155',
+    borderRadius: 8,
+    borderWidth: 1,
+    minHeight: 42,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  nextActionSecondaryDisabled: {
+    opacity: 0.62,
+  },
+  nextActionSecondaryText: {
+    color: '#e5e7eb',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  outcomeRow: {
+    borderTopColor: '#1f2937',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+    paddingTop: 10,
+  },
+  outcomeCard: {
+    backgroundColor: '#020617',
+    borderColor: '#1f2937',
+    borderLeftWidth: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    flexBasis: 190,
+    flexGrow: 1,
+    minHeight: 92,
+    minWidth: 160,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+  },
+  outcomeLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  outcomeValue: {
+    fontSize: 14,
+    fontWeight: '900',
+    lineHeight: 18,
+    marginTop: 4,
+  },
+  outcomeDetail: {
+    color: '#cbd5e1',
+    fontSize: 11,
+    lineHeight: 15,
     marginTop: 4,
   },
   guidanceStack: {
