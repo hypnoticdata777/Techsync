@@ -24,12 +24,13 @@ Important Vercel notes:
 - The Python runtime is marked Beta by Vercel, so the staging loop must include
   real hosted smoke tests before the portfolio link is promoted.
 - Runtime dependencies are installed from root-level dependency files, so this
-  repo has a root `requirements.txt` that points to `server/requirements.txt`.
+  repo has a root `requirements.txt` with the backend runtime dependencies
+  expanded directly for Vercel's Python dependency parser.
 
 ## Files Added For Vercel
 
 - `api/index.py` exposes the existing FastAPI app to Vercel.
-- `requirements.txt` delegates runtime dependencies to `server/requirements.txt`.
+- `requirements.txt` mirrors backend runtime dependencies directly for Vercel.
 - `.python-version` pins the Vercel Python runtime to `3.12`.
 - `vercel.json` rewrites all requests to the FastAPI entrypoint and excludes
   client/tests/scanner artifacts from the Python function bundle.

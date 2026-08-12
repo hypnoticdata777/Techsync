@@ -3185,3 +3185,36 @@ Result:
 - Python compile checks passed.
 - Reset hosted demo workflow YAML parsed successfully.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - Vercel Root Requirements Parser Fix
+
+Decision:
+
+- Vercel failed the API build because its Python dependency parser did not
+  accept the root `-r server/requirements.txt` include.
+- Keep `server/requirements.txt` as the backend developer dependency list, but
+  expand the same runtime dependencies directly in root `requirements.txt` for
+  Vercel.
+
+Changes:
+
+- Replaced the root requirements include with plain Python package entries.
+- Updated the Vercel runbook to explain that the root requirements file mirrors
+  backend runtime dependencies for Vercel's parser.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+npm.cmd run test:ci
+npm.cmd run build:web
+git diff --check
+```
+
+Result:
+
+- Backend tests passed: `188 passed`.
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

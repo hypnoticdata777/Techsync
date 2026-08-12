@@ -1,1 +1,13 @@
--r server/requirements.txt
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic[email]
+boto3
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt<4.1
+python-multipart
+alembic
+sqlalchemy
+psycopg2-binary
+stripe
