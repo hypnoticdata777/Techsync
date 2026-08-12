@@ -104,7 +104,8 @@ v1.3 should focus on the highest-value PMC product gaps:
    product-maturity review.
 12. Role-lane UX maturity for org admin, coordinator, technician, client,
    viewer, and vendor so each user understands their job, handoff partners,
-   allowed controls, and intentionally hidden controls.
+   allowed controls, queue-level event lanes, and intentionally hidden
+   controls.
 13. Later Vercel deployment, hosted smoke evidence, and portfolio sliver link
    only after the product feels robust enough to show.
 

@@ -23,6 +23,7 @@ import {
   buildQueueSummary,
   buildRoleGuidanceRows,
   buildRoleCardRows,
+  buildRoleEventLaneRows,
   buildRoleLaneRows,
   buildWorkOrderFlowRows,
   canManageOperations,
@@ -89,6 +90,10 @@ function WorkOrdersListScreen({navigation}) {
   const roleGuidanceRows = useMemo(
     () => buildRoleGuidanceRows(user?.role, queueSummary),
     [user?.role, queueSummary],
+  );
+  const roleEventLaneRows = useMemo(
+    () => buildRoleEventLaneRows(user?.role, workOrders),
+    [user?.role, workOrders],
   );
 
   const fetchWorkOrders = useCallback(async () => {
@@ -294,6 +299,26 @@ function WorkOrdersListScreen({navigation}) {
               accessibilityLabel={`${row.label}. ${row.value}`}>
               <Text style={styles.guidanceLabel}>{row.label}</Text>
               <Text style={styles.guidanceValue}>{row.value}</Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.eventLaneGrid}>
+          {roleEventLaneRows.map(row => (
+            <View
+              key={row.key}
+              style={[styles.eventLaneCard, {borderLeftColor: getStatusColor(row.tone)}]}
+              accessible
+              accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
+              <Text style={styles.eventLaneLabel}>{row.label}</Text>
+              <Text
+                style={[styles.eventLaneValue, {color: getStatusColor(row.tone)}]}
+                numberOfLines={1}>
+                {row.value}
+              </Text>
+              <Text style={styles.eventLaneDetail} numberOfLines={3}>
+                {row.detail}
+              </Text>
             </View>
           ))}
         </View>
@@ -544,6 +569,46 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
+  },
+  eventLaneGrid: {
+    borderTopColor: '#1f2937',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 10,
+    paddingTop: 10,
+  },
+  eventLaneCard: {
+    backgroundColor: '#07111f',
+    borderColor: '#243449',
+    borderLeftWidth: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    flexBasis: 180,
+    flexGrow: 1,
+    minHeight: 92,
+    minWidth: 160,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+  },
+  eventLaneLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  eventLaneValue: {
+    fontSize: 14,
+    fontWeight: '900',
+    lineHeight: 18,
+    marginTop: 4,
+  },
+  eventLaneDetail: {
+    color: '#cbd5e1',
+    fontSize: 11,
+    lineHeight: 15,
+    marginTop: 4,
   },
   actionGrid: {
     flexDirection: 'row',

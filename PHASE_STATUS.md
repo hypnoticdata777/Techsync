@@ -59,6 +59,8 @@ Completed in the latest lane UX pass:
 - Added post-action outcome notices on work-order detail pages so message
   sends, approval requests/decisions, proof uploads, and lifecycle transitions
   visibly confirm what changed and what the next handoff means.
+- Added role event-lane cards to the work-order home queue so each user's
+  recurring operating loops are visible before they choose a job.
 
 Next product maturity targets:
 
@@ -74,6 +76,8 @@ Next product maturity targets:
 - Continue maturing event follow-through after the first visible response:
   success confirmation, refreshed messages/proof, and clear next-state feedback
   should feel consistent across all six roles.
+- Continue checking whether role event lanes match what each user naturally
+  expects to monitor at the queue level.
 - Continue tightening action outcomes where deeper workflows need richer
   follow-through, especially closeout package review, cost review, and
   assignment changes.

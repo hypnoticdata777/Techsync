@@ -6,6 +6,7 @@ import {
   buildRoleGuidanceRows,
   buildRoleBoundaryRows,
   buildRoleCardRows,
+  buildRoleEventLaneRows,
   buildRoleEventPlaybookRows,
   buildRoleLaneRows,
   buildQueueSummary,
@@ -232,6 +233,80 @@ describe('role workflow helpers', () => {
       escalated: 1,
       pendingApproval: 1,
     });
+  });
+
+  test('builds role event lanes for queue-level operating loops', () => {
+    const queue = [
+      {status: 'open', client_approval_status: 'pending', client_id: 10},
+      {status: 'open', client_approval_status: 'not_required'},
+      {status: 'in_progress', assigned_technician_id: 12},
+      {status: 'paused', assigned_technician_id: 12},
+      {status: 'escalated', assigned_technician_id: 13},
+      {status: 'completed', completion_proof_verified_at: '2026-08-12T00:00:00Z'},
+      {status: 'completed'},
+    ];
+
+    expect(buildRoleEventLaneRows('org_admin', queue)).toEqual([
+      expect.objectContaining({
+        label: 'Explain Risk',
+        value: '6 events',
+        detail: expect.stringContaining('proof gaps'),
+        tone: 'pending',
+      }),
+      expect.objectContaining({
+        label: 'Operating Story',
+        value: '7 records',
+      }),
+      expect.objectContaining({
+        label: 'Closeout Watch',
+        value: '2 completed items',
+        tone: 'missing',
+      }),
+    ]);
+
+    expect(buildRoleEventLaneRows('coordinator', queue)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Intake To Assign', value: '2 requests'}),
+        expect.objectContaining({label: 'Approval Loop', value: '1 decision'}),
+        expect.objectContaining({label: 'Blocker Recovery', value: '2 blockers'}),
+      ]),
+    );
+
+    expect(buildRoleEventLaneRows('technician', queue)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Start Next', value: '2 jobs'}),
+        expect.objectContaining({
+          label: 'Proof Loop',
+          value: '1 active job',
+          detail: expect.stringContaining('photo proof'),
+        }),
+      ]),
+    );
+
+    expect(buildRoleEventLaneRows('client', queue)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Needs Decision', value: '1 approval'}),
+        expect.objectContaining({label: 'Visible Updates', value: '5 active items'}),
+      ]),
+    );
+
+    expect(buildRoleEventLaneRows('viewer', queue)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Snapshot Scope', value: '7 visible items'}),
+        expect.objectContaining({label: 'Boundary', value: 'Read only'}),
+      ]),
+    );
+
+    expect(buildRoleEventLaneRows('vendor', queue)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Linked Work', value: '7 vendor items'}),
+        expect.objectContaining({
+          label: 'Boundary',
+          value: 'Vendor lane',
+          detail: expect.stringContaining('unrelated vendors'),
+        }),
+      ]),
+    );
   });
 
   test('provides detail role context for clients with pending approval', () => {

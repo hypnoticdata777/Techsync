@@ -192,6 +192,8 @@ All 10 batches are captured below.
   technician faster.
 - As a technician, I want a simple mobile queue so I know what to do next and
   what proof is required.
+- As each role, I want my home queue to show the operating events I own so I
+  know what to monitor before opening individual work orders.
 - As a PMC admin, I want role permissions and tenant controls so staff and
   clients only see appropriate data.
 - As a client/homeowner, I want to see approval status and proof without needing

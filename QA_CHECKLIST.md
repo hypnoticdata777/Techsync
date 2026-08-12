@@ -236,6 +236,9 @@ they have been verified in the relevant environment.
 - [x] Work-order detail pages now show post-action outcome notices after
       messages, approval requests/decisions, proof uploads, and lifecycle
       transitions.
+- [x] Work-order home queues now show role event-lane cards for recurring
+      operating loops such as risk, intake, approval, proof, read-only review,
+      and vendor delivery before opening a job.
 - [x] Role-lane UX contract added in code/docs, with home queue lane maps and
       detail-page `Can Do` / `Not In This Lane` boundaries for all six roles.
 - [x] Client, viewer, and vendor home queues now include portal summaries for

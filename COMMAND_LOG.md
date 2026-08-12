@@ -2905,3 +2905,40 @@ Result:
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - v1.3 Queue Event Lane UX Pass
+
+Decision:
+
+- Make every role's home queue explain the recurring operating loops they own
+  before they open a work order.
+- Keep TechSync Ops centered on role clarity and handoffs: risk, intake,
+  assignment, approval, proof, read-only review, and vendor delivery.
+
+Changes:
+
+- Added tested `buildRoleEventLaneRows` helper for queue-level role event cards.
+- Updated the work-order home queue with role event-lane cards for org admin,
+  coordinator, technician, client, viewer, and vendor users.
+- Tuned event-lane cards to wrap more comfortably on narrow screens.
+- Updated README, roadmap, phase status, QA, requirements, traceability, and
+  role-lane docs so queue-level event monitoring is part of the role UX
+  contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `23 passed tests`.
+- Full client tests passed: `8 passed suites`, `62 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

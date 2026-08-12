@@ -16,12 +16,15 @@ now have purpose-built portal summaries and communication-channel notices so
 external users can tell what they can see, where replies go, and which controls
 are intentionally unavailable. Work-order queue cards now add role-specific
 scan cues so admin, coordinator, technician, client, viewer, and vendor users
-can tell why a visible job matters before opening it, and detail pages now carry
-that forward with approval, communication, proof, and lifecycle action-path
-cues, plus event playbook guidance for recurring approval, proof, escalation,
-vendor, closeout, and read-only snapshot states. Successful detail actions now
-show outcome notices so message sends, approval requests/decisions, proof
-uploads, and lifecycle transitions confirm what changed. The walkthrough manifest now has a tested
+can tell why a visible job matters before opening it. Home queues now also show
+role event-lane cards for each user's recurring operating loops, such as risk,
+intake, assignment, approval, proof, read-only review, and vendor delivery.
+Detail pages carry that forward with approval, communication, proof, and
+lifecycle action-path cues, plus event playbook guidance for recurring
+approval, proof, escalation, vendor, closeout, and read-only snapshot states.
+Successful detail actions now show outcome notices so message sends, approval
+requests/decisions, proof uploads, and lifecycle transitions confirm what
+changed. The walkthrough manifest now has a tested
 readiness audit for synthetic logins, screenshot targets, role controls,
 privacy expectations, and screenshot safety checks. The final capture workflow
 is prepared in `ROLE_UX_CAPTURE_PASS.md`, and

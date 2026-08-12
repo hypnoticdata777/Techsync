@@ -189,6 +189,8 @@ Likely scope:
     `scripts/seed_demo_data.py` and `DEMO_DATA_RUNBOOK.md`
   - role-by-role UX sweep now started with `ROLE_UX_SWEEP.md` and a
     role-specific mobile landing band
+  - role event-lane cards now started on home queues so each user sees their
+    recurring operating loops before opening work
   - role UX evidence readiness audit now started for synthetic login coverage,
     screenshot plan uniqueness, safety guardrails, and role privacy/control
     expectations

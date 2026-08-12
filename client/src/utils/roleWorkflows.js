@@ -364,6 +364,198 @@ export const buildRoleGuidanceRows = (role, queueSummary = {}) => {
   ];
 };
 
+const pluralize = (count, singular, plural = `${singular}s`) =>
+  `${count} ${count === 1 ? singular : plural}`;
+
+const countWhere = (rows, predicate) => rows.filter(predicate).length;
+
+export const buildRoleEventLaneRows = (role, workOrders = []) => {
+  const rows = workOrders || [];
+  const pendingApprovals = countWhere(
+    rows,
+    item => item.client_approval_status === 'pending',
+  );
+  const unassigned = countWhere(
+    rows,
+    item => item.status === 'open' && !hasAssignedTechnician(item),
+  );
+  const active = countWhere(rows, item => item.status === 'in_progress');
+  const paused = countWhere(rows, item => item.status === 'paused');
+  const escalated = countWhere(rows, item => item.status === 'escalated');
+  const completed = countWhere(rows, item => item.status === 'completed');
+  const completedNeedsProof = countWhere(
+    rows,
+    item => item.status === 'completed' && !hasCompletionProof(item),
+  );
+  const completedReady = completed - completedNeedsProof;
+  const openOrActive = countWhere(
+    rows,
+    item => ['open', 'in_progress', 'paused', 'escalated'].includes(item.status),
+  );
+  const blockers = paused + escalated;
+  const riskEvents = pendingApprovals + unassigned + blockers + completedNeedsProof;
+
+  switch (role) {
+    case 'org_admin':
+      return [
+        {
+          key: 'risk',
+          label: 'Explain Risk',
+          value: pluralize(riskEvents, 'event'),
+          detail: 'Approvals, unassigned work, blockers, and proof gaps must have an owner.',
+          tone: riskEvents > 0 ? 'pending' : 'verified',
+        },
+        {
+          key: 'operating-story',
+          label: 'Operating Story',
+          value: pluralize(rows.length, 'record'),
+          detail: 'Each record should show status, next owner, audience, proof, and audit path.',
+          tone: rows.length > 0 ? 'active' : 'default',
+        },
+        {
+          key: 'closeout',
+          label: 'Closeout Watch',
+          value: pluralize(completed, 'completed item'),
+          detail:
+            completedReady > 0
+              ? `${pluralize(completedReady, 'item')} can move toward archive after review.`
+              : 'Completed work will surface here when proof or override is ready.',
+          tone: completedNeedsProof > 0 ? 'missing' : 'verified',
+        },
+      ];
+    case 'coordinator':
+      return [
+        {
+          key: 'intake',
+          label: 'Intake To Assign',
+          value: pluralize(unassigned, 'request'),
+          detail: 'Unassigned open work needs a technician, vendor context, or explicit next owner.',
+          tone: unassigned > 0 ? 'open' : 'verified',
+        },
+        {
+          key: 'approval',
+          label: 'Approval Loop',
+          value: pluralize(pendingApprovals, 'decision'),
+          detail: 'Keep client-visible notes focused until the client decides.',
+          tone: pendingApprovals > 0 ? 'pending' : 'default',
+        },
+        {
+          key: 'blockers',
+          label: 'Blocker Recovery',
+          value: pluralize(blockers, 'blocker'),
+          detail: 'Paused and escalated work need owner, reason, and recovery path.',
+          tone: blockers > 0 ? 'escalated' : 'verified',
+        },
+      ];
+    case 'technician':
+      return [
+        {
+          key: 'start',
+          label: 'Start Next',
+          value: pluralize(countWhere(rows, item => item.status === 'open'), 'job'),
+          detail: 'Open assigned jobs are ready for field movement or notes.',
+          tone: unassigned > 0 ? 'open' : 'default',
+        },
+        {
+          key: 'proof',
+          label: 'Proof Loop',
+          value: pluralize(active, 'active job'),
+          detail: 'Active work needs status movement, field notes, and photo proof before completion.',
+          tone: active > 0 ? 'missing' : 'verified',
+        },
+        {
+          key: 'blockers',
+          label: 'Blocked Work',
+          value: pluralize(blockers, 'item'),
+          detail: 'Paused or escalated jobs need clear blocker notes for operations.',
+          tone: blockers > 0 ? 'escalated' : 'default',
+        },
+      ];
+    case 'client':
+      return [
+        {
+          key: 'decision',
+          label: 'Needs Decision',
+          value: pluralize(pendingApprovals, 'approval'),
+          detail: 'Approve or decline only after reviewing visible scope, notes, and proof context.',
+          tone: pendingApprovals > 0 ? 'pending' : 'verified',
+        },
+        {
+          key: 'updates',
+          label: 'Visible Updates',
+          value: pluralize(openOrActive, 'active item'),
+          detail: 'Client-visible messages are the reply path back to operations.',
+          tone: openOrActive > 0 ? 'active' : 'default',
+        },
+        {
+          key: 'proof',
+          label: 'Proof Review',
+          value: pluralize(completed, 'completed item'),
+          detail: 'Closeout evidence appears without exposing internal or vendor-only notes.',
+          tone: completed > 0 ? 'verified' : 'default',
+        },
+      ];
+    case 'viewer':
+      return [
+        {
+          key: 'snapshot',
+          label: 'Snapshot Scope',
+          value: pluralize(rows.length, 'visible item'),
+          detail: 'Review linked status and proof without changing the record.',
+          tone: rows.length > 0 ? 'active' : 'default',
+        },
+        {
+          key: 'watch',
+          label: 'Open Watch',
+          value: pluralize(openOrActive, 'active item'),
+          detail: 'Use this view to understand progress; operations owns all changes.',
+          tone: openOrActive > 0 ? 'open' : 'verified',
+        },
+        {
+          key: 'boundary',
+          label: 'Boundary',
+          value: 'Read only',
+          detail: 'No edit, message, approval, upload, dispatch, or archive controls belong here.',
+          tone: 'default',
+        },
+      ];
+    case 'vendor':
+      return [
+        {
+          key: 'linked',
+          label: 'Linked Work',
+          value: pluralize(rows.length, 'vendor item'),
+          detail: 'Only work connected to this vendor should appear in the queue.',
+          tone: rows.length > 0 ? 'active' : 'default',
+        },
+        {
+          key: 'active',
+          label: 'Active Delivery',
+          value: pluralize(openOrActive, 'active item'),
+          detail: 'Review scope and respond through vendor-visible messages only.',
+          tone: openOrActive > 0 ? 'open' : 'verified',
+        },
+        {
+          key: 'boundary',
+          label: 'Boundary',
+          value: 'Vendor lane',
+          detail: 'Client messages, internal notes, and unrelated vendors stay hidden.',
+          tone: 'default',
+        },
+      ];
+    default:
+      return [
+        {
+          key: 'visible',
+          label: 'Visible Work',
+          value: pluralize(rows.length, 'item'),
+          detail: 'Open a work order to see the next owner, waiting state, and visible audience.',
+          tone: rows.length > 0 ? 'active' : 'default',
+        },
+      ];
+  }
+};
+
 export const getRoleEmptyState = role => {
   switch (role) {
     case 'org_admin':
@@ -1409,6 +1601,7 @@ export default {
   buildDetailGuidanceRows,
   buildWorkOrderFlowRows,
   buildRoleCardRows,
+  buildRoleEventLaneRows,
   buildDetailActionPathRows,
   buildRoleEventPlaybookRows,
   buildActionOutcomeNotice,
