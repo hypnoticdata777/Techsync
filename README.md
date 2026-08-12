@@ -50,11 +50,20 @@ before a reseed. The latest local capture-prep run proved the Neon-backed API
 through all six synthetic roles with 67 passing smoke checks; the remaining
 evidence work is the manual 21-screenshot, small-width, and screen-reader pass.
 
-For faster product review, `HOSTED_TESTING.md` now defines the live staging
-loop: Vercel API + Vercel Expo web + Neon demo data + a GitHub Actions reset
-workflow. Use that loop when local terminal setup is slowing down UX testing;
-keep portfolio/public promotion gated by hosted smoke evidence and synthetic
-role walkthrough quality.
+For faster product review, `HOSTED_TESTING.md` defines the live staging loop:
+Vercel API + Vercel Expo web + Neon demo data + a GitHub Actions reset
+workflow. Current staged surfaces:
+
+- Web app: `https://techsync-ops-web.vercel.app`
+- API root: `https://techsync-ops-api-lyart.vercel.app`
+- API health: `https://techsync-ops-api-lyart.vercel.app/health`
+- API docs: `https://techsync-ops-api-lyart.vercel.app/docs`
+
+Use that loop when local terminal setup is slowing down UX testing. This is a
+hosted demo/staging environment for synthetic data and product maturity work,
+not a customer-production environment. Keep portfolio/public promotion gated by
+hosted smoke evidence, visual/UX quality, synthetic role walkthrough quality,
+and honest production-limitations labeling.
 
 ## Overview
 
@@ -400,9 +409,11 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
 
 ### Known gaps / deferred
 
-- **No web admin panel** was built (RF-25/RF-26 exist as API endpoints
-  only); the spec's "panel administrativo" is assumed to be a future
-  separate web client consuming this same API.
+- **Admin/coordinator web experience exists inside the Expo web client**, not
+  as a separate traditional admin portal. RF-25/RF-26 are backed by API
+  endpoints and surfaced through role-gated mobile/web workflows; deeper
+  desktop-grade admin polish, denser tables, and operational dashboard UX are
+  still product-maturity work.
 - **PMC operations expansion still remaining**: calendar/maps, deep accounting
   integrations, richer branded PDF package styling, deeper client/vendor
   portals, provider-level binary storage export automation, and final UI/UX
@@ -446,8 +457,11 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   issue involving `node:sea`; use Node 20 LTS for the durable local-web setup
   until Expo is upgraded.
 - Hosted staging note: use `HOSTED_TESTING.md` for the lower-friction live URL
-  loop. It avoids repeated local Neon secret injection by keeping API secrets
-  in Vercel and demo reset secrets in GitHub Actions.
+  loop at `https://techsync-ops-web.vercel.app` and
+  `https://techsync-ops-api-lyart.vercel.app`. It avoids repeated local Neon
+  secret injection by keeping API secrets in Vercel and demo reset secrets in
+  GitHub Actions. Treat this as staged/demo infrastructure until hosted smoke,
+  role walkthroughs, visual polish, and production-readiness evidence are clean.
 
 ## License
 
