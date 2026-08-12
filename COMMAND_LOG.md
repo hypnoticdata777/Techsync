@@ -2715,6 +2715,48 @@ Result:
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
 
+## 2026-08-12 - Local Testing Harness
+
+Decision:
+
+- Remove friction from role walkthroughs by replacing repeated manual terminal
+  setup and cloud credential injection with a local-first demo launcher.
+- Keep Neon as an optional cloud database mode instead of the default local
+  testing loop.
+
+Changes:
+
+- Added `LOCAL_TESTING.md` as the short runbook for local synthetic role
+  walkthroughs.
+- Added `docker-compose.local.yml` for local Docker Postgres and
+  `.local-demo.env.example` for generated local-only credentials.
+- Added `Start-TechSync-Demo.cmd` and `Stop-TechSync-Demo.cmd` as
+  double-clickable Windows launchers.
+- Added `scripts/local_dev.ps1` to generate local env, start local Postgres,
+  run Alembic migrations, seed/reset the synthetic demo tenant, start FastAPI,
+  start Expo web, open the browser, and write logs to ignored `.local-dev/`.
+- Added `scripts/local_stop.ps1` to stop the locally started backend/client
+  processes, optionally clear busy dev ports, and optionally stop the local
+  database container.
+- Updated README, phase status, QA, requirements, traceability, and roadmap so
+  low-friction local testing is part of the product-maturity workflow.
+
+Verification:
+
+```powershell
+powershell -NoProfile -Command "$null = [scriptblock]::Create((Get-Content .\scripts\local_dev.ps1 -Raw)); $null = [scriptblock]::Create((Get-Content .\scripts\local_stop.ps1 -Raw)); 'scripts parse'"
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Local default testing now avoids Neon credentials entirely; optional Neon
+  setup validation still requires a real direct Postgres URL before writing
+  ignored `.local-neon.env`.
+
 ## 2026-08-11 - v1.3 External Portal UX Maturity Pass
 
 Decision:
@@ -3098,4 +3140,48 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - Hosted Staging Loop Pivot
+
+Decision:
+
+- Move from local-only proof as the default testing posture to an active hosted
+  staging loop so TechSync Ops can be reviewed from real URLs faster.
+- Keep the safety boundary clear: hosted staging uses synthetic data and
+  `APP_ENV=demo`; portfolio/public promotion waits for hosted smoke evidence
+  and role walkthrough quality.
+
+Changes:
+
+- Added `HOSTED_TESTING.md` as the live staging setup guide for Vercel API,
+  Vercel Expo web, Neon, and GitHub reset secrets.
+- Added `client/vercel.json` and `npm run build:web` so the Expo web client can
+  deploy as a static Vercel project.
+- Added `.github/workflows/reset-hosted-demo.yml` so the synthetic Neon demo
+  tenant can be migrated and reset from GitHub Actions without local database
+  secret injection.
+- Updated deployment, roadmap, phase, QA, requirements, traceability, hosting,
+  and README docs so staging is an accelerator rather than a blocker, while
+  public portfolio promotion remains evidence-gated.
+- Ignored `client/dist/` so local Expo web export artifacts do not get tracked.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- Reset hosted demo workflow YAML parsed successfully.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.

@@ -11,12 +11,12 @@ Use this as the default unless a later implementation pass finds a blocker:
 
 ```text
 Database: Neon Postgres, project techsync-poc, using the pooled connection string for hosted/serverless runtime
-Backend: Vercel for the end-of-v1.3 FastAPI showcase POC
+Backend: Vercel FastAPI project for active hosted staging
 Cloudflare: DNS, portfolio/static front door, and later R2 object storage
 Storage: deferred for the first hosted smoke test unless attachment upload is in scope
 Email: deferred/logged for the first hosted smoke test; real client invite/approval evidence can be captured manually from the hosted email/log path
 Stripe: deferred; document as a supported billing boundary for later test-mode enablement
-Portfolio: prepare the TechSync Ops project entry now, connect the live link after the portfolio URL exists
+Portfolio: keep the TechSync Ops project entry ready; promote the live link only after staged smoke and role walkthrough evidence are clean
 ```
 
 ## Why This Path
@@ -29,7 +29,7 @@ Portfolio: prepare the TechSync Ops project entry now, connect the live link aft
 - Cloudflare Workers can run Python/FastAPI, but Python Workers are still beta
   and require a different deployment shape. Keep that as a later optimization,
   not the first investor POC backend.
-- Vercel is selected for the end-of-v1.3 showcase because the portfolio is
+- Vercel is selected for active hosted staging because the portfolio is
   expected to land there too. Its Python runtime is beta, so the hosted API must
   be smoke-tested carefully before the live link is promoted.
 - Render or Railway remain fallback options if Vercel's Python/serverless
@@ -46,7 +46,7 @@ Current POC state:
 - Branch: `production`
 - Database: `neondb`
 - Migration status: initial hosted-readiness pass reached `0001 (head)`;
-  v1.3 migrations now need hosted/demo verification through `0006 (head)`.
+  v1.3 migrations have since been verified through `0008 (head)`.
 - Direct connection string was used for Alembic migration.
 - Pooled connection string is reserved for hosted app runtime.
 - No Neon connection strings or secrets are tracked in this repo.
@@ -90,8 +90,8 @@ Pros:
 - Easy to connect to a portfolio or project landing page.
 - Supports FastAPI through the Python runtime.
 - Good preview deployment workflow.
-- Selected for the end-of-v1.3 showcase because the portfolio path is expected
-  to use Vercel.
+- Selected for active hosted staging because the portfolio path is expected to
+  use Vercel.
 
 Tradeoffs:
 
@@ -179,22 +179,23 @@ Current-code note:
 
 ## Portfolio Timing
 
-Do not wait to prepare TechSync for hosting. Do wait to hardwire portfolio links
-until the portfolio domain or deployment URL exists.
+Use hosting now as a staging/test accelerator. Do wait to hardwire or promote
+portfolio links until the staged API/web walkthrough is clean.
 
 Current flow:
 
-1. Neon demo Postgres is created and initially migrated to `0001 (head)`;
-   apply latest v1.3 migrations through `0006 (head)` before showcase smoke
-   evidence.
+1. Neon demo Postgres is created and migrated through `0008 (head)`.
 2. Use the pooled Neon connection string for hosted/serverless runtime.
-3. Deploy the backend on Vercel for portfolio alignment.
-4. Use `APP_ENV=demo` for the first hosted environment while
+3. Deploy the backend on Vercel for live staging and portfolio alignment.
+4. Deploy Expo web as a separate Vercel project with
+   `EXPO_PUBLIC_API_BASE_URL` pointing at the API project.
+5. Use `APP_ENV=demo` for the first hosted environment while
    storage/email/Stripe are deferred.
-5. Configure host secrets, deploy, and smoke-test the backend with
+6. Configure host secrets, reset the synthetic demo tenant through GitHub
+   Actions, and smoke-test the backend with
    `scripts/smoke_v13.py`.
-6. Add the TechSync Ops card/case study to the portfolio.
-7. Connect the live TechSync Ops URL once the portfolio landing page is up.
+7. Add the TechSync Ops card/case study to the portfolio.
+8. Promote the live TechSync Ops URL once staged evidence is clean.
 
 ## Official References Checked
 

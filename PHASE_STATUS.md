@@ -74,6 +74,12 @@ Completed in the latest lane UX pass:
   ranks visible work by role, priority, status, approval, assignment, blocker,
   and proof state, then lets the user open the recommended work order or focus
   the matching queue loop.
+- Added a low-friction local testing harness so product walkthroughs no longer
+  require manually juggling two terminals, touching Neon, or retyping
+  environment variables: `LOCAL_TESTING.md`, `.local-demo.env.example`,
+  `docker-compose.local.yml`, `Start-TechSync-Demo.cmd`,
+  `Stop-TechSync-Demo.cmd`, `scripts/local_dev.ps1`, and
+  `scripts/local_stop.ps1`.
 
 Next product maturity targets:
 
@@ -188,8 +194,7 @@ Completed:
   role smoke. The next clean seed now expands this to 10 users, 3 clients, and
   3 vendors by adding no-work viewer/vendor evidence personas.
 - Cleared `DATABASE_URL` from the local PowerShell session after migration.
-- Selected Vercel as the eventual backend host for portfolio alignment, now
-  deferred to the end of v1.3.
+- Selected Vercel as the hosted staging path for portfolio alignment.
 - Added Vercel deployment prep files: `api/index.py`, root `requirements.txt`,
   `.python-version`, `vercel.json`, and `VERCEL_DEPLOYMENT.md`.
 - Updated the FastAPI metadata and health service name to TechSync Ops.
@@ -208,12 +213,12 @@ Completed:
 
 Next:
 
-- Keep Vercel secrets/deployment work parked until the end-of-v1.3 showcase
-  gate.
-- Use the seeded Neon demo tenant for final role screenshots, small-width
-  checks, and manual accessibility notes before public hosting.
-- Run the hosted-style smoke scripts only after the final Vercel deployment
-  gate is intentionally opened.
+- Finish the Vercel/Neon staged testing setup with API/web projects, Vercel
+  environment variables, and GitHub reset secrets.
+- Use the staged URL and seeded Neon demo tenant for role walkthroughs,
+  small-width checks, manual accessibility notes, and faster UX feedback.
+- Promote the portfolio/public link only after the staged walkthrough and
+  hosted smoke evidence are clean.
 
 ### Phase 3 - v1.3 PMC Operations Foundation
 
@@ -425,35 +430,34 @@ Completed:
 
 Next:
 
-- Keep hosting deferred until every non-hosting requirement bucket is locally
-  as complete as practical.
+- Use hosted staging to speed up the remaining role-by-role product maturity
+  work while keeping synthetic data and demo-mode guardrails.
 - Continue the final local-only role-by-role UI/UX evidence pass: use the
   repaired `local-role-ux-manual-notes.json` to finish checklist, role, and
   viewport observations, verify 390px and 320px widths, record manual
   screen-reader notes, rebuild the evidence pack with summary JSON, run
   `scripts/pre_hosting_readiness.py --strict`, and complete screenshot safety
   review.
-- Continue maturing the role-specific experience before hosting: each account
+- Continue maturing the role-specific experience through hosted staging: each account
   now lands with a role badge, scope explanation, next move, and guardrail, and
   the next polish should make detail/form interactions feel equally guided.
-- Later, after the local product surface is complete, deploy only as the final
-  gate, manually verify the true hosted email/log invitation path, run
+- In hosted staging, manually verify the true hosted email/log invitation path, run
   `scripts/smoke_v13.py` against the hosted backend, and capture
   `V13_EVIDENCE_TEMPLATE.md`. The synthetic invite accept plus accepted-client
   approval path can now be proven locally first with the optional
   `--invite-database-url` flag.
-- Decide the demo surface only after the v1.3 product workflows are robust
-  enough to show.
+- Use Expo web on Vercel as the staged demo surface, then decide when it is
+  robust enough to promote from the portfolio.
 
 ### Phase 4 - Hosted Client or Demo Surface
 
-Status: not started
+Status: in progress
 
 Next:
 
-- Decide whether public demo is Expo web, hosted app preview, screenshots,
-  recorded walkthrough, or a lightweight portfolio wrapper.
-- Configure `EXPO_PUBLIC_API_BASE_URL`.
+- Deploy the Vercel API project from the repo root.
+- Deploy the Vercel web project from `client`.
+- Configure `EXPO_PUBLIC_API_BASE_URL` to the staged API URL.
 - Validate synthetic demo flow against hosted backend.
 
 ### Phase 5 - Portfolio Integration
@@ -494,14 +498,12 @@ Stop when:
 
 ## Current Recommended Next Move
 
-Continue the local-only v1.3 evidence pass and leave hosting as the absolute
-final gate. The 21 role screenshot filenames are now present locally, Expo web
-logout is fixed for role switching, role landing locates the active user, and
-work-order detail/form screens now explain scope, current action, guardrails,
-handoff ownership, visible audiences, and linked/manual context before the user
-mutates work. Capture prep now repairs stale manual-note files and the local
-screenshot inventory is complete at 21/21. The best next move is to finish
-`local-role-ux-manual-notes.json`, check 390px/320px layout comfort, record
-manual screen-reader notes, rebuild the evidence summary, and run the strict
-pre-hosting readiness doctor. Only after those non-hosting requirements are
-complete should the Vercel/portfolio showcase sequence resume.
+Continue the hosted staging setup so TechSync Ops can be tested from a real
+URL instead of manual local terminals. The 21 role screenshot filenames are
+present locally, Expo web logout is fixed for role switching, role landing
+locates the active user, and work-order detail/form screens explain scope,
+current action, guardrails, handoff ownership, visible audiences, and
+linked/manual context before mutation. Next: create the Vercel API and web
+projects, configure Vercel/GitHub secrets, reset the synthetic Neon demo tenant
+through GitHub Actions, run hosted smoke evidence, then use the live staged URL
+for faster role UX maturity before portfolio promotion.

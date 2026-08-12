@@ -50,6 +50,12 @@ before a reseed. The latest local capture-prep run proved the Neon-backed API
 through all six synthetic roles with 67 passing smoke checks; the remaining
 evidence work is the manual 21-screenshot, small-width, and screen-reader pass.
 
+For faster product review, `HOSTED_TESTING.md` now defines the live staging
+loop: Vercel API + Vercel Expo web + Neon demo data + a GitHub Actions reset
+workflow. Use that loop when local terminal setup is slowing down UX testing;
+keep portfolio/public promotion gated by hosted smoke evidence and synthetic
+role walkthrough quality.
+
 ## Overview
 
 TechSync Ops ingests maintenance work orders from CSV and webhook sources,
@@ -131,6 +137,12 @@ Two enforcement layers:
 
 ### Backend Setup
 
+For the lowest-friction local walkthrough, use `LOCAL_TESTING.md` instead of
+manually juggling terminals or cloud credentials. The default launcher uses a
+local Docker Postgres database, generates ignored local-only env values, runs
+migrations and synthetic seed data, starts FastAPI and Expo web, opens the
+browser, and writes logs under ignored `.local-dev/`.
+
 ```bash
 cd server
 pip install -r requirements.txt
@@ -160,8 +172,8 @@ EMAIL_DELIVERY_METHOD=log
 EMAIL_FROM=TechSync <no-reply@yourdomain.com>
 ```
 
-For the first hosted investor POC, start from `server/.env.demo.example`
-instead. `APP_ENV=demo` still requires hosted HTTPS URLs, a real `DATABASE_URL`,
+For hosted staging, use `HOSTED_TESTING.md` and `server/.env.demo.example`.
+`APP_ENV=demo` still requires hosted HTTPS URLs, a real `DATABASE_URL`,
 `JWT_SECRET_KEY`, and locked-down `CORS_ORIGINS`, but it intentionally permits
 SMTP email, Cloudflare R2/S3 attachment storage, and Stripe keys to stay empty.
 Use `APP_ENV=production` only after SMTP and object storage are configured.
@@ -224,6 +236,12 @@ developed in — the Dockerfile follows standard, well-tested patterns but
 verify the build in your own environment before relying on it.)
 
 ### Mobile App Setup
+
+For product walkthroughs with local Postgres, use the dedicated local launcher:
+
+```powershell
+.\Start-TechSync-Demo.cmd
+```
 
 ```bash
 cd client
@@ -427,6 +445,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
 - Local Expo web note: Expo 50 on Node 24 can hit a Windows Metro external path
   issue involving `node:sea`; use Node 20 LTS for the durable local-web setup
   until Expo is upgraded.
+- Hosted staging note: use `HOSTED_TESTING.md` for the lower-friction live URL
+  loop. It avoids repeated local Neon secret injection by keeping API secrets
+  in Vercel and demo reset secrets in GitHub Actions.
 
 ## License
 

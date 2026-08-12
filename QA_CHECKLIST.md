@@ -41,8 +41,7 @@ they have been verified in the relevant environment.
 - [x] Email/storage deferral tradeoffs documented.
 - [x] Code-supported `APP_ENV=demo` hosted POC mode added.
 - [x] Eventual backend host chosen: Vercel.
-- [x] Vercel deployment adapter and runbook added, with deployment deferred to
-      the end of v1.3.
+- [x] Vercel API/web staging runbook added for fast live testing.
 - [x] Repeatable v1.2 hosted smoke-test script added.
 - [x] Repeatable v1.3 hosted smoke-test script added.
 - [x] Repeatable synthetic demo seed/reset script added.
@@ -56,7 +55,8 @@ they have been verified in the relevant environment.
 - [x] Pooled Neon connection string selected for hosted/serverless runtime.
 - [x] Demo-mode vs full `APP_ENV=production` decision made for the first hosted
       POC.
-- [ ] Host secret manager configured at the end-of-v1.3 showcase gate.
+- [ ] Vercel API/web project environment variables configured.
+- [ ] GitHub hosted demo reset secrets configured.
 - [x] Initial Alembic migration run against hosted/demo database.
 - [x] Latest v1.3 Alembic migrations verified against hosted/demo database.
 - [x] Synthetic demo tenant seeded or reset against hosted/demo database.
@@ -131,8 +131,7 @@ they have been verified in the relevant environment.
 
 - [ ] Demo surface chosen: Expo web, hosted preview, screenshots, recording, or
       portfolio wrapper.
-- [ ] `EXPO_PUBLIC_API_BASE_URL` points to hosted backend in demo mode after
-      the end-of-v1.3 hosting gate.
+- [ ] `EXPO_PUBLIC_API_BASE_URL` points to the staged hosted API in demo mode.
 - [ ] Synthetic demo walkthrough validated.
 - [ ] Synthetic demo seed/reset run captured without exposing database URLs or
       provider secrets.
@@ -250,6 +249,10 @@ they have been verified in the relevant environment.
 - [x] Work-order home queues now include a tested role-aware next-best-action
       tool with real controls to open the recommended work order or focus the
       matching queue loop.
+- [x] Local role walkthrough startup friction is reduced with a local Docker
+      Postgres demo database, generated ignored `.local-demo.env`,
+      double-click start/stop launchers, and `LOCAL_TESTING.md`; Neon is now an
+      optional cloud test mode, not the default local testing loop.
 - [x] Role-lane UX contract added in code/docs, with home queue lane maps and
       detail-page `Can Do` / `Not In This Lane` boundaries for all six roles.
 - [x] Client, viewer, and vendor home queues now include portal summaries for
@@ -261,7 +264,8 @@ they have been verified in the relevant environment.
       inventory reports all 21 expected images present.
 - [x] Synthetic empty-state display names use no-work personas while preserving
       stable `quiet-*` login emails for repeatable role proof.
-- [ ] Exhaustive role-by-role UI/UX friction sweep completed before hosting.
+- [ ] Exhaustive role-by-role UI/UX friction sweep completed before portfolio
+      promotion.
 - [x] `scripts/smoke_role_ux.py` run against a local/demo API and sanitized
       `role-ux-smoke-evidence.json` reviewed.
 - [ ] Role Evidence screen opened locally as a manager and used to drive the
@@ -283,8 +287,8 @@ they have been verified in the relevant environment.
 - [x] Problem statement drafted.
 - [x] Architecture/proof summary drafted.
 - [ ] GitHub repo linked.
-- [ ] Hosted demo or walkthrough linked after v1.3 workflows are robust enough
-      to show.
+- [ ] Hosted staging URL linked publicly only after staged smoke and role
+      walkthrough evidence are clean.
 - [ ] POC status label added.
 - [ ] Production limitations listed honestly.
 

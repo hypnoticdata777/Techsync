@@ -82,7 +82,7 @@ Deferred from v1.2:
 - Full client/homeowner portal
 - Closeout PDF packages
 - Deep accounting integrations
-- Public Vercel/portfolio linking
+- Public portfolio promotion of the staged Vercel URL
 
 v1.2 exit criteria:
 
@@ -91,8 +91,8 @@ v1.2 exit criteria:
 - All 10 requirement batches are captured.
 - Requirement coverage is mapped in `TECHSYNC_OPS_TRACEABILITY.md`.
 - Neon migration is at `0001 (head)` or later.
-- Hosting adapter and runbook exist, but deployment remains deferred until the
-  end of v1.3.
+- Hosting adapter and runbook exist, and the staged Vercel loop is allowed for
+  live synthetic testing.
 - Demo uses synthetic data only.
 - Portfolio page or case-study shell exists.
 - Evidence screenshots/notes are captured.
@@ -105,7 +105,7 @@ Goal:
 TechSync Ops moves from a strong POC foundation into a more complete PMC
 operations prototype with first-class property/client/vendor context,
 client-facing visibility, closeout proof, stronger operational reporting, and a
-final Vercel/portfolio showcase gate.
+live Vercel/Neon staging loop before portfolio promotion.
 
 Primary audience:
 
@@ -279,6 +279,10 @@ Likely scope:
     next-best-action tool that ranks visible work by role, priority, status,
     approval, assignment, blocker, and proof state, then lets users open the
     recommended work order or focus the matching queue loop
+  - local role walkthrough startup is now simplified with `LOCAL_TESTING.md`,
+    local Docker Postgres, generated ignored `.local-demo.env`, double-click
+    start/stop launchers, and optional Neon mode only when cloud testing is
+    intentional
   - work-order create/edit now gives linked/manual context guidance before save
     so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while
@@ -286,17 +290,18 @@ Likely scope:
   - role-aware navigator gating now started for manager-only mobile screens
   - accessibility labels/hints now started for role dashboards, work-order
     cards, forms, dispatch chips, approval controls, and lifecycle actions
-- End-of-v1.3 showcase gate:
-  - Vercel backend deployed behind HTTPS
+- Hosted staging and showcase gate:
+  - Vercel API deployed behind HTTPS
+  - Vercel web client deployed with `EXPO_PUBLIC_API_BASE_URL`
   - `APP_ENV=demo` configured in Vercel
   - CORS locked to the intended portfolio/demo origins
   - hosted smoke-test evidence captured
   - v1.3 smoke evidence captured with `scripts/smoke_v13.py` and
     `V13_EVIDENCE_TEMPLATE.md`
   - DB-assisted synthetic invite acceptance and accepted-client approval smoke
-    proof available locally before hosting, without writing raw invite tokens,
+    proof available with synthetic data, without writing raw invite tokens,
     bearer tokens, passwords, or database URLs to evidence artifacts
-  - portfolio sliver/showcase link connected only after the portfolio is live
+  - portfolio sliver/showcase link promoted only after hosted staging is clean
 
 v1.3 exit criteria:
 
@@ -324,12 +329,12 @@ v1.3 exit criteria:
   lanes, workload utilization, and SLA risk.
 - Manual work-order creation warns coordinators about likely duplicates before
   creating another active/recent job.
-- Vercel hosting and portfolio linking are completed as the final showcase step,
-  not before the product feels robust enough to show.
+- Vercel staging is available for live testing; portfolio linking is promoted
+  only after the staged walkthrough feels robust enough to show.
 - Documentation explains which v1.3 features are prototype-ready versus still
   deferred.
-- Role-specific UX sweep evidence is started locally, with final screenshots
-  and walkthrough evidence still required before hosting; manager-only route
+- Role-specific UX sweep evidence is started, with final screenshots
+  and walkthrough evidence still required before public promotion; manager-only route
   gating is now covered by client tests, and primary mobile API failure states
   now expose retry actions. Backend role-scope regressions now cover
   client/viewer unrelated-work blocking, linked-vendor scope, vendor-visible
@@ -343,7 +348,7 @@ v1.3 exit criteria:
   the app. A local role UX smoke script and `ROLE_UX_CAPTURE_PASS.md` now
   prepare the final synthetic role run, small-width/mobile comfort proof, and
   manual screen-reader notes. A local evidence-pack builder now summarizes
-  smoke JSON plus screenshot inventory before the public showcase gate. Role
+  smoke JSON plus screenshot inventory before public promotion. Role
   landing now orients each user with role, scope, next-step, and guardrail
   guidance before they interact with the queue, and work-order detail/form
   screens now carry the same role-aware guidance into approval, messaging,
@@ -353,8 +358,8 @@ v1.3 exit criteria:
   for the final screen-reader pass.
 - Hosted evidence shows the v1.3 API surface passes with synthetic data. The
   client invite/accept/accepted-client approval path can now be proven locally
-  with a DB-assisted synthetic invitation before hosting, while the true hosted
-  email/log path remains a final deployment-gate manual check.
+  with a DB-assisted synthetic invitation; the true hosted email/log path
+  remains a staged deployment manual check.
 
 ## Beyond v1.3
 

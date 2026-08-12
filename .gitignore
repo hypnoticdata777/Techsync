@@ -33,6 +33,7 @@ yarn-error.log*
 *.mobileprovision
 *.orig.*
 web-build/
+client/dist/
 
 # iOS
 ios/Pods/
@@ -80,6 +81,10 @@ gitleaks*.json
 tools/gitleaks*/
 
 # Local hosted-smoke evidence artifacts
+.local-dev/
+.local-dev.env
+.local-demo.env
+.local-neon.env
 v12-smoke-evidence*.json
 v13-smoke-evidence*.json
 role-ux-smoke-evidence*.json

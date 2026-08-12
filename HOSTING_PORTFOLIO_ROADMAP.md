@@ -32,7 +32,7 @@ Product roadmap:
 Current recommendation:
 
 ```text
-Neon Postgres + Vercel FastAPI + Cloudflare DNS/portfolio/R2 later
+Neon Postgres + Vercel API/Web staging + Cloudflare DNS/portfolio/R2 later
 ```
 
 Rationale:
@@ -41,7 +41,7 @@ Rationale:
   connection string for serverless-style hosting.
 - Cloudflare is the best fit for DNS, the portfolio front door, and later R2
   attachment storage.
-- Vercel is selected for the end-of-v1.3 showcase because the portfolio is
+- Vercel is selected for the active staged demo loop because the portfolio is
   expected to land there too. Its Python runtime is beta, so the hosted API must
   be smoke-tested carefully before the portfolio promotes the live link.
 - Render or Railway are lower-friction traditional FastAPI service options if
@@ -78,7 +78,7 @@ Email candidates:
 
 Current decision:
 
-- Backend host selected for the end-of-v1.3 showcase: Vercel.
+- Backend/web staging host selected: Vercel.
 - First hosted POC uses `APP_ENV=demo`; full `APP_ENV=production` waits until
   SMTP and object storage are configured.
 - Whether attachment upload is part of the first hosted POC, or deferred.
@@ -110,8 +110,8 @@ Tasks:
 - Run Alembic migrations. Completed against Neon; `alembic current` reported
   `0001 (head)` during the first pass. Latest v1.3 migrations now need
   hosted/demo verification through `0006 (head)`.
-- Keep actual Vercel deployment deferred until the v1.3 product workflows are
-  robust enough to show.
+- Use Vercel staging now for faster live testing, but keep portfolio/public
+  promotion gated by smoke evidence and role walkthrough quality.
 
 Exit criteria:
 
@@ -146,8 +146,8 @@ Exit criteria:
 
 - The product tells a stronger PMC operations story before any public live link.
 - Demo data can show property/client/vendor workflows without manual narration.
-- Hosting remains deferred until the non-hosting requirement buckets and the
-  UI/UX friction sweep are complete.
+- Staged hosting can be used during UI/UX maturity. Portfolio promotion waits
+  until the staged walkthrough is clean enough to show.
 
 ## Phase 4 - Demo Surface
 
@@ -159,7 +159,7 @@ Tasks:
   - screenshot walkthrough
   - short recording
   - portfolio wrapper
-- Point demo client to hosted backend after the end-of-v1.3 hosting gate.
+- Point demo client to hosted backend through `EXPO_PUBLIC_API_BASE_URL`.
 - Use synthetic organization, users, technicians, work orders, and attachments.
 - Seed/reset the synthetic demo tenant before final screenshots or walkthrough
   recording.
@@ -209,10 +209,10 @@ Exit criteria:
 Tasks:
 
 - Capture GitHub Actions CI status.
-- Capture hosted `/health` result after the end-of-v1.3 deploy.
+- Capture hosted `/health` result after each staged deploy.
 - Capture synthetic demo seed/reset status output after hosted/demo database
   migration.
-- Capture `scripts/smoke_v13.py` result after the end-of-v1.3 deploy.
+- Capture `scripts/smoke_v13.py` result against the staged API.
 - Capture screenshots of:
   - onboarding;
   - login;

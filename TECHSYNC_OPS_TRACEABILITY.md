@@ -21,8 +21,8 @@ All 10 requirement batches are captured. v1.2 proves the tenant-safe
 intake/dispatch/technician workflow, demo database path, and documentation
 backbone with synthetic data. v1.3 now carries the deeper PMC-specific
 operations model: properties, clients, vendors, approvals, communication
-separation, closeout proof, stronger reporting, role-lane UX, and a later
-public showcase path.
+separation, closeout proof, stronger reporting, role-lane UX, and an active
+hosted staging path before public portfolio promotion.
 
 ## Batch-Level Traceability
 
@@ -44,15 +44,16 @@ public showcase path.
 - Repo is clean, pushed, and CI passes.
 - Public docs consistently use TechSync Ops positioning.
 - All 10 requirement batches are captured and traceable.
-- Vercel adapter and deployment runbook are ready but hosting is intentionally
-  deferred until the end of v1.3.
+- Vercel API/web staging runbooks are ready so hosted testing can begin with
+  synthetic data before portfolio promotion.
 - Neon migration is verified against the demo database.
 - Sanitized evidence is captured with `V12_EVIDENCE_TEMPLATE.md`.
 - Portfolio case-study source exists in `PORTFOLIO_TECHSYNC_OPS.md`.
 - Synthetic demo seed/reset tooling exists in `scripts/seed_demo_data.py` and
   `DEMO_DATA_RUNBOOK.md`.
-- Portfolio public page or shell is prepared with POC status and limitations,
-  but no hard public demo link is required until the v1.3 showcase gate.
+- Portfolio public page or shell is prepared with POC status and limitations;
+  the hard public demo link is promoted only after staged smoke evidence is
+  clean.
 
 ## v1.2 Explicit Non-Goals
 
@@ -109,8 +110,12 @@ v1.3 should focus on the highest-value PMC product gaps:
 13. Operable role UX maturity so guidance becomes clickable tooling, starting
    with a tested next-best-action queue engine that picks a specific visible
    work order and lets each role open it or focus the relevant queue loop.
-14. Later Vercel deployment, hosted smoke evidence, and portfolio sliver link
-   only after the product feels robust enough to show.
+14. Low-friction local product testing so walkthrough evidence can be gathered
+   with a local Docker Postgres demo database and double-click start/stop
+   launchers, without repeatedly injecting secrets or juggling manual terminal
+   steps.
+15. Active Vercel staging loop, hosted smoke evidence, and portfolio sliver
+   promotion only after the staged walkthrough is robust enough to show.
 
 ## Confidence Statement
 
