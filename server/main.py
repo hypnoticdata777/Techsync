@@ -57,6 +57,17 @@ def health_check():
     return {"status": "ok", "service": "techsync-ops-api"}
 
 
+@app.get("/")
+def root_check():
+    return {
+        "status": "ok",
+        "service": "techsync-ops-api",
+        "health": "/health",
+        "docs": "/docs",
+        "openapi": "/openapi.json",
+    }
+
+
 app.include_router(auth.router)
 app.include_router(organizations.router)
 app.include_router(invitations.router)

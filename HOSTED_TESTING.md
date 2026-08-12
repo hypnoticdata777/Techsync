@@ -84,7 +84,11 @@ After the API deploys:
 
 ```powershell
 Invoke-RestMethod "https://<api-project-url>/health"
+Invoke-RestMethod "https://<api-project-url>/openapi.json"
 ```
+
+Then open `https://<api-project-url>/docs` in the browser. A `404` at `/` is no
+longer expected; the root should return API route pointers.
 
 Then run:
 

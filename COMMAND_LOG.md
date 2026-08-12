@@ -3218,3 +3218,39 @@ Result:
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - Vercel API Path Adapter Fix
+
+Decision:
+
+- The API deployed successfully, but `/`, `/docs`, and other public paths
+  returned FastAPI `404` because the Vercel rewrite reached the function
+  without preserving the expected FastAPI route path.
+- Route Vercel requests through `api/index.py/$1` and strip the function prefix
+  in the ASGI entrypoint before handing requests to the existing app.
+
+Changes:
+
+- Updated `vercel.json` to preserve the original path segment in the function
+  destination.
+- Added a small Vercel path adapter in `api/index.py`.
+- Added a root API route that points testers to `/health`, `/docs`, and
+  `/openapi.json`.
+- Added a dependency-free ASGI test covering Vercel-prefixed root, health,
+  docs, and OpenAPI routes.
+- Updated hosted testing and Vercel runbooks with the live route checks.
+
+Verification:
+
+```powershell
+server\venv\Scripts\python.exe -m pytest server\tests\test_vercel_entrypoint.py -p no:cacheprovider
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+```
+
+Result:
+
+- Focused Vercel entrypoint test passed: `1 passed`.
+- Full backend tests passed: `189 passed`.
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.

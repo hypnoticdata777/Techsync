@@ -26,10 +26,14 @@ Important Vercel notes:
 - Runtime dependencies are installed from root-level dependency files, so this
   repo has a root `requirements.txt` with the backend runtime dependencies
   expanded directly for Vercel's Python dependency parser.
+- Requests are rewritten through `api/index.py/$1`; the entrypoint strips that
+  Vercel function prefix before handing paths to FastAPI so `/health`, `/docs`,
+  and `/openapi.json` keep their expected public URLs.
 
 ## Files Added For Vercel
 
-- `api/index.py` exposes the existing FastAPI app to Vercel.
+- `api/index.py` exposes the existing FastAPI app to Vercel and adapts Vercel
+  function-prefixed paths back to normal FastAPI routes.
 - `requirements.txt` mirrors backend runtime dependencies directly for Vercel.
 - `.python-version` pins the Vercel Python runtime to `3.12`.
 - `vercel.json` rewrites all requests to the FastAPI entrypoint and excludes
@@ -137,12 +141,19 @@ Replace `<api-project-url>` with the Vercel API deployment URL:
 
 ```powershell
 Invoke-RestMethod "https://<api-project-url>/health"
+Invoke-RestMethod "https://<api-project-url>/openapi.json"
 ```
 
 Expected:
 
 ```json
 {"status":"ok","service":"techsync-ops-api"}
+```
+
+The API docs should also load in a browser:
+
+```text
+https://<api-project-url>/docs
 ```
 
 Then verify:
