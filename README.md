@@ -22,8 +22,11 @@ intake, assignment, approval, proof, read-only review, and vendor delivery; the
 same operating loops can now be tapped as queue focus filters so each user can
 shrink the list to the work that needs their lane next.
 Detail pages carry that forward with approval, communication, proof, and
-lifecycle action-path cues that jump to the matching work sections, plus event playbook guidance for recurring
-approval, proof, escalation, vendor, closeout, and read-only snapshot states.
+lifecycle action-path cues that jump to the matching work sections. Each of
+those sections now opens with role-aware readiness guidance so unavailable
+controls explain their prerequisite instead of feeling broken, plus event
+playbook guidance for recurring approval, proof, escalation, vendor, closeout,
+and read-only snapshot states.
 Successful detail actions now show outcome notices so message sends, approval
 requests/decisions, proof uploads, and lifecycle transitions confirm what
 changed. The walkthrough manifest now has a tested

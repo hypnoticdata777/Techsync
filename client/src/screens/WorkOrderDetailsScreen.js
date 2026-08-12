@@ -24,6 +24,7 @@ import {
   buildRoleBoundaryRows,
   buildDetailActionPathRows,
   buildDetailGuidanceRows,
+  buildDetailSectionReadinessRows,
   buildDetailSummary,
   buildRoleEventPlaybookRows,
   buildWorkOrderFlowRows,
@@ -169,6 +170,30 @@ const getSummaryToneColor = tone => {
   }
 };
 
+const SectionReadiness = ({row}) => {
+  if (!row) return null;
+
+  return (
+    <View
+      style={[
+        styles.sectionReadiness,
+        {borderLeftColor: getSummaryToneColor(row.tone)},
+      ]}
+      accessible
+      accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
+      <Text style={styles.sectionReadinessLabel}>{row.label}</Text>
+      <Text
+        style={[
+          styles.sectionReadinessValue,
+          {color: getSummaryToneColor(row.tone)},
+        ]}>
+        {row.value}
+      </Text>
+      <Text style={styles.sectionReadinessDetail}>{row.detail}</Text>
+    </View>
+  );
+};
+
 function WorkOrderDetailsScreen({route, navigation}) {
   const {user, authFetch} = useAuth();
   const [workOrder, setWorkOrder] = useState(route.params.workOrder);
@@ -238,6 +263,39 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const detailActionPathRows = useMemo(
     () =>
       buildDetailActionPathRows(
+        user?.role,
+        workOrder,
+        {
+          canEdit,
+          canUpdateStatus,
+          canUploadAttachments,
+          canSendMessages,
+          canRequestApproval,
+          canDecideApproval,
+          nextStatusCount: nextStatuses.length,
+        },
+        {
+          attachmentCount: attachments.length,
+          messageCount: messages.length,
+        },
+      ),
+    [
+      attachments.length,
+      canDecideApproval,
+      canEdit,
+      canRequestApproval,
+      canSendMessages,
+      canUpdateStatus,
+      canUploadAttachments,
+      messages.length,
+      nextStatuses.length,
+      user?.role,
+      workOrder,
+    ],
+  );
+  const detailSectionReadinessRows = useMemo(
+    () =>
+      buildDetailSectionReadinessRows(
         user?.role,
         workOrder,
         {
@@ -749,7 +807,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
           </View>
         </View>
 
-        <View style={styles.section} onLayout={event => handleSectionLayout('approval', event)}>
+        <View style={styles.section}>
           <Text style={styles.label}>Status</Text>
           <View style={styles.statusBadge}>
             <Text style={[styles.statusText, {color: getStatusColor(workOrder.status)}]}>
@@ -786,13 +844,14 @@ function WorkOrderDetailsScreen({route, navigation}) {
           </View>
         ) : null}
 
-        <View style={styles.section} onLayout={event => handleSectionLayout('communication', event)}>
+        <View style={styles.section}>
           <Text style={styles.label}>Work Order ID</Text>
           <Text style={styles.metaText}>#{workOrder.id}</Text>
         </View>
 
-        <View style={styles.section} onLayout={event => handleSectionLayout('proof', event)}>
+        <View style={styles.section} onLayout={event => handleSectionLayout('approval', event)}>
           <Text style={styles.label}>Client Approval</Text>
+          <SectionReadiness row={detailSectionReadinessRows.approval} />
           <View style={styles.approvalPanel}>
             <Text
               style={[
@@ -864,11 +923,12 @@ function WorkOrderDetailsScreen({route, navigation}) {
           </View>
         </View>
 
-        <View style={styles.section}>
+        <View style={styles.section} onLayout={event => handleSectionLayout('communication', event)}>
           <View style={styles.rowHeader}>
             <Text style={styles.label}>Communication</Text>
             {messagesLoading ? <ActivityIndicator color="#38bdf8" size="small" /> : null}
           </View>
+          <SectionReadiness row={detailSectionReadinessRows.communication} />
 
           <View
             style={styles.communicationNotice}
@@ -999,11 +1059,12 @@ function WorkOrderDetailsScreen({route, navigation}) {
           ))}
         </View>
 
-        <View style={styles.section}>
+        <View style={styles.section} onLayout={event => handleSectionLayout('proof', event)}>
           <View style={styles.rowHeader}>
             <Text style={styles.label}>Attachments</Text>
             {attachmentsLoading ? <ActivityIndicator color="#38bdf8" size="small" /> : null}
           </View>
+          <SectionReadiness row={detailSectionReadinessRows.proof} />
 
           {canUploadAttachments ? (
             <View style={styles.attachmentActions}>
@@ -1090,6 +1151,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
         )}
 
         <View style={styles.actions} onLayout={event => handleSectionLayout('lifecycle', event)}>
+          <SectionReadiness row={detailSectionReadinessRows.lifecycle} />
           {canEdit && (
             <TouchableOpacity
               style={[styles.editButton, updating && styles.buttonDisabled]}
@@ -1499,6 +1561,31 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     marginTop: 8,
+  },
+  sectionReadiness: {
+    backgroundColor: '#07111f',
+    borderLeftWidth: 3,
+    borderRadius: 8,
+    marginBottom: 10,
+    paddingHorizontal: 11,
+    paddingVertical: 10,
+  },
+  sectionReadinessLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  sectionReadinessValue: {
+    fontSize: 14,
+    fontWeight: '900',
+    marginTop: 4,
+  },
+  sectionReadinessDetail: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 3,
   },
   approvalInput: {
     backgroundColor: '#0f172a',

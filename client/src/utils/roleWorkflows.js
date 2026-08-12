@@ -1790,6 +1790,176 @@ export const buildDetailActionPathRows = (
   return [approvalRow, communicationRow, proofRow, lifecycleRow];
 };
 
+export const buildDetailSectionReadinessRows = (
+  role,
+  workOrder = {},
+  capability = {},
+  context = {},
+) => {
+  const attachmentCount = context.attachmentCount || 0;
+  const messageCount = context.messageCount || 0;
+  const proofSatisfied = hasCompletionProof(workOrder);
+  const approvalStatus = workOrder.client_approval_status || 'not_required';
+  const status = (workOrder.status || 'open').replace('_', ' ');
+
+  const approval = (() => {
+    if (capability.canDecideApproval) {
+      return {
+        key: 'approval-readiness',
+        label: 'Approval Readiness',
+        value: 'Decision available',
+        detail: 'Review visible status, client notes, communication, and proof context before approving or declining.',
+        tone: 'pending',
+      };
+    }
+    if (approvalStatus === 'pending') {
+      return {
+        key: 'approval-readiness',
+        label: 'Approval Readiness',
+        value: role === 'client' ? 'Waiting on you' : 'Waiting on client',
+        detail: 'The request is already open; keep follow-up messages in the client-visible lane.',
+        tone: 'pending',
+      };
+    }
+    if (['approved', 'declined'].includes(approvalStatus)) {
+      return {
+        key: 'approval-readiness',
+        label: 'Approval Readiness',
+        value: approvalStatus === 'approved' ? 'Approved' : 'Declined',
+        detail: 'The client decision is recorded, so operations can continue from the current work state.',
+        tone: approvalStatus,
+      };
+    }
+    if (capability.canRequestApproval) {
+      return {
+        key: 'approval-readiness',
+        label: 'Approval Readiness',
+        value: 'Request available',
+        detail: 'Use this when the linked client needs to make a visible decision before work continues.',
+        tone: 'active',
+      };
+    }
+    if (capability.canEdit && !hasLinkedClient(workOrder)) {
+      return {
+        key: 'approval-readiness',
+        label: 'Approval Readiness',
+        value: 'Client not linked',
+        detail: 'Link a client before requesting approval; otherwise this record stays internal-only for decisions.',
+        tone: 'missing',
+      };
+    }
+    return {
+      key: 'approval-readiness',
+      label: 'Approval Readiness',
+      value: 'No approval action',
+      detail: 'This role can monitor the approval state without opening or deciding a request.',
+      tone: 'default',
+    };
+  })();
+
+  const communication = (() => {
+    if (role === 'viewer') {
+      return {
+        key: 'communication-readiness',
+        label: 'Communication Readiness',
+        value: 'Read-only review',
+        detail: `${messageCount} visible message${messageCount === 1 ? '' : 's'} can be reviewed; replies are disabled for this lane.`,
+        tone: 'default',
+      };
+    }
+    if (role === 'vendor') {
+      return {
+        key: 'communication-readiness',
+        label: 'Communication Readiness',
+        value: 'Vendor lane ready',
+        detail: 'Replies go to vendor-visible communication only; client and internal notes remain separate.',
+        tone: 'active',
+      };
+    }
+    if (role === 'client') {
+      return {
+        key: 'communication-readiness',
+        label: 'Communication Readiness',
+        value: 'Client lane ready',
+        detail: 'Replies go to operations as client-visible updates without exposing internal or vendor-only context.',
+        tone: 'active',
+      };
+    }
+    if (capability.canSendMessages) {
+      return {
+        key: 'communication-readiness',
+        label: 'Communication Readiness',
+        value: 'Audience required',
+        detail: 'Choose internal, client, or vendor visibility before sending so the update lands in the right lane.',
+        tone: 'active',
+      };
+    }
+    return {
+      key: 'communication-readiness',
+      label: 'Communication Readiness',
+      value: 'Review only',
+      detail: `${messageCount} visible message${messageCount === 1 ? '' : 's'} can be reviewed by this role.`,
+      tone: 'default',
+    };
+  })();
+
+  const proof = (() => {
+    if (proofSatisfied) {
+      return {
+        key: 'proof-readiness',
+        label: 'Proof Readiness',
+        value: getProofSignal(workOrder),
+        detail: 'Closeout proof or manager override is already recorded for this work order.',
+        tone: 'verified',
+      };
+    }
+    if (attachmentCount > 0) {
+      return {
+        key: 'proof-readiness',
+        label: 'Proof Readiness',
+        value: `${attachmentCount} file${attachmentCount === 1 ? '' : 's'} ready`,
+        detail: 'Review uploaded evidence before completion, approval, or closeout movement.',
+        tone: 'active',
+      };
+    }
+    if (capability.canUploadAttachments) {
+      return {
+        key: 'proof-readiness',
+        label: 'Proof Readiness',
+        value: 'Upload needed',
+        detail: 'Capture photo evidence here before marking work complete when proof is required.',
+        tone: 'missing',
+      };
+    }
+    return {
+      key: 'proof-readiness',
+      label: 'Proof Readiness',
+      value: 'Proof not available yet',
+      detail: 'This lane can review proof once operations or field users attach it.',
+      tone: 'default',
+    };
+  })();
+
+  const lifecycle =
+    capability.canUpdateStatus && capability.nextStatusCount > 0
+      ? {
+          key: 'lifecycle-readiness',
+          label: 'Lifecycle Readiness',
+          value: `${capability.nextStatusCount} action${capability.nextStatusCount === 1 ? '' : 's'} available`,
+          detail: `Current status is ${status}; use status actions only when the real work state changes.`,
+          tone: workOrder.status || 'active',
+        }
+      : {
+          key: 'lifecycle-readiness',
+          label: 'Lifecycle Readiness',
+          value: 'Operations controlled',
+          detail: `Current status is ${status}; this role can monitor status without changing it.`,
+          tone: 'default',
+        };
+
+  return {approval, communication, proof, lifecycle};
+};
+
 export default {
   canManageOperations,
   getAvailableMainRoutes,
@@ -1810,6 +1980,7 @@ export default {
   buildRoleCardRows,
   buildRoleEventLaneRows,
   buildDetailActionPathRows,
+  buildDetailSectionReadinessRows,
   buildRoleEventPlaybookRows,
   buildActionOutcomeNotice,
   getRoleUserExperience,

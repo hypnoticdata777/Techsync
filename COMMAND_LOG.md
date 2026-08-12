@@ -2982,6 +2982,46 @@ Result:
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
 
+## 2026-08-12 - v1.3 Detail Section Readiness UX Pass
+
+Decision:
+
+- Reduce role confusion inside long work-order detail pages by explaining each
+  section's readiness before the user reaches approval, messaging, proof, or
+  lifecycle controls.
+- Fix the detail jump targets while adding readiness cues so top action-path
+  controls land in the section they name.
+
+Changes:
+
+- Added `buildDetailSectionReadinessRows` for role-aware approval,
+  communication, proof, and lifecycle readiness states.
+- Rendered compact readiness bands before client approval, communication,
+  attachment/proof, and lifecycle controls.
+- Covered client approval decisions, manager missing-client prerequisites,
+  technician proof needs, viewer read-only communication, and lifecycle action
+  availability in role workflow tests.
+- Updated README, roadmap, phase status, QA, requirements, traceability, and
+  role-lane docs so section-level readiness is part of the role UX contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `25 passed tests`.
+- Full client tests passed.
+- Backend tests passed.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.
+
 ## 2026-08-12 - v1.3 Detail Action Jump UX Pass
 
 Decision:

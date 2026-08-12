@@ -195,6 +195,9 @@ Likely scope:
     operating loop that needs their lane
   - detail action-path jump controls now started so approval, communication,
     proof, and lifecycle sections are reachable from the command panel
+  - detail section readiness cues now started so approval, communication,
+    proof, and lifecycle areas explain prerequisites, available actions,
+    read-only lanes, or already-satisfied states before controls
   - role UX evidence readiness audit now started for synthetic login coverage,
     screenshot plan uniqueness, safety guardrails, and role privacy/control
     expectations

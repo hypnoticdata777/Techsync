@@ -2,6 +2,7 @@ import {
   buildActionOutcomeNotice,
   buildDetailActionPathRows,
   buildDetailGuidanceRows,
+  buildDetailSectionReadinessRows,
   buildDetailSummary,
   buildRoleGuidanceRows,
   buildRoleBoundaryRows,
@@ -482,6 +483,66 @@ describe('role workflow helpers', () => {
         expect.objectContaining({label: 'Proof', value: 'Verified proof'}),
       ]),
     );
+  });
+
+  test('builds detail section readiness for role-specific prerequisites', () => {
+    const clientReadiness = buildDetailSectionReadinessRows(
+      'client',
+      {status: 'open', client_approval_status: 'pending'},
+      {canDecideApproval: true, canSendMessages: true, nextStatusCount: 0},
+      {attachmentCount: 0, messageCount: 2},
+    );
+    expect(clientReadiness.approval).toEqual(
+      expect.objectContaining({
+        label: 'Approval Readiness',
+        value: 'Decision available',
+        detail: expect.stringContaining('approving or declining'),
+      }),
+    );
+    expect(clientReadiness.communication.value).toBe('Client lane ready');
+    expect(clientReadiness.lifecycle.value).toBe('Operations controlled');
+
+    const managerReadiness = buildDetailSectionReadinessRows(
+      'coordinator',
+      {status: 'open', client_approval_status: 'not_required'},
+      {canEdit: true, canSendMessages: true, nextStatusCount: 2},
+      {attachmentCount: 0, messageCount: 0},
+    );
+    expect(managerReadiness.approval).toEqual(
+      expect.objectContaining({
+        value: 'Client not linked',
+        detail: expect.stringContaining('Link a client'),
+      }),
+    );
+    expect(managerReadiness.communication.value).toBe('Audience required');
+
+    const technicianReadiness = buildDetailSectionReadinessRows(
+      'technician',
+      {status: 'in_progress', client_approval_status: 'not_required'},
+      {canUpdateStatus: true, canUploadAttachments: true, canSendMessages: true, nextStatusCount: 3},
+      {attachmentCount: 0, messageCount: 0},
+    );
+    expect(technicianReadiness.proof).toEqual(
+      expect.objectContaining({
+        value: 'Upload needed',
+        tone: 'missing',
+      }),
+    );
+    expect(technicianReadiness.lifecycle.value).toBe('3 actions available');
+
+    const viewerReadiness = buildDetailSectionReadinessRows(
+      'viewer',
+      {status: 'completed', completion_proof_verified_at: '2026-08-01T00:00:00Z'},
+      {},
+      {attachmentCount: 1, messageCount: 1},
+    );
+    expect(viewerReadiness.communication).toEqual(
+      expect.objectContaining({
+        value: 'Read-only review',
+        detail: expect.stringContaining('replies are disabled'),
+      }),
+    );
+    expect(viewerReadiness.proof.value).toBe('Verified proof');
   });
 
   test('builds role event playbooks for repeated work-order events', () => {

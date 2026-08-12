@@ -231,6 +231,9 @@ they have been verified in the relevant environment.
       opens a work order.
 - [x] Detail action-path cues now jump to approval, communication, proof, and
       lifecycle sections so long work-order pages are easier to operate.
+- [x] Detail approval, communication, proof, and lifecycle sections now show
+      role-aware readiness cues before controls so prerequisites and read-only
+      boundaries are clear.
 - [x] Work-order detail pages now show role event playbook cues for repeated
       events such as approval requested, proof needed, vendor thread active,
       escalation, pause resolution, completed closeout, and read-only snapshot

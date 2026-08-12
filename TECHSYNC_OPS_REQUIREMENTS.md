@@ -269,6 +269,9 @@ Already represented in the codebase:
   opening a work order.
 - v1.3 detail action-path jump controls so long work-order detail pages move
   users directly to approval, communication, proof, or lifecycle sections.
+- v1.3 detail section readiness cues for approval, communication, proof, and
+  lifecycle so admin, coordinator, technician, client, viewer, and vendor
+  users understand prerequisites and lane boundaries before using controls.
 - v1.3 role event playbook cues for recurring work-order events such as
   approval requested, proof needed, vendor thread active, escalation raised,
   pause resolution, completed closeout, and read-only snapshot review, with
