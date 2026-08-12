@@ -67,6 +67,7 @@ TechSync Ops is one workflow with separated lanes:
 
 - Every home queue must show the user's lane, handoff partners, and success signal before the list.
 - Every home queue must also show queue-level event lanes so recurring loops like intake, risk, proof, approval, read-only review, and vendor delivery are visible before a user opens a job.
+- Queue-level event lanes should be actionable focus filters, not passive labels, so each role can narrow the visible list to the work that needs their lane next.
 - Every work-order queue card must explain why the item matters to the active role before the user opens it.
 - Every work-order detail page must show what the role can do and what is intentionally unavailable.
 - Empty states should still explain the lane, not just say there is no data.

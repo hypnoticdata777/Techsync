@@ -9,10 +9,12 @@ import {
   buildRoleEventLaneRows,
   buildRoleEventPlaybookRows,
   buildRoleLaneRows,
+  buildRoleQueueFilterRows,
   buildQueueSummary,
   buildWorkOrderFlowRows,
   canAccessMainRoute,
   canManageOperations,
+  filterWorkOrdersForRoleQueue,
   getAvailableMainRoutes,
   getDetailRoleContext,
   getRoleEmptyState,
@@ -307,6 +309,39 @@ describe('role workflow helpers', () => {
         }),
       ]),
     );
+  });
+
+  test('filters visible queues by role operating focus', () => {
+    const queue = [
+      {id: 1, status: 'open', client_approval_status: 'pending', client_id: 10},
+      {id: 2, status: 'open', client_approval_status: 'not_required'},
+      {id: 3, status: 'in_progress', assigned_technician_id: 12},
+      {id: 4, status: 'paused', assigned_technician_id: 12},
+      {id: 5, status: 'escalated', assigned_technician_id: 13},
+      {id: 6, status: 'completed', completion_proof_verified_at: '2026-08-12T00:00:00Z'},
+      {id: 7, status: 'completed'},
+    ];
+
+    expect(buildRoleQueueFilterRows('coordinator', queue)).toEqual([
+      expect.objectContaining({key: 'all', count: 7, value: '7 items'}),
+      expect.objectContaining({key: 'unassigned', count: 2, label: 'Assign'}),
+      expect.objectContaining({key: 'approvals', count: 1, label: 'Approvals'}),
+      expect.objectContaining({key: 'blockers', count: 2, label: 'Blockers'}),
+    ]);
+
+    expect(filterWorkOrdersForRoleQueue('org_admin', 'risk', queue).map(item => item.id))
+      .toEqual([1, 2, 4, 5, 7]);
+    expect(filterWorkOrdersForRoleQueue('coordinator', 'unassigned', queue).map(item => item.id))
+      .toEqual([1, 2]);
+    expect(filterWorkOrdersForRoleQueue('technician', 'proof', queue).map(item => item.id))
+      .toEqual([3, 7]);
+    expect(filterWorkOrdersForRoleQueue('client', 'proof', queue).map(item => item.id))
+      .toEqual([6, 7]);
+    expect(filterWorkOrdersForRoleQueue('viewer', 'watch', queue).map(item => item.id))
+      .toEqual([1, 2]);
+    expect(filterWorkOrdersForRoleQueue('vendor', 'blocked', queue).map(item => item.id))
+      .toEqual([4, 5]);
+    expect(filterWorkOrdersForRoleQueue('vendor', 'unknown', queue)).toBe(queue);
   });
 
   test('provides detail role context for clients with pending approval', () => {

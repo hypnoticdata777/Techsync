@@ -24,9 +24,11 @@ import {
   buildRoleGuidanceRows,
   buildRoleCardRows,
   buildRoleEventLaneRows,
+  buildRoleQueueFilterRows,
   buildRoleLaneRows,
   buildWorkOrderFlowRows,
   canManageOperations,
+  filterWorkOrdersForRoleQueue,
   getRoleAccessMessage,
   getRoleActions,
   getRoleEmptyState,
@@ -72,6 +74,7 @@ function WorkOrdersListScreen({navigation}) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const [activeQueueFilter, setActiveQueueFilter] = useState('all');
   const canManageWorkOrders = canManageOperations(user?.role);
 
   // RF-22: technicians see their assigned queue ordered by priority;
@@ -95,6 +98,24 @@ function WorkOrdersListScreen({navigation}) {
     () => buildRoleEventLaneRows(user?.role, workOrders),
     [user?.role, workOrders],
   );
+  const queueFilterRows = useMemo(
+    () => buildRoleQueueFilterRows(user?.role, workOrders),
+    [user?.role, workOrders],
+  );
+  const activeFilterRow = useMemo(
+    () => queueFilterRows.find(row => row.key === activeQueueFilter) || queueFilterRows[0],
+    [activeQueueFilter, queueFilterRows],
+  );
+  const visibleWorkOrders = useMemo(
+    () => filterWorkOrdersForRoleQueue(user?.role, activeQueueFilter, workOrders),
+    [activeQueueFilter, user?.role, workOrders],
+  );
+
+  useEffect(() => {
+    if (!queueFilterRows.some(row => row.key === activeQueueFilter)) {
+      setActiveQueueFilter('all');
+    }
+  }, [activeQueueFilter, queueFilterRows]);
 
   const fetchWorkOrders = useCallback(async () => {
     try {
@@ -323,6 +344,38 @@ function WorkOrdersListScreen({navigation}) {
           ))}
         </View>
 
+        <View style={styles.queueFilterPanel}>
+          <Text style={styles.queueFilterTitle}>Focus Queue</Text>
+          <Text style={styles.queueFilterHint}>{activeFilterRow?.detail}</Text>
+          <View style={styles.queueFilterRow}>
+            {queueFilterRows.map(row => {
+              const selected = row.key === activeQueueFilter;
+              return (
+                <TouchableOpacity
+                  key={row.key}
+                  style={[
+                    styles.queueFilterChip,
+                    selected && styles.queueFilterChipSelected,
+                    selected && {borderColor: getStatusColor(row.tone)},
+                  ]}
+                  onPress={() => setActiveQueueFilter(row.key)}
+                  accessibilityRole="button"
+                  accessibilityState={{selected}}
+                  accessibilityLabel={`${row.label} queue filter. ${row.value}. ${row.detail}`}>
+                  <Text
+                    style={[
+                      styles.queueFilterLabel,
+                      selected && {color: getStatusColor(row.tone)},
+                    ]}>
+                    {row.label}
+                  </Text>
+                  <Text style={styles.queueFilterCount}>{row.count}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
         {canManageWorkOrders && (
           <View style={styles.actionGrid}>
             {roleActions.map(action => (
@@ -375,18 +428,19 @@ function WorkOrdersListScreen({navigation}) {
       )}
       {!loading && !error && (
         <FlatList
-          data={workOrders}
+          data={visibleWorkOrders}
           keyExtractor={item => String(item.id)}
           renderItem={renderWorkOrder}
           ListEmptyComponent={
             <EmptyQueueState
               state={roleEmptyState}
+              filter={activeQueueFilter === 'all' ? null : activeFilterRow}
               onAction={roleEmptyState.actionRoute ? handleEmptyAction : null}
             />
           }
           contentContainerStyle={[
             styles.listContent,
-            workOrders.length === 0 && styles.emptyListContent,
+            visibleWorkOrders.length === 0 && styles.emptyListContent,
           ]}
           refreshControl={
             <RefreshControl
@@ -402,11 +456,17 @@ function WorkOrdersListScreen({navigation}) {
   );
 }
 
-const EmptyQueueState = ({state, onAction}) => (
+const EmptyQueueState = ({state, filter, onAction}) => (
   <View style={styles.emptyPanel}>
-    <Text style={styles.emptyTitle}>{state.title}</Text>
-    <Text style={styles.emptyMessage}>{state.message}</Text>
-    <Text style={styles.emptyDetail}>{state.detail}</Text>
+    <Text style={styles.emptyTitle}>
+      {filter ? `No ${filter.label.toLowerCase()} items` : state.title}
+    </Text>
+    <Text style={styles.emptyMessage}>
+      {filter
+        ? `${filter.detail} Switch back to All to see the full visible queue.`
+        : state.message}
+    </Text>
+    <Text style={styles.emptyDetail}>{filter ? state.detail : state.detail}</Text>
     {onAction ? (
       <TouchableOpacity
         style={styles.emptyActionButton}
@@ -609,6 +669,55 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 15,
     marginTop: 4,
+  },
+  queueFilterPanel: {
+    borderTopColor: '#1f2937',
+    borderTopWidth: 1,
+    marginBottom: 10,
+    paddingTop: 10,
+  },
+  queueFilterTitle: {
+    color: '#e5e7eb',
+    fontSize: 12,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  queueFilterHint: {
+    color: '#94a3b8',
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 3,
+  },
+  queueFilterRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+  },
+  queueFilterChip: {
+    alignItems: 'center',
+    backgroundColor: '#0f172a',
+    borderColor: '#243449',
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 7,
+    minHeight: 40,
+    paddingHorizontal: 10,
+  },
+  queueFilterChipSelected: {
+    backgroundColor: '#07111f',
+    borderWidth: 2,
+  },
+  queueFilterLabel: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  queueFilterCount: {
+    color: '#f9fafb',
+    fontSize: 12,
+    fontWeight: '900',
   },
   actionGrid: {
     flexDirection: 'row',

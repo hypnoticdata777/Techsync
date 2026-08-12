@@ -239,6 +239,9 @@ they have been verified in the relevant environment.
 - [x] Work-order home queues now show role event-lane cards for recurring
       operating loops such as risk, intake, approval, proof, read-only review,
       and vendor delivery before opening a job.
+- [x] Work-order home queues now include role-aware focus filters so admin,
+      coordinator, technician, client, viewer, and vendor users can isolate the
+      operating loop that needs their lane next.
 - [x] Role-lane UX contract added in code/docs, with home queue lane maps and
       detail-page `Can Do` / `Not In This Lane` boundaries for all six roles.
 - [x] Client, viewer, and vendor home queues now include portal summaries for

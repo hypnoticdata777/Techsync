@@ -368,6 +368,196 @@ const pluralize = (count, singular, plural = `${singular}s`) =>
   `${count} ${count === 1 ? singular : plural}`;
 
 const countWhere = (rows, predicate) => rows.filter(predicate).length;
+const isOpenOrActiveStatus = item =>
+  ['open', 'in_progress', 'paused', 'escalated'].includes(item?.status);
+const isBlockedStatus = item => ['paused', 'escalated'].includes(item?.status);
+const needsCompletionProof = item => item?.status === 'completed' && !hasCompletionProof(item);
+const needsApprovalDecision = item => item?.client_approval_status === 'pending';
+const needsAssignment = item => item?.status === 'open' && !hasAssignedTechnician(item);
+const isQueueRiskEvent = item =>
+  needsApprovalDecision(item) ||
+  needsAssignment(item) ||
+  isBlockedStatus(item) ||
+  needsCompletionProof(item);
+
+const QUEUE_FILTERS_BY_ROLE = {
+  org_admin: [
+    {
+      key: 'risk',
+      label: 'Risk',
+      detail: 'Approvals, unassigned work, blockers, or proof gaps.',
+      tone: 'pending',
+      match: isQueueRiskEvent,
+    },
+    {
+      key: 'active',
+      label: 'Active',
+      detail: 'Open, in-progress, paused, and escalated operating work.',
+      tone: 'active',
+      match: isOpenOrActiveStatus,
+    },
+    {
+      key: 'closeout',
+      label: 'Closeout',
+      detail: 'Completed work ready for proof or archive review.',
+      tone: 'verified',
+      match: item => item?.status === 'completed',
+    },
+  ],
+  coordinator: [
+    {
+      key: 'unassigned',
+      label: 'Assign',
+      detail: 'Open requests without a technician owner.',
+      tone: 'open',
+      match: needsAssignment,
+    },
+    {
+      key: 'approvals',
+      label: 'Approvals',
+      detail: 'Client decisions waiting on visible context.',
+      tone: 'pending',
+      match: needsApprovalDecision,
+    },
+    {
+      key: 'blockers',
+      label: 'Blockers',
+      detail: 'Paused or escalated work needing recovery.',
+      tone: 'escalated',
+      match: isBlockedStatus,
+    },
+  ],
+  technician: [
+    {
+      key: 'start',
+      label: 'Start',
+      detail: 'Assigned open jobs ready for first movement.',
+      tone: 'open',
+      match: item => item?.status === 'open',
+    },
+    {
+      key: 'proof',
+      label: 'Proof',
+      detail: 'Active jobs needing notes, photos, or completion proof.',
+      tone: 'missing',
+      match: item => item?.status === 'in_progress' || needsCompletionProof(item),
+    },
+    {
+      key: 'blockers',
+      label: 'Blocked',
+      detail: 'Paused or escalated assigned jobs.',
+      tone: 'escalated',
+      match: isBlockedStatus,
+    },
+  ],
+  client: [
+    {
+      key: 'decisions',
+      label: 'Decide',
+      detail: 'Approval requests waiting for client response.',
+      tone: 'pending',
+      match: needsApprovalDecision,
+    },
+    {
+      key: 'updates',
+      label: 'Updates',
+      detail: 'Visible work still moving through operations.',
+      tone: 'active',
+      match: isOpenOrActiveStatus,
+    },
+    {
+      key: 'proof',
+      label: 'Proof',
+      detail: 'Completed work with visible closeout context.',
+      tone: 'verified',
+      match: item => item?.status === 'completed',
+    },
+  ],
+  viewer: [
+    {
+      key: 'active',
+      label: 'Active',
+      detail: 'Visible linked work still moving.',
+      tone: 'active',
+      match: isOpenOrActiveStatus,
+    },
+    {
+      key: 'completed',
+      label: 'Complete',
+      detail: 'Completed visible work for read-only review.',
+      tone: 'verified',
+      match: item => item?.status === 'completed',
+    },
+    {
+      key: 'watch',
+      label: 'Watch',
+      detail: 'Open or approval-related items to keep an eye on.',
+      tone: 'open',
+      match: item => item?.status === 'open' || needsApprovalDecision(item),
+    },
+  ],
+  vendor: [
+    {
+      key: 'active',
+      label: 'Active',
+      detail: 'Linked vendor work still moving.',
+      tone: 'active',
+      match: isOpenOrActiveStatus,
+    },
+    {
+      key: 'blocked',
+      label: 'Blocked',
+      detail: 'Paused or escalated vendor-linked work.',
+      tone: 'escalated',
+      match: isBlockedStatus,
+    },
+    {
+      key: 'complete',
+      label: 'Complete',
+      detail: 'Completed linked work with proof context.',
+      tone: 'verified',
+      match: item => item?.status === 'completed',
+    },
+  ],
+};
+
+const getQueueFiltersForRole = role => QUEUE_FILTERS_BY_ROLE[role] || [];
+
+export const buildRoleQueueFilterRows = (role, workOrders = []) => {
+  const rows = workOrders || [];
+  const roleFilters = getQueueFiltersForRole(role);
+
+  return [
+    {
+      key: 'all',
+      label: 'All',
+      value: pluralize(rows.length, 'item'),
+      count: rows.length,
+      detail: 'Show every work order visible to this role.',
+      tone: rows.length > 0 ? 'active' : 'default',
+    },
+    ...roleFilters.map(filter => {
+      const count = countWhere(rows, filter.match);
+      return {
+        key: filter.key,
+        label: filter.label,
+        value: pluralize(count, 'item'),
+        count,
+        detail: filter.detail,
+        tone: count > 0 ? filter.tone : 'default',
+      };
+    }),
+  ];
+};
+
+export const filterWorkOrdersForRoleQueue = (role, filterKey, workOrders = []) => {
+  const rows = workOrders || [];
+  if (!filterKey || filterKey === 'all') {
+    return rows;
+  }
+  const filter = getQueueFiltersForRole(role).find(row => row.key === filterKey);
+  return filter ? rows.filter(filter.match) : rows;
+};
 
 export const buildRoleEventLaneRows = (role, workOrders = []) => {
   const rows = workOrders || [];
@@ -1596,6 +1786,8 @@ export default {
   getRoleAccessMessage,
   buildQueueSummary,
   buildRoleGuidanceRows,
+  buildRoleQueueFilterRows,
+  filterWorkOrdersForRoleQueue,
   getDetailRoleContext,
   buildDetailSummary,
   buildDetailGuidanceRows,

@@ -2942,3 +2942,42 @@ Result:
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - v1.3 Role-Aware Queue Focus UX Pass
+
+Decision:
+
+- Turn the role event lanes from passive queue context into actionable focus
+  filters.
+- Help every user answer "what should I look at now?" without scanning the
+  full queue or stepping outside their lane.
+
+Changes:
+
+- Added tested queue-filter helpers for org admin, coordinator, technician,
+  client, viewer, and vendor operating loops.
+- Updated the work-order home queue with `Focus Queue` chips that filter the
+  visible list by risk, assignment, approval, proof, blocker, read-only, and
+  vendor delivery contexts.
+- Added filtered empty-state copy so an empty focus lane explains the selected
+  operating loop and tells users how to return to the full visible queue.
+- Updated README, roadmap, phase status, QA, requirements, traceability, and
+  role-lane docs so queue filtering is part of the role UX contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `24 passed tests`.
+- Full client tests passed: `8 passed suites`, `63 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

@@ -18,7 +18,9 @@ are intentionally unavailable. Work-order queue cards now add role-specific
 scan cues so admin, coordinator, technician, client, viewer, and vendor users
 can tell why a visible job matters before opening it. Home queues now also show
 role event-lane cards for each user's recurring operating loops, such as risk,
-intake, assignment, approval, proof, read-only review, and vendor delivery.
+intake, assignment, approval, proof, read-only review, and vendor delivery; the
+same operating loops can now be tapped as queue focus filters so each user can
+shrink the list to the work that needs their lane next.
 Detail pages carry that forward with approval, communication, proof, and
 lifecycle action-path cues, plus event playbook guidance for recurring
 approval, proof, escalation, vendor, closeout, and read-only snapshot states.
@@ -349,7 +351,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   active, escalation, pause resolution, completed closeout, and read-only
   snapshot review. Successful detail mutations now show post-action outcome
   notices so users know what changed after messages, approvals, proof uploads,
-  and lifecycle transitions. The
+  and lifecycle transitions. Home queues now include role-aware focus filters
+  for risk, assignment, approval, proof, blocker, read-only, and vendor loops so
+  users can narrow the queue without leaving their lane. The
   pre-hosting readiness doctor can be run locally to confirm no smoke,
   screenshot, manual-note, or evidence-summary blockers remain before Vercel.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),

@@ -274,6 +274,9 @@ Already represented in the codebase:
 - v1.3 post-action outcome notices after message sends, approval
   requests/decisions, proof uploads, and lifecycle transitions so every role
   gets visible confirmation and next-handoff context.
+- v1.3 role-aware queue focus filters for risk, assignment, approval, proof,
+  blocker, read-only, and vendor delivery loops so users can narrow visible
+  work by their next operating event.
 - v1.3 work-order create/edit guidance for linked/manual intake states so
   client, property, vendor, and address context gaps are visible before save.
 - v1.3 manager-only mobile navigation gating for directory, dispatch,

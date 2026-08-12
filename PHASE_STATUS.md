@@ -61,6 +61,8 @@ Completed in the latest lane UX pass:
   visibly confirm what changed and what the next handoff means.
 - Added role event-lane cards to the work-order home queue so each user's
   recurring operating loops are visible before they choose a job.
+- Added role-aware queue focus filters so users can narrow the visible queue
+  by the operating loop they need to handle next.
 
 Next product maturity targets:
 
@@ -78,6 +80,8 @@ Next product maturity targets:
   should feel consistent across all six roles.
 - Continue checking whether role event lanes match what each user naturally
   expects to monitor at the queue level.
+- Continue refining queue focus filters as live walkthroughs reveal which
+  operating loops should be easier to isolate.
 - Continue tightening action outcomes where deeper workflows need richer
   follow-through, especially closeout package review, cost review, and
   assignment changes.

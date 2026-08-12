@@ -191,6 +191,8 @@ Likely scope:
     role-specific mobile landing band
   - role event-lane cards now started on home queues so each user sees their
     recurring operating loops before opening work
+  - role-aware queue focus filters now started so users can isolate the next
+    operating loop that needs their lane
   - role UX evidence readiness audit now started for synthetic login coverage,
     screenshot plan uniqueness, safety guardrails, and role privacy/control
     expectations
