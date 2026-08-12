@@ -226,6 +226,9 @@ they have been verified in the relevant environment.
 - [x] Work-order queue cards now show role-specific scan cues for admin,
       coordinator, technician, client, viewer, and vendor users before opening
       the detail page.
+- [x] Work-order detail pages now show role-specific action-path cues for
+      approval, communication, proof, and lifecycle follow-through after a user
+      opens a work order.
 - [x] Role-lane UX contract added in code/docs, with home queue lane maps and
       detail-page `Can Do` / `Not In This Lane` boundaries for all six roles.
 - [x] Client, viewer, and vendor home queues now include portal summaries for

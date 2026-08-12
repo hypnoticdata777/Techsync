@@ -1,4 +1,5 @@
 import {
+  buildDetailActionPathRows,
   buildDetailGuidanceRows,
   buildDetailSummary,
   buildRoleGuidanceRows,
@@ -286,6 +287,85 @@ describe('role workflow helpers', () => {
     const vendorRows = buildDetailGuidanceRows('vendor', {}, {});
     expect(vendorRows[1].label).toBe('Vendor update');
     expect(vendorRows[2].value).toContain('Internal/client messages');
+  });
+
+  test('builds detail action paths for role-specific follow-through', () => {
+    const pendingWork = {
+      status: 'open',
+      client_approval_status: 'pending',
+    };
+
+    expect(
+      buildDetailActionPathRows(
+        'client',
+        pendingWork,
+        {canDecideApproval: true, canSendMessages: true, nextStatusCount: 0},
+        {attachmentCount: 0, messageCount: 2},
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        label: 'Approval',
+        value: 'Decide request',
+        detail: expect.stringContaining('Approve or decline'),
+      }),
+      expect.objectContaining({
+        label: 'Communication',
+        value: 'Client-visible reply',
+      }),
+      expect.objectContaining({
+        label: 'Proof',
+        value: 'Visible proof only',
+      }),
+      expect.objectContaining({
+        label: 'Lifecycle',
+        value: 'Operations controlled',
+      }),
+    ]);
+
+    expect(
+      buildDetailActionPathRows(
+        'technician',
+        {status: 'in_progress', client_approval_status: 'not_required'},
+        {canUpdateStatus: true, canUploadAttachments: true, canSendMessages: true, nextStatusCount: 3},
+        {attachmentCount: 0, messageCount: 0},
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Proof', value: 'Upload proof'}),
+        expect.objectContaining({label: 'Lifecycle', value: '3 actions'}),
+      ]),
+    );
+
+    expect(
+      buildDetailActionPathRows(
+        'vendor',
+        {status: 'in_progress'},
+        {canSendMessages: true, nextStatusCount: 0},
+        {messageCount: 1},
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: 'Communication',
+          value: 'Vendor-visible reply',
+          detail: expect.stringContaining('vendor lane'),
+        }),
+      ]),
+    );
+
+    expect(
+      buildDetailActionPathRows(
+        'viewer',
+        {status: 'completed', completion_proof_verified_at: '2026-08-01T00:00:00Z'},
+        {},
+        {attachmentCount: 1, messageCount: 1},
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({label: 'Communication', value: 'Read only'}),
+        expect.objectContaining({label: 'Proof', value: 'Verified proof'}),
+      ]),
+    );
   });
 
   test('marks verified and override proof states clearly', () => {

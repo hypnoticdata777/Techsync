@@ -986,6 +986,157 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
   }
 };
 
+export const buildDetailActionPathRows = (
+  role,
+  workOrder = {},
+  capability = {},
+  context = {},
+) => {
+  const attachmentCount = context.attachmentCount || 0;
+  const messageCount = context.messageCount || 0;
+  const proofSatisfied = hasCompletionProof(workOrder);
+  const approvalStatus = workOrder.client_approval_status || 'not_required';
+
+  const approvalRow = (() => {
+    if (capability.canDecideApproval) {
+      return {
+        key: 'approval-path',
+        label: 'Approval',
+        value: 'Decide request',
+        detail: 'Approve or decline after reviewing the visible status, proof, and notes.',
+        tone: 'pending',
+      };
+    }
+    if (approvalStatus === 'pending') {
+      return {
+        key: 'approval-path',
+        label: 'Approval',
+        value: role === 'client' ? 'Waiting on you' : 'Awaiting client',
+        detail: 'Keep the client-visible thread clean while the decision is pending.',
+        tone: 'pending',
+      };
+    }
+    if (['approved', 'declined'].includes(approvalStatus)) {
+      return {
+        key: 'approval-path',
+        label: 'Approval',
+        value: approvalStatus === 'approved' ? 'Approved' : 'Declined',
+        detail: 'The decision is recorded in the work-order timeline.',
+        tone: approvalStatus,
+      };
+    }
+    if (capability.canRequestApproval) {
+      return {
+        key: 'approval-path',
+        label: 'Approval',
+        value: 'Request if needed',
+        detail: 'Use this only when the client should make a visible decision.',
+        tone: 'active',
+      };
+    }
+    return {
+      key: 'approval-path',
+      label: 'Approval',
+      value: 'No request active',
+      detail: 'This lane can monitor the status without starting an approval.',
+      tone: 'default',
+    };
+  })();
+
+  const communicationRow = (() => {
+    if (role === 'viewer') {
+      return {
+        key: 'communication-path',
+        label: 'Communication',
+        value: 'Read only',
+        detail: `${messageCount} visible message${messageCount === 1 ? '' : 's'} available for review.`,
+        tone: 'default',
+      };
+    }
+    if (role === 'vendor') {
+      return {
+        key: 'communication-path',
+        label: 'Communication',
+        value: 'Vendor-visible reply',
+        detail: 'Reply only through the vendor lane; client/internal threads stay hidden.',
+        tone: 'active',
+      };
+    }
+    if (role === 'client') {
+      return {
+        key: 'communication-path',
+        label: 'Communication',
+        value: 'Client-visible reply',
+        detail: 'Replies go to operations without exposing internal or vendor-only notes.',
+        tone: 'active',
+      };
+    }
+    return {
+      key: 'communication-path',
+      label: 'Communication',
+      value: capability.canSendMessages ? 'Choose audience' : 'Review only',
+      detail: 'Pick internal, client, or vendor visibility before sending.',
+      tone: capability.canSendMessages ? 'active' : 'default',
+    };
+  })();
+
+  const proofRow = (() => {
+    if (proofSatisfied) {
+      return {
+        key: 'proof-path',
+        label: 'Proof',
+        value: getProofSignal(workOrder),
+        detail: 'Closeout proof or override is already attached to the record.',
+        tone: 'verified',
+      };
+    }
+    if (attachmentCount > 0) {
+      return {
+        key: 'proof-path',
+        label: 'Proof',
+        value: `${attachmentCount} file${attachmentCount === 1 ? '' : 's'} ready`,
+        detail: 'Review the uploaded proof before completion or closeout.',
+        tone: 'active',
+      };
+    }
+    if (capability.canUploadAttachments) {
+      return {
+        key: 'proof-path',
+        label: 'Proof',
+        value: 'Upload proof',
+        detail: 'Add photo evidence before marking completed when proof is required.',
+        tone: 'missing',
+      };
+    }
+    return {
+      key: 'proof-path',
+      label: 'Proof',
+      value: 'Visible proof only',
+      detail: 'This lane can review proof once operations or field users attach it.',
+      tone: 'default',
+    };
+  })();
+
+  const lifecycleRow =
+    capability.canUpdateStatus && capability.nextStatusCount > 0
+      ? {
+          key: 'lifecycle-path',
+          label: 'Lifecycle',
+          value: `${capability.nextStatusCount} action${capability.nextStatusCount === 1 ? '' : 's'}`,
+          detail: 'Use the status buttons only when the real work state changes.',
+          tone: workOrder.status || 'active',
+        }
+      : {
+          key: 'lifecycle-path',
+          label: 'Lifecycle',
+          value: 'Operations controlled',
+          detail: 'Status movement is intentionally unavailable in this lane.',
+          tone: 'default',
+        };
+
+  return [approvalRow, communicationRow, proofRow, lifecycleRow];
+};
+
 export default {
   canManageOperations,
   getAvailableMainRoutes,
@@ -1002,6 +1153,7 @@ export default {
   buildDetailGuidanceRows,
   buildWorkOrderFlowRows,
   buildRoleCardRows,
+  buildDetailActionPathRows,
   getRoleUserExperience,
   getRoleLane,
   buildRoleLaneRows,

@@ -16,7 +16,9 @@ now have purpose-built portal summaries and communication-channel notices so
 external users can tell what they can see, where replies go, and which controls
 are intentionally unavailable. Work-order queue cards now add role-specific
 scan cues so admin, coordinator, technician, client, viewer, and vendor users
-can tell why a visible job matters before opening it. The walkthrough manifest now has a tested
+can tell why a visible job matters before opening it, and detail pages now carry
+that forward with approval, communication, proof, and lifecycle action-path
+cues. The walkthrough manifest now has a tested
 readiness audit for synthetic logins, screenshot targets, role controls,
 privacy expectations, and screenshot safety checks. The final capture workflow
 is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
@@ -334,7 +336,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   the generated local capture manifest. The local evidence pack now requires
   checklist, role-by-role, and viewport notes before strict mode can pass.
   Work-order cards now add role-specific scan cues for immediate action,
-  proof state, scope, or visibility lane before a user opens the detail page. The
+  proof state, scope, or visibility lane before a user opens the detail page,
+  and detail pages now add role-specific action-path cues for approval,
+  communication, proof, and lifecycle follow-through. The
   pre-hosting readiness doctor can be run locally to confirm no smoke,
   screenshot, manual-note, or evidence-summary blockers remain before Vercel.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),

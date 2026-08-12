@@ -21,6 +21,7 @@ import {
 } from '../utils/accessibility';
 import {
   buildRoleBoundaryRows,
+  buildDetailActionPathRows,
   buildDetailGuidanceRows,
   buildDetailSummary,
   buildWorkOrderFlowRows,
@@ -218,6 +219,39 @@ function WorkOrderDetailsScreen({route, navigation}) {
       canSendMessages,
       canUpdateStatus,
       canUploadAttachments,
+      nextStatuses.length,
+      user?.role,
+      workOrder,
+    ],
+  );
+  const detailActionPathRows = useMemo(
+    () =>
+      buildDetailActionPathRows(
+        user?.role,
+        workOrder,
+        {
+          canEdit,
+          canUpdateStatus,
+          canUploadAttachments,
+          canSendMessages,
+          canRequestApproval,
+          canDecideApproval,
+          nextStatusCount: nextStatuses.length,
+        },
+        {
+          attachmentCount: attachments.length,
+          messageCount: messages.length,
+        },
+      ),
+    [
+      attachments.length,
+      canDecideApproval,
+      canEdit,
+      canRequestApproval,
+      canSendMessages,
+      canUpdateStatus,
+      canUploadAttachments,
+      messages.length,
       nextStatuses.length,
       user?.role,
       workOrder,
@@ -567,6 +601,28 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   {row.value}
                 </Text>
                 <Text style={styles.flowDetail}>{row.detail}</Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.actionPathGrid}>
+            {detailActionPathRows.map(row => (
+              <View
+                key={row.key}
+                style={styles.actionPathItem}
+                accessible
+                accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
+                <Text style={styles.actionPathLabel}>{row.label}</Text>
+                <Text
+                  style={[
+                    styles.actionPathValue,
+                    {color: getSummaryToneColor(row.tone)},
+                  ]}
+                  numberOfLines={1}>
+                  {row.value}
+                </Text>
+                <Text style={styles.actionPathDetail} numberOfLines={2}>
+                  {row.detail}
+                </Text>
               </View>
             ))}
           </View>
@@ -1122,6 +1178,42 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 16,
     marginTop: 4,
+  },
+  actionPathGrid: {
+    borderTopColor: '#1e293b',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 12,
+    paddingTop: 10,
+  },
+  actionPathItem: {
+    flexBasis: '47%',
+    flexGrow: 1,
+    minHeight: 72,
+    borderLeftColor: '#38bdf8',
+    borderLeftWidth: 2,
+    paddingLeft: 9,
+    paddingRight: 6,
+  },
+  actionPathLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  actionPathValue: {
+    fontSize: 13,
+    fontWeight: '900',
+    lineHeight: 17,
+    marginTop: 3,
+  },
+  actionPathDetail: {
+    color: '#94a3b8',
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 3,
   },
   guidanceStack: {
     borderTopWidth: 1,

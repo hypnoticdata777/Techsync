@@ -256,6 +256,9 @@ Likely scope:
     coordinator, technician, client, viewer, and vendor users can see their
     immediate action, proof state, scope, or visibility lane before opening a
     job
+  - work-order detail pages now continue the queue scan with role-specific
+    action-path cues for approval, communication, proof, and lifecycle
+    follow-through
   - work-order create/edit now gives linked/manual context guidance before save
     so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while

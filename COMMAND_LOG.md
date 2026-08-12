@@ -2790,3 +2790,41 @@ Result:
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - v1.3 Detail Action Path UX Pass
+
+Decision:
+
+- Carry the role-aware queue scan into the work-order detail page so every role
+  can see the next useful action across approval, communication, proof, and
+  lifecycle without guessing.
+- Keep the detail page predictable by naming both available actions and
+  intentionally limited lanes.
+
+Changes:
+
+- Added tested `buildDetailActionPathRows` helper for role-specific detail
+  follow-through.
+- Updated the work-order detail command panel with a compact action-path grid
+  for approval, communication, proof, and lifecycle.
+- Added accessible labels for the action-path cues and mobile-safe wrapping.
+- Updated README, roadmap, phase status, QA, requirements, traceability, and
+  role-lane docs to track the detail action-path expectation.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `20 passed tests`.
+- Full client tests passed: `8 passed suites`, `59 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.
