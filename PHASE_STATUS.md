@@ -52,6 +52,8 @@ Completed in the latest lane UX pass:
 - Added role-specific detail action-path cues for approval, communication,
   proof, and lifecycle follow-through so the detail page makes the next move
   predictable after a queue card is opened.
+- Made detail action-path cues tappable jump controls so users can move from
+  the command panel to approval, communication, proof, or lifecycle work.
 - Added role event playbook cues on work-order detail pages so repeated SaaS
   events such as approval requested, proof needed, vendor thread active,
   escalation, pause resolution, completed closeout, and read-only snapshot
@@ -75,6 +77,8 @@ Next product maturity targets:
 - Continue polishing the detail action path with live role walkthrough
   observations, especially where a user expects a visible confirmation after
   taking an action.
+- Continue refining direct-jump behavior on long detail pages as role
+  walkthroughs reveal where users expect to land.
 - Continue maturing event follow-through after the first visible response:
   success confirmation, refreshed messages/proof, and clear next-state feedback
   should feel consistent across all six roles.

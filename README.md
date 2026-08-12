@@ -22,7 +22,7 @@ intake, assignment, approval, proof, read-only review, and vendor delivery; the
 same operating loops can now be tapped as queue focus filters so each user can
 shrink the list to the work that needs their lane next.
 Detail pages carry that forward with approval, communication, proof, and
-lifecycle action-path cues, plus event playbook guidance for recurring
+lifecycle action-path cues that jump to the matching work sections, plus event playbook guidance for recurring
 approval, proof, escalation, vendor, closeout, and read-only snapshot states.
 Successful detail actions now show outcome notices so message sends, approval
 requests/decisions, proof uploads, and lifecycle transitions confirm what
@@ -346,7 +346,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   Work-order cards now add role-specific scan cues for immediate action,
   proof state, scope, or visibility lane before a user opens the detail page,
   and detail pages now add role-specific action-path cues for approval,
-  communication, proof, and lifecycle follow-through. Detail pages also include
+  communication, proof, and lifecycle follow-through; those action-path cues
+  now jump directly to the matching approval, communication, proof, or
+  lifecycle controls. Detail pages also include
   role event playbook cues for approval requested, proof needed, vendor thread
   active, escalation, pause resolution, completed closeout, and read-only
   snapshot review. Successful detail mutations now show post-action outcome

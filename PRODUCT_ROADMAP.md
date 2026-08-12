@@ -193,6 +193,8 @@ Likely scope:
     recurring operating loops before opening work
   - role-aware queue focus filters now started so users can isolate the next
     operating loop that needs their lane
+  - detail action-path jump controls now started so approval, communication,
+    proof, and lifecycle sections are reachable from the command panel
   - role UX evidence readiness audit now started for synthetic login coverage,
     screenshot plan uniqueness, safety guardrails, and role privacy/control
     expectations

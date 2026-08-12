@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -98,6 +98,12 @@ const STATUS_CONFIRMATIONS = {
 };
 
 const INTERNAL_ROLES = ['org_admin', 'coordinator', 'technician'];
+const DETAIL_SECTION_LABELS = {
+  approval: 'Client Approval',
+  communication: 'Communication',
+  proof: 'Attachments',
+  lifecycle: 'Lifecycle Actions',
+};
 
 const getMessageVisibilityLabel = visibility => {
   switch (visibility) {
@@ -181,6 +187,8 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const [approvalNotes, setApprovalNotes] = useState('');
   const [updatingApproval, setUpdatingApproval] = useState(false);
   const [outcomeNotice, setOutcomeNotice] = useState(null);
+  const scrollRef = useRef(null);
+  const sectionOffsets = useRef({});
 
   const canEdit = user?.role === 'org_admin' || user?.role === 'coordinator';
   const canUseInternalMessages = INTERNAL_ROLES.includes(user?.role);
@@ -280,6 +288,15 @@ function WorkOrderDetailsScreen({route, navigation}) {
     () => getCommunicationLaneNotice(user?.role, messageVisibility),
     [messageVisibility, user?.role],
   );
+  const handleSectionLayout = (key, event) => {
+    sectionOffsets.current[key] = event.nativeEvent.layout.y;
+  };
+  const jumpToSection = key => {
+    const y = sectionOffsets.current[key];
+    if (typeof y === 'number') {
+      scrollRef.current?.scrollTo({y: Math.max(y - 12, 0), animated: true});
+    }
+  };
 
   const loadAttachments = useCallback(async () => {
     try {
@@ -597,7 +614,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView ref={scrollRef} style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>{workOrder.title}</Text>
 
@@ -642,11 +659,13 @@ function WorkOrderDetailsScreen({route, navigation}) {
           </View>
           <View style={styles.actionPathGrid}>
             {detailActionPathRows.map(row => (
-              <View
+              <TouchableOpacity
                 key={row.key}
                 style={styles.actionPathItem}
+                onPress={() => jumpToSection(row.target)}
                 accessible
-                accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
+                accessibilityRole="button"
+                accessibilityLabel={`${row.label}: ${row.value}. ${row.detail} Jump to ${DETAIL_SECTION_LABELS[row.target] || 'section'}.`}>
                 <Text style={styles.actionPathLabel}>{row.label}</Text>
                 <Text
                   style={[
@@ -659,7 +678,8 @@ function WorkOrderDetailsScreen({route, navigation}) {
                 <Text style={styles.actionPathDetail} numberOfLines={2}>
                   {row.detail}
                 </Text>
-              </View>
+                <Text style={styles.actionPathJump}>Jump</Text>
+              </TouchableOpacity>
             ))}
           </View>
           <View style={styles.eventPlaybook}>
@@ -729,7 +749,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
           </View>
         </View>
 
-        <View style={styles.section}>
+        <View style={styles.section} onLayout={event => handleSectionLayout('approval', event)}>
           <Text style={styles.label}>Status</Text>
           <View style={styles.statusBadge}>
             <Text style={[styles.statusText, {color: getStatusColor(workOrder.status)}]}>
@@ -766,12 +786,12 @@ function WorkOrderDetailsScreen({route, navigation}) {
           </View>
         ) : null}
 
-        <View style={styles.section}>
+        <View style={styles.section} onLayout={event => handleSectionLayout('communication', event)}>
           <Text style={styles.label}>Work Order ID</Text>
           <Text style={styles.metaText}>#{workOrder.id}</Text>
         </View>
 
-        <View style={styles.section}>
+        <View style={styles.section} onLayout={event => handleSectionLayout('proof', event)}>
           <Text style={styles.label}>Client Approval</Text>
           <View style={styles.approvalPanel}>
             <Text
@@ -1069,7 +1089,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
           </View>
         )}
 
-        <View style={styles.actions}>
+        <View style={styles.actions} onLayout={event => handleSectionLayout('lifecycle', event)}>
           {canEdit && (
             <TouchableOpacity
               style={[styles.editButton, updating && styles.buttonDisabled]}
@@ -1270,13 +1290,17 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   actionPathItem: {
+    backgroundColor: '#07111f',
+    borderColor: '#243449',
+    borderRadius: 8,
+    borderWidth: 1,
     flexBasis: '47%',
     flexGrow: 1,
     minHeight: 72,
     borderLeftColor: '#38bdf8',
     borderLeftWidth: 2,
-    paddingLeft: 9,
-    paddingRight: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
   },
   actionPathLabel: {
     color: '#bfdbfe',
@@ -1295,6 +1319,14 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 16,
     marginTop: 3,
+  },
+  actionPathJump: {
+    alignSelf: 'flex-start',
+    color: '#38bdf8',
+    fontSize: 10,
+    fontWeight: '900',
+    marginTop: 6,
+    textTransform: 'uppercase',
   },
   eventPlaybook: {
     backgroundColor: '#07111f',

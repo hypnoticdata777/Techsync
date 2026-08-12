@@ -229,6 +229,8 @@ they have been verified in the relevant environment.
 - [x] Work-order detail pages now show role-specific action-path cues for
       approval, communication, proof, and lifecycle follow-through after a user
       opens a work order.
+- [x] Detail action-path cues now jump to approval, communication, proof, and
+      lifecycle sections so long work-order pages are easier to operate.
 - [x] Work-order detail pages now show role event playbook cues for repeated
       events such as approval requested, proof needed, vendor thread active,
       escalation, pause resolution, completed closeout, and read-only snapshot

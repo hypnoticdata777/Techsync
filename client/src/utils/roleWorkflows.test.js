@@ -417,19 +417,23 @@ describe('role workflow helpers', () => {
     ).toEqual([
       expect.objectContaining({
         label: 'Approval',
+        target: 'approval',
         value: 'Decide request',
         detail: expect.stringContaining('Approve or decline'),
       }),
       expect.objectContaining({
         label: 'Communication',
+        target: 'communication',
         value: 'Client-visible reply',
       }),
       expect.objectContaining({
         label: 'Proof',
+        target: 'proof',
         value: 'Visible proof only',
       }),
       expect.objectContaining({
         label: 'Lifecycle',
+        target: 'lifecycle',
         value: 'Operations controlled',
       }),
     ]);

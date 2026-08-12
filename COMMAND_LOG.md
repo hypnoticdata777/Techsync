@@ -2981,3 +2981,41 @@ Result:
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - v1.3 Detail Action Jump UX Pass
+
+Decision:
+
+- Make long work-order detail pages easier to operate by turning the top
+  action-path cues into direct jump controls.
+- Preserve the role-lane model while reducing scroll-and-hunt friction for
+  approval, communication, proof, and lifecycle work.
+
+Changes:
+
+- Added section targets to `buildDetailActionPathRows` for approval,
+  communication, proof, and lifecycle paths.
+- Updated the work-order detail command panel so action-path cards are tappable
+  and scroll to the matching section.
+- Styled action-path cards as interactive controls with visible `Jump` affordance
+  and accessibility labels.
+- Updated README, roadmap, phase status, QA, requirements, traceability, and
+  role-lane docs so detail jump controls are part of the role UX contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `24 passed tests`.
+- Full client tests passed: `8 passed suites`, `63 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

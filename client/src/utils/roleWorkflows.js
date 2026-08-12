@@ -1640,6 +1640,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'approval-path',
         label: 'Approval',
+        target: 'approval',
         value: 'Decide request',
         detail: 'Approve or decline after reviewing the visible status, proof, and notes.',
         tone: 'pending',
@@ -1649,6 +1650,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'approval-path',
         label: 'Approval',
+        target: 'approval',
         value: role === 'client' ? 'Waiting on you' : 'Awaiting client',
         detail: 'Keep the client-visible thread clean while the decision is pending.',
         tone: 'pending',
@@ -1658,6 +1660,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'approval-path',
         label: 'Approval',
+        target: 'approval',
         value: approvalStatus === 'approved' ? 'Approved' : 'Declined',
         detail: 'The decision is recorded in the work-order timeline.',
         tone: approvalStatus,
@@ -1667,6 +1670,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'approval-path',
         label: 'Approval',
+        target: 'approval',
         value: 'Request if needed',
         detail: 'Use this only when the client should make a visible decision.',
         tone: 'active',
@@ -1675,6 +1679,7 @@ export const buildDetailActionPathRows = (
     return {
       key: 'approval-path',
       label: 'Approval',
+      target: 'approval',
       value: 'No request active',
       detail: 'This lane can monitor the status without starting an approval.',
       tone: 'default',
@@ -1686,6 +1691,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'communication-path',
         label: 'Communication',
+        target: 'communication',
         value: 'Read only',
         detail: `${messageCount} visible message${messageCount === 1 ? '' : 's'} available for review.`,
         tone: 'default',
@@ -1695,6 +1701,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'communication-path',
         label: 'Communication',
+        target: 'communication',
         value: 'Vendor-visible reply',
         detail: 'Reply only through the vendor lane; client/internal threads stay hidden.',
         tone: 'active',
@@ -1704,6 +1711,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'communication-path',
         label: 'Communication',
+        target: 'communication',
         value: 'Client-visible reply',
         detail: 'Replies go to operations without exposing internal or vendor-only notes.',
         tone: 'active',
@@ -1712,6 +1720,7 @@ export const buildDetailActionPathRows = (
     return {
       key: 'communication-path',
       label: 'Communication',
+      target: 'communication',
       value: capability.canSendMessages ? 'Choose audience' : 'Review only',
       detail: 'Pick internal, client, or vendor visibility before sending.',
       tone: capability.canSendMessages ? 'active' : 'default',
@@ -1723,6 +1732,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'proof-path',
         label: 'Proof',
+        target: 'proof',
         value: getProofSignal(workOrder),
         detail: 'Closeout proof or override is already attached to the record.',
         tone: 'verified',
@@ -1732,6 +1742,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'proof-path',
         label: 'Proof',
+        target: 'proof',
         value: `${attachmentCount} file${attachmentCount === 1 ? '' : 's'} ready`,
         detail: 'Review the uploaded proof before completion or closeout.',
         tone: 'active',
@@ -1741,6 +1752,7 @@ export const buildDetailActionPathRows = (
       return {
         key: 'proof-path',
         label: 'Proof',
+        target: 'proof',
         value: 'Upload proof',
         detail: 'Add photo evidence before marking completed when proof is required.',
         tone: 'missing',
@@ -1749,6 +1761,7 @@ export const buildDetailActionPathRows = (
     return {
       key: 'proof-path',
       label: 'Proof',
+      target: 'proof',
       value: 'Visible proof only',
       detail: 'This lane can review proof once operations or field users attach it.',
       tone: 'default',
@@ -1760,6 +1773,7 @@ export const buildDetailActionPathRows = (
       ? {
           key: 'lifecycle-path',
           label: 'Lifecycle',
+          target: 'lifecycle',
           value: `${capability.nextStatusCount} action${capability.nextStatusCount === 1 ? '' : 's'}`,
           detail: 'Use the status buttons only when the real work state changes.',
           tone: workOrder.status || 'active',
@@ -1767,6 +1781,7 @@ export const buildDetailActionPathRows = (
       : {
           key: 'lifecycle-path',
           label: 'Lifecycle',
+          target: 'lifecycle',
           value: 'Operations controlled',
           detail: 'Status movement is intentionally unavailable in this lane.',
           tone: 'default',
