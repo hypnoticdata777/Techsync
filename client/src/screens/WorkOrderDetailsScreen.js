@@ -20,6 +20,7 @@ import {
   statusActionA11y,
 } from '../utils/accessibility';
 import {
+  buildActionOutcomeNotice,
   buildRoleBoundaryRows,
   buildDetailActionPathRows,
   buildDetailGuidanceRows,
@@ -179,6 +180,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [approvalNotes, setApprovalNotes] = useState('');
   const [updatingApproval, setUpdatingApproval] = useState(false);
+  const [outcomeNotice, setOutcomeNotice] = useState(null);
 
   const canEdit = user?.role === 'org_admin' || user?.role === 'coordinator';
   const canUseInternalMessages = INTERNAL_ROLES.includes(user?.role);
@@ -352,6 +354,9 @@ function WorkOrderDetailsScreen({route, navigation}) {
         const updated = await res.json();
         setWorkOrder(updated);
         setNotes('');
+        setOutcomeNotice(
+          buildActionOutcomeNotice(user?.role, {type: 'status', status: newStatus}, updated),
+        );
       } else {
         const errorData = await res.json().catch(() => ({}));
         Alert.alert('Error', errorData.detail || 'Failed to update status');
@@ -407,6 +412,16 @@ function WorkOrderDetailsScreen({route, navigation}) {
         const created = await res.json();
         setMessages(current => [created, ...current]);
         setMessageBody('');
+        setOutcomeNotice(
+          buildActionOutcomeNotice(
+            user?.role,
+            {
+              type: 'message',
+              visibility: canUseInternalMessages ? messageVisibility : forcedMessageVisibility,
+            },
+            workOrder,
+          ),
+        );
         return;
       }
 
@@ -434,6 +449,9 @@ function WorkOrderDetailsScreen({route, navigation}) {
         setWorkOrder(updated);
         setApprovalNotes('');
         await loadMessages();
+        setOutcomeNotice(
+          buildActionOutcomeNotice(user?.role, {type: 'approval_request'}, updated),
+        );
         return;
       }
 
@@ -461,6 +479,13 @@ function WorkOrderDetailsScreen({route, navigation}) {
         setWorkOrder(updated);
         setApprovalNotes('');
         await loadMessages();
+        setOutcomeNotice(
+          buildActionOutcomeNotice(
+            user?.role,
+            {type: 'approval_decision', decision},
+            updated,
+          ),
+        );
         return;
       }
 
@@ -542,7 +567,9 @@ function WorkOrderDetailsScreen({route, navigation}) {
       if (res.ok) {
         const uploaded = await res.json();
         setAttachments(current => [uploaded, ...current]);
-        Alert.alert('Attached', 'Photo added to the work order.');
+        setOutcomeNotice(
+          buildActionOutcomeNotice(user?.role, {type: 'attachment'}, workOrder),
+        );
         return;
       }
 
@@ -657,6 +684,29 @@ function WorkOrderDetailsScreen({route, navigation}) {
               </View>
             ))}
           </View>
+          {outcomeNotice ? (
+            <View
+              style={styles.outcomeNotice}
+              accessible
+              accessibilityLabel={`Last update: ${outcomeNotice.title}. ${outcomeNotice.detail}`}>
+              <View style={styles.outcomeHeader}>
+                <Text style={styles.outcomeLabel}>Last Update</Text>
+                <TouchableOpacity
+                  onPress={() => setOutcomeNotice(null)}
+                  {...actionButtonA11y('Dismiss last update', 'Hides the latest action confirmation.')}>
+                  <Text style={styles.outcomeDismiss}>Dismiss</Text>
+                </TouchableOpacity>
+              </View>
+              <Text
+                style={[
+                  styles.outcomeTitle,
+                  {color: getSummaryToneColor(outcomeNotice.tone)},
+                ]}>
+                {outcomeNotice.title}
+              </Text>
+              <Text style={styles.outcomeDetail}>{outcomeNotice.detail}</Text>
+            </View>
+          ) : null}
           <View style={styles.guidanceStack}>
             {detailGuidanceRows.map(row => (
               <View key={row.key} style={styles.guidanceRow}>
@@ -1275,6 +1325,44 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 17,
     marginTop: 4,
+  },
+  outcomeNotice: {
+    backgroundColor: '#101827',
+    borderColor: '#38bdf8',
+    borderLeftWidth: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 12,
+    padding: 12,
+  },
+  outcomeHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  outcomeLabel: {
+    color: '#bfdbfe',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  outcomeDismiss: {
+    color: '#38bdf8',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  outcomeTitle: {
+    fontSize: 15,
+    fontWeight: '900',
+    lineHeight: 20,
+    marginTop: 5,
+  },
+  outcomeDetail: {
+    color: '#cbd5e1',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 3,
   },
   guidanceStack: {
     borderTopWidth: 1,

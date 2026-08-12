@@ -19,7 +19,9 @@ scan cues so admin, coordinator, technician, client, viewer, and vendor users
 can tell why a visible job matters before opening it, and detail pages now carry
 that forward with approval, communication, proof, and lifecycle action-path
 cues, plus event playbook guidance for recurring approval, proof, escalation,
-vendor, closeout, and read-only snapshot states. The walkthrough manifest now has a tested
+vendor, closeout, and read-only snapshot states. Successful detail actions now
+show outcome notices so message sends, approval requests/decisions, proof
+uploads, and lifecycle transitions confirm what changed. The walkthrough manifest now has a tested
 readiness audit for synthetic logins, screenshot targets, role controls,
 privacy expectations, and screenshot safety checks. The final capture workflow
 is prepared in `ROLE_UX_CAPTURE_PASS.md`, and
@@ -342,7 +344,9 @@ Implemented for this POC pass (mapped to `TECHSYNC_OPS_REQUIREMENTS.md`):
   communication, proof, and lifecycle follow-through. Detail pages also include
   role event playbook cues for approval requested, proof needed, vendor thread
   active, escalation, pause resolution, completed closeout, and read-only
-  snapshot review. The
+  snapshot review. Successful detail mutations now show post-action outcome
+  notices so users know what changed after messages, approvals, proof uploads,
+  and lifecycle transitions. The
   pre-hosting readiness doctor can be run locally to confirm no smoke,
   screenshot, manual-note, or evidence-summary blockers remain before Vercel.
 - **Mobile**: RF-22 (technician's assigned queue, ordered by priority),

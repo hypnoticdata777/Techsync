@@ -961,6 +961,92 @@ export const buildRoleEventPlaybookRows = (role, workOrder = {}, context = {}) =
   ];
 };
 
+const formatMessageVisibility = visibility => {
+  if (visibility === 'client') {
+    return 'client-visible';
+  }
+  if (visibility === 'vendor') {
+    return 'vendor-visible';
+  }
+  return 'internal';
+};
+
+export const buildActionOutcomeNotice = (role, outcome = {}, workOrder = {}) => {
+  const type = outcome.type;
+
+  if (type === 'status') {
+    const status = outcome.status || workOrder.status;
+    const statusLabel = formatStatus(status);
+    const nextWaiting = getWaitingOn(workOrder).toLowerCase();
+    const detailByStatus = {
+      completed:
+        role === 'technician'
+          ? 'Completion is recorded. Operations can now review proof and closeout.'
+          : 'Completion is recorded. Review proof and closeout before archive.',
+      paused: 'Pause is visible now. Keep the blocker and resume condition clear in notes.',
+      escalated: 'Escalation is visible now. Coordination should own the recovery path.',
+      cancelled: 'Cancellation is recorded and visible for audit review.',
+      archived: 'Archive is recorded. The item leaves active operating surfaces.',
+    };
+
+    return {
+      title: `${statusLabel} recorded`,
+      detail: detailByStatus[status] || `Status changed to ${statusLabel}; next handoff is ${nextWaiting}.`,
+      tone: status || 'active',
+    };
+  }
+
+  if (type === 'message') {
+    const lane = formatMessageVisibility(outcome.visibility);
+    const detailByRole = {
+      client: 'Operations can now respond from the client-visible lane.',
+      vendor: 'Operations can now respond from the vendor-visible lane.',
+      viewer: 'Read-only users cannot send messages.',
+    };
+
+    return {
+      title: `${lane} message sent`,
+      detail:
+        detailByRole[role] ||
+        `The message is saved to the ${lane} thread and stays scoped to that audience.`,
+      tone: 'active',
+    };
+  }
+
+  if (type === 'approval_request') {
+    return {
+      title: 'Approval requested',
+      detail: 'The client lane now owns the decision; keep follow-up messages client-visible.',
+      tone: 'pending',
+    };
+  }
+
+  if (type === 'approval_decision') {
+    const decision = outcome.decision === 'declined' ? 'declined' : 'approved';
+    return {
+      title: `Approval ${decision}`,
+      detail:
+        decision === 'approved'
+          ? 'The decision is recorded; operations can continue the work or closeout path.'
+          : 'The decline is recorded; operations should revise scope, cost, or communication.',
+      tone: decision,
+    };
+  }
+
+  if (type === 'attachment') {
+    return {
+      title: 'Proof attached',
+      detail:
+        role === 'technician'
+          ? 'Photo evidence is saved. Complete the work when field state and proof are ready.'
+          : 'Attachment is saved for proof review and closeout context.',
+      tone: 'verified',
+    };
+  }
+
+  return null;
+};
+
 const formatStatus = value => (value || 'unknown').replace(/_/g, ' ');
 
 const getProofSignal = workOrder => {
@@ -1325,6 +1411,7 @@ export default {
   buildRoleCardRows,
   buildDetailActionPathRows,
   buildRoleEventPlaybookRows,
+  buildActionOutcomeNotice,
   getRoleUserExperience,
   getRoleLane,
   buildRoleLaneRows,

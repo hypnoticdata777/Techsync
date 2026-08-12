@@ -56,6 +56,9 @@ Completed in the latest lane UX pass:
   events such as approval requested, proof needed, vendor thread active,
   escalation, pause resolution, completed closeout, and read-only snapshot
   review tell each role how to respond and who receives the handoff.
+- Added post-action outcome notices on work-order detail pages so message
+  sends, approval requests/decisions, proof uploads, and lifecycle transitions
+  visibly confirm what changed and what the next handoff means.
 
 Next product maturity targets:
 
@@ -71,6 +74,9 @@ Next product maturity targets:
 - Continue maturing event follow-through after the first visible response:
   success confirmation, refreshed messages/proof, and clear next-state feedback
   should feel consistent across all six roles.
+- Continue tightening action outcomes where deeper workflows need richer
+  follow-through, especially closeout package review, cost review, and
+  assignment changes.
 - Keep improving mobile/narrow-width comfort for the lanes that work from the
   detail page most often.
 
@@ -274,6 +280,9 @@ Completed:
 - Added role-specific event playbook rows to the work-order detail page so
   admin, coordinator, technician, client, viewer, and vendor users can handle
   repeated operating events with predictable response and handoff guidance.
+- Added visible post-action outcome notices for work-order detail mutations so
+  roles get immediate confirmation after messages, approvals, proof uploads,
+  and lifecycle changes.
 - Added mobile work-order form before-save context review for linked/manual/open
   client, property, vendor, and address state.
 - Added tested mobile navigator gating so manager-only screens are mounted only

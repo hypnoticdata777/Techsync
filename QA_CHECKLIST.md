@@ -233,6 +233,9 @@ they have been verified in the relevant environment.
       events such as approval requested, proof needed, vendor thread active,
       escalation, pause resolution, completed closeout, and read-only snapshot
       review.
+- [x] Work-order detail pages now show post-action outcome notices after
+      messages, approval requests/decisions, proof uploads, and lifecycle
+      transitions.
 - [x] Role-lane UX contract added in code/docs, with home queue lane maps and
       detail-page `Can Do` / `Not In This Lane` boundaries for all six roles.
 - [x] Client, viewer, and vendor home queues now include portal summaries for

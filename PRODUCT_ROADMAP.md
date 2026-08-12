@@ -263,6 +263,9 @@ Likely scope:
     SaaS events such as approval requested, proof needed, vendor thread active,
     escalation, pause resolution, completed closeout, and read-only snapshot
     review
+  - work-order detail actions now show dismissible outcome notices after
+    messages, approval requests/decisions, proof uploads, and lifecycle
+    transitions so successful work does not feel silent
   - work-order create/edit now gives linked/manual context guidance before save
     so open client, property, vendor, and address context is intentional
   - synthetic no-work empty-state personas now have clearer display names while

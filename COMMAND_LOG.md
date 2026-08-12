@@ -2867,3 +2867,41 @@ Result:
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - `git diff --check` reported only Windows LF-to-CRLF warnings.
+
+## 2026-08-12 - v1.3 Post-Action Outcome UX Pass
+
+Decision:
+
+- Make successful work-order detail actions feel explicit and SaaS-grade by
+  confirming what changed and what the next handoff means.
+- Cover the actions users repeat most often across roles: status movement,
+  messages, approval requests/decisions, and proof uploads.
+
+Changes:
+
+- Added tested `buildActionOutcomeNotice` helper for status, message,
+  approval, and proof outcomes.
+- Updated the work-order detail page with a dismissible `Last Update` panel
+  after successful detail mutations.
+- Removed the proof-upload success alert in favor of the same inline
+  confirmation pattern used by other role actions.
+- Updated README, roadmap, phase status, QA, requirements, traceability, and
+  role-lane docs so post-action confidence is part of the role UX contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+npm.cmd run test:ci
+server\venv\Scripts\python.exe -m pytest server\tests -p no:cacheprovider
+server\venv\Scripts\python.exe -m compileall -q server scripts
+git diff --check
+```
+
+Result:
+
+- Focused role workflow tests passed: `1 passed suite`, `22 passed tests`.
+- Full client tests passed: `8 passed suites`, `61 passed tests`.
+- Backend tests passed: `188 passed`.
+- Python compile checks passed.
+- `git diff --check` reported only Windows LF-to-CRLF warnings.

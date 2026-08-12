@@ -269,6 +269,9 @@ Already represented in the codebase:
   approval requested, proof needed, vendor thread active, escalation raised,
   pause resolution, completed closeout, and read-only snapshot review, with
   response and handoff guidance by role.
+- v1.3 post-action outcome notices after message sends, approval
+  requests/decisions, proof uploads, and lifecycle transitions so every role
+  gets visible confirmation and next-handoff context.
 - v1.3 work-order create/edit guidance for linked/manual intake states so
   client, property, vendor, and address context gaps are visible before save.
 - v1.3 manager-only mobile navigation gating for directory, dispatch,

@@ -1,4 +1,5 @@
 import {
+  buildActionOutcomeNotice,
   buildDetailActionPathRows,
   buildDetailGuidanceRows,
   buildDetailSummary,
@@ -448,6 +449,64 @@ describe('role workflow helpers', () => {
         value: expect.stringContaining('auditability'),
       }),
     );
+  });
+
+  test('builds post-action outcome notices for role confidence', () => {
+    expect(
+      buildActionOutcomeNotice(
+        'technician',
+        {type: 'status', status: 'completed'},
+        {status: 'completed', completion_proof_verified_at: '2026-08-12T00:00:00Z'},
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        title: 'completed recorded',
+        detail: expect.stringContaining('Operations can now review proof'),
+        tone: 'completed',
+      }),
+    );
+
+    expect(
+      buildActionOutcomeNotice(
+        'coordinator',
+        {type: 'message', visibility: 'vendor'},
+        {status: 'in_progress'},
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        title: 'vendor-visible message sent',
+        detail: expect.stringContaining('vendor-visible thread'),
+        tone: 'active',
+      }),
+    );
+
+    expect(buildActionOutcomeNotice('coordinator', {type: 'approval_request'})).toEqual(
+      expect.objectContaining({
+        title: 'Approval requested',
+        detail: expect.stringContaining('client lane now owns'),
+        tone: 'pending',
+      }),
+    );
+
+    expect(
+      buildActionOutcomeNotice('client', {type: 'approval_decision', decision: 'declined'}),
+    ).toEqual(
+      expect.objectContaining({
+        title: 'Approval declined',
+        detail: expect.stringContaining('revise scope'),
+        tone: 'declined',
+      }),
+    );
+
+    expect(buildActionOutcomeNotice('technician', {type: 'attachment'})).toEqual(
+      expect.objectContaining({
+        title: 'Proof attached',
+        detail: expect.stringContaining('Photo evidence'),
+        tone: 'verified',
+      }),
+    );
+
+    expect(buildActionOutcomeNotice('viewer', {type: 'unknown'})).toBeNull();
   });
 
   test('marks verified and override proof states clearly', () => {
