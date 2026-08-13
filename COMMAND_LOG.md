@@ -3220,8 +3220,9 @@ Changes:
 - Updated the shared `HintBubble` component so every help bubble shares one
   active-popover registry.
 - Removed sticky pinned behavior that kept popovers visible after click.
-- Rendered web help popovers with measured viewport placement so they are not
-  hidden by work-order cards, rails, or scroll panes.
+- Rendered web help popovers through a document-level portal with measured
+  viewport placement so they are not hidden by work-order cards, rails, or
+  scroll panes.
 - Documented the one-at-a-time, click-to-dismiss help-bubble contract.
 
 Verification:

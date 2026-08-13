@@ -1,9 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Platform, Pressable, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 
-const TOOLTIP_WIDTH = 260;
+const ReactDOM = Platform.OS === 'web' ? require('react-dom') : null;
+
+const TOOLTIP_WIDTH = 220;
 const EDGE_GAP = 12;
-const VERTICAL_GAP = 8;
+const VERTICAL_GAP = 10;
 const ESTIMATED_TOOLTIP_HEIGHT = 96;
 
 let nextHintId = 1;
@@ -45,6 +47,14 @@ function buildTooltipPosition(anchor, align, windowWidth, windowHeight) {
       : belowTop;
 
   return {left, top};
+}
+
+function Tooltip({children, positionStyle}) {
+  return (
+    <View pointerEvents="none" style={[styles.tooltip, positionStyle]}>
+      <Text style={styles.tooltipText}>{children}</Text>
+    </View>
+  );
 }
 
 function HintBubble({label = 'Help', text, align = 'right'}) {
@@ -133,6 +143,14 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
     Platform.OS === 'web' && floatingPosition
       ? [styles.tooltipFloating, floatingPosition]
       : [styles.tooltipInline, align === 'left' ? styles.tooltipLeft : styles.tooltipRight];
+  const tooltip =
+    visible && (Platform.OS !== 'web' || floatingPosition) ? (
+      <Tooltip positionStyle={tooltipPositionStyle}>{text}</Tooltip>
+    ) : null;
+  const portaledTooltip =
+    Platform.OS === 'web' && ReactDOM && typeof document !== 'undefined' && tooltip
+      ? ReactDOM.createPortal(tooltip, document.body)
+      : tooltip;
 
   return (
     <View style={styles.wrap}>
@@ -150,13 +168,7 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
           <Text style={styles.bubbleText}>?</Text>
         </Pressable>
       </View>
-      {visible && (Platform.OS !== 'web' || floatingPosition) ? (
-        <View
-          pointerEvents="none"
-          style={[styles.tooltip, tooltipPositionStyle]}>
-          <Text style={styles.tooltipText}>{text}</Text>
-        </View>
-      ) : null}
+      {portaledTooltip}
     </View>
   );
 }
