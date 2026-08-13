@@ -19,6 +19,13 @@ technician, client, viewer, and vendor lanes:
   interaction. Each work-order card should include a stable request reference,
   visible location/customer context, and quiet last-update timing before the
   title, so similar requests do not blur together in dense queues.
+- Role search: every lane gets a compact search panel directly above the center
+  queue. Search must run inside the active Work View rather than replacing it,
+  and wording should match the lane: Tenant Search for admins, Dispatch Search
+  for coordinators, Assigned Search for technicians, Request Search for
+  clients, Snapshot Search for viewers, and Vendor Search for vendors. Matching
+  should include request reference, title, address/unit, status, dates,
+  proof/approval state, and role-relevant linked names.
 - Right action rail: next-best action, waiting-on signals, operating guidance,
   and event-lane cues. It uses the same fixed-rail treatment and scrolls inside
   the rail so long guidance does not push the primary queue out of view.

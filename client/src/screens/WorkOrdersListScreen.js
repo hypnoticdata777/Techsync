@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
   TouchableOpacity,
+  TextInput,
   StyleSheet,
   Alert,
   Platform,
@@ -36,11 +37,13 @@ import {
   buildWorkOrderFlowRows,
   canManageOperations,
   filterWorkOrdersForRoleQueue,
+  filterWorkOrdersForRoleSearch,
   getRoleAccessMessage,
   getRoleActions,
   getRoleEmptyState,
   getRoleHome,
   getRolePortalSummary,
+  getRoleQueueSearchConfig,
   getRoleUserExperience,
   getWorkOrdersEndpointForRole,
 } from '../utils/roleWorkflows';
@@ -124,6 +127,7 @@ function WorkOrdersListScreen({navigation}) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [activeQueueFilter, setActiveQueueFilter] = useState('all');
+  const [queueSearch, setQueueSearch] = useState('');
   const canManageWorkOrders = canManageOperations(user?.role);
   const useWorkspaceLayout = width >= 1040;
 
@@ -133,6 +137,10 @@ function WorkOrdersListScreen({navigation}) {
   const roleHome = useMemo(() => getRoleHome(user?.role), [user?.role]);
   const roleExperience = useMemo(() => getRoleUserExperience(user?.role), [user?.role]);
   const roleEmptyState = useMemo(() => getRoleEmptyState(user?.role), [user?.role]);
+  const roleSearchConfig = useMemo(
+    () => getRoleQueueSearchConfig(user?.role),
+    [user?.role],
+  );
   const roleActions = useMemo(() => getRoleActions(user?.role), [user?.role]);
   const queueSummary = useMemo(() => buildQueueSummary(workOrders), [workOrders]);
   const roleLaneRows = useMemo(() => buildRoleLaneRows(user?.role), [user?.role]);
@@ -171,10 +179,15 @@ function WorkOrdersListScreen({navigation}) {
     () => queueFilterRows.find(row => row.key === activeQueueFilter) || queueFilterRows[0],
     [activeQueueFilter, queueFilterRows],
   );
-  const visibleWorkOrders = useMemo(
+  const filteredWorkOrders = useMemo(
     () => filterWorkOrdersForRoleQueue(user?.role, activeQueueFilter, workOrders),
     [activeQueueFilter, user?.role, workOrders],
   );
+  const visibleWorkOrders = useMemo(
+    () => filterWorkOrdersForRoleSearch(user?.role, queueSearch, filteredWorkOrders),
+    [filteredWorkOrders, queueSearch, user?.role],
+  );
+  const hasActiveSearch = queueSearch.trim().length > 0;
 
   useEffect(() => {
     if (!queueFilterRows.some(row => row.key === activeQueueFilter)) {
@@ -492,6 +505,53 @@ function WorkOrdersListScreen({navigation}) {
             </View>
           ) : null}
 
+          {!loading && !error && (
+            <View
+              style={styles.queueSearchPanel}
+              accessible
+              accessibilityLabel={`${roleSearchConfig.label}. ${roleSearchConfig.help}`}>
+              <View style={styles.queueSearchHeader}>
+                <View style={styles.inlineHelpRow}>
+                  <Text style={styles.queueSearchLabel}>{roleSearchConfig.label}</Text>
+                  <HintBubble
+                    label={roleSearchConfig.label}
+                    text={roleSearchConfig.help}
+                    align="left"
+                  />
+                </View>
+                <Text style={styles.queueSearchCount}>
+                  {visibleWorkOrders.length} / {filteredWorkOrders.length}
+                </Text>
+              </View>
+              <TextInput
+                style={styles.queueSearchInput}
+                value={queueSearch}
+                onChangeText={setQueueSearch}
+                placeholder={roleSearchConfig.placeholder}
+                placeholderTextColor="#766b5a"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="search"
+                accessibilityLabel={`${roleSearchConfig.label}. ${roleSearchConfig.placeholder}`}
+              />
+              <View style={styles.queueSearchMetaRow}>
+                <Text style={styles.queueSearchMeta} numberOfLines={1}>
+                  {hasActiveSearch
+                    ? `Searching inside ${activeFilterRow?.label || 'All Work'}`
+                    : `${activeFilterRow?.label || 'All Work'} view is active`}
+                </Text>
+                {hasActiveSearch ? (
+                  <TouchableOpacity
+                    style={styles.queueSearchClear}
+                    onPress={() => setQueueSearch('')}
+                    {...actionButtonA11y('Clear search', 'Clears the current queue search.')}>
+                    <Text style={styles.queueSearchClearText}>Clear</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </View>
+          )}
+
           {loading && <ActivityIndicator style={styles.loader} />}
           {error && (
             <ScreenErrorState message={error} onRetry={fetchWorkOrders} />
@@ -502,11 +562,19 @@ function WorkOrdersListScreen({navigation}) {
               keyExtractor={item => String(item.id)}
               renderItem={renderWorkOrder}
               ListEmptyComponent={
-                <EmptyQueueState
-                  state={roleEmptyState}
-                  filter={activeQueueFilter === 'all' ? null : activeFilterRow}
-                  onAction={roleEmptyState.actionRoute ? handleEmptyAction : null}
-                />
+                hasActiveSearch ? (
+                  <SearchEmptyState
+                    config={roleSearchConfig}
+                    query={queueSearch}
+                    onClear={() => setQueueSearch('')}
+                  />
+                ) : (
+                  <EmptyQueueState
+                    state={roleEmptyState}
+                    filter={activeQueueFilter === 'all' ? null : activeFilterRow}
+                    onAction={roleEmptyState.actionRoute ? handleEmptyAction : null}
+                  />
+                )
               }
               contentContainerStyle={[
                 styles.listContent,
@@ -677,6 +745,22 @@ const EmptyQueueState = ({state, filter, onAction}) => (
         <Text style={styles.emptyActionText}>{state.actionLabel}</Text>
       </TouchableOpacity>
     ) : null}
+  </View>
+);
+
+const SearchEmptyState = ({config, query, onClear}) => (
+  <View style={styles.emptyPanel}>
+    <Text style={styles.emptyTitle}>{config.emptyTitle}</Text>
+    <Text style={styles.emptyMessage}>
+      No records match "{query.trim()}."
+    </Text>
+    <Text style={styles.emptyDetail}>{config.emptyDetail}</Text>
+    <TouchableOpacity
+      style={styles.emptyActionButton}
+      onPress={onClear}
+      {...actionButtonA11y('Clear search', 'Returns to the current work view without search terms.')}>
+      <Text style={styles.emptyActionText}>Clear search</Text>
+    </TouchableOpacity>
   </View>
 );
 
@@ -1194,6 +1278,70 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     lineHeight: 17,
     marginTop: 4,
+  },
+  queueSearchPanel: {
+    backgroundColor: '#fbf4e8',
+    borderColor: '#d2c2aa',
+    borderRadius: 6,
+    borderWidth: 1,
+    gap: 8,
+    marginBottom: 10,
+    padding: 10,
+  },
+  queueSearchHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+    overflow: 'visible',
+  },
+  queueSearchLabel: {
+    color: '#182532',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  queueSearchCount: {
+    color: '#2f6f9f',
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  queueSearchInput: {
+    backgroundColor: '#f6eddf',
+    borderColor: '#9b8b73',
+    borderRadius: 5,
+    borderWidth: 1,
+    color: '#182532',
+    fontSize: 14,
+    minHeight: 42,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+  },
+  queueSearchMetaRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+  },
+  queueSearchMeta: {
+    color: '#655d52',
+    flex: 1,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  queueSearchClear: {
+    alignItems: 'center',
+    backgroundColor: '#263241',
+    borderColor: '#182532',
+    borderRadius: 5,
+    borderWidth: 1,
+    justifyContent: 'center',
+    minHeight: 30,
+    paddingHorizontal: 12,
+  },
+  queueSearchClearText: {
+    color: '#fbf4e8',
+    fontSize: 12,
+    fontWeight: '900',
   },
   listContent: {
     paddingBottom: 16,

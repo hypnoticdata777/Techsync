@@ -68,6 +68,14 @@ TechSync Ops is one workflow with separated lanes:
 - Every home queue must show the user's lane, handoff partners, and success signal before the list.
 - Every home queue must also show queue-level event lanes so recurring loops like intake, risk, proof, approval, read-only review, and vendor delivery are visible before a user opens a job.
 - Queue-level event lanes should be actionable focus filters, not passive labels, so each role can narrow the visible list to the work that needs their lane next.
+- Queue search should be role-aware and applied after the active Work View, so
+  each lane can find the right record without escaping its permissions or
+  current focus. Admins search tenant records; coordinators search dispatch
+  context; technicians search assigned work; clients search linked requests;
+  viewers search their read-only snapshot; vendors search linked vendor work.
+  Search terms should include `Request TS-####`, title, address, unit, status,
+  update date, proof/approval state, and the role-relevant client, property,
+  vendor, or technician names.
 - Every home queue must include at least one operable next-best-action tool that selects a specific work order from the visible queue and lets the user either open it or focus the matching queue loop.
 - Every work-order queue card must explain why the item matters to the active role before the user opens it.
 - Every work-order detail page must show what the role can do and what is intentionally unavailable.

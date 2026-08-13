@@ -3265,6 +3265,12 @@ npm.cmd run test:ci
 npm.cmd run build:web
 ```
 
+Result:
+
+- Full client tests passed: `8 passed suites`, `67 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.
+
 ## 2026-08-13 - Role Workspace Layout Pass
 
 Decision:
@@ -3587,3 +3593,46 @@ Changes:
   required is available on demand without adding always-visible paragraph noise.
 - Passed the active role into detail-page handoff rows so list and detail
   language stay consistent for external users.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+```
+
+Result:
+
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.
+
+## 2026-08-13 - Role-Aware Queue Search Pass
+
+Decision:
+
+- The client lane needs fast request lookup by ID, address, unit, date, status,
+  proof, and approval state, but the same need exists in every role with
+  different vocabulary.
+- Search should respect the current lane and selected Work View instead of
+  acting like a global escape hatch.
+
+Changes:
+
+- Added reusable role-aware queue search configuration for org admin,
+  coordinator, technician, client, viewer, and vendor lanes.
+- Added a shared work-order search helper that matches stable `Request TS-####`
+  references, titles, address/unit context, status, dates, proof/approval
+  state, and linked client/property/vendor/technician names.
+- Added the search panel to the role workspace center column so every lane can
+  narrow the currently selected Work View.
+- Added a clear search action and search-specific empty state.
+- Updated README, role UX, workspace layout, and QA docs so queue search is
+  tracked as part of the role-lane UX contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+```

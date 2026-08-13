@@ -758,6 +758,121 @@ export const filterWorkOrdersForRoleQueue = (role, filterKey, workOrders = []) =
   return filter ? rows.filter(filter.match) : rows;
 };
 
+const ROLE_QUEUE_SEARCH_CONFIG = {
+  org_admin: {
+    label: 'Tenant Search',
+    placeholder: 'Search TS number, client, property, vendor, technician, risk, or status',
+    help: 'Find any visible tenant record by request number, address, linked people, proof state, priority, or work status.',
+    emptyTitle: 'No tenant work matches',
+    emptyDetail: 'Try a TS number, client name, property, vendor, technician, priority, status, or proof term.',
+  },
+  coordinator: {
+    label: 'Dispatch Search',
+    placeholder: 'Search TS number, address, unit, assignee, vendor, client, or status',
+    help: 'Find coordination work by request number, location, client, vendor, assigned technician, priority, status, or waiting state.',
+    emptyTitle: 'No dispatch work matches',
+    emptyDetail: 'Try the TS number, address, unit, client, assigned technician, vendor, priority, or status.',
+  },
+  technician: {
+    label: 'Assigned Search',
+    placeholder: 'Search TS number, address, unit, service, status, proof, or date',
+    help: 'Find assigned field work by request number, service, location, status, priority, proof state, or recent date.',
+    emptyTitle: 'No assigned work matches',
+    emptyDetail: 'Try the TS number, address, service type, status, priority, or proof term.',
+  },
+  client: {
+    label: 'Request Search',
+    placeholder: 'Search TS number, address, unit, status, proof, update, or date',
+    help: 'Find client-visible requests by request number, property, unit, status, approval, proof, or update date.',
+    emptyTitle: 'No client requests match',
+    emptyDetail: 'Try a TS number, address, unit, status, approval, proof, or date term.',
+  },
+  viewer: {
+    label: 'Snapshot Search',
+    placeholder: 'Search TS number, linked work, address, unit, proof, or status',
+    help: 'Find read-only visible work by request number, linked property, status, approval, proof, or update date.',
+    emptyTitle: 'No visible snapshot matches',
+    emptyDetail: 'Try a TS number, address, status, proof, approval, or date term.',
+  },
+  vendor: {
+    label: 'Vendor Search',
+    placeholder: 'Search TS number, assigned vendor work, address, service, status, or proof',
+    help: 'Find vendor-visible work by request number, service, address, status, blocker, proof state, or update date.',
+    emptyTitle: 'No vendor work matches',
+    emptyDetail: 'Try a TS number, service, address, status, blocker, proof, or date term.',
+  },
+  default: {
+    label: 'Queue Search',
+    placeholder: 'Search TS number, title, address, status, proof, or date',
+    help: 'Find visible work by request number, title, address, status, proof, or update date.',
+    emptyTitle: 'No work matches',
+    emptyDetail: 'Try a TS number, title, address, status, proof, or date term.',
+  },
+};
+
+export const getRoleQueueSearchConfig = role =>
+  ROLE_QUEUE_SEARCH_CONFIG[role] || ROLE_QUEUE_SEARCH_CONFIG.default;
+
+const normalizeSearchValue = value =>
+  String(value ?? '')
+    .toLowerCase()
+    .replace(/[_#-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const buildSearchReferenceTerms = workOrder => {
+  if (!workOrder?.id) {
+    return [];
+  }
+
+  const padded = String(workOrder.id).padStart(4, '0');
+  return [`Request TS-${padded}`, `TS-${padded}`, `TS${padded}`, workOrder.id];
+};
+
+const buildWorkOrderSearchHaystack = workOrder => {
+  const proofState = hasCompletionProof(workOrder) ? 'proof verified closeout complete' : 'proof pending missing';
+  const approvalState = workOrder?.client_approval_status
+    ? `approval ${workOrder.client_approval_status}`
+    : '';
+
+  return [
+    ...buildSearchReferenceTerms(workOrder),
+    workOrder?.title,
+    workOrder?.description,
+    workOrder?.status,
+    workOrder?.priority,
+    workOrder?.service_type,
+    workOrder?.customer_name,
+    workOrder?.client_display_name,
+    workOrder?.property_name,
+    workOrder?.vendor_name,
+    workOrder?.assigned_technician_name,
+    workOrder?.address,
+    workOrder?.unit,
+    workOrder?.created_at,
+    workOrder?.updated_at,
+    approvalState,
+    proofState,
+  ]
+    .map(normalizeSearchValue)
+    .filter(Boolean)
+    .join(' ');
+};
+
+export const filterWorkOrdersForRoleSearch = (role, query, workOrders = []) => {
+  const rows = workOrders || [];
+  const terms = normalizeSearchValue(query).split(' ').filter(Boolean);
+
+  if (terms.length === 0) {
+    return rows;
+  }
+
+  return rows.filter(workOrder => {
+    const haystack = buildWorkOrderSearchHaystack(workOrder);
+    return terms.every(term => haystack.includes(term));
+  });
+};
+
 const PRIORITY_SCORE = {
   emergency: 50,
   urgent: 40,
@@ -2586,6 +2701,8 @@ export default {
   buildRoleGuidanceRows,
   buildRoleQueueFilterRows,
   filterWorkOrdersForRoleQueue,
+  filterWorkOrdersForRoleSearch,
+  getRoleQueueSearchConfig,
   getDetailRoleContext,
   buildDetailSummary,
   buildDetailGuidanceRows,

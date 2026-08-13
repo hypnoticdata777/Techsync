@@ -18,6 +18,7 @@ import {
   canAccessMainRoute,
   canManageOperations,
   filterWorkOrdersForRoleQueue,
+  filterWorkOrdersForRoleSearch,
   getAvailableMainRoutes,
   getDetailRoleContext,
   getRoleEmptyState,
@@ -25,6 +26,7 @@ import {
   getRoleHome,
   getRoleLane,
   getRolePortalSummary,
+  getRoleQueueSearchConfig,
   getCommunicationLaneNotice,
   getRoleUserExperience,
   getWorkOrdersEndpointForRole,
@@ -345,6 +347,46 @@ describe('role workflow helpers', () => {
     expect(filterWorkOrdersForRoleQueue('vendor', 'blocked', queue).map(item => item.id))
       .toEqual([4, 5]);
     expect(filterWorkOrdersForRoleQueue('vendor', 'unknown', queue)).toBe(queue);
+  });
+
+  test('filters visible queues by role-aware search terms', () => {
+    const queue = [
+      {
+        id: 19,
+        title: 'Common hallway lights flickering',
+        description: 'Second active job for same technician.',
+        status: 'open',
+        priority: 'medium',
+        client_display_name: 'Riverside HOA',
+        property_name: '1300 Demo Ridge Floor 8',
+        address: 'Test City, NY',
+        vendor_name: 'BrightLine Demo Electrical',
+        assigned_technician_name: 'Marco Rivera',
+        updated_at: '2026-07-30T00:00:00Z',
+      },
+      {
+        id: 20,
+        title: 'Completed disposal replacement with proof',
+        status: 'completed',
+        priority: 'normal',
+        client_display_name: 'Riley Homeowner',
+        property_name: '1300 Demo Ridge Unit 4B',
+        vendor_name: 'Apex Demo Plumbing',
+        completion_proof_verified_at: '2026-08-12T00:00:00Z',
+      },
+    ];
+
+    expect(getRoleQueueSearchConfig('client').placeholder).toContain('address');
+    expect(getRoleQueueSearchConfig('vendor').placeholder).toContain('vendor');
+    expect(filterWorkOrdersForRoleSearch('client', 'TS-0019', queue).map(item => item.id))
+      .toEqual([19]);
+    expect(filterWorkOrdersForRoleSearch('client', 'ridge floor', queue).map(item => item.id))
+      .toEqual([19]);
+    expect(filterWorkOrdersForRoleSearch('coordinator', 'brightline marco', queue).map(item => item.id))
+      .toEqual([19]);
+    expect(filterWorkOrdersForRoleSearch('viewer', 'proof verified', queue).map(item => item.id))
+      .toEqual([20]);
+    expect(filterWorkOrdersForRoleSearch('technician', '', queue)).toBe(queue);
   });
 
   test('selects an operable next-best queue action for each role', () => {

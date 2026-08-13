@@ -66,12 +66,15 @@ TechSync Ops is shaped around six user lanes:
 | Vendor | See linked vendor work and vendor-visible communication only. |
 
 The UX direction is a calmer SaaS console: a persistent left Work Views rail,
-a center work queue or detail record, and a right next-actions rail. Explanatory
-copy is being moved into compact help bubbles so the visible interface can focus
-on work, status, and action. Client-facing work cards now expose a stable
-`Request TS-####` identifier, visible location/update context, and plain
-handoff language so linked requests are easy to distinguish without leaking
-internal operations shorthand.
+a center work queue or detail record, and a right next-actions rail. Each lane
+also has role-aware queue search, applied after the selected Work View, so users
+can narrow their own visible work by `Request TS-####`, address/unit, status,
+dates, proof or approval state, and relevant people or vendor context.
+Explanatory copy is being moved into compact help bubbles so the visible
+interface can focus on work, status, and action. Client-facing work cards now
+expose a stable `Request TS-####` identifier, visible location/update context,
+and plain handoff language so linked requests are easy to distinguish without
+leaking internal operations shorthand.
 
 ## Live Staging Loop
 

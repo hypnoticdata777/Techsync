@@ -288,6 +288,11 @@ they have been verified in the relevant environment.
 - [x] Waiting-state explanations now sit behind contextual help bubbles on the
       card handoff chips, including the field that previously surfaced
       ambiguous client-facing `Triage` language.
+- [x] Home queues now include tested role-aware search after the selected Work
+      View so admin, coordinator, technician, client, viewer, and vendor lanes
+      can narrow visible records by request reference, address/unit, status,
+      date, proof/approval state, and relevant linked names without changing
+      lane scope.
 - [x] Work-order detail pages now include a work-story timeline covering
       intake, schedule, assignment, field progress, proof/photos, and latest
       update context.
