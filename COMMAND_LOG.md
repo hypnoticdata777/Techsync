@@ -3298,10 +3298,6 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
-- Backend tests passed: `188 passed`.
-- Python compile checks passed.
-- Reset hosted demo workflow YAML parsed successfully.
-- `git diff --check` reported only Windows LF-to-CRLF warnings.
 
 ## 2026-08-12 - Vercel Root Requirements Parser Fix
 
@@ -3400,6 +3396,37 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
+
+## 2026-08-13 - Public README Front-Door Polish
+
+Decision:
+
+- The README had accurate project history, but the opening read like internal
+  build notes instead of a public-facing product/repo front door.
+- Keep the README honest about staged-demo readiness while making the first
+  impression clearer for portfolio viewers, technical reviewers, and investor
+  conversations.
+
+Changes:
+
+- Reframed the README around the product promise, problem, current readiness
+  state, user lanes, live staging loop, architecture, testing, security, and
+  roadmap.
+- Moved detailed evidence and requirement trails into the documentation index
+  instead of placing all implementation history above the fold.
+- Preserved explicit boundaries that the hosted loop is synthetic-data staging,
+  not real customer production.
+
+Verification:
+
+```powershell
+Get-Content README.md -TotalCount 120
+```
+
+Result:
+
+- README now opens with public positioning, readiness boundaries, role lanes,
+  and concise links into the deeper project docs.
 
 ## 2026-08-13 - Refined Light Visual System Pass
 
