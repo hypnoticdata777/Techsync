@@ -226,6 +226,9 @@ they have been verified in the relevant environment.
 - [x] Role home explanatory helper copy is tucked behind compact `?` help
       bubbles so the visible workspace prioritizes actions, counts, and work
       records.
+- [x] Help bubbles now behave as one-at-a-time contextual popovers; hover,
+      focus, or tap opens one explanation, clicking the active bubble
+      dismisses it, and moving to another bubble closes the previous one.
 - [x] Clickable portal/work-order/jump surfaces now carry stronger raised and
       hover/pressed affordances so users can tell what opens another view.
 - [x] Signed-in header brand hierarchy sharpened so TechSync anchors the app

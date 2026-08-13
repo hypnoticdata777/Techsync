@@ -1,14 +1,84 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 
+let nextHintId = 1;
+let activeHintId = null;
+const activeHintListeners = new Set();
+
+function emitActiveHint(id) {
+  activeHintId = id;
+  activeHintListeners.forEach(listener => listener(activeHintId));
+}
+
+function clearActiveHint(id) {
+  if (activeHintId === id) {
+    emitActiveHint(null);
+  }
+}
+
+function subscribeActiveHint(listener) {
+  activeHintListeners.add(listener);
+  return () => activeHintListeners.delete(listener);
+}
+
 function HintBubble({label = 'Help', text, align = 'right'}) {
+  const idRef = useRef(null);
+  if (idRef.current === null) {
+    idRef.current = `hint-${nextHintId}`;
+    nextHintId += 1;
+  }
+
+  const [activeId, setActiveId] = useState(activeHintId);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [pinned, setPinned] = useState(false);
+  const [tappedOpen, setTappedOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => subscribeActiveHint(setActiveId), []);
 
   if (!text) return null;
 
-  const visible = hovered || focused || pinned;
+  const isActive = activeId === idRef.current;
+  const visible = isActive && !dismissed && (hovered || focused || tappedOpen);
+
+  const openFromHover = () => {
+    setHovered(true);
+    setTappedOpen(false);
+    setDismissed(false);
+    emitActiveHint(idRef.current);
+  };
+
+  const closeFromHover = () => {
+    setHovered(false);
+    setTappedOpen(false);
+    setDismissed(false);
+    clearActiveHint(idRef.current);
+  };
+
+  const openFromFocus = () => {
+    setFocused(true);
+    emitActiveHint(idRef.current);
+  };
+
+  const closeFromFocus = () => {
+    setFocused(false);
+    setTappedOpen(false);
+    setDismissed(false);
+    clearActiveHint(idRef.current);
+  };
+
+  const toggleFromPress = () => {
+    if (visible) {
+      setTappedOpen(false);
+      setDismissed(true);
+      clearActiveHint(idRef.current);
+      return;
+    }
+
+    setTappedOpen(true);
+    setDismissed(false);
+    emitActiveHint(idRef.current);
+  };
 
   return (
     <View style={styles.wrap}>
@@ -17,11 +87,11 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
         accessibilityRole="button"
         accessibilityLabel={`${label}: ${text}`}
         accessibilityHint="Shows a short explanation."
-        onHoverIn={() => setHovered(true)}
-        onHoverOut={() => setHovered(false)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        onPress={() => setPinned(current => !current)}>
+        onHoverIn={openFromHover}
+        onHoverOut={closeFromHover}
+        onFocus={openFromFocus}
+        onBlur={closeFromFocus}
+        onPress={toggleFromPress}>
         <Text style={styles.bubbleText}>?</Text>
       </Pressable>
       {visible ? (

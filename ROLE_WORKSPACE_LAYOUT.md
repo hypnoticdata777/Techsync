@@ -17,8 +17,10 @@ technician, client, viewer, and vendor lanes:
   the rail so long guidance does not push the primary queue out of view.
 - Inline explanations should not compete with the work. Section purpose copy
   now lives behind compact `?` help bubbles. On hover, keyboard focus, or tap,
-  the bubble opens a small contextual explanation window. The always-visible
-  surface should keep only labels, counts, statuses, work titles, and actions.
+  the bubble opens a small contextual explanation window. Only one help bubble
+  may stay active at a time, and clicking the active bubble dismisses it so
+  tooltip copy never stacks over the workspace. The always-visible surface
+  should keep only labels, counts, statuses, work titles, and actions.
 
 On narrow screens, the same order stacks vertically: identity and scope first,
 then navigation/focus, then primary data, then next actions. The user should

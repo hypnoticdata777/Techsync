@@ -3206,6 +3206,29 @@ Result:
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
 
+## 2026-08-13 - Help Bubble Dismissal Polish
+
+Decision:
+
+- The new contextual help bubbles reduced visible copy, but clicked bubbles
+  could stay open and stack over nearby UI.
+- Treat the bubbles like transient contextual help: one active explanation at
+  a time, click again to dismiss, and hover/focus/tap to reopen when needed.
+
+Changes:
+
+- Updated the shared `HintBubble` component so every help bubble shares one
+  active-popover registry.
+- Removed sticky pinned behavior that kept popovers visible after click.
+- Documented the one-at-a-time, click-to-dismiss help-bubble contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+```
+
 ## 2026-08-13 - Role Workspace Layout Pass
 
 Decision:
