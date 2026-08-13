@@ -478,33 +478,6 @@ function WorkOrdersListScreen({navigation}) {
             </View>
           </View>
 
-          {portalSummary ? (
-            <View
-              style={styles.portalPanel}
-              accessible
-              accessibilityLabel={`${portalSummary.title}. ${portalSummary.subtitle}`}>
-              <View style={styles.portalHeader}>
-                <Text style={styles.portalTitle}>{portalSummary.title}</Text>
-                <HintBubble
-                  label={portalSummary.title}
-                  text={portalSummary.subtitle}
-                />
-              </View>
-              <View style={styles.portalRow}>
-                {portalSummary.rows.map(row => (
-                  <View
-                    key={row.key}
-                    style={styles.portalMetric}
-                    accessible
-                    accessibilityLabel={`${row.label}. ${row.value}`}>
-                    <Text style={styles.portalMetricLabel}>{row.label}</Text>
-                    <Text style={styles.portalMetricValue}>{row.value}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          ) : null}
-
           {!loading && !error && (
             <View
               style={styles.queueSearchPanel}
@@ -551,6 +524,33 @@ function WorkOrdersListScreen({navigation}) {
               </View>
             </View>
           )}
+
+          {portalSummary ? (
+            <View
+              style={styles.portalPanel}
+              accessible
+              accessibilityLabel={`${portalSummary.title}. ${portalSummary.subtitle}`}>
+              <View style={styles.portalHeader}>
+                <Text style={styles.portalTitle}>{portalSummary.title}</Text>
+                <HintBubble
+                  label={portalSummary.title}
+                  text={portalSummary.subtitle}
+                />
+              </View>
+              <View style={styles.portalRow}>
+                {portalSummary.rows.map(row => (
+                  <View
+                    key={row.key}
+                    style={styles.portalMetric}
+                    accessible
+                    accessibilityLabel={`${row.label}. ${row.value}`}>
+                    <Text style={styles.portalMetricLabel}>{row.label}</Text>
+                    <Text style={styles.portalMetricValue}>{row.value}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : null}
 
           {loading && <ActivityIndicator style={styles.loader} />}
           {error && (
