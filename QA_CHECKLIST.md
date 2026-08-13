@@ -218,6 +218,13 @@ they have been verified in the relevant environment.
       and vendor users before approval, messaging, proof, or lifecycle actions.
 - [x] Work-order create/edit form now shows linked/manual intake guidance before
       save so client, property, vendor, and address context gaps are explicit.
+- [x] Role home explanatory helper copy is tucked behind compact `?` help
+      bubbles so the visible workspace prioritizes actions, counts, and work
+      records.
+- [x] Clickable portal/work-order/jump surfaces now carry stronger raised and
+      hover/pressed affordances so users can tell what opens another view.
+- [x] Signed-in header brand hierarchy sharpened so TechSync anchors the app
+      while role/page text stays smaller and easier to scan.
 - [x] Work-order queue cards and detail command panels now show
       interoperability cues for next owner, waiting-on state, and visible
       audiences so role handoffs are understandable before opening or mutating

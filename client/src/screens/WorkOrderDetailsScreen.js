@@ -4,6 +4,7 @@ import {
   Alert,
   Image,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -194,6 +195,17 @@ const SectionReadiness = ({row}) => {
     </View>
   );
 };
+
+const HintBubble = ({label, text}) => (
+  <View
+    style={styles.hintBubble}
+    accessible
+    accessibilityRole="text"
+    accessibilityLabel={`${label}: ${text}`}
+    {...(Platform.OS === 'web' ? {title: text} : {})}>
+    <Text style={styles.hintBubbleText}>?</Text>
+  </View>
+);
 
 const readableStatus = value =>
   value ? String(value).replace(/_/g, ' ') : 'Not recorded';
@@ -774,8 +786,13 @@ function WorkOrderDetailsScreen({route, navigation}) {
 
         <View style={styles.commandPanel}>
           <View style={styles.commandHeader}>
-            <Text style={styles.commandTitle}>{roleContext.title}</Text>
-            <Text style={styles.commandSubtitle}>{roleContext.subtitle}</Text>
+            <View style={styles.panelTitleRow}>
+              <Text style={styles.commandTitle}>{roleContext.title}</Text>
+              <HintBubble
+                label={roleContext.title}
+                text={roleContext.subtitle}
+              />
+            </View>
           </View>
           <View style={styles.summaryGrid}>
             {detailSummary.map(item => (
@@ -813,11 +830,13 @@ function WorkOrderDetailsScreen({route, navigation}) {
           </View>
           <View style={styles.storyPanel}>
             <View style={styles.storyHeader}>
-              <Text style={styles.storyTitle}>Work Story</Text>
-              <Text style={styles.storySubtitle}>
-                Follow the job from request intake to schedule, assignment, field
-                movement, messages, and proof.
-              </Text>
+              <View style={styles.panelTitleRow}>
+                <Text style={styles.storyTitle}>Work Story</Text>
+                <HintBubble
+                  label="Work Story"
+                  text="Shows the work order path from intake through schedule, assignment, field progress, messages, and proof."
+                />
+              </View>
             </View>
             <View style={styles.storyGrid}>
               {workOrderStoryRows.map(row => (
@@ -1401,16 +1420,32 @@ const styles = StyleSheet.create({
   commandHeader: {
     marginBottom: 12,
   },
+  panelTitleRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'space-between',
+  },
+  hintBubble: {
+    alignItems: 'center',
+    backgroundColor: '#f6eddf',
+    borderColor: '#bfae94',
+    borderRadius: 999,
+    borderWidth: 1,
+    height: 18,
+    justifyContent: 'center',
+    width: 18,
+  },
+  hintBubbleText: {
+    color: '#2f6f9f',
+    fontSize: 11,
+    fontWeight: '900',
+    lineHeight: 14,
+  },
   commandTitle: {
     color: '#182532',
     fontSize: 16,
     fontWeight: '800',
-  },
-  commandSubtitle: {
-    color: '#655d52',
-    fontSize: 12,
-    lineHeight: 17,
-    marginTop: 3,
   },
   summaryGrid: {
     flexDirection: 'row',
@@ -1493,12 +1528,6 @@ const styles = StyleSheet.create({
     color: '#182532',
     fontSize: 15,
     fontWeight: '900',
-  },
-  storySubtitle: {
-    color: '#574f45',
-    fontSize: 12,
-    lineHeight: 17,
-    marginTop: 4,
   },
   storyGrid: {
     flexDirection: 'row',

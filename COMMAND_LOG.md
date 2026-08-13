@@ -3386,3 +3386,39 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
+
+## 2026-08-13 - Role Workspace Help and Click Affordance Polish
+
+Decision:
+
+- The stronger light workspace was easier to scan, but visible explanatory
+  sentences still created noise in the left rail, center portal summary, and
+  right next-action rail.
+- Keep the visible surface focused on actions, counts, and work records, while
+  moving explanation into compact on-demand help bubbles.
+
+Changes:
+
+- Added compact `?` help bubbles for role navigation, queue focus, portal
+  summary, next actions, detail command context, and work-story context.
+- Removed always-visible helper paragraphs from the role home and detail
+  headers where the screen already communicates the action directly.
+- Strengthened clickable card affordances with raised resting surfaces and a
+  darker pressed/hovered state for queue cards and portal panels.
+- Sharpened the signed-in TechSync header brand with a larger title and small
+  circled mark while keeping role/page text subordinate.
+- Updated README, QA checklist, and role workspace layout docs with the
+  visible-action/on-demand-help contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+```
+
+Result:
+
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.

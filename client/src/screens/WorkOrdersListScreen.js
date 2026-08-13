@@ -73,6 +73,17 @@ const getStatusColor = (status) => {
   }
 };
 
+const HintBubble = ({label, text}) => (
+  <View
+    style={styles.hintBubble}
+    accessible
+    accessibilityRole="text"
+    accessibilityLabel={`${label}: ${text}`}
+    {...(Platform.OS === 'web' ? {title: text} : {})}>
+    <Text style={styles.hintBubbleText}>?</Text>
+  </View>
+);
+
 function WorkOrdersListScreen({navigation}) {
   const {user, logout, authFetch} = useAuth();
   const {width} = useWindowDimensions();
@@ -306,11 +317,13 @@ function WorkOrdersListScreen({navigation}) {
 
       <View style={[styles.workspaceShell, !useWorkspaceLayout && styles.workspaceStack]}>
         <View style={[styles.workspaceNav, !useWorkspaceLayout && styles.workspaceCardStack]}>
-          <Text style={styles.workspaceTitle}>Navigation</Text>
-          <Text style={styles.workspaceHelp}>
-            Choose the queue lane, operating context, or action this role is allowed
-            to run.
-          </Text>
+          <View style={styles.panelTitleRow}>
+            <Text style={styles.workspaceTitle}>Navigation</Text>
+            <HintBubble
+              label="Navigation"
+              text="Use this column to switch queue lanes and open role-specific tools."
+            />
+          </View>
           <View style={styles.laneMap}>
             {roleLaneRows.map(row => (
               <View
@@ -325,8 +338,13 @@ function WorkOrdersListScreen({navigation}) {
           </View>
 
           <View style={styles.queueFilterPanel}>
-            <Text style={styles.queueFilterTitle}>Focus Queue</Text>
-            <Text style={styles.queueFilterHint}>{activeFilterRow?.detail}</Text>
+            <View style={styles.panelTitleRow}>
+              <Text style={styles.queueFilterTitle}>Focus Queue</Text>
+              <HintBubble
+                label="Focus Queue"
+                text={activeFilterRow?.detail || 'Filter visible work to the queue lane this role needs next.'}
+              />
+            </View>
             {isQueueFocused ? (
               <View
                 style={[styles.focusStatusPanel, {borderLeftColor: activeFilterColor}]}
@@ -445,7 +463,10 @@ function WorkOrdersListScreen({navigation}) {
               accessibilityLabel={`${portalSummary.title}. ${portalSummary.subtitle}`}>
               <View style={styles.portalHeader}>
                 <Text style={styles.portalTitle}>{portalSummary.title}</Text>
-                <Text style={styles.portalSubtitle}>{portalSummary.subtitle}</Text>
+                <HintBubble
+                  label={portalSummary.title}
+                  text={portalSummary.subtitle}
+                />
               </View>
               <View style={styles.portalRow}>
                 {portalSummary.rows.map(row => (
@@ -495,11 +516,13 @@ function WorkOrdersListScreen({navigation}) {
         </View>
 
         <View style={[styles.workspaceAside, !useWorkspaceLayout && styles.workspaceCardStack]}>
-          <Text style={styles.workspaceTitle}>Next Actions</Text>
-          <Text style={styles.workspaceHelp}>
-            Shows what is waiting on this user, the safest next click, and why the
-            item matters.
-          </Text>
+          <View style={styles.panelTitleRow}>
+            <Text style={styles.workspaceTitle}>Next Actions</Text>
+            <HintBubble
+              label="Next Actions"
+              text="Shows the safest next click, what is waiting on this user, and why it matters."
+            />
+          </View>
           <ScrollView
             style={styles.workspaceAsideScroll}
             contentContainerStyle={styles.workspaceAsideContent}
@@ -756,13 +779,29 @@ const styles = StyleSheet.create({
     color: '#182532',
     fontSize: 13,
     fontWeight: '900',
-    marginBottom: 5,
   },
-  workspaceHelp: {
-    color: '#574f45',
-    fontSize: 11,
-    lineHeight: 16,
+  panelTitleRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'space-between',
     marginBottom: 10,
+  },
+  hintBubble: {
+    alignItems: 'center',
+    backgroundColor: '#f6eddf',
+    borderColor: '#bfae94',
+    borderRadius: 999,
+    borderWidth: 1,
+    height: 18,
+    justifyContent: 'center',
+    width: 18,
+  },
+  hintBubbleText: {
+    color: '#2f6f9f',
+    fontSize: 11,
+    fontWeight: '900',
+    lineHeight: 14,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -1014,12 +1053,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     textTransform: 'uppercase',
   },
-  queueFilterHint: {
-    color: '#655d52',
-    fontSize: 11,
-    lineHeight: 16,
-    marginTop: 3,
-  },
   focusStatusPanel: {
     alignItems: 'center',
     backgroundColor: '#fbf4e8',
@@ -1111,6 +1144,10 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     justifyContent: 'center',
     backgroundColor: '#f6eddf',
+    shadowColor: '#27313d',
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    shadowOffset: {width: 0, height: 2},
   },
   directoryAction: {
     borderColor: '#6f5f95',
@@ -1142,26 +1179,29 @@ const styles = StyleSheet.create({
     color: '#f1eadf',
   },
   portalPanel: {
-    backgroundColor: '#fbf4e8',
-    borderColor: '#bfae94',
+    backgroundColor: '#eee3d2',
+    borderColor: '#9b8b73',
     borderRadius: 6,
+    borderBottomWidth: 3,
     borderWidth: 1,
     marginBottom: 10,
-    padding: 10,
+    padding: 11,
+    shadowColor: '#27313d',
+    shadowOpacity: 0.08,
+    shadowRadius: 5,
+    shadowOffset: {width: 0, height: 2},
   },
   portalHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'space-between',
     marginBottom: 10,
   },
   portalTitle: {
     color: '#182532',
     fontSize: 16,
     fontWeight: '900',
-  },
-  portalSubtitle: {
-    color: '#655d52',
-    fontSize: 12,
-    lineHeight: 17,
-    marginTop: 3,
   },
   portalRow: {
     flexDirection: 'row',
@@ -1199,6 +1239,7 @@ const styles = StyleSheet.create({
   workOrderCard: {
     backgroundColor: '#fbf4e8',
     borderRadius: 6,
+    borderBottomWidth: 3,
     minHeight: 66,
     padding: 10,
     marginBottom: 8,
@@ -1206,8 +1247,9 @@ const styles = StyleSheet.create({
     borderColor: '#d2c2aa',
   },
   workOrderCardInteractive: {
-    backgroundColor: '#efe3d1',
+    backgroundColor: '#eadbc6',
     borderColor: '#2f6f9f',
+    transform: [{translateY: 1}],
     shadowColor: '#2f6f9f',
     shadowOpacity: 0.12,
     shadowRadius: 6,

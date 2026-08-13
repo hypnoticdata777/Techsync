@@ -15,14 +15,18 @@ role-lane contract lives in `ROLE_LANE_UX.md`, and the shared three-zone
 workspace pattern is documented in `ROLE_WORKSPACE_LAYOUT.md`. Each role home
 now follows a calmer SaaS console structure: left navigation/focus rail, center
 work queue, and right next-action rail. The fixed rails now use stronger muted
-surfaces, explicit helper language, and a scrollable next-action panel so the
-main queue stays easy to scan. Client, viewer, and vendor lanes have
+surfaces, compact `?` help bubbles for explanatory copy, and a scrollable
+next-action panel so the main queue stays easy to scan without visible
+instruction noise. The signed-in header gives TechSync stronger brand weight
+with a small circled mark while page and role text stay quieter. Client,
+viewer, and vendor lanes have
 purpose-built portal summaries and communication-channel notices so external
 users can tell what they can see, where replies go, and which controls are
 intentionally unavailable. Work-order queue cards now add role-specific scan
-cues and hover/press shading so admin, coordinator, technician, client, viewer,
-and vendor users can tell why a visible job matters and that the card opens a
-record before clicking it. Home queues now also show role event-lane cards for
+cues plus raised and hover/press affordances so admin, coordinator, technician,
+client, viewer, and vendor users can tell why a visible job matters and that
+the card opens a record before clicking it. Home queues now also show role
+event-lane cards for
 each user's recurring operating loops, such as risk, intake, assignment,
 approval, proof, read-only review, and vendor delivery; the same operating
 loops can now be tapped as queue focus filters so each user can shrink the list

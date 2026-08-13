@@ -15,6 +15,9 @@ technician, client, viewer, and vendor lanes:
 - Right action rail: next-best action, waiting-on signals, operating guidance,
   and event-lane cues. It uses the same fixed-rail treatment and scrolls inside
   the rail so long guidance does not push the primary queue out of view.
+- Inline explanations should not compete with the work. Section purpose copy
+  now lives behind compact `?` help bubbles so users can inspect meaning on
+  demand without turning every role home into a documentation page.
 
 On narrow screens, the same order stacks vertically: identity and scope first,
 then navigation/focus, then primary data, then next actions. The user should
@@ -35,8 +38,14 @@ sizes.
   dark POC look.
 - Interactable cards and jump surfaces shade on hover/press so users can tell
   they are clickable before committing to a click.
+- Non-action summaries must remain visually quieter than clickable work cards,
+  while clickable cards should feel slightly raised at rest and slightly
+  pressed/darker on interaction.
 - Roboto Serif remains the app typography direction for web. Text hierarchy
   should come from size, weight, spacing, and placement instead of loud colors.
+- The signed-in app header gives TechSync the strongest brand weight with a
+  small circled mark; page titles and role content stay smaller so the product
+  identity anchors the workspace without overwhelming the data.
 
 ## Role Navigation Baseline
 
@@ -58,7 +67,8 @@ Role-specific navigation may differ, but it should map into the same zones:
 ## Implementation Notes
 
 - `WorkOrdersListScreen` is the reference implementation for the three-zone
-  shell.
+  shell. It should keep explanatory helper text behind help bubbles, not as
+  always-visible paragraphs.
 - `WorkOrderDetailsScreen` should stay quieter and denser than the first dark
   POC pass: compact cards, toned surfaces, and action sections sized around
   the text they contain. The detail page now frames each job as a work story:

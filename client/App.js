@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Platform,
   View,
+  Text,
   StyleSheet,
 } from 'react-native';
 
@@ -26,6 +27,13 @@ import {canAccessMainRoute} from './src/utils/roleWorkflows';
 import {colors, typography} from './src/theme';
 
 const Stack = createNativeStackNavigator();
+
+const BrandTitle = () => (
+  <View style={styles.brandTitle}>
+    <Text style={styles.brandText}>TechSync</Text>
+    <Text style={styles.brandMark}>©</Text>
+  </View>
+);
 
 function Navigation() {
   const {isAuthenticated, loading, user} = useAuth();
@@ -101,7 +109,7 @@ function Navigation() {
               name="WorkOrdersList"
               component={WorkOrdersListScreen}
               options={{
-                title: 'TechSync',
+                headerTitle: () => <BrandTitle />,
               }}
             />
             <Stack.Screen
@@ -183,6 +191,30 @@ function App() {
 }
 
 const styles = StyleSheet.create({
+  brandTitle: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+  },
+  brandText: {
+    color: colors.ink,
+    fontFamily: typography.heading,
+    fontSize: 22,
+    fontWeight: '900',
+  },
+  brandMark: {
+    alignItems: 'center',
+    borderColor: colors.primary,
+    borderRadius: 999,
+    borderWidth: 1,
+    color: colors.primary,
+    fontSize: 10,
+    fontWeight: '900',
+    height: 16,
+    lineHeight: 14,
+    textAlign: 'center',
+    width: 16,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
