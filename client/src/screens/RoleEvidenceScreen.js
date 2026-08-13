@@ -161,27 +161,27 @@ const Section = ({title, children}) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f3ea',
+    backgroundColor: '#f1eadf',
   },
   content: {
     padding: 16,
     paddingBottom: 28,
   },
   title: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 26,
     fontWeight: '800',
   },
   subtitle: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 13,
     lineHeight: 19,
     marginTop: 6,
     marginBottom: 16,
   },
   statusBand: {
-    backgroundColor: '#fffaf0',
-    borderColor: '#d8ccb9',
+    backgroundColor: '#fbf4e8',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -190,8 +190,8 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   statusMetric: {
-    backgroundColor: '#fdf8ef',
-    borderColor: '#d8ccb9',
+    backgroundColor: '#f6eddf',
+    borderColor: '#d2c2aa',
     borderRadius: 7,
     borderWidth: 1,
     flex: 1,
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   sectionTitle: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 15,
     fontWeight: '900',
     marginBottom: 8,
@@ -223,8 +223,8 @@ const styles = StyleSheet.create({
   },
   checkRow: {
     alignItems: 'flex-start',
-    backgroundColor: '#fffaf0',
-    borderColor: '#d8ccb9',
+    backgroundColor: '#fbf4e8',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -239,8 +239,8 @@ const styles = StyleSheet.create({
   },
   preflightRow: {
     alignItems: 'flex-start',
-    backgroundColor: '#fffaf0',
-    borderColor: '#c7b89f',
+    backgroundColor: '#fbf4e8',
+    borderColor: '#bfae94',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     width: 32,
   },
   stepNumber: {
-    color: '#fffaf0',
+    color: '#fbf4e8',
     fontSize: 13,
     fontWeight: '900',
   },
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stepTitle: {
-    color: '#1f2933',
+    color: '#182532',
     flex: 1,
     fontSize: 13,
     fontWeight: '900',
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   viewportRow: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderColor: '#9eb4c8',
     borderRadius: 8,
     borderWidth: 1,
@@ -304,8 +304,8 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   roleRow: {
-    backgroundColor: '#fffaf0',
-    borderColor: '#d8ccb9',
+    backgroundColor: '#fbf4e8',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     borderWidth: 1,
     marginBottom: 10,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   roleName: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 15,
     fontWeight: '900',
     textTransform: 'capitalize',
@@ -357,19 +357,19 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   guardrail: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 6,
   },
   screenshotRow: {
-    borderBottomColor: '#d8ccb9',
+    borderBottomColor: '#d2c2aa',
     borderBottomWidth: 1,
     paddingVertical: 10,
   },
   manualRow: {
-    backgroundColor: '#fffaf0',
-    borderColor: '#c7b89f',
+    backgroundColor: '#fbf4e8',
+    borderColor: '#bfae94',
     borderRadius: 8,
     borderWidth: 1,
     marginBottom: 8,
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   fileName: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 13,
     fontWeight: '800',
   },

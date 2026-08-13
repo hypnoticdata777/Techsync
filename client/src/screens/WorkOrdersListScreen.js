@@ -9,6 +9,7 @@ import {
   Alert,
   Platform,
   RefreshControl,
+  useWindowDimensions,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
 import ScreenErrorState from '../components/ScreenErrorState';
@@ -56,7 +57,7 @@ const getStatusColor = (status) => {
     case 'cancelled':
       return '#b24a3a'; // red
     case 'archived':
-      return '#746a5d'; // slate
+      return '#655d52'; // slate
     case 'pending':
       return '#b98524';
     case 'missing':
@@ -66,18 +67,20 @@ const getStatusColor = (status) => {
     case 'active':
       return '#2f6f9f';
     default:
-      return '#746a5d'; // gray
+      return '#655d52'; // gray
   }
 };
 
 function WorkOrdersListScreen({navigation}) {
   const {user, logout, authFetch} = useAuth();
+  const {width} = useWindowDimensions();
   const [workOrders, setWorkOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [activeQueueFilter, setActiveQueueFilter] = useState('all');
   const canManageWorkOrders = canManageOperations(user?.role);
+  const useWorkspaceLayout = width >= 1040;
 
   // RF-22: technicians see their assigned queue ordered by priority;
   // client/viewer scoping is enforced by the backend list endpoint (RF-21).
@@ -296,290 +299,298 @@ function WorkOrdersListScreen({navigation}) {
         </View>
       </View>
 
-      <View style={styles.rolePanel}>
-        <View style={styles.summaryRow}>
-          <View
-            style={styles.summaryPill}
-            accessible
-            accessibilityLabel={summaryA11yLabel('Total work orders', queueSummary.total)}>
-            <Text style={styles.summaryValue}>{queueSummary.total}</Text>
-            <Text style={styles.summaryLabel}>Total</Text>
-          </View>
-          <View
-            style={styles.summaryPill}
-            accessible
-            accessibilityLabel={summaryA11yLabel('Open work orders', queueSummary.open)}>
-            <Text style={styles.summaryValue}>{queueSummary.open}</Text>
-            <Text style={styles.summaryLabel}>Open</Text>
-          </View>
-          <View
-            style={styles.summaryPill}
-            accessible
-            accessibilityLabel={summaryA11yLabel('Active work orders', queueSummary.inProgress)}>
-            <Text style={styles.summaryValue}>{queueSummary.inProgress}</Text>
-            <Text style={styles.summaryLabel}>Active</Text>
-          </View>
-          <View
-            style={styles.summaryPill}
-            accessible
-            accessibilityLabel={summaryA11yLabel('Pending approvals', queueSummary.pendingApproval)}>
-            <Text style={styles.summaryValue}>{queueSummary.pendingApproval}</Text>
-            <Text style={styles.summaryLabel}>Approvals</Text>
-          </View>
-        </View>
-
-        <View style={styles.laneMap}>
-          {roleLaneRows.map(row => (
-            <View
-              key={row.key}
-              style={styles.laneRow}
-              accessible
-              accessibilityLabel={`${row.label}. ${row.value}`}>
-              <Text style={styles.laneLabel}>{row.label}</Text>
-              <Text style={styles.laneValue}>{row.value}</Text>
-            </View>
-          ))}
-        </View>
-
-        <View
-          style={[styles.nextActionPanel, {borderLeftColor: getStatusColor(roleNextBestAction.tone)}]}
-          accessible
-          accessibilityLabel={`Next best action. ${roleNextBestAction.label}. ${roleNextBestAction.value}. Target: ${roleNextBestAction.workOrderTitle}. ${roleNextBestAction.detail}`}>
-          <View style={styles.nextActionHeader}>
-            <View style={styles.nextActionCopy}>
-              <Text style={styles.nextActionEyebrow}>{roleNextBestAction.label}</Text>
-              <Text style={styles.nextActionTitle}>{roleNextBestAction.value}</Text>
-              <Text style={styles.nextActionTarget} numberOfLines={2}>
-                {roleNextBestAction.workOrderTitle}
-              </Text>
-              <Text style={styles.nextActionDetail}>{roleNextBestAction.detail}</Text>
-            </View>
-            <View style={styles.nextActionButtons}>
-              <TouchableOpacity
-                style={styles.nextActionPrimary}
-                onPress={handleNextBestOpen}
-                {...actionButtonA11y(
-                  roleNextBestAction.actionLabel,
-                  roleNextBestAction.workOrderId
-                    ? `Opens ${roleNextBestAction.workOrderTitle}.`
-                    : 'Refreshes the visible queue.',
-                )}>
-                <Text style={styles.nextActionPrimaryText}>
-                  {roleNextBestAction.actionLabel}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.nextActionSecondary,
-                  activeQueueFilter === roleNextBestAction.filterKey &&
-                    styles.nextActionSecondaryActive,
-                ]}
-                onPress={handleNextBestFocus}
-                {...actionButtonA11y(
-                  activeQueueFilter === roleNextBestAction.filterKey
-                    ? `${roleNextBestAction.filterLabel} active`
-                    : roleNextBestAction.filterLabel,
-                  `Shows only ${roleNextBestAction.filterKey || 'all'} queue records.`,
-                )}>
-                <Text style={styles.nextActionSecondaryText}>
-                  {activeQueueFilter === roleNextBestAction.filterKey
-                    ? `Showing ${activeFilterRow?.label || 'Focus'}`
-                    : roleNextBestAction.filterLabel}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={styles.outcomeRow}>
-            {roleOutcomeRows.map(row => (
+      <View style={[styles.workspaceShell, !useWorkspaceLayout && styles.workspaceStack]}>
+        <View style={[styles.workspaceNav, !useWorkspaceLayout && styles.workspaceCardStack]}>
+          <Text style={styles.workspaceTitle}>Navigation</Text>
+          <View style={styles.laneMap}>
+            {roleLaneRows.map(row => (
               <View
                 key={row.key}
-                style={[
-                  styles.outcomeCard,
-                  {borderLeftColor: getStatusColor(row.tone)},
-                ]}>
-                <Text style={styles.outcomeLabel}>{row.label}</Text>
+                style={styles.laneRow}
+                accessible
+                accessibilityLabel={`${row.label}. ${row.value}`}>
+                <Text style={styles.laneLabel}>{row.label}</Text>
+                <Text style={styles.laneValue}>{row.value}</Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.queueFilterPanel}>
+            <Text style={styles.queueFilterTitle}>Focus Queue</Text>
+            <Text style={styles.queueFilterHint}>{activeFilterRow?.detail}</Text>
+            {isQueueFocused ? (
+              <View
+                style={[styles.focusStatusPanel, {borderLeftColor: activeFilterColor}]}
+                accessible
+                accessibilityLabel={`${activeFilterRow?.label} focus is active. ${visibleWorkOrders.length} of ${workOrders.length} records are shown. ${activeFilterRow?.detail}`}>
+                <View style={styles.focusStatusCopy}>
+                  <Text style={styles.focusStatusLabel}>Active Focus</Text>
+                  <Text style={[styles.focusStatusTitle, {color: activeFilterColor}]}>
+                    Showing {activeFilterRow?.label}
+                  </Text>
+                  <Text style={styles.focusStatusDetail}>
+                    {visibleWorkOrders.length} of {workOrders.length} visible records match this lane.
+                    Clear focus to restore the full queue.
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.focusClearButton}
+                  onPress={handleClearFocus}
+                  {...actionButtonA11y(
+                    'Clear Focus',
+                    'Restores all visible work orders for this role.',
+                  )}>
+                  <Text style={styles.focusClearText}>Clear Focus</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
+            <View style={styles.queueFilterRow}>
+              {queueFilterRows.map(row => {
+                const selected = row.key === activeQueueFilter;
+                return (
+                  <TouchableOpacity
+                    key={row.key}
+                    style={[
+                      styles.queueFilterChip,
+                      selected && styles.queueFilterChipSelected,
+                      selected && {borderColor: getStatusColor(row.tone)},
+                    ]}
+                    onPress={() => setActiveQueueFilter(selected && row.key !== 'all' ? 'all' : row.key)}
+                    accessibilityRole="button"
+                    accessibilityState={{selected}}
+                    accessibilityLabel={`${row.label} queue filter. ${row.value}. ${row.detail}${
+                      selected && row.key !== 'all' ? ' Tap again to clear focus.' : ''
+                    }`}>
+                    <Text
+                      style={[
+                        styles.queueFilterLabel,
+                        selected && {color: getStatusColor(row.tone)},
+                      ]}>
+                      {row.label}
+                    </Text>
+                    <Text style={styles.queueFilterCount}>{row.count}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
+          {canManageWorkOrders && (
+            <View style={styles.actionGrid}>
+              {roleActions.map(action => (
+                <TouchableOpacity
+                  key={action.key}
+                  style={[styles.actionCard, styles[`${action.tone}Action`]]}
+                  {...roleActionA11y(action)}
+                  onPress={() => navigation.navigate(action.route)}>
+                  <Text
+                    style={[
+                      styles.actionLabel,
+                      action.tone === 'primary' && styles.primaryActionLabel,
+                    ]}>
+                    {action.label}
+                  </Text>
+                  <Text style={styles.actionDetail}>{action.detail}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+
+        <View style={styles.workspaceMain}>
+          <View style={styles.summaryRow}>
+            <View
+              style={styles.summaryPill}
+              accessible
+              accessibilityLabel={summaryA11yLabel('Total work orders', queueSummary.total)}>
+              <Text style={styles.summaryValue}>{queueSummary.total}</Text>
+              <Text style={styles.summaryLabel}>Total</Text>
+            </View>
+            <View
+              style={styles.summaryPill}
+              accessible
+              accessibilityLabel={summaryA11yLabel('Open work orders', queueSummary.open)}>
+              <Text style={styles.summaryValue}>{queueSummary.open}</Text>
+              <Text style={styles.summaryLabel}>Open</Text>
+            </View>
+            <View
+              style={styles.summaryPill}
+              accessible
+              accessibilityLabel={summaryA11yLabel('Active work orders', queueSummary.inProgress)}>
+              <Text style={styles.summaryValue}>{queueSummary.inProgress}</Text>
+              <Text style={styles.summaryLabel}>Active</Text>
+            </View>
+            <View
+              style={styles.summaryPill}
+              accessible
+              accessibilityLabel={summaryA11yLabel('Pending approvals', queueSummary.pendingApproval)}>
+              <Text style={styles.summaryValue}>{queueSummary.pendingApproval}</Text>
+              <Text style={styles.summaryLabel}>Approvals</Text>
+            </View>
+          </View>
+
+          {portalSummary ? (
+            <View
+              style={styles.portalPanel}
+              accessible
+              accessibilityLabel={`${portalSummary.title}. ${portalSummary.subtitle}`}>
+              <View style={styles.portalHeader}>
+                <Text style={styles.portalTitle}>{portalSummary.title}</Text>
+                <Text style={styles.portalSubtitle}>{portalSummary.subtitle}</Text>
+              </View>
+              <View style={styles.portalRow}>
+                {portalSummary.rows.map(row => (
+                  <View
+                    key={row.key}
+                    style={styles.portalMetric}
+                    accessible
+                    accessibilityLabel={`${row.label}. ${row.value}`}>
+                    <Text style={styles.portalMetricLabel}>{row.label}</Text>
+                    <Text style={styles.portalMetricValue}>{row.value}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ) : null}
+
+          {loading && <ActivityIndicator style={styles.loader} />}
+          {error && (
+            <ScreenErrorState message={error} onRetry={fetchWorkOrders} />
+          )}
+          {!loading && !error && (
+            <FlatList
+              data={visibleWorkOrders}
+              keyExtractor={item => String(item.id)}
+              renderItem={renderWorkOrder}
+              ListEmptyComponent={
+                <EmptyQueueState
+                  state={roleEmptyState}
+                  filter={activeQueueFilter === 'all' ? null : activeFilterRow}
+                  onAction={roleEmptyState.actionRoute ? handleEmptyAction : null}
+                />
+              }
+              contentContainerStyle={[
+                styles.listContent,
+                visibleWorkOrders.length === 0 && styles.emptyListContent,
+              ]}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  tintColor="#2f6f9f"
+                  colors={['#2f6f9f']}
+                />
+              }
+            />
+          )}
+        </View>
+
+        <View style={[styles.workspaceAside, !useWorkspaceLayout && styles.workspaceCardStack]}>
+          <Text style={styles.workspaceTitle}>Next Actions</Text>
+          <View
+            style={[styles.nextActionPanel, {borderLeftColor: getStatusColor(roleNextBestAction.tone)}]}
+            accessible
+            accessibilityLabel={`Next best action. ${roleNextBestAction.label}. ${roleNextBestAction.value}. Target: ${roleNextBestAction.workOrderTitle}. ${roleNextBestAction.detail}`}>
+            <View style={styles.nextActionHeader}>
+              <View style={styles.nextActionCopy}>
+                <Text style={styles.nextActionEyebrow}>{roleNextBestAction.label}</Text>
+                <Text style={styles.nextActionTitle}>{roleNextBestAction.value}</Text>
+                <Text style={styles.nextActionTarget} numberOfLines={2}>
+                  {roleNextBestAction.workOrderTitle}
+                </Text>
+                <Text style={styles.nextActionDetail}>{roleNextBestAction.detail}</Text>
+              </View>
+              <View style={styles.nextActionButtons}>
+                <TouchableOpacity
+                  style={styles.nextActionPrimary}
+                  onPress={handleNextBestOpen}
+                  {...actionButtonA11y(
+                    roleNextBestAction.actionLabel,
+                    roleNextBestAction.workOrderId
+                      ? `Opens ${roleNextBestAction.workOrderTitle}.`
+                      : 'Refreshes the visible queue.',
+                  )}>
+                  <Text style={styles.nextActionPrimaryText}>
+                    {roleNextBestAction.actionLabel}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.nextActionSecondary,
+                    activeQueueFilter === roleNextBestAction.filterKey &&
+                      styles.nextActionSecondaryActive,
+                  ]}
+                  onPress={handleNextBestFocus}
+                  {...actionButtonA11y(
+                    activeQueueFilter === roleNextBestAction.filterKey
+                      ? `${roleNextBestAction.filterLabel} active`
+                      : roleNextBestAction.filterLabel,
+                    `Shows only ${roleNextBestAction.filterKey || 'all'} queue records.`,
+                  )}>
+                  <Text style={styles.nextActionSecondaryText}>
+                    {activeQueueFilter === roleNextBestAction.filterKey
+                      ? `Showing ${activeFilterRow?.label || 'Focus'}`
+                      : roleNextBestAction.filterLabel}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.outcomeRow}>
+              {roleOutcomeRows.map(row => (
+                <View
+                  key={row.key}
+                  style={[
+                    styles.outcomeCard,
+                    {borderLeftColor: getStatusColor(row.tone)},
+                  ]}>
+                  <Text style={styles.outcomeLabel}>{row.label}</Text>
+                  <Text
+                    style={[styles.outcomeValue, {color: getStatusColor(row.tone)}]}
+                    numberOfLines={2}>
+                    {row.value}
+                  </Text>
+                  <Text style={styles.outcomeDetail} numberOfLines={3}>
+                    {row.detail}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.guidanceStack}>
+            {roleGuidanceRows.map(row => (
+              <View
+                key={row.key}
+                style={styles.guidanceRow}
+                accessible
+                accessibilityLabel={`${row.label}. ${row.value}`}>
+                <Text style={styles.guidanceLabel}>{row.label}</Text>
+                <Text style={styles.guidanceValue}>{row.value}</Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.eventLaneGrid}>
+            {roleEventLaneRows.map(row => (
+              <View
+                key={row.key}
+                style={[styles.eventLaneCard, {borderLeftColor: getStatusColor(row.tone)}]}
+                accessible
+                accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
+                <Text style={styles.eventLaneLabel}>{row.label}</Text>
                 <Text
-                  style={[styles.outcomeValue, {color: getStatusColor(row.tone)}]}
-                  numberOfLines={2}>
+                  style={[styles.eventLaneValue, {color: getStatusColor(row.tone)}]}
+                  numberOfLines={1}>
                   {row.value}
                 </Text>
-                <Text style={styles.outcomeDetail} numberOfLines={3}>
+                <Text style={styles.eventLaneDetail} numberOfLines={3}>
                   {row.detail}
                 </Text>
               </View>
             ))}
           </View>
         </View>
-
-        <View style={styles.guidanceStack}>
-          {roleGuidanceRows.map(row => (
-            <View
-              key={row.key}
-              style={styles.guidanceRow}
-              accessible
-              accessibilityLabel={`${row.label}. ${row.value}`}>
-              <Text style={styles.guidanceLabel}>{row.label}</Text>
-              <Text style={styles.guidanceValue}>{row.value}</Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.eventLaneGrid}>
-          {roleEventLaneRows.map(row => (
-            <View
-              key={row.key}
-              style={[styles.eventLaneCard, {borderLeftColor: getStatusColor(row.tone)}]}
-              accessible
-              accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
-              <Text style={styles.eventLaneLabel}>{row.label}</Text>
-              <Text
-                style={[styles.eventLaneValue, {color: getStatusColor(row.tone)}]}
-                numberOfLines={1}>
-                {row.value}
-              </Text>
-              <Text style={styles.eventLaneDetail} numberOfLines={3}>
-                {row.detail}
-              </Text>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.queueFilterPanel}>
-          <Text style={styles.queueFilterTitle}>Focus Queue</Text>
-          <Text style={styles.queueFilterHint}>{activeFilterRow?.detail}</Text>
-          {isQueueFocused ? (
-            <View
-              style={[styles.focusStatusPanel, {borderLeftColor: activeFilterColor}]}
-              accessible
-              accessibilityLabel={`${activeFilterRow?.label} focus is active. ${visibleWorkOrders.length} of ${workOrders.length} records are shown. ${activeFilterRow?.detail}`}>
-              <View style={styles.focusStatusCopy}>
-                <Text style={styles.focusStatusLabel}>Active Focus</Text>
-                <Text style={[styles.focusStatusTitle, {color: activeFilterColor}]}>
-                  Showing {activeFilterRow?.label}
-                </Text>
-                <Text style={styles.focusStatusDetail}>
-                  {visibleWorkOrders.length} of {workOrders.length} visible records match this lane.
-                  Clear focus to restore the full queue.
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={styles.focusClearButton}
-                onPress={handleClearFocus}
-                {...actionButtonA11y(
-                  'Clear Focus',
-                  'Restores all visible work orders for this role.',
-                )}>
-                <Text style={styles.focusClearText}>Clear Focus</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
-          <View style={styles.queueFilterRow}>
-            {queueFilterRows.map(row => {
-              const selected = row.key === activeQueueFilter;
-              return (
-                <TouchableOpacity
-                  key={row.key}
-                  style={[
-                    styles.queueFilterChip,
-                    selected && styles.queueFilterChipSelected,
-                    selected && {borderColor: getStatusColor(row.tone)},
-                  ]}
-                  onPress={() => setActiveQueueFilter(selected && row.key !== 'all' ? 'all' : row.key)}
-                  accessibilityRole="button"
-                  accessibilityState={{selected}}
-                  accessibilityLabel={`${row.label} queue filter. ${row.value}. ${row.detail}${
-                    selected && row.key !== 'all' ? ' Tap again to clear focus.' : ''
-                  }`}>
-                  <Text
-                    style={[
-                      styles.queueFilterLabel,
-                      selected && {color: getStatusColor(row.tone)},
-                    ]}>
-                    {row.label}
-                  </Text>
-                  <Text style={styles.queueFilterCount}>{row.count}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-
-        {canManageWorkOrders && (
-          <View style={styles.actionGrid}>
-            {roleActions.map(action => (
-              <TouchableOpacity
-                key={action.key}
-                style={[styles.actionCard, styles[`${action.tone}Action`]]}
-                {...roleActionA11y(action)}
-                onPress={() => navigation.navigate(action.route)}>
-                <Text
-                  style={[
-                    styles.actionLabel,
-                    action.tone === 'primary' && styles.primaryActionLabel,
-                  ]}>
-                  {action.label}
-                </Text>
-                <Text style={styles.actionDetail}>{action.detail}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
       </View>
-
-      {portalSummary ? (
-        <View
-          style={styles.portalPanel}
-          accessible
-          accessibilityLabel={`${portalSummary.title}. ${portalSummary.subtitle}`}>
-          <View style={styles.portalHeader}>
-            <Text style={styles.portalTitle}>{portalSummary.title}</Text>
-            <Text style={styles.portalSubtitle}>{portalSummary.subtitle}</Text>
-          </View>
-          <View style={styles.portalRow}>
-            {portalSummary.rows.map(row => (
-              <View
-                key={row.key}
-                style={styles.portalMetric}
-                accessible
-                accessibilityLabel={`${row.label}. ${row.value}`}>
-                <Text style={styles.portalMetricLabel}>{row.label}</Text>
-                <Text style={styles.portalMetricValue}>{row.value}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      ) : null}
-
-      {loading && <ActivityIndicator style={styles.loader} />}
-      {error && (
-        <ScreenErrorState message={error} onRetry={fetchWorkOrders} />
-      )}
-      {!loading && !error && (
-        <FlatList
-          data={visibleWorkOrders}
-          keyExtractor={item => String(item.id)}
-          renderItem={renderWorkOrder}
-          ListEmptyComponent={
-            <EmptyQueueState
-              state={roleEmptyState}
-              filter={activeQueueFilter === 'all' ? null : activeFilterRow}
-              onAction={roleEmptyState.actionRoute ? handleEmptyAction : null}
-            />
-          }
-          contentContainerStyle={[
-            styles.listContent,
-            visibleWorkOrders.length === 0 && styles.emptyListContent,
-          ]}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="#2f6f9f"
-              colors={['#2f6f9f']}
-            />
-          }
-        />
-      )}
     </View>
   );
 }
@@ -609,7 +620,7 @@ const EmptyQueueState = ({state, filter, onAction}) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f3ea',
+    backgroundColor: '#f1eadf',
   },
   userBar: {
     flexDirection: 'row',
@@ -629,10 +640,10 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 12,
-    color: '#746a5d',
+    color: '#655d52',
   },
   roleBadge: {
-    borderColor: '#c7b89f',
+    borderColor: '#bfae94',
     borderRadius: 999,
     borderWidth: 1,
     color: '#6f5f95',
@@ -657,10 +668,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1f2933',
+    color: '#182532',
   },
   sectionSubtitle: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     lineHeight: 17,
   },
@@ -676,23 +687,64 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 12,
     padding: 12,
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
+  },
+  workspaceShell: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  workspaceStack: {
+    flexDirection: 'column',
+  },
+  workspaceNav: {
+    width: 260,
+    backgroundColor: '#fbf4e8',
+    borderWidth: 1,
+    borderColor: '#d2c2aa',
+    borderRadius: 6,
+    padding: 10,
+  },
+  workspaceMain: {
+    flex: 1,
+    minWidth: 0,
+  },
+  workspaceAside: {
+    width: 360,
+    backgroundColor: '#fbf4e8',
+    borderWidth: 1,
+    borderColor: '#d2c2aa',
+    borderRadius: 6,
+    padding: 10,
+  },
+  workspaceCardStack: {
+    width: '100%',
+  },
+  workspaceTitle: {
+    color: '#182532',
+    fontSize: 13,
+    fontWeight: '900',
+    marginBottom: 8,
   },
   summaryRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
     marginBottom: 10,
   },
   summaryPill: {
     flex: 1,
-    minHeight: 54,
-    backgroundColor: '#fdf8ef',
+    flexBasis: 120,
+    minHeight: 46,
+    backgroundColor: '#f6eddf',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
-    borderRadius: 7,
+    borderColor: '#d2c2aa',
+    borderRadius: 5,
     justifyContent: 'center',
     paddingHorizontal: 8,
   },
@@ -708,20 +760,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   laneMap: {
-    borderTopColor: '#d8ccb9',
-    borderTopWidth: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    paddingTop: 10,
-    marginBottom: 10,
+    gap: 8,
+    marginBottom: 12,
   },
   laneRow: {
     borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
-    flexBasis: '31%',
-    flexGrow: 1,
-    minHeight: 62,
+    minHeight: 48,
     paddingLeft: 9,
     paddingRight: 6,
   },
@@ -738,10 +783,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   nextActionPanel: {
-    backgroundColor: '#fffaf0',
-    borderColor: '#c7b89f',
-    borderLeftWidth: 4,
-    borderRadius: 8,
+    backgroundColor: '#fbf4e8',
+    borderColor: '#bfae94',
+    borderLeftWidth: 3,
+    borderRadius: 6,
     borderWidth: 1,
     marginBottom: 10,
     padding: 10,
@@ -756,20 +801,20 @@ const styles = StyleSheet.create({
     minWidth: 220,
   },
   nextActionEyebrow: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 12,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   nextActionTitle: {
     color: '#2f6f9f',
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: '900',
-    lineHeight: 25,
+    lineHeight: 22,
     marginTop: 4,
   },
   nextActionTarget: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 14,
     fontWeight: '800',
     lineHeight: 18,
@@ -782,7 +827,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   nextActionButtons: {
-    flexBasis: 210,
+    flexBasis: 150,
     flexGrow: 1,
     gap: 8,
     justifyContent: 'center',
@@ -791,26 +836,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#2f6f9f',
     borderColor: '#2f6f9f',
-    borderRadius: 8,
+    borderRadius: 5,
     borderWidth: 1,
-    minHeight: 44,
+    minHeight: 38,
     justifyContent: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
   },
   nextActionPrimaryText: {
-    color: '#fffaf0',
+    color: '#fbf4e8',
     fontSize: 13,
     fontWeight: '900',
   },
   nextActionSecondary: {
     alignItems: 'center',
-    backgroundColor: '#fdf8ef',
-    borderColor: '#c7b89f',
-    borderRadius: 8,
+    backgroundColor: '#f6eddf',
+    borderColor: '#bfae94',
+    borderRadius: 5,
     borderWidth: 1,
-    minHeight: 42,
+    minHeight: 36,
     justifyContent: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
   },
   nextActionSecondaryActive: {
     backgroundColor: '#efe6d6',
@@ -822,7 +867,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   outcomeRow: {
-    borderTopColor: '#d8ccb9',
+    borderTopColor: '#d2c2aa',
     borderTopWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -831,15 +876,15 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   outcomeCard: {
-    backgroundColor: '#fffaf0',
-    borderColor: '#d8ccb9',
+    backgroundColor: '#fbf4e8',
+    borderColor: '#d2c2aa',
     borderLeftWidth: 3,
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 1,
-    flexBasis: 190,
+    flexBasis: 140,
     flexGrow: 1,
-    minHeight: 92,
-    minWidth: 160,
+    minHeight: 74,
+    minWidth: 130,
     paddingHorizontal: 10,
     paddingVertical: 9,
   },
@@ -862,7 +907,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   guidanceStack: {
-    borderTopColor: '#d8ccb9',
+    borderTopColor: '#d2c2aa',
     borderTopWidth: 1,
     marginBottom: 10,
   },
@@ -877,30 +922,25 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   guidanceValue: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
   },
   eventLaneGrid: {
-    borderTopColor: '#d8ccb9',
+    borderTopColor: '#d2c2aa',
     borderTopWidth: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
     marginBottom: 10,
     paddingTop: 10,
   },
   eventLaneCard: {
-    backgroundColor: '#fffaf0',
-    borderColor: '#c7b89f',
+    backgroundColor: '#fbf4e8',
+    borderColor: '#bfae94',
     borderLeftWidth: 3,
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 1,
-    flexBasis: 180,
-    flexGrow: 1,
-    minHeight: 92,
-    minWidth: 160,
+    minHeight: 76,
     paddingHorizontal: 10,
     paddingVertical: 9,
   },
@@ -923,7 +963,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   queueFilterPanel: {
-    borderTopColor: '#d8ccb9',
+    borderTopColor: '#d2c2aa',
     borderTopWidth: 1,
     marginBottom: 10,
     paddingTop: 10,
@@ -935,17 +975,17 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   queueFilterHint: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 11,
     lineHeight: 16,
     marginTop: 3,
   },
   focusStatusPanel: {
     alignItems: 'center',
-    backgroundColor: '#fffaf0',
-    borderColor: '#c7b89f',
+    backgroundColor: '#fbf4e8',
+    borderColor: '#bfae94',
     borderLeftWidth: 3,
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -977,38 +1017,37 @@ const styles = StyleSheet.create({
   },
   focusClearButton: {
     alignItems: 'center',
-    backgroundColor: '#fdf8ef',
-    borderColor: '#c7b89f',
-    borderRadius: 8,
+    backgroundColor: '#f6eddf',
+    borderColor: '#bfae94',
+    borderRadius: 5,
     borderWidth: 1,
-    minHeight: 40,
+    minHeight: 34,
     justifyContent: 'center',
     paddingHorizontal: 12,
   },
   focusClearText: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 12,
     fontWeight: '900',
   },
   queueFilterRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
     marginTop: 8,
   },
   queueFilterChip: {
     alignItems: 'center',
-    backgroundColor: '#fdf8ef',
-    borderColor: '#c7b89f',
-    borderRadius: 8,
+    backgroundColor: '#f6eddf',
+    borderColor: '#bfae94',
+    borderRadius: 5,
     borderWidth: 1,
     flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: 7,
-    minHeight: 40,
+    minHeight: 34,
     paddingHorizontal: 10,
   },
   queueFilterChipSelected: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 2,
   },
   queueFilterLabel: {
@@ -1017,25 +1056,21 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   queueFilterCount: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 12,
     fontWeight: '900',
   },
   actionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: 8,
   },
   actionCard: {
-    flexGrow: 1,
-    flexBasis: '47%',
-    minHeight: 58,
+    minHeight: 44,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 5,
     paddingHorizontal: 10,
     paddingVertical: 9,
     justifyContent: 'center',
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
   },
   directoryAction: {
     borderColor: '#6f5f95',
@@ -1054,37 +1089,36 @@ const styles = StyleSheet.create({
     borderColor: '#2f6f9f',
   },
   actionLabel: {
-    color: '#1f2933',
+    color: '#182532',
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 13,
   },
   actionDetail: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 11,
     marginTop: 3,
   },
   primaryActionLabel: {
-    color: '#f7f3ea',
+    color: '#f1eadf',
   },
   portalPanel: {
-    backgroundColor: '#fffaf0',
-    borderColor: '#c7b89f',
-    borderRadius: 8,
+    backgroundColor: '#fbf4e8',
+    borderColor: '#bfae94',
+    borderRadius: 6,
     borderWidth: 1,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    padding: 12,
+    marginBottom: 10,
+    padding: 10,
   },
   portalHeader: {
     marginBottom: 10,
   },
   portalTitle: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 16,
     fontWeight: '900',
   },
   portalSubtitle: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
@@ -1117,29 +1151,28 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   listContent: {
-    paddingHorizontal: 16,
     paddingBottom: 16,
   },
   emptyListContent: {
     flexGrow: 1,
   },
   workOrderCard: {
-    backgroundColor: '#fffaf0',
-    borderRadius: 10,
-    minHeight: 72,
-    padding: 12,
-    marginBottom: 10,
+    backgroundColor: '#fbf4e8',
+    borderRadius: 6,
+    minHeight: 66,
+    padding: 10,
+    marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
   },
   workOrderTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#27313d',
   },
   workOrderDescription: {
     fontSize: 13,
-    color: '#746a5d',
+    color: '#655d52',
     marginTop: 4,
   },
   workOrderMeta: {
@@ -1165,7 +1198,7 @@ const styles = StyleSheet.create({
   cardSignal: {
     flexBasis: '47%',
     flexGrow: 1,
-    minHeight: 64,
+    minHeight: 52,
     borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
     paddingLeft: 9,
@@ -1184,7 +1217,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   cardSignalDetail: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 11,
     lineHeight: 15,
     marginTop: 2,
@@ -1192,17 +1225,17 @@ const styles = StyleSheet.create({
   flowChip: {
     flexGrow: 1,
     flexBasis: '31%',
-    minHeight: 48,
+    minHeight: 40,
     justifyContent: 'center',
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
-    borderRadius: 8,
+    borderColor: '#d2c2aa',
+    borderRadius: 5,
     paddingHorizontal: 8,
     paddingVertical: 6,
   },
   flowChipLabel: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 9,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -1214,15 +1247,15 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   emptyPanel: {
-    backgroundColor: '#fffaf0',
-    borderRadius: 8,
+    backgroundColor: '#fbf4e8',
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     marginTop: 8,
     padding: 16,
   },
   emptyTitle: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 18,
     fontWeight: '800',
     textAlign: 'center',
@@ -1235,7 +1268,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptyDetail: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     lineHeight: 18,
     marginTop: 8,
@@ -1253,7 +1286,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   emptyActionText: {
-    color: '#f7f3ea',
+    color: '#f1eadf',
     fontSize: 14,
     fontWeight: '800',
     textAlign: 'center',

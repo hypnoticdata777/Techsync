@@ -1,13 +1,13 @@
 import {Platform} from 'react-native';
 
 export const colors = {
-  canvas: '#f7f3ea',
-  surface: '#fffaf0',
-  surfaceMuted: '#f3eadb',
-  border: '#d8ccb9',
-  borderStrong: '#c7b89f',
-  ink: '#1f2933',
-  inkMuted: '#746a5d',
+  canvas: '#f1eadf',
+  surface: '#fbf4e8',
+  surfaceMuted: '#eee3d2',
+  border: '#d2c2aa',
+  borderStrong: '#bfae94',
+  ink: '#182532',
+  inkMuted: '#655d52',
   primary: '#2f6f9f',
   primarySoft: '#dbe9f3',
   success: '#5f8f62',

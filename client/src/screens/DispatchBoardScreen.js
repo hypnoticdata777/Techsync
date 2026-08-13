@@ -23,7 +23,7 @@ const getPriorityColor = priority => {
     case 'low':
       return '#5f8f62';
     default:
-      return '#746a5d';
+      return '#655d52';
   }
 };
 
@@ -36,7 +36,7 @@ const getRiskColor = risk => {
     case 'on_track':
       return '#5f8f62';
     default:
-      return '#746a5d';
+      return '#655d52';
   }
 };
 
@@ -260,7 +260,7 @@ function DispatchBoardScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f3ea',
+    backgroundColor: '#f1eadf',
   },
   content: {
     padding: 16,
@@ -272,12 +272,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#1f2933',
+    color: '#182532',
   },
   subtitle: {
     marginTop: 4,
     fontSize: 13,
-    color: '#746a5d',
+    color: '#655d52',
   },
   loader: {
     marginTop: 24,
@@ -293,9 +293,9 @@ const styles = StyleSheet.create({
     minWidth: 96,
     minHeight: 76,
     justifyContent: 'center',
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 10,
   },
@@ -323,15 +323,15 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   sectionTitle: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 10,
   },
   lane: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   laneMeta: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     marginTop: 2,
   },
@@ -369,15 +369,15 @@ const styles = StyleSheet.create({
     color: '#b24a3a',
   },
   loadLabel: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 11,
     fontWeight: '700',
     marginTop: 2,
   },
   workChip: {
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     minHeight: 72,
     padding: 10,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   },
   workTitle: {
     flex: 1,
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 14,
     fontWeight: '800',
   },
@@ -418,23 +418,23 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   contextText: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     marginTop: 6,
   },
   noLaneWork: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 13,
   },
   emptyPanel: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 14,
   },
   emptyText: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 13,
     textAlign: 'center',
   },

@@ -39,9 +39,9 @@ const getStatusColor = status => {
     case 'cancelled':
       return '#b24a3a';
     case 'archived':
-      return '#746a5d';
+      return '#655d52';
     default:
-      return '#746a5d';
+      return '#655d52';
   }
 };
 
@@ -56,7 +56,7 @@ const getPriorityColor = priority => {
     case 'low':
       return '#5f8f62';
     default:
-      return '#746a5d';
+      return '#655d52';
   }
 };
 
@@ -480,7 +480,7 @@ function OperationsReportScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f3ea',
+    backgroundColor: '#f1eadf',
   },
   content: {
     padding: 16,
@@ -492,17 +492,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#1f2933',
+    color: '#182532',
   },
   subtitle: {
     marginTop: 4,
     fontSize: 13,
-    color: '#746a5d',
+    color: '#655d52',
   },
   controls: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
     marginBottom: 14,
@@ -528,8 +528,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#c7b89f',
-    backgroundColor: '#fdf8ef',
+    borderColor: '#bfae94',
+    backgroundColor: '#f6eddf',
   },
   segmentButtonActive: {
     backgroundColor: '#2f6f9f',
@@ -542,7 +542,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   segmentButtonTextActive: {
-    color: '#f7f3ea',
+    color: '#f1eadf',
   },
   loader: {
     marginTop: 24,
@@ -558,9 +558,9 @@ const styles = StyleSheet.create({
     minWidth: 132,
     minHeight: 72,
     justifyContent: 'center',
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 10,
   },
@@ -576,9 +576,9 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   chartBlock: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
@@ -587,12 +587,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   chartTitle: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 16,
     fontWeight: '800',
   },
   chartSubtitle: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     marginTop: 3,
   },
@@ -613,19 +613,19 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   barValue: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 13,
     fontWeight: '800',
   },
   barDetail: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 11,
     marginTop: 2,
   },
   barTrack: {
     height: 10,
     overflow: 'hidden',
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderRadius: 5,
     marginTop: 6,
   },
@@ -637,15 +637,15 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   sectionTitle: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 10,
   },
   card: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
     marginBottom: 10,
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   cardMeta: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     marginTop: 6,
   },
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
   countCell: {
     minWidth: 86,
     color: '#4f5f6f',
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 6,
@@ -704,14 +704,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   emptyPanel: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 14,
   },
   emptyText: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 13,
     textAlign: 'center',
   },

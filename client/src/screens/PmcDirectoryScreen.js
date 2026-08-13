@@ -502,7 +502,7 @@ const Input = ({label, multiline, style, ...props}) => (
     <TextInput
       {...props}
       style={[styles.input, multiline && styles.textArea, style]}
-      placeholderTextColor="#746a5d"
+      placeholderTextColor="#655d52"
       multiline={multiline}
       textAlignVertical={multiline ? 'top' : 'center'}
     />
@@ -558,7 +558,7 @@ const StatusPill = ({active}) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f3ea',
+    backgroundColor: '#f1eadf',
   },
   content: {
     padding: 16,
@@ -568,12 +568,12 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   title: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 26,
     fontWeight: '800',
   },
   subtitle: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 13,
     marginTop: 4,
   },
@@ -586,11 +586,11 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 44,
     borderWidth: 1,
-    borderColor: '#c7b89f',
+    borderColor: '#bfae94',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
   },
   tabButtonActive: {
     backgroundColor: '#2f6f9f',
@@ -602,12 +602,12 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   tabButtonTextActive: {
-    color: '#f7f3ea',
+    color: '#f1eadf',
   },
   formPanel: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
     marginBottom: 18,
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   formTitle: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 18,
     fontWeight: '800',
   },
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   label: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 11,
     fontWeight: '800',
     marginBottom: 7,
@@ -632,9 +632,9 @@ const styles = StyleSheet.create({
   },
   input: {
     minHeight: 44,
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderWidth: 1,
-    borderColor: '#c7b89f',
+    borderColor: '#bfae94',
     borderRadius: 8,
     color: '#27313d',
     fontSize: 15,
@@ -663,9 +663,9 @@ const styles = StyleSheet.create({
   optionButton: {
     minHeight: 44,
     borderWidth: 1,
-    borderColor: '#c7b89f',
+    borderColor: '#bfae94',
     borderRadius: 8,
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,
@@ -704,7 +704,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: '#f7f3ea',
+    color: '#f1eadf',
     fontSize: 15,
     fontWeight: '800',
   },
@@ -712,7 +712,7 @@ const styles = StyleSheet.create({
     minWidth: 96,
     minHeight: 46,
     borderWidth: 1,
-    borderColor: '#c7b89f',
+    borderColor: '#bfae94',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
@@ -726,15 +726,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 10,
   },
   card: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
     marginBottom: 10,
@@ -752,7 +752,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   cardMeta: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     marginTop: 6,
   },
@@ -783,14 +783,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   emptyPanel: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 14,
   },
   emptyText: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 13,
     textAlign: 'center',
   },

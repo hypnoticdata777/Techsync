@@ -155,7 +155,7 @@ function OnboardingScreen({navigation}) {
               onPress={handleCreateOrganization}
               disabled={loading}>
               {loading ? (
-                <ActivityIndicator color="#f7f3ea" />
+                <ActivityIndicator color="#f1eadf" />
               ) : (
                 <Text style={styles.registerButtonText}>Create Organization</Text>
               )}
@@ -184,7 +184,7 @@ function OnboardingScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f3ea',
+    backgroundColor: '#f1eadf',
   },
   scrollContent: {
     flexGrow: 1,
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#746a5d',
+    color: '#655d52',
     textAlign: 'center',
     marginBottom: 32,
   },
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#d8ccb9',
+    backgroundColor: '#d2c2aa',
     marginVertical: 12,
   },
   field: {
@@ -221,14 +221,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#746a5d',
+    color: '#655d52',
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   registerButtonText: {
-    color: '#f7f3ea',
+    color: '#f1eadf',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   loginText: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 14,
   },
   loginLink: {

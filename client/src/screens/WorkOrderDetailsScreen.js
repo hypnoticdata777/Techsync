@@ -48,9 +48,9 @@ const getStatusColor = status => {
     case 'cancelled':
       return '#b24a3a'; // red
     case 'archived':
-      return '#746a5d'; // slate
+      return '#655d52'; // slate
     default:
-      return '#746a5d'; // gray
+      return '#655d52'; // gray
   }
 };
 
@@ -126,7 +126,7 @@ const getApprovalColor = status => {
     case 'declined':
       return '#b24a3a';
     default:
-      return '#746a5d';
+      return '#655d52';
   }
 };
 
@@ -164,9 +164,9 @@ const getSummaryToneColor = tone => {
     case 'override':
       return '#b86b2b';
     case 'archived':
-      return '#746a5d';
+      return '#655d52';
     default:
-      return '#746a5d';
+      return '#655d52';
   }
 };
 
@@ -1246,35 +1246,38 @@ function formatDate(value) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f3ea',
+    backgroundColor: '#f1eadf',
   },
   content: {
     padding: 16,
+    width: '100%',
+    maxWidth: 1360,
+    alignSelf: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1f2933',
+    color: '#182532',
     marginBottom: 14,
   },
   commandPanel: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 20,
+    borderColor: '#d2c2aa',
+    borderRadius: 6,
+    padding: 10,
+    marginBottom: 14,
   },
   commandHeader: {
     marginBottom: 12,
   },
   commandTitle: {
-    color: '#1f2933',
+    color: '#182532',
     fontSize: 16,
     fontWeight: '800',
   },
   commandSubtitle: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
@@ -1287,16 +1290,16 @@ const styles = StyleSheet.create({
   summaryTile: {
     flexBasis: '47%',
     flexGrow: 1,
-    minHeight: 64,
+    minHeight: 52,
     justifyContent: 'center',
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
-    borderRadius: 7,
+    borderColor: '#d2c2aa',
+    borderRadius: 5,
     paddingHorizontal: 10,
   },
   summaryLabel: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 10,
     fontWeight: '800',
     textTransform: 'uppercase',
@@ -1317,12 +1320,12 @@ const styles = StyleSheet.create({
   flowItem: {
     flexBasis: '31%',
     flexGrow: 1,
-    minHeight: 78,
-    backgroundColor: '#fffaf0',
+    minHeight: 62,
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#c7b89f',
-    borderRadius: 8,
-    padding: 10,
+    borderColor: '#bfae94',
+    borderRadius: 6,
+    padding: 9,
   },
   flowLabel: {
     color: '#2f6f9f',
@@ -1337,13 +1340,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   flowDetail: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 11,
     lineHeight: 16,
     marginTop: 4,
   },
   actionPathGrid: {
-    borderTopColor: '#d8ccb9',
+    borderTopColor: '#d2c2aa',
     borderTopWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1352,13 +1355,13 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   actionPathItem: {
-    backgroundColor: '#fffaf0',
-    borderColor: '#c7b89f',
-    borderRadius: 8,
+    backgroundColor: '#fbf4e8',
+    borderColor: '#bfae94',
+    borderRadius: 6,
     borderWidth: 1,
     flexBasis: '47%',
     flexGrow: 1,
-    minHeight: 72,
+    minHeight: 58,
     borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
     paddingHorizontal: 10,
@@ -1377,7 +1380,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   actionPathDetail: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 11,
     lineHeight: 16,
     marginTop: 3,
@@ -1391,16 +1394,16 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   eventPlaybook: {
-    backgroundColor: '#fffaf0',
-    borderColor: '#c7b89f',
-    borderRadius: 8,
+    backgroundColor: '#fbf4e8',
+    borderColor: '#bfae94',
+    borderRadius: 6,
     borderWidth: 1,
     gap: 10,
     marginTop: 12,
-    padding: 12,
+    padding: 10,
   },
   eventPlaybookItem: {
-    minHeight: 64,
+    minHeight: 52,
   },
   eventPlaybookLabel: {
     color: '#2f6f9f',
@@ -1421,10 +1424,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   outcomeNotice: {
-    backgroundColor: '#f3eadb',
+    backgroundColor: '#eee3d2',
     borderColor: '#2f6f9f',
     borderLeftWidth: 3,
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 1,
     marginTop: 12,
     padding: 12,
@@ -1460,7 +1463,7 @@ const styles = StyleSheet.create({
   },
   guidanceStack: {
     borderTopWidth: 1,
-    borderTopColor: '#d8ccb9',
+    borderTopColor: '#d2c2aa',
     marginTop: 12,
     paddingTop: 10,
     gap: 8,
@@ -1485,7 +1488,7 @@ const styles = StyleSheet.create({
     lineHeight: 17,
   },
   boundaryStack: {
-    borderTopColor: '#d8ccb9',
+    borderTopColor: '#d2c2aa',
     borderTopWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1520,13 +1523,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#746a5d',
+    color: '#655d52',
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   statusBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#d8ccb9',
+    backgroundColor: '#d2c2aa',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -1545,9 +1548,9 @@ const styles = StyleSheet.create({
     color: '#27313d',
   },
   approvalPanel: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
   },
@@ -1563,7 +1566,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionReadiness: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderLeftWidth: 3,
     borderRadius: 8,
     marginBottom: 10,
@@ -1588,9 +1591,9 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   approvalInput: {
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderWidth: 1,
-    borderColor: '#c7b89f',
+    borderColor: '#bfae94',
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
@@ -1618,7 +1621,7 @@ const styles = StyleSheet.create({
   },
   declineButton: {
     flex: 1,
-    backgroundColor: '#d8ccb9',
+    backgroundColor: '#d2c2aa',
     borderWidth: 1,
     borderColor: '#b24a3a',
     padding: 12,
@@ -1642,7 +1645,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   communicationNotice: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
     borderRadius: 8,
@@ -1667,9 +1670,9 @@ const styles = StyleSheet.create({
     minWidth: 92,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fdf8ef',
+    backgroundColor: '#f6eddf',
     borderWidth: 1,
-    borderColor: '#c7b89f',
+    borderColor: '#bfae94',
     borderRadius: 8,
   },
   visibilityTabActive: {
@@ -1683,12 +1686,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   visibilityTabTextActive: {
-    color: '#f7f3ea',
+    color: '#f1eadf',
   },
   messageInput: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
@@ -1707,14 +1710,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   messageButtonText: {
-    color: '#f7f3ea',
+    color: '#f1eadf',
     fontWeight: '700',
     fontSize: 14,
   },
   messageItem: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 10,
     marginTop: 8,
@@ -1739,17 +1742,17 @@ const styles = StyleSheet.create({
     color: '#5f8f62',
   },
   readOnlyNotice: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#c7b89f',
+    borderColor: '#bfae94',
     borderRadius: 8,
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 13,
     lineHeight: 18,
     padding: 12,
   },
   messageDate: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 11,
   },
   messageBody: {
@@ -1764,14 +1767,14 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     flex: 1,
-    backgroundColor: '#d8ccb9',
+    backgroundColor: '#d2c2aa',
     minHeight: 44,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#c7b89f',
+    borderColor: '#bfae94',
   },
   secondaryButtonText: {
     color: '#27313d',
@@ -1780,15 +1783,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptyAttachments: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 13,
   },
   attachmentItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 8,
     marginTop: 8,
@@ -1808,7 +1811,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fileBadgeText: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 10,
     fontWeight: '700',
   },
@@ -1822,14 +1825,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   attachmentMeta: {
-    color: '#746a5d',
+    color: '#655d52',
     fontSize: 12,
     marginTop: 2,
   },
   input: {
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#fbf4e8',
     borderWidth: 1,
-    borderColor: '#d8ccb9',
+    borderColor: '#d2c2aa',
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
@@ -1842,7 +1845,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   editButton: {
-    backgroundColor: '#d8ccb9',
+    backgroundColor: '#d2c2aa',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -1859,12 +1862,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButtonText: {
-    color: '#f7f3ea',
+    color: '#f1eadf',
     fontWeight: '600',
     fontSize: 16,
   },
   dangerButton: {
-    backgroundColor: '#d8ccb9',
+    backgroundColor: '#d2c2aa',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',

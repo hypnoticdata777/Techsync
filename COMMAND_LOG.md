@@ -3181,6 +3181,40 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
+
+## 2026-08-13 - Role Workspace Layout Pass
+
+Decision:
+
+- The light palette improved comfort, but role pages still felt like stacked
+  cards with equally loud sections.
+- Standardize the role home UX around a calmer SaaS workspace: left
+  navigation/focus rail, center data lane, and right next-action rail.
+- Keep beige/white as the foundation, but tone it down slightly and shrink
+  large pill-like controls so interaction weight matches the text.
+
+Changes:
+
+- Added `ROLE_WORKSPACE_LAYOUT.md` as the shared layout contract for admin,
+  coordinator, technician, client, viewer, and vendor lanes.
+- Reworked `WorkOrdersListScreen` into the three-zone workspace with responsive
+  stacking for smaller widths.
+- Softened shared palette tokens and swept existing client colors to match.
+- Tightened work-order list cards and detail-page command surfaces so the UI
+  feels less oversized while keeping role guidance and actions available.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+```
+
+Result:
+
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.
 - Backend tests passed: `188 passed`.
 - Python compile checks passed.
 - Reset hosted demo workflow YAML parsed successfully.

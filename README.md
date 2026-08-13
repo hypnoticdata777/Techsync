@@ -10,13 +10,16 @@ This repository implements the POC scope defined in
 `PRODUCT_ROADMAP.md`. See [Spec Coverage](#spec-coverage) below for what's
 implemented vs. deferred.
 
-Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`, and the current
-role-lane contract lives in `ROLE_LANE_UX.md`. Client, viewer, and vendor lanes
-now have purpose-built portal summaries and communication-channel notices so
-external users can tell what they can see, where replies go, and which controls
-are intentionally unavailable. Work-order queue cards now add role-specific
-scan cues so admin, coordinator, technician, client, viewer, and vendor users
-can tell why a visible job matters before opening it. Home queues now also show
+Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`, the current
+role-lane contract lives in `ROLE_LANE_UX.md`, and the shared three-zone
+workspace pattern is documented in `ROLE_WORKSPACE_LAYOUT.md`. Each role home
+now follows a calmer SaaS console structure: left navigation/focus rail, center
+work queue, and right next-action rail. Client, viewer, and vendor lanes have
+purpose-built portal summaries and communication-channel notices so external
+users can tell what they can see, where replies go, and which controls are
+intentionally unavailable. Work-order queue cards now add role-specific scan
+cues so admin, coordinator, technician, client, viewer, and vendor users can
+tell why a visible job matters before opening it. Home queues now also show
 role event-lane cards for each user's recurring operating loops, such as risk,
 intake, assignment, approval, proof, read-only review, and vendor delivery; the
 same operating loops can now be tapped as queue focus filters so each user can
