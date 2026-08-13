@@ -24,8 +24,8 @@ function ScreenErrorState({
 const styles = StyleSheet.create({
   panel: {
     alignItems: 'center',
-    backgroundColor: '#1f1218',
-    borderColor: '#7f1d1d',
+    backgroundColor: '#f8ddd6',
+    borderColor: '#d9a39b',
     borderRadius: 8,
     borderWidth: 1,
     marginVertical: 12,
@@ -36,14 +36,14 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   title: {
-    color: '#fecaca',
+    color: '#7f2f25',
     fontSize: 14,
     fontWeight: '800',
     marginBottom: 6,
     textAlign: 'center',
   },
   message: {
-    color: '#fca5a5',
+    color: '#8f3a30',
     fontSize: 13,
     lineHeight: 18,
     marginBottom: 12,
@@ -51,14 +51,14 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     alignItems: 'center',
-    backgroundColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
     borderRadius: 8,
     justifyContent: 'center',
     minHeight: 44,
     paddingHorizontal: 18,
   },
   retryButtonText: {
-    color: '#050816',
+    color: '#f7f3ea',
     fontSize: 14,
     fontWeight: '800',
   },

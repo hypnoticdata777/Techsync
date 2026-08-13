@@ -36,21 +36,21 @@ import {
 const getStatusColor = status => {
   switch (status) {
     case 'open':
-      return '#fbbf24'; // yellow
+      return '#b98524'; // yellow
     case 'in_progress':
-      return '#38bdf8'; // blue
+      return '#2f6f9f'; // blue
     case 'paused':
-      return '#f97316'; // orange
+      return '#b86b2b'; // orange
     case 'escalated':
-      return '#fb7185'; // rose
+      return '#b24a3a'; // rose
     case 'completed':
-      return '#a3e635'; // green
+      return '#5f8f62'; // green
     case 'cancelled':
-      return '#ef4444'; // red
+      return '#b24a3a'; // red
     case 'archived':
-      return '#94a3b8'; // slate
+      return '#746a5d'; // slate
     default:
-      return '#9ca3af'; // gray
+      return '#746a5d'; // gray
   }
 };
 
@@ -120,13 +120,13 @@ const getMessageVisibilityLabel = visibility => {
 const getApprovalColor = status => {
   switch (status) {
     case 'pending':
-      return '#fbbf24';
+      return '#b98524';
     case 'approved':
-      return '#a3e635';
+      return '#5f8f62';
     case 'declined':
-      return '#fb7185';
+      return '#b24a3a';
     default:
-      return '#9ca3af';
+      return '#746a5d';
   }
 };
 
@@ -148,25 +148,25 @@ const getSummaryToneColor = tone => {
     case 'open':
     case 'pending':
     case 'missing':
-      return '#fbbf24';
+      return '#b98524';
     case 'in_progress':
     case 'active':
-      return '#38bdf8';
+      return '#2f6f9f';
     case 'completed':
     case 'approved':
     case 'verified':
-      return '#a3e635';
+      return '#5f8f62';
     case 'cancelled':
     case 'declined':
     case 'escalated':
-      return '#fb7185';
+      return '#b24a3a';
     case 'paused':
     case 'override':
-      return '#f97316';
+      return '#b86b2b';
     case 'archived':
-      return '#94a3b8';
+      return '#746a5d';
     default:
-      return '#94a3b8';
+      return '#746a5d';
   }
 };
 
@@ -873,7 +873,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
                       ? 'Decision note (optional)...'
                       : 'Approval request note (optional)...'
                   }
-                  placeholderTextColor="#6b7280"
+                  placeholderTextColor="#8a7f70"
                   value={approvalNotes}
                   onChangeText={setApprovalNotes}
                   multiline
@@ -926,7 +926,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
         <View style={styles.section} onLayout={event => handleSectionLayout('communication', event)}>
           <View style={styles.rowHeader}>
             <Text style={styles.label}>Communication</Text>
-            {messagesLoading ? <ActivityIndicator color="#38bdf8" size="small" /> : null}
+            {messagesLoading ? <ActivityIndicator color="#2f6f9f" size="small" /> : null}
           </View>
           <SectionReadiness row={detailSectionReadinessRows.communication} />
 
@@ -1002,7 +1002,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
               <TextInput
                 style={styles.messageInput}
                 placeholder="Add a message..."
-                placeholderTextColor="#6b7280"
+                placeholderTextColor="#8a7f70"
                 value={messageBody}
                 onChangeText={setMessageBody}
                 {...inputA11y('Work-order message', {multiline: true})}
@@ -1062,7 +1062,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
         <View style={styles.section} onLayout={event => handleSectionLayout('proof', event)}>
           <View style={styles.rowHeader}>
             <Text style={styles.label}>Attachments</Text>
-            {attachmentsLoading ? <ActivityIndicator color="#38bdf8" size="small" /> : null}
+            {attachmentsLoading ? <ActivityIndicator color="#2f6f9f" size="small" /> : null}
           </View>
           <SectionReadiness row={detailSectionReadinessRows.proof} />
 
@@ -1141,7 +1141,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
             <TextInput
               style={styles.input}
               placeholder="Add notes for this status change..."
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#8a7f70"
               value={notes}
               onChangeText={setNotes}
               {...inputA11y('Status change notes', {multiline: true})}
@@ -1246,7 +1246,7 @@ function formatDate(value) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050816',
+    backgroundColor: '#f7f3ea',
   },
   content: {
     padding: 16,
@@ -1254,13 +1254,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#f9fafb',
+    color: '#1f2933',
     marginBottom: 14,
   },
   commandPanel: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     marginBottom: 20,
@@ -1269,12 +1269,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   commandTitle: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 16,
     fontWeight: '800',
   },
   commandSubtitle: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
@@ -1289,14 +1289,14 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     minHeight: 64,
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#d8ccb9',
     borderRadius: 7,
     paddingHorizontal: 10,
   },
   summaryLabel: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 10,
     fontWeight: '800',
     textTransform: 'uppercase',
@@ -1318,14 +1318,14 @@ const styles = StyleSheet.create({
     flexBasis: '31%',
     flexGrow: 1,
     minHeight: 78,
-    backgroundColor: '#07111f',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#243449',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     padding: 10,
   },
   flowLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -1337,13 +1337,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   flowDetail: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     lineHeight: 16,
     marginTop: 4,
   },
   actionPathGrid: {
-    borderTopColor: '#1e293b',
+    borderTopColor: '#d8ccb9',
     borderTopWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1352,20 +1352,20 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   actionPathItem: {
-    backgroundColor: '#07111f',
-    borderColor: '#243449',
+    backgroundColor: '#fffaf0',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     borderWidth: 1,
     flexBasis: '47%',
     flexGrow: 1,
     minHeight: 72,
-    borderLeftColor: '#38bdf8',
+    borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
     paddingHorizontal: 10,
     paddingVertical: 9,
   },
   actionPathLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -1377,22 +1377,22 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   actionPathDetail: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     lineHeight: 16,
     marginTop: 3,
   },
   actionPathJump: {
     alignSelf: 'flex-start',
-    color: '#38bdf8',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     marginTop: 6,
     textTransform: 'uppercase',
   },
   eventPlaybook: {
-    backgroundColor: '#07111f',
-    borderColor: '#243449',
+    backgroundColor: '#fffaf0',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     borderWidth: 1,
     gap: 10,
@@ -1403,7 +1403,7 @@ const styles = StyleSheet.create({
     minHeight: 64,
   },
   eventPlaybookLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -1415,14 +1415,14 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   eventPlaybookDetail: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 4,
   },
   outcomeNotice: {
-    backgroundColor: '#101827',
-    borderColor: '#38bdf8',
+    backgroundColor: '#f3eadb',
+    borderColor: '#2f6f9f',
     borderLeftWidth: 3,
     borderRadius: 8,
     borderWidth: 1,
@@ -1436,13 +1436,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   outcomeLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   outcomeDismiss: {
-    color: '#38bdf8',
+    color: '#2f6f9f',
     fontSize: 11,
     fontWeight: '800',
   },
@@ -1453,14 +1453,14 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   outcomeDetail: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
   },
   guidanceStack: {
     borderTopWidth: 1,
-    borderTopColor: '#1e293b',
+    borderTopColor: '#d8ccb9',
     marginTop: 12,
     paddingTop: 10,
     gap: 8,
@@ -1472,7 +1472,7 @@ const styles = StyleSheet.create({
   },
   guidanceLabel: {
     width: 112,
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 11,
     fontWeight: '800',
     lineHeight: 16,
@@ -1480,12 +1480,12 @@ const styles = StyleSheet.create({
   },
   guidanceValue: {
     flex: 1,
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     lineHeight: 17,
   },
   boundaryStack: {
-    borderTopColor: '#1e293b',
+    borderTopColor: '#d8ccb9',
     borderTopWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1494,7 +1494,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   boundaryRow: {
-    borderLeftColor: '#a3e635',
+    borderLeftColor: '#5f8f62',
     borderLeftWidth: 2,
     flexBasis: '47%',
     flexGrow: 1,
@@ -1503,13 +1503,13 @@ const styles = StyleSheet.create({
     paddingRight: 6,
   },
   boundaryLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   boundaryValue: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 4,
@@ -1520,13 +1520,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#9ca3af',
+    color: '#746a5d',
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   statusBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#1f2937',
+    backgroundColor: '#d8ccb9',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
@@ -1537,17 +1537,17 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    color: '#e5e7eb',
+    color: '#27313d',
     lineHeight: 24,
   },
   metaText: {
     fontSize: 14,
-    color: '#e5e7eb',
+    color: '#27313d',
   },
   approvalPanel: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
   },
@@ -1557,13 +1557,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   approvalNotes: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 13,
     lineHeight: 19,
     marginTop: 8,
   },
   sectionReadiness: {
-    backgroundColor: '#07111f',
+    backgroundColor: '#fffaf0',
     borderLeftWidth: 3,
     borderRadius: 8,
     marginBottom: 10,
@@ -1571,7 +1571,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   sectionReadinessLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -1582,19 +1582,19 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   sectionReadinessDetail: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
   },
   approvalInput: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
-    color: '#e5e7eb',
+    color: '#27313d',
     minHeight: 64,
     textAlignVertical: 'top',
     marginTop: 12,
@@ -1606,27 +1606,27 @@ const styles = StyleSheet.create({
   },
   approveButton: {
     flex: 1,
-    backgroundColor: '#a3e635',
+    backgroundColor: '#5f8f62',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   approveButtonText: {
-    color: '#052e16',
+    color: '#e4f0e2',
     fontWeight: '800',
     fontSize: 14,
   },
   declineButton: {
     flex: 1,
-    backgroundColor: '#1f2937',
+    backgroundColor: '#d8ccb9',
     borderWidth: 1,
-    borderColor: '#fb7185',
+    borderColor: '#b24a3a',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
   },
   declineButtonText: {
-    color: '#fb7185',
+    color: '#b24a3a',
     fontWeight: '800',
     fontSize: 14,
   },
@@ -1642,8 +1642,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   communicationNotice: {
-    backgroundColor: '#07111f',
-    borderLeftColor: '#38bdf8',
+    backgroundColor: '#fffaf0',
+    borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
     borderRadius: 8,
     marginBottom: 10,
@@ -1651,13 +1651,13 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
   },
   communicationNoticeTitle: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 11,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   communicationNoticeDetail: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
@@ -1667,37 +1667,37 @@ const styles = StyleSheet.create({
     minWidth: 92,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
     borderRadius: 8,
   },
   visibilityTabActive: {
-    backgroundColor: '#38bdf8',
-    borderColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
+    borderColor: '#2f6f9f',
   },
   visibilityTabText: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 13,
     fontWeight: '700',
     textAlign: 'center',
   },
   visibilityTabTextActive: {
-    color: '#050816',
+    color: '#f7f3ea',
   },
   messageInput: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
-    color: '#e5e7eb',
+    color: '#27313d',
     minHeight: 72,
     textAlignVertical: 'top',
   },
   messageButton: {
-    backgroundColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
     minHeight: 44,
     padding: 12,
     borderRadius: 8,
@@ -1707,14 +1707,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   messageButtonText: {
-    color: '#050816',
+    color: '#f7f3ea',
     fontWeight: '700',
     fontSize: 14,
   },
   messageItem: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 10,
     marginTop: 8,
@@ -1727,33 +1727,33 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   messageBadge: {
-    color: '#fbbf24',
+    color: '#b98524',
     fontSize: 11,
     fontWeight: '800',
     textTransform: 'uppercase',
   },
   messageBadgeClient: {
-    color: '#38bdf8',
+    color: '#2f6f9f',
   },
   messageBadgeVendor: {
-    color: '#a3e635',
+    color: '#5f8f62',
   },
   readOnlyNotice: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
     borderRadius: 8,
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 13,
     lineHeight: 18,
     padding: 12,
   },
   messageDate: {
-    color: '#64748b',
+    color: '#746a5d',
     fontSize: 11,
   },
   messageBody: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 14,
     lineHeight: 20,
   },
@@ -1764,31 +1764,31 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     flex: 1,
-    backgroundColor: '#1f2937',
+    backgroundColor: '#d8ccb9',
     minHeight: 44,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
   },
   secondaryButtonText: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontWeight: '600',
     fontSize: 14,
     textAlign: 'center',
   },
   emptyAttachments: {
-    color: '#9ca3af',
+    color: '#746a5d',
     fontSize: 13,
   },
   attachmentItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 8,
     marginTop: 8,
@@ -1797,18 +1797,18 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 6,
-    backgroundColor: '#111827',
+    backgroundColor: '#efe6d6',
   },
   fileBadge: {
     width: 48,
     height: 48,
     borderRadius: 6,
-    backgroundColor: '#111827',
+    backgroundColor: '#efe6d6',
     alignItems: 'center',
     justifyContent: 'center',
   },
   fileBadgeText: {
-    color: '#9ca3af',
+    color: '#746a5d',
     fontSize: 10,
     fontWeight: '700',
   },
@@ -1817,23 +1817,23 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   attachmentName: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 14,
     fontWeight: '600',
   },
   attachmentMeta: {
-    color: '#9ca3af',
+    color: '#746a5d',
     fontSize: 12,
     marginTop: 2,
   },
   input: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
-    color: '#e5e7eb',
+    color: '#27313d',
     minHeight: 60,
     textAlignVertical: 'top',
   },
@@ -1842,37 +1842,37 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   editButton: {
-    backgroundColor: '#1f2937',
+    backgroundColor: '#d8ccb9',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   editButtonText: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontWeight: '600',
     fontSize: 16,
   },
   primaryButton: {
-    backgroundColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   primaryButtonText: {
-    color: '#050816',
+    color: '#f7f3ea',
     fontWeight: '600',
     fontSize: 16,
   },
   dangerButton: {
-    backgroundColor: '#1f2937',
+    backgroundColor: '#d8ccb9',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ef4444',
+    borderColor: '#b24a3a',
   },
   dangerButtonText: {
-    color: '#ef4444',
+    color: '#b24a3a',
     fontWeight: '600',
     fontSize: 16,
   },

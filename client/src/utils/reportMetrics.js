@@ -12,9 +12,9 @@ export const buildRiskBreakdown = report => {
   const total = stale + overloaded + hotspots;
 
   return [
-    {key: 'stale', label: 'Stale work', value: stale, color: '#fbbf24'},
-    {key: 'overloaded', label: 'Overloaded techs', value: overloaded, color: '#fb7185'},
-    {key: 'hotspots', label: 'Property hotspots', value: hotspots, color: '#38bdf8'},
+    {key: 'stale', label: 'Stale work', value: stale, color: '#b98524'},
+    {key: 'overloaded', label: 'Overloaded techs', value: overloaded, color: '#b24a3a'},
+    {key: 'hotspots', label: 'Property hotspots', value: hotspots, color: '#2f6f9f'},
   ].map(item => ({
     ...item,
     percent: total > 0 ? clampPercent((item.value / total) * 100) : 0,
@@ -34,7 +34,7 @@ export const buildTechnicianLoadRows = technicians =>
         value: active,
         loadPercent,
         percent: clampPercent(loadPercent),
-        color: loadPercent >= 125 ? '#fb7185' : '#f97316',
+        color: loadPercent >= 125 ? '#b24a3a' : '#b86b2b',
       };
     })
     .sort((a, b) => b.loadPercent - a.loadPercent)
@@ -55,7 +55,7 @@ export const buildPropertyHotspotRows = hotspots => {
         )} active`,
         value: total,
         percent: maxTotal > 0 ? clampPercent((total / maxTotal) * 100) : 0,
-        color: '#a3e635',
+        color: '#5f8f62',
       };
     })
     .slice(0, 5);
@@ -78,7 +78,7 @@ export const buildCompletionCycleRows = cycles => {
         value: `${average}h`,
         rawValue: average,
         percent: maxAverage > 0 ? clampPercent((average / maxAverage) * 100) : 0,
-        color: average >= 72 ? '#fb7185' : average >= 24 ? '#fbbf24' : '#a3e635',
+        color: average >= 72 ? '#b24a3a' : average >= 24 ? '#b98524' : '#5f8f62',
       };
     })
     .sort((a, b) => b.rawValue - a.rawValue)
@@ -103,7 +103,7 @@ export const buildCostSummaryRows = costs => {
         value: `$${(actual / 100).toFixed(0)}`,
         rawValue: actual,
         percent: maxActual > 0 ? clampPercent((actual / maxActual) * 100) : 0,
-        color: variance > 0 ? '#fb7185' : variance < 0 ? '#a3e635' : '#38bdf8',
+        color: variance > 0 ? '#b24a3a' : variance < 0 ? '#5f8f62' : '#2f6f9f',
       };
     })
     .sort((a, b) => b.rawValue - a.rawValue)

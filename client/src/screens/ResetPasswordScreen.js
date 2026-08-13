@@ -65,7 +65,7 @@ function ResetPasswordScreen({navigation}) {
             <TextInput
               style={styles.input}
               placeholder="Paste the token from your email"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#8a7f70"
               value={token}
               onChangeText={setToken}
               autoCapitalize="none"
@@ -78,7 +78,7 @@ function ResetPasswordScreen({navigation}) {
             <TextInput
               style={styles.input}
               placeholder="At least 8 characters"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#8a7f70"
               value={newPassword}
               onChangeText={setNewPassword}
               secureTextEntry
@@ -91,7 +91,7 @@ function ResetPasswordScreen({navigation}) {
             <TextInput
               style={styles.input}
               placeholder="Re-enter your new password"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#8a7f70"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
@@ -104,7 +104,7 @@ function ResetPasswordScreen({navigation}) {
             onPress={handleSubmit}
             disabled={loading}>
             {loading ? (
-              <ActivityIndicator color="#050816" />
+              <ActivityIndicator color="#f7f3ea" />
             ) : (
               <Text style={styles.submitButtonText}>Update Password</Text>
             )}
@@ -122,7 +122,7 @@ function ResetPasswordScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050816',
+    backgroundColor: '#f7f3ea',
   },
   content: {
     flex: 1,
@@ -132,13 +132,13 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 36,
     fontWeight: '700',
-    color: '#38bdf8',
+    color: '#2f6f9f',
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#746a5d',
     textAlign: 'center',
     marginBottom: 48,
   },
@@ -151,21 +151,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#9ca3af',
+    color: '#746a5d',
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: '#e5e7eb',
+    color: '#27313d',
   },
   submitButton: {
-    backgroundColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -176,12 +176,12 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   submitButtonText: {
-    color: '#050816',
+    color: '#f7f3ea',
     fontWeight: '600',
     fontSize: 16,
   },
   backLink: {
-    color: '#38bdf8',
+    color: '#2f6f9f',
     fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',

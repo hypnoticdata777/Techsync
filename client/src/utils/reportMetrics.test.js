@@ -80,7 +80,7 @@ describe('report metric helpers', () => {
         id: 'hvac',
         value: '80h',
         percent: 100,
-        color: '#fb7185',
+        color: '#b24a3a',
       }),
     );
     expect(rows[1]).toEqual(expect.objectContaining({id: 'plumbing', percent: 23}));
@@ -107,7 +107,7 @@ describe('report metric helpers', () => {
         id: 'plumbing',
         value: '$940',
         percent: 100,
-        color: '#fb7185',
+        color: '#b24a3a',
       }),
     );
     expect(rows[1]).toEqual(
@@ -115,7 +115,7 @@ describe('report metric helpers', () => {
         id: 'electrical',
         value: '$900',
         percent: 96,
-        color: '#a3e635',
+        color: '#5f8f62',
       }),
     );
   });

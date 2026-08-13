@@ -15,28 +15,28 @@ import {summaryA11yLabel, workOrderButtonA11y} from '../utils/accessibility';
 const getPriorityColor = priority => {
   switch (priority) {
     case 'emergency':
-      return '#f97316';
+      return '#b86b2b';
     case 'high':
-      return '#fb7185';
+      return '#b24a3a';
     case 'medium':
-      return '#fbbf24';
+      return '#b98524';
     case 'low':
-      return '#a3e635';
+      return '#5f8f62';
     default:
-      return '#9ca3af';
+      return '#746a5d';
   }
 };
 
 const getRiskColor = risk => {
   switch (risk) {
     case 'breached':
-      return '#ef4444';
+      return '#b24a3a';
     case 'due_soon':
-      return '#f97316';
+      return '#b86b2b';
     case 'on_track':
-      return '#22c55e';
+      return '#5f8f62';
     default:
-      return '#94a3b8';
+      return '#746a5d';
   }
 };
 
@@ -171,8 +171,8 @@ function DispatchBoardScreen({navigation}) {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor="#38bdf8"
-          colors={['#38bdf8']}
+          tintColor="#2f6f9f"
+          colors={['#2f6f9f']}
         />
       }>
       <View style={styles.header}>
@@ -180,7 +180,7 @@ function DispatchBoardScreen({navigation}) {
         <Text style={styles.subtitle}>Unassigned work, technician load, SLA risk</Text>
       </View>
 
-      {loading && <ActivityIndicator style={styles.loader} color="#38bdf8" />}
+      {loading && <ActivityIndicator style={styles.loader} color="#2f6f9f" />}
 
       {error && (
         <ScreenErrorState message={error} onRetry={fetchBoard} />
@@ -260,7 +260,7 @@ function DispatchBoardScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050816',
+    backgroundColor: '#f7f3ea',
   },
   content: {
     padding: 16,
@@ -272,12 +272,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#f9fafb',
+    color: '#1f2933',
   },
   subtitle: {
     marginTop: 4,
     fontSize: 13,
-    color: '#94a3b8',
+    color: '#746a5d',
   },
   loader: {
     marginTop: 24,
@@ -293,28 +293,28 @@ const styles = StyleSheet.create({
     minWidth: 96,
     minHeight: 76,
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 10,
   },
   warningTile: {
-    borderColor: '#fbbf24',
+    borderColor: '#b98524',
   },
   riskTile: {
-    borderColor: '#f97316',
+    borderColor: '#b86b2b',
   },
   urgentTile: {
-    borderColor: '#fb7185',
+    borderColor: '#b24a3a',
   },
   summaryValue: {
-    color: '#38bdf8',
+    color: '#2f6f9f',
     fontSize: 24,
     fontWeight: '800',
   },
   summaryLabel: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 11,
     fontWeight: '700',
     marginTop: 4,
@@ -323,15 +323,15 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   sectionTitle: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 10,
   },
   lane: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
@@ -347,12 +347,12 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   laneTitle: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 16,
     fontWeight: '800',
   },
   laneMeta: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     marginTop: 2,
   },
@@ -361,23 +361,23 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   loadValue: {
-    color: '#a3e635',
+    color: '#5f8f62',
     fontSize: 18,
     fontWeight: '800',
   },
   loadRisk: {
-    color: '#fb7185',
+    color: '#b24a3a',
   },
   loadLabel: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     fontWeight: '700',
     marginTop: 2,
   },
   workChip: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     minHeight: 72,
     padding: 10,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   },
   workTitle: {
     flex: 1,
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 14,
     fontWeight: '800',
   },
@@ -412,29 +412,29 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   metaText: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     fontWeight: '700',
     textTransform: 'uppercase',
   },
   contextText: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     marginTop: 6,
   },
   noLaneWork: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 13,
   },
   emptyPanel: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 14,
   },
   emptyText: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 13,
     textAlign: 'center',
   },

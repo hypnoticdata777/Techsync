@@ -441,8 +441,8 @@ function PmcDirectoryScreen() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor="#38bdf8"
-          colors={['#38bdf8']}
+          tintColor="#2f6f9f"
+          colors={['#2f6f9f']}
         />
       }>
       <View style={styles.header}>
@@ -466,7 +466,7 @@ function PmcDirectoryScreen() {
 
       {renderForm()}
 
-      {loading && <ActivityIndicator style={styles.loader} color="#38bdf8" />}
+      {loading && <ActivityIndicator style={styles.loader} color="#2f6f9f" />}
 
       {error && (
         <ScreenErrorState message={error} onRetry={loadDirectory} />
@@ -502,7 +502,7 @@ const Input = ({label, multiline, style, ...props}) => (
     <TextInput
       {...props}
       style={[styles.input, multiline && styles.textArea, style]}
-      placeholderTextColor="#64748b"
+      placeholderTextColor="#746a5d"
       multiline={multiline}
       textAlignVertical={multiline ? 'top' : 'center'}
     />
@@ -558,7 +558,7 @@ const StatusPill = ({active}) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050816',
+    backgroundColor: '#f7f3ea',
   },
   content: {
     padding: 16,
@@ -568,12 +568,12 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   title: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 26,
     fontWeight: '800',
   },
   subtitle: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 13,
     marginTop: 4,
   },
@@ -586,28 +586,28 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 44,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
   },
   tabButtonActive: {
-    backgroundColor: '#38bdf8',
-    borderColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
+    borderColor: '#2f6f9f',
   },
   tabButtonText: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 13,
     fontWeight: '800',
   },
   tabButtonTextActive: {
-    color: '#050816',
+    color: '#f7f3ea',
   },
   formPanel: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     marginBottom: 18,
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   formTitle: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 18,
     fontWeight: '800',
   },
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   label: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     fontWeight: '800',
     marginBottom: 7,
@@ -632,11 +632,11 @@ const styles = StyleSheet.create({
   },
   input: {
     minHeight: 44,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
     borderRadius: 8,
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 15,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -663,26 +663,26 @@ const styles = StyleSheet.create({
   optionButton: {
     minHeight: 44,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
     borderRadius: 8,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   optionButtonActive: {
-    backgroundColor: '#a3e635',
-    borderColor: '#a3e635',
+    backgroundColor: '#5f8f62',
+    borderColor: '#5f8f62',
   },
   optionButtonText: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     fontWeight: '800',
     textAlign: 'center',
   },
   optionButtonTextActive: {
-    color: '#052e16',
+    color: '#e4f0e2',
   },
   activeRow: {
     marginBottom: 4,
@@ -695,7 +695,7 @@ const styles = StyleSheet.create({
   saveButton: {
     flex: 1,
     minHeight: 46,
-    backgroundColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
@@ -704,7 +704,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: '#050816',
+    color: '#f7f3ea',
     fontSize: 15,
     fontWeight: '800',
   },
@@ -712,13 +712,13 @@ const styles = StyleSheet.create({
     minWidth: 96,
     minHeight: 46,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelButtonText: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 14,
     fontWeight: '800',
   },
@@ -726,15 +726,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 10,
   },
   card: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     marginBottom: 10,
@@ -747,12 +747,12 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     flex: 1,
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 16,
     fontWeight: '800',
   },
   cardMeta: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     marginTop: 6,
   },
@@ -764,33 +764,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   statusPillActive: {
-    backgroundColor: '#1e3a8a',
+    backgroundColor: '#cbd9e6',
   },
   statusPillInactive: {
-    backgroundColor: '#3f1d1d',
+    backgroundColor: '#f8ddd6',
   },
   statusPillText: {
     fontSize: 11,
     fontWeight: '800',
   },
   statusTextActive: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
   },
   statusTextInactive: {
-    color: '#fecaca',
+    color: '#7f2f25',
   },
   loader: {
     marginTop: 20,
   },
   emptyPanel: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 14,
   },
   emptyText: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 13,
     textAlign: 'center',
   },

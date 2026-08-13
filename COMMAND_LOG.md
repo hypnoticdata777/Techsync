@@ -3283,3 +3283,36 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
+
+## 2026-08-13 - Refined Light Visual System Pass
+
+Decision:
+
+- The hosted web app was usable, but the dark/neon palette made long testing
+  sessions visually tiring and harder to scan.
+- Shift the client toward a white/light-beige operating surface with softer
+  black, blue, green, yellow, and red system colors.
+- Use a Roboto Serif-first web font stack with safe serif fallbacks while
+  avoiding a new package or external runtime dependency.
+
+Changes:
+
+- Added `client/src/theme.js` with shared color and typography tokens.
+- Updated app navigation, status bar, loading state, auth screens, dashboards,
+  work-order flows, directory, reports, role evidence, and error states to the
+  refined palette.
+- Rebased report metric color constants and tests onto the same softened status
+  colors so UI evidence stays consistent across roles.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+```
+
+Result:
+
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.

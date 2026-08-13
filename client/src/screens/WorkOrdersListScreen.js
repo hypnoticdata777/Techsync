@@ -44,29 +44,29 @@ import {
 const getStatusColor = (status) => {
   switch (status) {
     case 'open':
-      return '#fbbf24'; // yellow
+      return '#b98524'; // yellow
     case 'in_progress':
-      return '#38bdf8'; // blue
+      return '#2f6f9f'; // blue
     case 'paused':
-      return '#f97316'; // orange
+      return '#b86b2b'; // orange
     case 'escalated':
-      return '#fb7185'; // rose
+      return '#b24a3a'; // rose
     case 'completed':
-      return '#a3e635'; // green
+      return '#5f8f62'; // green
     case 'cancelled':
-      return '#ef4444'; // red
+      return '#b24a3a'; // red
     case 'archived':
-      return '#94a3b8'; // slate
+      return '#746a5d'; // slate
     case 'pending':
-      return '#fbbf24';
+      return '#b98524';
     case 'missing':
-      return '#fb7185';
+      return '#b24a3a';
     case 'verified':
-      return '#a3e635';
+      return '#5f8f62';
     case 'active':
-      return '#38bdf8';
+      return '#2f6f9f';
     default:
-      return '#9ca3af'; // gray
+      return '#746a5d'; // gray
   }
 };
 
@@ -223,7 +223,7 @@ function WorkOrdersListScreen({navigation}) {
               <Text
                 style={[
                   styles.flowChipValue,
-                  {color: row.key === 'owner' ? getStatusColor(item.status) : '#e5e7eb'},
+                  {color: row.key === 'owner' ? getStatusColor(item.status) : '#27313d'},
                 ]}
                 numberOfLines={1}>
                 {row.value}
@@ -574,8 +574,8 @@ function WorkOrdersListScreen({navigation}) {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#38bdf8"
-              colors={['#38bdf8']}
+              tintColor="#2f6f9f"
+              colors={['#2f6f9f']}
             />
           }
         />
@@ -609,7 +609,7 @@ const EmptyQueueState = ({state, filter, onAction}) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050816',
+    backgroundColor: '#f7f3ea',
   },
   userBar: {
     flexDirection: 'row',
@@ -629,13 +629,13 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: '#746a5d',
   },
   roleBadge: {
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
     borderRadius: 999,
     borderWidth: 1,
-    color: '#c4b5fd',
+    color: '#6f5f95',
     fontSize: 11,
     fontWeight: '800',
     paddingHorizontal: 8,
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontSize: 12,
-    color: '#ef4444',
+    color: '#b24a3a',
     fontWeight: '600',
   },
   header: {
@@ -657,16 +657,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#f9fafb',
+    color: '#1f2933',
   },
   sectionSubtitle: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     lineHeight: 17,
   },
   scopeLine: {
     alignSelf: 'flex-start',
-    color: '#a3e635',
+    color: '#5f8f62',
     fontSize: 11,
     fontWeight: '800',
     marginTop: 4,
@@ -676,9 +676,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 12,
     padding: 12,
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
   },
   summaryRow: {
@@ -689,26 +689,26 @@ const styles = StyleSheet.create({
   summaryPill: {
     flex: 1,
     minHeight: 54,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#d8ccb9',
     borderRadius: 7,
     justifyContent: 'center',
     paddingHorizontal: 8,
   },
   summaryValue: {
-    color: '#38bdf8',
+    color: '#2f6f9f',
     fontSize: 18,
     fontWeight: '800',
   },
   summaryLabel: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 10,
     fontWeight: '700',
     marginTop: 2,
   },
   laneMap: {
-    borderTopColor: '#1f2937',
+    borderTopColor: '#d8ccb9',
     borderTopWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -717,7 +717,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   laneRow: {
-    borderLeftColor: '#38bdf8',
+    borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
     flexBasis: '31%',
     flexGrow: 1,
@@ -726,20 +726,20 @@ const styles = StyleSheet.create({
     paddingRight: 6,
   },
   laneLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   laneValue: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 4,
   },
   nextActionPanel: {
-    backgroundColor: '#07111f',
-    borderColor: '#243449',
+    backgroundColor: '#fffaf0',
+    borderColor: '#c7b89f',
     borderLeftWidth: 4,
     borderRadius: 8,
     borderWidth: 1,
@@ -756,27 +756,27 @@ const styles = StyleSheet.create({
     minWidth: 220,
   },
   nextActionEyebrow: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 12,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   nextActionTitle: {
-    color: '#38bdf8',
+    color: '#2f6f9f',
     fontSize: 20,
     fontWeight: '900',
     lineHeight: 25,
     marginTop: 4,
   },
   nextActionTarget: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 14,
     fontWeight: '800',
     lineHeight: 18,
     marginTop: 5,
   },
   nextActionDetail: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 5,
@@ -789,8 +789,8 @@ const styles = StyleSheet.create({
   },
   nextActionPrimary: {
     alignItems: 'center',
-    backgroundColor: '#38bdf8',
-    borderColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
+    borderColor: '#2f6f9f',
     borderRadius: 8,
     borderWidth: 1,
     minHeight: 44,
@@ -798,14 +798,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   nextActionPrimaryText: {
-    color: '#020617',
+    color: '#fffaf0',
     fontSize: 13,
     fontWeight: '900',
   },
   nextActionSecondary: {
     alignItems: 'center',
-    backgroundColor: '#0f172a',
-    borderColor: '#334155',
+    backgroundColor: '#fdf8ef',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     borderWidth: 1,
     minHeight: 42,
@@ -813,16 +813,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   nextActionSecondaryActive: {
-    backgroundColor: '#111827',
-    borderColor: '#38bdf8',
+    backgroundColor: '#efe6d6',
+    borderColor: '#2f6f9f',
   },
   nextActionSecondaryText: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 12,
     fontWeight: '900',
   },
   outcomeRow: {
-    borderTopColor: '#1f2937',
+    borderTopColor: '#d8ccb9',
     borderTopWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -831,8 +831,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   outcomeCard: {
-    backgroundColor: '#020617',
-    borderColor: '#1f2937',
+    backgroundColor: '#fffaf0',
+    borderColor: '#d8ccb9',
     borderLeftWidth: 3,
     borderRadius: 8,
     borderWidth: 1,
@@ -844,7 +844,7 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
   },
   outcomeLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -856,34 +856,34 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   outcomeDetail: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 11,
     lineHeight: 15,
     marginTop: 4,
   },
   guidanceStack: {
-    borderTopColor: '#1f2937',
+    borderTopColor: '#d8ccb9',
     borderTopWidth: 1,
     marginBottom: 10,
   },
   guidanceRow: {
-    borderBottomColor: '#111827',
+    borderBottomColor: '#efe6d6',
     borderBottomWidth: 1,
     paddingVertical: 9,
   },
   guidanceLabel: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 12,
     fontWeight: '800',
   },
   guidanceValue: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
   },
   eventLaneGrid: {
-    borderTopColor: '#1f2937',
+    borderTopColor: '#d8ccb9',
     borderTopWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -892,8 +892,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   eventLaneCard: {
-    backgroundColor: '#07111f',
-    borderColor: '#243449',
+    backgroundColor: '#fffaf0',
+    borderColor: '#c7b89f',
     borderLeftWidth: 3,
     borderRadius: 8,
     borderWidth: 1,
@@ -905,7 +905,7 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
   },
   eventLaneLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -917,33 +917,33 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   eventLaneDetail: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 11,
     lineHeight: 15,
     marginTop: 4,
   },
   queueFilterPanel: {
-    borderTopColor: '#1f2937',
+    borderTopColor: '#d8ccb9',
     borderTopWidth: 1,
     marginBottom: 10,
     paddingTop: 10,
   },
   queueFilterTitle: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 12,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   queueFilterHint: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     lineHeight: 16,
     marginTop: 3,
   },
   focusStatusPanel: {
     alignItems: 'center',
-    backgroundColor: '#07111f',
-    borderColor: '#243449',
+    backgroundColor: '#fffaf0',
+    borderColor: '#c7b89f',
     borderLeftWidth: 3,
     borderRadius: 8,
     borderWidth: 1,
@@ -958,7 +958,7 @@ const styles = StyleSheet.create({
     minWidth: 210,
   },
   focusStatusLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -970,15 +970,15 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   focusStatusDetail: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 11,
     lineHeight: 16,
     marginTop: 3,
   },
   focusClearButton: {
     alignItems: 'center',
-    backgroundColor: '#0f172a',
-    borderColor: '#334155',
+    backgroundColor: '#fdf8ef',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     borderWidth: 1,
     minHeight: 40,
@@ -986,7 +986,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   focusClearText: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 12,
     fontWeight: '900',
   },
@@ -998,8 +998,8 @@ const styles = StyleSheet.create({
   },
   queueFilterChip: {
     alignItems: 'center',
-    backgroundColor: '#0f172a',
-    borderColor: '#243449',
+    backgroundColor: '#fdf8ef',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -1008,16 +1008,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   queueFilterChipSelected: {
-    backgroundColor: '#07111f',
+    backgroundColor: '#fffaf0',
     borderWidth: 2,
   },
   queueFilterLabel: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     fontWeight: '900',
   },
   queueFilterCount: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 12,
     fontWeight: '900',
   },
@@ -1035,40 +1035,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 9,
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
   },
   directoryAction: {
-    borderColor: '#c084fc',
+    borderColor: '#6f5f95',
   },
   dispatchAction: {
-    borderColor: '#a3e635',
+    borderColor: '#5f8f62',
   },
   reportAction: {
-    borderColor: '#38bdf8',
+    borderColor: '#2f6f9f',
   },
   evidenceAction: {
-    borderColor: '#fbbf24',
+    borderColor: '#b98524',
   },
   primaryAction: {
-    backgroundColor: '#38bdf8',
-    borderColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
+    borderColor: '#2f6f9f',
   },
   actionLabel: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontWeight: '700',
     fontSize: 14,
   },
   actionDetail: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     marginTop: 3,
   },
   primaryActionLabel: {
-    color: '#050816',
+    color: '#f7f3ea',
   },
   portalPanel: {
-    backgroundColor: '#07111f',
-    borderColor: '#243449',
+    backgroundColor: '#fffaf0',
+    borderColor: '#c7b89f',
     borderRadius: 8,
     borderWidth: 1,
     marginHorizontal: 16,
@@ -1079,12 +1079,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   portalTitle: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 16,
     fontWeight: '900',
   },
   portalSubtitle: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     lineHeight: 17,
     marginTop: 3,
@@ -1095,7 +1095,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   portalMetric: {
-    borderLeftColor: '#a3e635',
+    borderLeftColor: '#5f8f62',
     borderLeftWidth: 2,
     flexBasis: '31%',
     flexGrow: 1,
@@ -1104,13 +1104,13 @@ const styles = StyleSheet.create({
     paddingRight: 6,
   },
   portalMetricLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   portalMetricValue: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 12,
     fontWeight: '800',
     lineHeight: 17,
@@ -1124,27 +1124,27 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   workOrderCard: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderRadius: 10,
     minHeight: 72,
     padding: 12,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
   },
   workOrderTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#e5e7eb',
+    color: '#27313d',
   },
   workOrderDescription: {
     fontSize: 13,
-    color: '#9ca3af',
+    color: '#746a5d',
     marginTop: 4,
   },
   workOrderMeta: {
     fontSize: 12,
-    color: '#a3e635',
+    color: '#5f8f62',
     marginTop: 6,
   },
   flowChipRow: {
@@ -1154,7 +1154,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   cardSignalRow: {
-    borderTopColor: '#111827',
+    borderTopColor: '#efe6d6',
     borderTopWidth: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1166,13 +1166,13 @@ const styles = StyleSheet.create({
     flexBasis: '47%',
     flexGrow: 1,
     minHeight: 64,
-    borderLeftColor: '#38bdf8',
+    borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
     paddingLeft: 9,
     paddingRight: 6,
   },
   cardSignalLabel: {
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 9,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -1184,7 +1184,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   cardSignalDetail: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     lineHeight: 15,
     marginTop: 2,
@@ -1194,15 +1194,15 @@ const styles = StyleSheet.create({
     flexBasis: '31%',
     minHeight: 48,
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 6,
   },
   flowChipLabel: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 9,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -1214,28 +1214,28 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   emptyPanel: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     marginTop: 8,
     padding: 16,
   },
   emptyTitle: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 18,
     fontWeight: '800',
     textAlign: 'center',
   },
   emptyMessage: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 13,
     lineHeight: 19,
     marginTop: 8,
     textAlign: 'center',
   },
   emptyDetail: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     lineHeight: 18,
     marginTop: 8,
@@ -1244,7 +1244,7 @@ const styles = StyleSheet.create({
   emptyActionButton: {
     alignItems: 'center',
     alignSelf: 'center',
-    backgroundColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
     borderRadius: 8,
     justifyContent: 'center',
     marginTop: 14,
@@ -1253,7 +1253,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   emptyActionText: {
-    color: '#050816',
+    color: '#f7f3ea',
     fontSize: 14,
     fontWeight: '800',
     textAlign: 'center',

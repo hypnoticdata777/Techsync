@@ -360,7 +360,7 @@ function WorkOrderFormScreen({route, navigation}) {
           <TextInput
             style={styles.input}
             placeholder="e.g., Fix kitchen sink leak"
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#8a7f70"
             value={title}
             onChangeText={setTitle}
             {...inputA11y('Title', {required: true})}
@@ -372,7 +372,7 @@ function WorkOrderFormScreen({route, navigation}) {
           <TextInput
             style={[styles.input, styles.textArea]}
             placeholder="Additional details about the work order..."
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#8a7f70"
             value={description}
             onChangeText={setDescription}
             {...inputA11y('Description', {multiline: true})}
@@ -399,7 +399,7 @@ function WorkOrderFormScreen({route, navigation}) {
           </View>
 
           {directoryLoading ? (
-            <ActivityIndicator color="#38bdf8" style={styles.directoryLoader} />
+            <ActivityIndicator color="#2f6f9f" style={styles.directoryLoader} />
           ) : null}
 
           {directoryError ? (
@@ -451,7 +451,7 @@ function WorkOrderFormScreen({route, navigation}) {
           <TextInput
             style={styles.input}
             placeholder="e.g., Jane Doe"
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#8a7f70"
             value={customerName}
             onChangeText={setCustomerName}
             {...inputA11y('Customer name')}
@@ -463,7 +463,7 @@ function WorkOrderFormScreen({route, navigation}) {
           <TextInput
             style={styles.input}
             placeholder="e.g., 123 Main St, Apt 4"
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#8a7f70"
             value={address}
             onChangeText={setAddress}
             {...inputA11y('Address')}
@@ -475,7 +475,7 @@ function WorkOrderFormScreen({route, navigation}) {
           <TextInput
             style={styles.input}
             placeholder="e.g., plumbing, hvac, electrical"
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#8a7f70"
             value={serviceType}
             onChangeText={setServiceType}
             {...inputA11y('Service type', {required: true})}
@@ -540,7 +540,7 @@ function WorkOrderFormScreen({route, navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050816',
+    backgroundColor: '#f7f3ea',
   },
   content: {
     padding: 16,
@@ -548,13 +548,13 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#f9fafb',
+    color: '#1f2933',
     marginBottom: 14,
   },
   guidancePanel: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     gap: 8,
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
   },
   guidanceLabel: {
     width: 118,
-    color: '#bfdbfe',
+    color: '#2f6f9f',
     fontSize: 11,
     fontWeight: '800',
     lineHeight: 16,
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
   },
   guidanceValue: {
     flex: 1,
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     lineHeight: 17,
   },
@@ -585,27 +585,27 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#9ca3af',
+    color: '#746a5d',
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: '#e5e7eb',
+    color: '#27313d',
   },
   textArea: {
     minHeight: 100,
     textAlignVertical: 'top',
   },
   directoryPanel: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     marginBottom: 20,
@@ -618,12 +618,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   directoryTitle: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 17,
     fontWeight: '800',
   },
   directorySubtitle: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     marginTop: 3,
   },
@@ -631,11 +631,11 @@ const styles = StyleSheet.create({
     minHeight: 44,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#c084fc',
+    borderColor: '#6f5f95',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
   },
   directoryManageButtonText: {
     color: '#d8b4fe',
@@ -661,25 +661,25 @@ const styles = StyleSheet.create({
     maxWidth: 190,
     minHeight: 44,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#c7b89f',
     borderRadius: 8,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,
   },
   selectorChipActive: {
-    backgroundColor: '#a3e635',
-    borderColor: '#a3e635',
+    backgroundColor: '#5f8f62',
+    borderColor: '#5f8f62',
   },
   selectorChipText: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     fontWeight: '800',
     textAlign: 'center',
   },
   selectorChipTextActive: {
-    color: '#052e16',
+    color: '#e4f0e2',
   },
   contextSummaryPanel: {
     marginTop: 4,
@@ -706,16 +706,16 @@ const styles = StyleSheet.create({
   },
   contextSummaryCount: {
     maxWidth: 150,
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     fontWeight: '700',
   },
   contextSummaryRow: {
     minHeight: 58,
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     paddingHorizontal: 10,
     paddingVertical: 8,
     flexDirection: 'row',
@@ -727,19 +727,19 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   contextSummaryLabel: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 10,
     fontWeight: '800',
     textTransform: 'uppercase',
   },
   contextSummaryValue: {
-    color: '#f8fafc',
+    color: '#1f2933',
     fontSize: 14,
     fontWeight: '800',
     marginTop: 2,
   },
   contextSummaryDetail: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     marginTop: 2,
   },
@@ -748,8 +748,8 @@ const styles = StyleSheet.create({
     minHeight: 28,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#334155',
-    backgroundColor: '#111827',
+    borderColor: '#c7b89f',
+    backgroundColor: '#efe6d6',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -762,16 +762,16 @@ const styles = StyleSheet.create({
     borderColor: '#facc15',
   },
   contextStateText: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 10,
     fontWeight: '900',
     textTransform: 'uppercase',
   },
   contextStateTextLinked: {
-    color: '#14532d',
+    color: '#335c39',
   },
   contextStateTextManual: {
-    color: '#713f12',
+    color: '#7a541d',
   },
   statusOptions: {
     flexDirection: 'row',
@@ -779,9 +779,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   statusOption: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
@@ -790,22 +790,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   statusOptionActive: {
-    backgroundColor: '#38bdf8',
-    borderColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
+    borderColor: '#2f6f9f',
   },
   statusOptionText: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#746a5d',
     fontWeight: '500',
     textTransform: 'capitalize',
     textAlign: 'center',
   },
   statusOptionTextActive: {
-    color: '#050816',
+    color: '#f7f3ea',
     fontWeight: '600',
   },
   saveButton: {
-    backgroundColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -815,7 +815,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: '#050816',
+    color: '#f7f3ea',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -827,7 +827,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   cancelButtonText: {
-    color: '#9ca3af',
+    color: '#746a5d',
     fontWeight: '600',
     fontSize: 16,
   },

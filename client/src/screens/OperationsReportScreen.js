@@ -27,36 +27,36 @@ const REPORT_LIMIT = 10;
 const getStatusColor = status => {
   switch (status) {
     case 'open':
-      return '#fbbf24';
+      return '#b98524';
     case 'in_progress':
-      return '#38bdf8';
+      return '#2f6f9f';
     case 'paused':
-      return '#f97316';
+      return '#b86b2b';
     case 'escalated':
-      return '#fb7185';
+      return '#b24a3a';
     case 'completed':
-      return '#a3e635';
+      return '#5f8f62';
     case 'cancelled':
-      return '#ef4444';
+      return '#b24a3a';
     case 'archived':
-      return '#94a3b8';
+      return '#746a5d';
     default:
-      return '#9ca3af';
+      return '#746a5d';
   }
 };
 
 const getPriorityColor = priority => {
   switch (priority) {
     case 'emergency':
-      return '#f97316';
+      return '#b86b2b';
     case 'high':
-      return '#fb7185';
+      return '#b24a3a';
     case 'medium':
-      return '#fbbf24';
+      return '#b98524';
     case 'low':
-      return '#a3e635';
+      return '#5f8f62';
     default:
-      return '#9ca3af';
+      return '#746a5d';
   }
 };
 
@@ -245,8 +245,8 @@ function OperationsReportScreen() {
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor="#38bdf8"
-          colors={['#38bdf8']}
+          tintColor="#2f6f9f"
+          colors={['#2f6f9f']}
         />
       }>
       <View style={styles.header}>
@@ -285,7 +285,7 @@ function OperationsReportScreen() {
         />
       </View>
 
-      {loading && <ActivityIndicator style={styles.loader} color="#38bdf8" />}
+      {loading && <ActivityIndicator style={styles.loader} color="#2f6f9f" />}
 
       {error && (
         <ScreenErrorState message={error} onRetry={fetchReport} />
@@ -480,7 +480,7 @@ function OperationsReportScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050816',
+    backgroundColor: '#f7f3ea',
   },
   content: {
     padding: 16,
@@ -492,17 +492,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#f9fafb',
+    color: '#1f2933',
   },
   subtitle: {
     marginTop: 4,
     fontSize: 13,
-    color: '#94a3b8',
+    color: '#746a5d',
   },
   controls: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     marginBottom: 14,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   segmentLabel: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     fontWeight: '700',
     marginBottom: 8,
@@ -528,21 +528,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#334155',
-    backgroundColor: '#0f172a',
+    borderColor: '#c7b89f',
+    backgroundColor: '#fdf8ef',
   },
   segmentButtonActive: {
-    backgroundColor: '#38bdf8',
-    borderColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
+    borderColor: '#2f6f9f',
   },
   segmentButtonText: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 13,
     fontWeight: '700',
     textAlign: 'center',
   },
   segmentButtonTextActive: {
-    color: '#050816',
+    color: '#f7f3ea',
   },
   loader: {
     marginTop: 24,
@@ -558,27 +558,27 @@ const styles = StyleSheet.create({
     minWidth: 132,
     minHeight: 72,
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 10,
   },
   summaryValue: {
-    color: '#38bdf8',
+    color: '#2f6f9f',
     fontSize: 24,
     fontWeight: '800',
   },
   summaryLabel: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 11,
     fontWeight: '700',
     marginTop: 4,
   },
   chartBlock: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
@@ -587,12 +587,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   chartTitle: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 16,
     fontWeight: '800',
   },
   chartSubtitle: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     marginTop: 3,
   },
@@ -608,24 +608,24 @@ const styles = StyleSheet.create({
   },
   barLabel: {
     flex: 1,
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 13,
     fontWeight: '700',
   },
   barValue: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 13,
     fontWeight: '800',
   },
   barDetail: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 11,
     marginTop: 2,
   },
   barTrack: {
     height: 10,
     overflow: 'hidden',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#fdf8ef',
     borderRadius: 5,
     marginTop: 6,
   },
@@ -637,26 +637,26 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   sectionTitle: {
-    color: '#f9fafb',
+    color: '#1f2933',
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 10,
   },
   card: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     marginBottom: 10,
   },
   cardTitle: {
-    color: '#e5e7eb',
+    color: '#27313d',
     fontSize: 16,
     fontWeight: '700',
   },
   cardMeta: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 12,
     marginTop: 6,
   },
@@ -677,13 +677,13 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   loadValue: {
-    color: '#fb7185',
+    color: '#b24a3a',
     fontSize: 24,
     fontWeight: '800',
     marginRight: 8,
   },
   loadLabel: {
-    color: '#cbd5e1',
+    color: '#4f5f6f',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -695,8 +695,8 @@ const styles = StyleSheet.create({
   },
   countCell: {
     minWidth: 86,
-    color: '#cbd5e1',
-    backgroundColor: '#0f172a',
+    color: '#4f5f6f',
+    backgroundColor: '#fdf8ef',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 6,
@@ -704,14 +704,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   emptyPanel: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 14,
   },
   emptyText: {
-    color: '#94a3b8',
+    color: '#746a5d',
     fontSize: 13,
     textAlign: 'center',
   },

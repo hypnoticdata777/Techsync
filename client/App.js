@@ -1,7 +1,13 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {StatusBar, ActivityIndicator, View, StyleSheet} from 'react-native';
+import {
+  StatusBar,
+  ActivityIndicator,
+  Platform,
+  View,
+  StyleSheet,
+} from 'react-native';
 
 import {AuthProvider, useAuth} from './src/context/AuthContext';
 import LoginScreen from './src/screens/LoginScreen';
@@ -17,6 +23,7 @@ import DispatchBoardScreen from './src/screens/DispatchBoardScreen';
 import PmcDirectoryScreen from './src/screens/PmcDirectoryScreen';
 import RoleEvidenceScreen from './src/screens/RoleEvidenceScreen';
 import {canAccessMainRoute} from './src/utils/roleWorkflows';
+import {colors, typography} from './src/theme';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +33,7 @@ function Navigation() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#38bdf8" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -36,15 +43,16 @@ function Navigation() {
       <Stack.Navigator
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#050816',
+            backgroundColor: colors.canvas,
           },
-          headerTintColor: '#38bdf8',
+          headerTintColor: colors.primary,
           headerTitleStyle: {
             fontWeight: '700',
-            color: '#f9fafb',
+            color: colors.ink,
+            fontFamily: typography.heading,
           },
           contentStyle: {
-            backgroundColor: '#050816',
+            backgroundColor: colors.canvas,
           },
         }}>
         {!isAuthenticated ? (
@@ -158,9 +166,17 @@ function Navigation() {
 }
 
 function App() {
+  React.useEffect(() => {
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      document.documentElement.style.backgroundColor = colors.canvas;
+      document.body.style.backgroundColor = colors.canvas;
+      document.body.style.fontFamily = typography.body;
+    }
+  }, []);
+
   return (
     <AuthProvider>
-      <StatusBar barStyle="light-content" backgroundColor="#050816" />
+      <StatusBar barStyle="dark-content" backgroundColor={colors.canvas} />
       <Navigation />
     </AuthProvider>
   );
@@ -171,7 +187,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#050816',
+    backgroundColor: colors.canvas,
   },
 });
 

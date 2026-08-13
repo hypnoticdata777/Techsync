@@ -54,7 +54,7 @@ function LoginScreen({navigation}) {
             <TextInput
               style={styles.input}
               placeholder="email@example.com"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#8a7f70"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -68,7 +68,7 @@ function LoginScreen({navigation}) {
             <TextInput
               style={styles.input}
               placeholder="Enter your password"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#8a7f70"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -81,7 +81,7 @@ function LoginScreen({navigation}) {
             onPress={handleLogin}
             disabled={loading}>
             {loading ? (
-              <ActivityIndicator color="#050816" />
+              <ActivityIndicator color="#f7f3ea" />
             ) : (
               <Text style={styles.loginButtonText}>Sign In</Text>
             )}
@@ -115,7 +115,7 @@ function LoginScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#050816',
+    backgroundColor: '#f7f3ea',
   },
   content: {
     flex: 1,
@@ -125,13 +125,13 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 36,
     fontWeight: '700',
-    color: '#38bdf8',
+    color: '#2f6f9f',
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: '#746a5d',
     textAlign: 'center',
     marginBottom: 48,
   },
@@ -144,21 +144,21 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#9ca3af',
+    color: '#746a5d',
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#020617',
+    backgroundColor: '#fffaf0',
     borderWidth: 1,
-    borderColor: '#1f2937',
+    borderColor: '#d8ccb9',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: '#e5e7eb',
+    color: '#27313d',
   },
   loginButton: {
-    backgroundColor: '#38bdf8',
+    backgroundColor: '#2f6f9f',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   loginButtonText: {
-    color: '#050816',
+    color: '#f7f3ea',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   forgotPasswordText: {
-    color: '#9ca3af',
+    color: '#746a5d',
     fontSize: 13,
   },
   registerSection: {
@@ -186,11 +186,11 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   registerText: {
-    color: '#9ca3af',
+    color: '#746a5d',
     fontSize: 14,
   },
   registerLink: {
-    color: '#38bdf8',
+    color: '#2f6f9f',
     fontSize: 14,
     fontWeight: '600',
   },
