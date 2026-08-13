@@ -229,6 +229,8 @@ they have been verified in the relevant environment.
 - [x] Help bubbles now behave as one-at-a-time contextual popovers; hover,
       focus, or tap opens one explanation, clicking the active bubble
       dismisses it, and moving to another bubble closes the previous one.
+- [x] Web help popovers now render above the workspace and clamp inside the
+      viewport so rail/card/scroll containers do not hide the explanation.
 - [x] Clickable portal/work-order/jump surfaces now carry stronger raised and
       hover/pressed affordances so users can tell what opens another view.
 - [x] Signed-in header brand hierarchy sharpened so TechSync anchors the app

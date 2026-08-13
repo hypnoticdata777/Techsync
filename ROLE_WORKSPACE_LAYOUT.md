@@ -19,8 +19,10 @@ technician, client, viewer, and vendor lanes:
   now lives behind compact `?` help bubbles. On hover, keyboard focus, or tap,
   the bubble opens a small contextual explanation window. Only one help bubble
   may stay active at a time, and clicking the active bubble dismisses it so
-  tooltip copy never stacks over the workspace. The always-visible surface
-  should keep only labels, counts, statuses, work titles, and actions.
+  tooltip copy never stacks over the workspace. On web, help popovers should
+  render above the workspace and clamp away from viewport edges so they are not
+  hidden by rails, cards, or scroll panes. The always-visible surface should
+  keep only labels, counts, statuses, work titles, and actions.
 
 On narrow screens, the same order stacks vertically: identity and scope first,
 then navigation/focus, then primary data, then next actions. The user should

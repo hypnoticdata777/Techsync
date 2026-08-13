@@ -1,5 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {Platform, Pressable, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
+
+const TOOLTIP_WIDTH = 260;
+const EDGE_GAP = 12;
+const VERTICAL_GAP = 8;
+const ESTIMATED_TOOLTIP_HEIGHT = 96;
 
 let nextHintId = 1;
 let activeHintId = null;
@@ -21,13 +26,37 @@ function subscribeActiveHint(listener) {
   return () => activeHintListeners.delete(listener);
 }
 
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function buildTooltipPosition(anchor, align, windowWidth, windowHeight) {
+  if (!anchor) return null;
+
+  const maxLeft = Math.max(EDGE_GAP, windowWidth - TOOLTIP_WIDTH - EDGE_GAP);
+  const preferredLeft =
+    align === 'left' ? anchor.x : anchor.x + anchor.width - TOOLTIP_WIDTH;
+  const left = clamp(preferredLeft, EDGE_GAP, maxLeft);
+
+  const belowTop = anchor.y + anchor.height + VERTICAL_GAP;
+  const top =
+    belowTop + ESTIMATED_TOOLTIP_HEIGHT > windowHeight - EDGE_GAP
+      ? Math.max(EDGE_GAP, anchor.y - ESTIMATED_TOOLTIP_HEIGHT - VERTICAL_GAP)
+      : belowTop;
+
+  return {left, top};
+}
+
 function HintBubble({label = 'Help', text, align = 'right'}) {
   const idRef = useRef(null);
+  const anchorRef = useRef(null);
+  const {width: windowWidth, height: windowHeight} = useWindowDimensions();
   if (idRef.current === null) {
     idRef.current = `hint-${nextHintId}`;
     nextHintId += 1;
   }
 
+  const [anchor, setAnchor] = useState(null);
   const [activeId, setActiveId] = useState(activeHintId);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -40,11 +69,20 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
 
   const isActive = activeId === idRef.current;
   const visible = isActive && !dismissed && (hovered || focused || tappedOpen);
+  const floatingPosition =
+    Platform.OS === 'web' ? buildTooltipPosition(anchor, align, windowWidth, windowHeight) : null;
+
+  const measureAnchor = () => {
+    anchorRef.current?.measureInWindow?.((x, y, width, height) => {
+      setAnchor({x, y, width, height});
+    });
+  };
 
   const openFromHover = () => {
     setHovered(true);
     setTappedOpen(false);
     setDismissed(false);
+    measureAnchor();
     emitActiveHint(idRef.current);
   };
 
@@ -52,11 +90,13 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
     setHovered(false);
     setTappedOpen(false);
     setDismissed(false);
+    setAnchor(null);
     clearActiveHint(idRef.current);
   };
 
   const openFromFocus = () => {
     setFocused(true);
+    measureAnchor();
     emitActiveHint(idRef.current);
   };
 
@@ -64,6 +104,7 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
     setFocused(false);
     setTappedOpen(false);
     setDismissed(false);
+    setAnchor(null);
     clearActiveHint(idRef.current);
   };
 
@@ -71,33 +112,48 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
     if (visible) {
       setTappedOpen(false);
       setDismissed(true);
+      setAnchor(null);
       clearActiveHint(idRef.current);
       return;
     }
 
     setTappedOpen(true);
     setDismissed(false);
+    measureAnchor();
     emitActiveHint(idRef.current);
   };
 
+  useEffect(() => {
+    if (visible) {
+      measureAnchor();
+    }
+  }, [visible, windowWidth, windowHeight]);
+
+  const tooltipPositionStyle =
+    Platform.OS === 'web' && floatingPosition
+      ? [styles.tooltipFloating, floatingPosition]
+      : [styles.tooltipInline, align === 'left' ? styles.tooltipLeft : styles.tooltipRight];
+
   return (
     <View style={styles.wrap}>
-      <Pressable
-        style={({pressed}) => [styles.bubble, pressed && styles.bubblePressed]}
-        accessibilityRole="button"
-        accessibilityLabel={`${label}: ${text}`}
-        accessibilityHint="Shows a short explanation."
-        onHoverIn={openFromHover}
-        onHoverOut={closeFromHover}
-        onFocus={openFromFocus}
-        onBlur={closeFromFocus}
-        onPress={toggleFromPress}>
-        <Text style={styles.bubbleText}>?</Text>
-      </Pressable>
-      {visible ? (
+      <View ref={anchorRef} collapsable={false}>
+        <Pressable
+          style={({pressed}) => [styles.bubble, pressed && styles.bubblePressed]}
+          accessibilityRole="button"
+          accessibilityLabel={`${label}: ${text}`}
+          accessibilityHint="Shows a short explanation."
+          onHoverIn={openFromHover}
+          onHoverOut={closeFromHover}
+          onFocus={openFromFocus}
+          onBlur={closeFromFocus}
+          onPress={toggleFromPress}>
+          <Text style={styles.bubbleText}>?</Text>
+        </Pressable>
+      </View>
+      {visible && (Platform.OS !== 'web' || floatingPosition) ? (
         <View
           pointerEvents="none"
-          style={[styles.tooltip, align === 'left' ? styles.tooltipLeft : styles.tooltipRight]}>
+          style={[styles.tooltip, tooltipPositionStyle]}>
           <Text style={styles.tooltipText}>{text}</Text>
         </View>
       ) : null}
@@ -137,15 +193,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    position: 'absolute',
-    top: 22,
-    width: 240,
-    zIndex: 1000,
+    maxWidth: TOOLTIP_WIDTH,
+    width: TOOLTIP_WIDTH,
+    zIndex: 10000,
     shadowColor: '#182532',
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.18,
     shadowRadius: 10,
     elevation: 8,
+  },
+  tooltipInline: {
+    position: 'absolute',
+    top: 22,
+  },
+  tooltipFloating: {
+    position: 'fixed',
   },
   tooltipRight: {
     right: 0,
