@@ -249,6 +249,15 @@ they have been verified in the relevant environment.
 - [x] Work-order home queues now include a tested role-aware next-best-action
       tool with real controls to open the recommended work order or focus the
       matching queue loop.
+- [x] Role home queues now visually separate the fixed navigation and
+      next-action rails from the center data area with stronger muted rail
+      backgrounds and an independently scrollable next-action rail.
+- [x] Work-order cards and detail action-path jump cards now shade on
+      hover/press so clickable records and jump targets are visible before a
+      user clicks.
+- [x] Work-order detail pages now include a work-story timeline covering
+      intake, schedule, assignment, field progress, proof/photos, and latest
+      update context.
 - [x] Local role walkthrough startup friction is reduced with a local Docker
       Postgres demo database, generated ignored `.local-demo.env`,
       double-click start/stop launchers, and `LOCAL_TESTING.md`; Neon is now an

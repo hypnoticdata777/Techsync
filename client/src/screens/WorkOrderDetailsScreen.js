@@ -4,6 +4,7 @@ import {
   Alert,
   Image,
   Linking,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -194,6 +195,97 @@ const SectionReadiness = ({row}) => {
   );
 };
 
+const readableStatus = value =>
+  value ? String(value).replace(/_/g, ' ') : 'Not recorded';
+
+const firstPresent = values =>
+  values.find(value => value !== undefined && value !== null && String(value).trim() !== '');
+
+function buildWorkOrderStoryRows(workOrder, attachments, messages) {
+  const requester = firstPresent([
+    workOrder.customer_name,
+    workOrder.client_name,
+    workOrder.property_name,
+    'Client request',
+  ]);
+  const location = firstPresent([
+    workOrder.address,
+    workOrder.property_name,
+    workOrder.property_id ? `Property #${workOrder.property_id}` : null,
+  ]);
+  const assignedOwner = firstPresent([
+    workOrder.technician_name,
+    workOrder.assigned_technician_name,
+    workOrder.assigned_technician_id ? `Technician #${workOrder.assigned_technician_id}` : null,
+    workOrder.vendor_name,
+  ]);
+  const scheduledFor = firstPresent([
+    workOrder.scheduled_for,
+    workOrder.scheduled_at,
+    workOrder.due_at,
+    workOrder.due_date,
+  ]);
+  const proofImages = attachments.filter(isImageAttachment).length;
+  const latestMessage = [...messages].sort(
+    (a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0),
+  )[0];
+
+  return [
+    {
+      key: 'intake',
+      label: '1. Intake',
+      value: formatDate(workOrder.created_at),
+      detail: `${requester} opened the request${location ? ` for ${location}` : ''}.`,
+      tone: 'active',
+    },
+    {
+      key: 'schedule',
+      label: '2. Schedule',
+      value: scheduledFor ? formatDate(scheduledFor) : 'No scheduled window',
+      detail: scheduledFor
+        ? 'The field window is captured for planning and expectation setting.'
+        : 'Add a scheduled window when operations needs client or technician timing clarity.',
+      tone: scheduledFor ? 'verified' : 'pending',
+    },
+    {
+      key: 'assignment',
+      label: '3. Assignment',
+      value: assignedOwner || 'Not assigned',
+      detail: workOrder.vendor_name
+        ? `Vendor context: ${workOrder.vendor_name}.`
+        : 'Assignment should identify the technician or vendor responsible for the next move.',
+      tone: assignedOwner ? 'verified' : 'pending',
+    },
+    {
+      key: 'field',
+      label: '4. Field Work',
+      value: readableStatus(workOrder.status),
+      detail: workOrder.completed_at
+        ? `Completed ${formatDate(workOrder.completed_at)}.`
+        : 'Status changes and notes should explain how the work progressed.',
+      tone: workOrder.status,
+    },
+    {
+      key: 'proof',
+      label: '5. Proof',
+      value: `${attachments.length} attachment${attachments.length === 1 ? '' : 's'}`,
+      detail: `${proofImages} photo${proofImages === 1 ? '' : 's'} and ${
+        messages.length
+      } message${messages.length === 1 ? '' : 's'} are tied to this record.`,
+      tone: attachments.length > 0 || workOrder.completion_proof_verified_at ? 'verified' : 'missing',
+    },
+    {
+      key: 'latest',
+      label: '6. Latest Update',
+      value: latestMessage ? formatDate(latestMessage.created_at) : 'No messages yet',
+      detail: latestMessage
+        ? `${readableStatus(latestMessage.visibility)} lane: ${latestMessage.body}`
+        : 'Use the communication lane below to record the next stakeholder-facing update.',
+      tone: latestMessage ? 'active' : 'pending',
+    },
+  ];
+}
+
 function WorkOrderDetailsScreen({route, navigation}) {
   const {user, authFetch} = useAuth();
   const [workOrder, setWorkOrder] = useState(route.params.workOrder);
@@ -337,6 +429,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
   const workOrderFlowRows = useMemo(
     () => buildWorkOrderFlowRows(workOrder),
     [workOrder],
+  );
+  const workOrderStoryRows = useMemo(
+    () => buildWorkOrderStoryRows(workOrder, attachments, messages),
+    [attachments, messages, workOrder],
   );
   const roleBoundaryRows = useMemo(
     () => buildRoleBoundaryRows(user?.role),
@@ -715,11 +811,45 @@ function WorkOrderDetailsScreen({route, navigation}) {
               </View>
             ))}
           </View>
+          <View style={styles.storyPanel}>
+            <View style={styles.storyHeader}>
+              <Text style={styles.storyTitle}>Work Story</Text>
+              <Text style={styles.storySubtitle}>
+                Follow the job from request intake to schedule, assignment, field
+                movement, messages, and proof.
+              </Text>
+            </View>
+            <View style={styles.storyGrid}>
+              {workOrderStoryRows.map(row => (
+                <View
+                  key={row.key}
+                  style={[
+                    styles.storyStep,
+                    {borderLeftColor: getSummaryToneColor(row.tone)},
+                  ]}
+                  accessible
+                  accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
+                  <Text style={styles.storyStepLabel}>{row.label}</Text>
+                  <Text
+                    style={[styles.storyStepValue, {color: getSummaryToneColor(row.tone)}]}
+                    numberOfLines={2}>
+                    {row.value}
+                  </Text>
+                  <Text style={styles.storyStepDetail} numberOfLines={3}>
+                    {row.detail}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
           <View style={styles.actionPathGrid}>
             {detailActionPathRows.map(row => (
-              <TouchableOpacity
+              <Pressable
                 key={row.key}
-                style={styles.actionPathItem}
+                style={({hovered, pressed}) => [
+                  styles.actionPathItem,
+                  (hovered || pressed) && styles.actionPathItemInteractive,
+                ]}
                 onPress={() => jumpToSection(row.target)}
                 accessible
                 accessibilityRole="button"
@@ -737,7 +867,7 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   {row.detail}
                 </Text>
                 <Text style={styles.actionPathJump}>Jump</Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
           <View style={styles.eventPlaybook}>
@@ -1345,6 +1475,68 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     marginTop: 4,
   },
+  storyPanel: {
+    backgroundColor: '#eee3d2',
+    borderColor: '#bfae94',
+    borderRadius: 6,
+    borderWidth: 1,
+    marginTop: 12,
+    padding: 10,
+  },
+  storyHeader: {
+    borderBottomColor: '#d2c2aa',
+    borderBottomWidth: 1,
+    marginBottom: 10,
+    paddingBottom: 8,
+  },
+  storyTitle: {
+    color: '#182532',
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  storySubtitle: {
+    color: '#574f45',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 4,
+  },
+  storyGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  storyStep: {
+    backgroundColor: '#fbf4e8',
+    borderColor: '#d2c2aa',
+    borderLeftWidth: 3,
+    borderRadius: 5,
+    borderWidth: 1,
+    flexBasis: '31%',
+    flexGrow: 1,
+    minHeight: 92,
+    minWidth: 190,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+  },
+  storyStepLabel: {
+    color: '#2f6f9f',
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  storyStepValue: {
+    fontSize: 14,
+    fontWeight: '900',
+    lineHeight: 18,
+    marginTop: 4,
+    textTransform: 'capitalize',
+  },
+  storyStepDetail: {
+    color: '#574f45',
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 4,
+  },
   actionPathGrid: {
     borderTopColor: '#d2c2aa',
     borderTopWidth: 1,
@@ -1366,6 +1558,14 @@ const styles = StyleSheet.create({
     borderLeftWidth: 2,
     paddingHorizontal: 10,
     paddingVertical: 9,
+  },
+  actionPathItemInteractive: {
+    backgroundColor: '#efe3d1',
+    borderColor: '#2f6f9f',
+    shadowColor: '#2f6f9f',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: {width: 0, height: 2},
   },
   actionPathLabel: {
     color: '#2f6f9f',

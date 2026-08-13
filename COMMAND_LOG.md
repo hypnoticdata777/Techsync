@@ -3350,3 +3350,39 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
+
+## 2026-08-13 - Role Workspace Rail and Story Polish
+
+Decision:
+
+- The light theme made the app calmer, but the left/right role rails still
+  blended into the center data area and clickable cards were not obvious
+  enough.
+- Work-order details also needed to read more like a field-service job story:
+  who requested it, where it happened, who owned it, what happened next, and
+  what proof exists.
+
+Changes:
+
+- Added stronger muted backgrounds to the fixed navigation and next-action
+  rails, plus explicit helper copy for what each rail is meant to communicate.
+- Made the right next-action rail scroll internally so long guidance does not
+  push the central work queue out of view.
+- Added hover/pressed shading to work-order queue cards and detail jump cards.
+- Added a detail-page work-story timeline covering intake, schedule,
+  assignment, field work, proof/photos, and latest update.
+- Updated README, QA checklist, and role workspace layout documentation with
+  the new scanning and work-story contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+```
+
+Result:
+
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.

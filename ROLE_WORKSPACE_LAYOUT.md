@@ -6,11 +6,15 @@ TechSync Ops uses one shared role workspace pattern across admin, coordinator,
 technician, client, viewer, and vendor lanes:
 
 - Left rail: stable navigation, lane scope, queue filters, and role-permitted
-  creation or management actions.
+  creation or management actions. It uses a stronger beige rail background so
+  fixed navigation reads separately from the working data.
 - Center workspace: the primary data the user is acting on, such as work-order
-  queues, linked client work, approval items, or vendor work.
+  queues, linked client work, approval items, or vendor work. Work-order cards
+  must show an obvious hover/pressed state because opening a record is a core
+  interaction.
 - Right action rail: next-best action, waiting-on signals, operating guidance,
-  and event-lane cues.
+  and event-lane cues. It uses the same fixed-rail treatment and scrolls inside
+  the rail so long guidance does not push the primary queue out of view.
 
 On narrow screens, the same order stacks vertically: identity and scope first,
 then navigation/focus, then primary data, then next actions. The user should
@@ -26,6 +30,11 @@ sizes.
   saturated panels.
 - Controls use compact rectangular proportions with small radius. Large pill
   shapes are reserved for small labels or identity chips only.
+- Left/right rails use stronger muted surfaces than the center workspace. The
+  contrast should create a clear scan boundary without returning to the harsh
+  dark POC look.
+- Interactable cards and jump surfaces shade on hover/press so users can tell
+  they are clickable before committing to a click.
 - Roboto Serif remains the app typography direction for web. Text hierarchy
   should come from size, weight, spacing, and placement instead of loud colors.
 
@@ -52,6 +61,7 @@ Role-specific navigation may differ, but it should map into the same zones:
   shell.
 - `WorkOrderDetailsScreen` should stay quieter and denser than the first dark
   POC pass: compact cards, toned surfaces, and action sections sized around
-  the text they contain.
+  the text they contain. The detail page now frames each job as a work story:
+  intake, schedule, assignment, field work, proof, and latest update.
 - Future role pages should reuse the same model before adding new page-specific
   chrome.

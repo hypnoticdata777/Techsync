@@ -4,6 +4,8 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
+  Pressable,
+  ScrollView,
   TouchableOpacity,
   StyleSheet,
   Alert,
@@ -180,8 +182,11 @@ function WorkOrdersListScreen({navigation}) {
     const cardRows = buildRoleCardRows(user?.role, item);
 
     return (
-      <TouchableOpacity
-        style={styles.workOrderCard}
+      <Pressable
+        style={({hovered, pressed}) => [
+          styles.workOrderCard,
+          (hovered || pressed) && styles.workOrderCardInteractive,
+        ]}
         {...workOrderButtonA11y(item)}
         onPress={() => navigation.navigate('WorkOrderDetails', {workOrder: item})}>
         <Text style={styles.workOrderTitle}>{item.title}</Text>
@@ -234,7 +239,7 @@ function WorkOrdersListScreen({navigation}) {
             </View>
           ))}
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
@@ -302,6 +307,10 @@ function WorkOrdersListScreen({navigation}) {
       <View style={[styles.workspaceShell, !useWorkspaceLayout && styles.workspaceStack]}>
         <View style={[styles.workspaceNav, !useWorkspaceLayout && styles.workspaceCardStack]}>
           <Text style={styles.workspaceTitle}>Navigation</Text>
+          <Text style={styles.workspaceHelp}>
+            Choose the queue lane, operating context, or action this role is allowed
+            to run.
+          </Text>
           <View style={styles.laneMap}>
             {roleLaneRows.map(row => (
               <View
@@ -487,108 +496,118 @@ function WorkOrdersListScreen({navigation}) {
 
         <View style={[styles.workspaceAside, !useWorkspaceLayout && styles.workspaceCardStack]}>
           <Text style={styles.workspaceTitle}>Next Actions</Text>
-          <View
-            style={[styles.nextActionPanel, {borderLeftColor: getStatusColor(roleNextBestAction.tone)}]}
-            accessible
-            accessibilityLabel={`Next best action. ${roleNextBestAction.label}. ${roleNextBestAction.value}. Target: ${roleNextBestAction.workOrderTitle}. ${roleNextBestAction.detail}`}>
-            <View style={styles.nextActionHeader}>
-              <View style={styles.nextActionCopy}>
-                <Text style={styles.nextActionEyebrow}>{roleNextBestAction.label}</Text>
-                <Text style={styles.nextActionTitle}>{roleNextBestAction.value}</Text>
-                <Text style={styles.nextActionTarget} numberOfLines={2}>
-                  {roleNextBestAction.workOrderTitle}
-                </Text>
-                <Text style={styles.nextActionDetail}>{roleNextBestAction.detail}</Text>
+          <Text style={styles.workspaceHelp}>
+            Shows what is waiting on this user, the safest next click, and why the
+            item matters.
+          </Text>
+          <ScrollView
+            style={styles.workspaceAsideScroll}
+            contentContainerStyle={styles.workspaceAsideContent}
+            nestedScrollEnabled
+            showsVerticalScrollIndicator>
+            <View
+              style={[styles.nextActionPanel, {borderLeftColor: getStatusColor(roleNextBestAction.tone)}]}
+              accessible
+              accessibilityLabel={`Next best action. ${roleNextBestAction.label}. ${roleNextBestAction.value}. Target: ${roleNextBestAction.workOrderTitle}. ${roleNextBestAction.detail}`}>
+              <View style={styles.nextActionHeader}>
+                <View style={styles.nextActionCopy}>
+                  <Text style={styles.nextActionEyebrow}>{roleNextBestAction.label}</Text>
+                  <Text style={styles.nextActionTitle}>{roleNextBestAction.value}</Text>
+                  <Text style={styles.nextActionTarget} numberOfLines={2}>
+                    {roleNextBestAction.workOrderTitle}
+                  </Text>
+                  <Text style={styles.nextActionDetail}>{roleNextBestAction.detail}</Text>
+                </View>
+                <View style={styles.nextActionButtons}>
+                  <TouchableOpacity
+                    style={styles.nextActionPrimary}
+                    onPress={handleNextBestOpen}
+                    {...actionButtonA11y(
+                      roleNextBestAction.actionLabel,
+                      roleNextBestAction.workOrderId
+                        ? `Opens ${roleNextBestAction.workOrderTitle}.`
+                        : 'Refreshes the visible queue.',
+                    )}>
+                    <Text style={styles.nextActionPrimaryText}>
+                      {roleNextBestAction.actionLabel}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.nextActionSecondary,
+                      activeQueueFilter === roleNextBestAction.filterKey &&
+                        styles.nextActionSecondaryActive,
+                    ]}
+                    onPress={handleNextBestFocus}
+                    {...actionButtonA11y(
+                      activeQueueFilter === roleNextBestAction.filterKey
+                        ? `${roleNextBestAction.filterLabel} active`
+                        : roleNextBestAction.filterLabel,
+                      `Shows only ${roleNextBestAction.filterKey || 'all'} queue records.`,
+                    )}>
+                    <Text style={styles.nextActionSecondaryText}>
+                      {activeQueueFilter === roleNextBestAction.filterKey
+                        ? `Showing ${activeFilterRow?.label || 'Focus'}`
+                        : roleNextBestAction.filterLabel}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.nextActionButtons}>
-                <TouchableOpacity
-                  style={styles.nextActionPrimary}
-                  onPress={handleNextBestOpen}
-                  {...actionButtonA11y(
-                    roleNextBestAction.actionLabel,
-                    roleNextBestAction.workOrderId
-                      ? `Opens ${roleNextBestAction.workOrderTitle}.`
-                      : 'Refreshes the visible queue.',
-                  )}>
-                  <Text style={styles.nextActionPrimaryText}>
-                    {roleNextBestAction.actionLabel}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.nextActionSecondary,
-                    activeQueueFilter === roleNextBestAction.filterKey &&
-                      styles.nextActionSecondaryActive,
-                  ]}
-                  onPress={handleNextBestFocus}
-                  {...actionButtonA11y(
-                    activeQueueFilter === roleNextBestAction.filterKey
-                      ? `${roleNextBestAction.filterLabel} active`
-                      : roleNextBestAction.filterLabel,
-                    `Shows only ${roleNextBestAction.filterKey || 'all'} queue records.`,
-                  )}>
-                  <Text style={styles.nextActionSecondaryText}>
-                    {activeQueueFilter === roleNextBestAction.filterKey
-                      ? `Showing ${activeFilterRow?.label || 'Focus'}`
-                      : roleNextBestAction.filterLabel}
-                  </Text>
-                </TouchableOpacity>
+              <View style={styles.outcomeRow}>
+                {roleOutcomeRows.map(row => (
+                  <View
+                    key={row.key}
+                    style={[
+                      styles.outcomeCard,
+                      {borderLeftColor: getStatusColor(row.tone)},
+                    ]}>
+                    <Text style={styles.outcomeLabel}>{row.label}</Text>
+                    <Text
+                      style={[styles.outcomeValue, {color: getStatusColor(row.tone)}]}
+                      numberOfLines={2}>
+                      {row.value}
+                    </Text>
+                    <Text style={styles.outcomeDetail} numberOfLines={3}>
+                      {row.detail}
+                    </Text>
+                  </View>
+                ))}
               </View>
             </View>
-            <View style={styles.outcomeRow}>
-              {roleOutcomeRows.map(row => (
+
+            <View style={styles.guidanceStack}>
+              {roleGuidanceRows.map(row => (
                 <View
                   key={row.key}
-                  style={[
-                    styles.outcomeCard,
-                    {borderLeftColor: getStatusColor(row.tone)},
-                  ]}>
-                  <Text style={styles.outcomeLabel}>{row.label}</Text>
+                  style={styles.guidanceRow}
+                  accessible
+                  accessibilityLabel={`${row.label}. ${row.value}`}>
+                  <Text style={styles.guidanceLabel}>{row.label}</Text>
+                  <Text style={styles.guidanceValue}>{row.value}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.eventLaneGrid}>
+              {roleEventLaneRows.map(row => (
+                <View
+                  key={row.key}
+                  style={[styles.eventLaneCard, {borderLeftColor: getStatusColor(row.tone)}]}
+                  accessible
+                  accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
+                  <Text style={styles.eventLaneLabel}>{row.label}</Text>
                   <Text
-                    style={[styles.outcomeValue, {color: getStatusColor(row.tone)}]}
-                    numberOfLines={2}>
+                    style={[styles.eventLaneValue, {color: getStatusColor(row.tone)}]}
+                    numberOfLines={1}>
                     {row.value}
                   </Text>
-                  <Text style={styles.outcomeDetail} numberOfLines={3}>
+                  <Text style={styles.eventLaneDetail} numberOfLines={3}>
                     {row.detail}
                   </Text>
                 </View>
               ))}
             </View>
-          </View>
-
-          <View style={styles.guidanceStack}>
-            {roleGuidanceRows.map(row => (
-              <View
-                key={row.key}
-                style={styles.guidanceRow}
-                accessible
-                accessibilityLabel={`${row.label}. ${row.value}`}>
-                <Text style={styles.guidanceLabel}>{row.label}</Text>
-                <Text style={styles.guidanceValue}>{row.value}</Text>
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.eventLaneGrid}>
-            {roleEventLaneRows.map(row => (
-              <View
-                key={row.key}
-                style={[styles.eventLaneCard, {borderLeftColor: getStatusColor(row.tone)}]}
-                accessible
-                accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
-                <Text style={styles.eventLaneLabel}>{row.label}</Text>
-                <Text
-                  style={[styles.eventLaneValue, {color: getStatusColor(row.tone)}]}
-                  numberOfLines={1}>
-                  {row.value}
-                </Text>
-                <Text style={styles.eventLaneDetail} numberOfLines={3}>
-                  {row.detail}
-                </Text>
-              </View>
-            ))}
-          </View>
+          </ScrollView>
         </View>
       </View>
     </View>
@@ -704,11 +723,11 @@ const styles = StyleSheet.create({
   },
   workspaceNav: {
     width: 260,
-    backgroundColor: '#fbf4e8',
+    backgroundColor: '#e7d8c3',
     borderWidth: 1,
-    borderColor: '#d2c2aa',
+    borderColor: '#bfae94',
     borderRadius: 6,
-    padding: 10,
+    padding: 12,
   },
   workspaceMain: {
     flex: 1,
@@ -716,11 +735,19 @@ const styles = StyleSheet.create({
   },
   workspaceAside: {
     width: 360,
-    backgroundColor: '#fbf4e8',
+    backgroundColor: '#e7d8c3',
     borderWidth: 1,
-    borderColor: '#d2c2aa',
+    borderColor: '#bfae94',
     borderRadius: 6,
-    padding: 10,
+    maxHeight: 680,
+    padding: 12,
+  },
+  workspaceAsideScroll: {
+    flexGrow: 0,
+    maxHeight: 590,
+  },
+  workspaceAsideContent: {
+    paddingBottom: 8,
   },
   workspaceCardStack: {
     width: '100%',
@@ -729,7 +756,13 @@ const styles = StyleSheet.create({
     color: '#182532',
     fontSize: 13,
     fontWeight: '900',
-    marginBottom: 8,
+    marginBottom: 5,
+  },
+  workspaceHelp: {
+    color: '#574f45',
+    fontSize: 11,
+    lineHeight: 16,
+    marginBottom: 10,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -767,8 +800,11 @@ const styles = StyleSheet.create({
     borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
     minHeight: 48,
+    backgroundColor: '#f6eddf',
+    borderRadius: 5,
     paddingLeft: 9,
     paddingRight: 6,
+    paddingVertical: 7,
   },
   laneLabel: {
     color: '#2f6f9f',
@@ -783,7 +819,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   nextActionPanel: {
-    backgroundColor: '#fbf4e8',
+    backgroundColor: '#f6eddf',
     borderColor: '#bfae94',
     borderLeftWidth: 3,
     borderRadius: 6,
@@ -912,8 +948,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   guidanceRow: {
-    borderBottomColor: '#efe6d6',
+    backgroundColor: '#f6eddf',
+    borderBottomColor: '#d2c2aa',
     borderBottomWidth: 1,
+    borderRadius: 5,
+    marginTop: 7,
+    paddingHorizontal: 9,
     paddingVertical: 9,
   },
   guidanceLabel: {
@@ -1164,6 +1204,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderWidth: 1,
     borderColor: '#d2c2aa',
+  },
+  workOrderCardInteractive: {
+    backgroundColor: '#efe3d1',
+    borderColor: '#2f6f9f',
+    shadowColor: '#2f6f9f',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: {width: 0, height: 2},
   },
   workOrderTitle: {
     fontSize: 15,

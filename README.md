@@ -14,26 +14,31 @@ Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`, the current
 role-lane contract lives in `ROLE_LANE_UX.md`, and the shared three-zone
 workspace pattern is documented in `ROLE_WORKSPACE_LAYOUT.md`. Each role home
 now follows a calmer SaaS console structure: left navigation/focus rail, center
-work queue, and right next-action rail. Client, viewer, and vendor lanes have
+work queue, and right next-action rail. The fixed rails now use stronger muted
+surfaces, explicit helper language, and a scrollable next-action panel so the
+main queue stays easy to scan. Client, viewer, and vendor lanes have
 purpose-built portal summaries and communication-channel notices so external
 users can tell what they can see, where replies go, and which controls are
 intentionally unavailable. Work-order queue cards now add role-specific scan
-cues so admin, coordinator, technician, client, viewer, and vendor users can
-tell why a visible job matters before opening it. Home queues now also show
-role event-lane cards for each user's recurring operating loops, such as risk,
-intake, assignment, approval, proof, read-only review, and vendor delivery; the
-same operating loops can now be tapped as queue focus filters so each user can
-shrink the list to the work that needs their lane next.
+cues and hover/press shading so admin, coordinator, technician, client, viewer,
+and vendor users can tell why a visible job matters and that the card opens a
+record before clicking it. Home queues now also show role event-lane cards for
+each user's recurring operating loops, such as risk, intake, assignment,
+approval, proof, read-only review, and vendor delivery; the same operating
+loops can now be tapped as queue focus filters so each user can shrink the list
+to the work that needs their lane next.
 The home queue also includes a tested role-aware next-best-action tool that
 ranks visible work by role, priority, status, approval, assignment, blocker, and
 proof state, then gives users direct controls to open the recommended work order
 or focus the queue on that operating loop.
 Detail pages carry that forward with approval, communication, proof, and
 lifecycle action-path cues that jump to the matching work sections. Each of
-those sections now opens with role-aware readiness guidance so unavailable
-controls explain their prerequisite instead of feeling broken, plus event
-playbook guidance for recurring approval, proof, escalation, vendor, closeout,
-and read-only snapshot states.
+those sections now opens with role-aware readiness guidance and a work-story
+timeline for intake, schedule, assignment, field progress, proof, and latest
+update so the detail page explains what happened before asking the user to act.
+Unavailable controls explain their prerequisite instead of feeling broken, plus
+event playbook guidance for recurring approval, proof, escalation, vendor,
+closeout, and read-only snapshot states.
 Successful detail actions now show outcome notices so message sends, approval
 requests/decisions, proof uploads, and lifecycle transitions confirm what
 changed. The walkthrough manifest now has a tested
