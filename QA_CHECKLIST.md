@@ -213,9 +213,14 @@ they have been verified in the relevant environment.
 - [x] Role landing now locates the active user with a role badge, visible
       scope, next-move guidance, and privacy/operations guardrail copy before
       queue interaction.
+- [x] Role home explanations now live behind hover/tap `?` help bubbles so the
+      visible workspace prioritizes labels, counts, statuses, work titles, and
+      actions instead of always-visible helper paragraphs.
 - [x] Work-order details now show role-aware scope, current action, and
       guardrail guidance for admin, coordinator, technician, client, viewer,
       and vendor users before approval, messaging, proof, or lifecycle actions.
+- [x] Work-order details now keep readiness, work-story, action-path, event,
+      and communication explanations behind contextual help bubbles.
 - [x] Work-order create/edit form now shows linked/manual intake guidance before
       save so client, property, vendor, and address context gaps are explicit.
 - [x] Role home explanatory helper copy is tucked behind compact `?` help

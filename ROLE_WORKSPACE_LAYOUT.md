@@ -16,8 +16,9 @@ technician, client, viewer, and vendor lanes:
   and event-lane cues. It uses the same fixed-rail treatment and scrolls inside
   the rail so long guidance does not push the primary queue out of view.
 - Inline explanations should not compete with the work. Section purpose copy
-  now lives behind compact `?` help bubbles so users can inspect meaning on
-  demand without turning every role home into a documentation page.
+  now lives behind compact `?` help bubbles. On hover, keyboard focus, or tap,
+  the bubble opens a small contextual explanation window. The always-visible
+  surface should keep only labels, counts, statuses, work titles, and actions.
 
 On narrow screens, the same order stacks vertically: identity and scope first,
 then navigation/focus, then primary data, then next actions. The user should
@@ -38,6 +39,9 @@ sizes.
   dark POC look.
 - Interactable cards and jump surfaces shade on hover/press so users can tell
   they are clickable before committing to a click.
+- Explanatory paragraphs belong in contextual help bubbles next to the label or
+  title they explain. Work-order cards should not show synthetic seed/story
+  descriptions inline unless that text is part of the user-facing record body.
 - Non-action summaries must remain visually quieter than clickable work cards,
   while clickable cards should feel slightly raised at rest and slightly
   pressed/darker on interaction.
@@ -67,11 +71,14 @@ Role-specific navigation may differ, but it should map into the same zones:
 ## Implementation Notes
 
 - `WorkOrdersListScreen` is the reference implementation for the three-zone
-  shell. It should keep explanatory helper text behind help bubbles, not as
+  shell. It keeps role purpose, lane meaning, work-order seed context, action
+  guidance, and next-action rationale behind hover/tap help bubbles instead of
   always-visible paragraphs.
 - `WorkOrderDetailsScreen` should stay quieter and denser than the first dark
   POC pass: compact cards, toned surfaces, and action sections sized around
   the text they contain. The detail page now frames each job as a work story:
-  intake, schedule, assignment, field work, proof, and latest update.
+  intake, schedule, assignment, field work, proof, and latest update, with
+  explanation hidden behind contextual help where it would otherwise compete
+  with the action path.
 - Future role pages should reuse the same model before adding new page-specific
   chrome.

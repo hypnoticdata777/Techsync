@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import {useAuth} from '../context/AuthContext';
+import HintBubble from '../components/HintBubble';
 import ScreenErrorState from '../components/ScreenErrorState';
 import {
   actionButtonA11y,
@@ -72,17 +73,6 @@ const getStatusColor = (status) => {
       return '#655d52'; // gray
   }
 };
-
-const HintBubble = ({label, text}) => (
-  <View
-    style={styles.hintBubble}
-    accessible
-    accessibilityRole="text"
-    accessibilityLabel={`${label}: ${text}`}
-    {...(Platform.OS === 'web' ? {title: text} : {})}>
-    <Text style={styles.hintBubbleText}>?</Text>
-  </View>
-);
 
 function WorkOrdersListScreen({navigation}) {
   const {user, logout, authFetch} = useAuth();
@@ -200,12 +190,10 @@ function WorkOrdersListScreen({navigation}) {
         ]}
         {...workOrderButtonA11y(item)}
         onPress={() => navigation.navigate('WorkOrderDetails', {workOrder: item})}>
-        <Text style={styles.workOrderTitle}>{item.title}</Text>
-        {item.description ? (
-          <Text style={styles.workOrderDescription} numberOfLines={2}>
-            {item.description}
-          </Text>
-        ) : null}
+        <View style={styles.cardHeaderRow}>
+          <Text style={styles.workOrderTitle}>{item.title}</Text>
+          <HintBubble label={`${item.title} context`} text={item.description} align="left" />
+        </View>
         <Text style={[styles.workOrderMeta, {color: getStatusColor(item.status)}]}>
           Status: {item.status.replace('_', ' ')}
         </Text>
@@ -216,7 +204,10 @@ function WorkOrdersListScreen({navigation}) {
               style={styles.cardSignal}
               accessible
               accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
-              <Text style={styles.cardSignalLabel}>{row.label}</Text>
+              <View style={styles.inlineHelpRow}>
+                <Text style={styles.cardSignalLabel}>{row.label}</Text>
+                <HintBubble label={row.label} text={row.detail} align="left" />
+              </View>
               <Text
                 style={[
                   styles.cardSignalValue,
@@ -224,9 +215,6 @@ function WorkOrdersListScreen({navigation}) {
                 ]}
                 numberOfLines={1}>
                 {row.value}
-              </Text>
-              <Text style={styles.cardSignalDetail} numberOfLines={2}>
-                {row.detail}
               </Text>
             </View>
           ))}
@@ -309,8 +297,10 @@ function WorkOrdersListScreen({navigation}) {
 
       <View style={styles.header}>
         <View style={styles.titleBlock}>
-          <Text style={styles.sectionTitle}>{roleHome.title}</Text>
-          <Text style={styles.sectionSubtitle}>{roleHome.subtitle}</Text>
+          <View style={styles.sectionTitleRow}>
+            <Text style={styles.sectionTitle}>{roleHome.title}</Text>
+            <HintBubble label={roleHome.title} text={roleHome.subtitle} align="left" />
+          </View>
           <Text style={styles.scopeLine}>{roleExperience.scopeLabel}</Text>
         </View>
       </View>
@@ -331,8 +321,10 @@ function WorkOrdersListScreen({navigation}) {
                 style={styles.laneRow}
                 accessible
                 accessibilityLabel={`${row.label}. ${row.value}`}>
-                <Text style={styles.laneLabel}>{row.label}</Text>
-                <Text style={styles.laneValue}>{row.value}</Text>
+                <View style={styles.inlineHelpRow}>
+                  <Text style={styles.laneLabel}>{row.label}</Text>
+                  <HintBubble label={row.label} text={row.value} align="left" />
+                </View>
               </View>
             ))}
           </View>
@@ -355,10 +347,16 @@ function WorkOrdersListScreen({navigation}) {
                   <Text style={[styles.focusStatusTitle, {color: activeFilterColor}]}>
                     Showing {activeFilterRow?.label}
                   </Text>
-                  <Text style={styles.focusStatusDetail}>
-                    {visibleWorkOrders.length} of {workOrders.length} visible records match this lane.
-                    Clear focus to restore the full queue.
-                  </Text>
+                  <View style={styles.inlineHelpRow}>
+                    <Text style={styles.focusStatusDetail}>
+                      {visibleWorkOrders.length} of {workOrders.length} records
+                    </Text>
+                    <HintBubble
+                      label="Active Focus"
+                      text="Visible records match this lane. Clear focus to restore the full queue."
+                      align="left"
+                    />
+                  </View>
                 </View>
                 <TouchableOpacity
                   style={styles.focusClearButton}
@@ -410,14 +408,16 @@ function WorkOrdersListScreen({navigation}) {
                   style={[styles.actionCard, styles[`${action.tone}Action`]]}
                   {...roleActionA11y(action)}
                   onPress={() => navigation.navigate(action.route)}>
-                  <Text
-                    style={[
-                      styles.actionLabel,
-                      action.tone === 'primary' && styles.primaryActionLabel,
-                    ]}>
-                    {action.label}
-                  </Text>
-                  <Text style={styles.actionDetail}>{action.detail}</Text>
+                  <View style={styles.inlineHelpRow}>
+                    <Text
+                      style={[
+                        styles.actionLabel,
+                        action.tone === 'primary' && styles.primaryActionLabel,
+                      ]}>
+                      {action.label}
+                    </Text>
+                    <HintBubble label={action.label} text={action.detail} align="left" />
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>
@@ -534,12 +534,18 @@ function WorkOrdersListScreen({navigation}) {
               accessibilityLabel={`Next best action. ${roleNextBestAction.label}. ${roleNextBestAction.value}. Target: ${roleNextBestAction.workOrderTitle}. ${roleNextBestAction.detail}`}>
               <View style={styles.nextActionHeader}>
                 <View style={styles.nextActionCopy}>
-                  <Text style={styles.nextActionEyebrow}>{roleNextBestAction.label}</Text>
+                  <View style={styles.inlineHelpRow}>
+                    <Text style={styles.nextActionEyebrow}>{roleNextBestAction.label}</Text>
+                    <HintBubble
+                      label={roleNextBestAction.label}
+                      text={roleNextBestAction.detail}
+                      align="left"
+                    />
+                  </View>
                   <Text style={styles.nextActionTitle}>{roleNextBestAction.value}</Text>
                   <Text style={styles.nextActionTarget} numberOfLines={2}>
                     {roleNextBestAction.workOrderTitle}
                   </Text>
-                  <Text style={styles.nextActionDetail}>{roleNextBestAction.detail}</Text>
                 </View>
                 <View style={styles.nextActionButtons}>
                   <TouchableOpacity
@@ -584,14 +590,14 @@ function WorkOrdersListScreen({navigation}) {
                       styles.outcomeCard,
                       {borderLeftColor: getStatusColor(row.tone)},
                     ]}>
-                    <Text style={styles.outcomeLabel}>{row.label}</Text>
+                    <View style={styles.inlineHelpRow}>
+                      <Text style={styles.outcomeLabel}>{row.label}</Text>
+                      <HintBubble label={row.label} text={row.detail} align="left" />
+                    </View>
                     <Text
                       style={[styles.outcomeValue, {color: getStatusColor(row.tone)}]}
                       numberOfLines={2}>
                       {row.value}
-                    </Text>
-                    <Text style={styles.outcomeDetail} numberOfLines={3}>
-                      {row.detail}
                     </Text>
                   </View>
                 ))}
@@ -605,8 +611,10 @@ function WorkOrdersListScreen({navigation}) {
                   style={styles.guidanceRow}
                   accessible
                   accessibilityLabel={`${row.label}. ${row.value}`}>
-                  <Text style={styles.guidanceLabel}>{row.label}</Text>
-                  <Text style={styles.guidanceValue}>{row.value}</Text>
+                  <View style={styles.inlineHelpRow}>
+                    <Text style={styles.guidanceLabel}>{row.label}</Text>
+                    <HintBubble label={row.label} text={row.value} align="left" />
+                  </View>
                 </View>
               ))}
             </View>
@@ -618,14 +626,14 @@ function WorkOrdersListScreen({navigation}) {
                   style={[styles.eventLaneCard, {borderLeftColor: getStatusColor(row.tone)}]}
                   accessible
                   accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
-                  <Text style={styles.eventLaneLabel}>{row.label}</Text>
+                  <View style={styles.inlineHelpRow}>
+                    <Text style={styles.eventLaneLabel}>{row.label}</Text>
+                    <HintBubble label={row.label} text={row.detail} align="left" />
+                  </View>
                   <Text
                     style={[styles.eventLaneValue, {color: getStatusColor(row.tone)}]}
                     numberOfLines={1}>
                     {row.value}
-                  </Text>
-                  <Text style={styles.eventLaneDetail} numberOfLines={3}>
-                    {row.detail}
                   </Text>
                 </View>
               ))}
@@ -642,12 +650,16 @@ const EmptyQueueState = ({state, filter, onAction}) => (
     <Text style={styles.emptyTitle}>
       {filter ? `No ${filter.label.toLowerCase()} items` : state.title}
     </Text>
-    <Text style={styles.emptyMessage}>
-      {filter
-        ? `${filter.detail} Switch back to All to see the full visible queue.`
-        : state.message}
-    </Text>
-    <Text style={styles.emptyDetail}>{filter ? state.detail : state.detail}</Text>
+    <View style={styles.emptyHintRow}>
+      <HintBubble
+        label="Empty queue"
+        text={
+          filter
+            ? `${filter.detail} Switch back to All to see the full visible queue. ${state.detail}`
+            : `${state.message} ${state.detail}`
+        }
+      />
+    </View>
     {onAction ? (
       <TouchableOpacity
         style={styles.emptyActionButton}
@@ -712,6 +724,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#182532',
   },
+  sectionTitleRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    overflow: 'visible',
+  },
   sectionSubtitle: {
     color: '#655d52',
     fontSize: 12,
@@ -750,11 +768,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#bfae94',
     borderRadius: 6,
+    overflow: 'visible',
     padding: 12,
   },
   workspaceMain: {
     flex: 1,
     minWidth: 0,
+    overflow: 'visible',
   },
   workspaceAside: {
     width: 360,
@@ -763,6 +783,7 @@ const styles = StyleSheet.create({
     borderColor: '#bfae94',
     borderRadius: 6,
     maxHeight: 680,
+    overflow: 'visible',
     padding: 12,
   },
   workspaceAsideScroll: {
@@ -787,21 +808,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-  hintBubble: {
+  inlineHelpRow: {
     alignItems: 'center',
-    backgroundColor: '#f6eddf',
-    borderColor: '#bfae94',
-    borderRadius: 999,
-    borderWidth: 1,
-    height: 18,
-    justifyContent: 'center',
-    width: 18,
-  },
-  hintBubbleText: {
-    color: '#2f6f9f',
-    fontSize: 11,
-    fontWeight: '900',
-    lineHeight: 14,
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    gap: 6,
+    justifyContent: 'space-between',
+    minHeight: 18,
+    overflow: 'visible',
   },
   summaryRow: {
     flexDirection: 'row',
@@ -838,9 +852,10 @@ const styles = StyleSheet.create({
   laneRow: {
     borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
-    minHeight: 48,
+    minHeight: 34,
     backgroundColor: '#f6eddf',
     borderRadius: 5,
+    justifyContent: 'center',
     paddingLeft: 9,
     paddingRight: 6,
     paddingVertical: 7,
@@ -864,6 +879,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     marginBottom: 10,
+    overflow: 'visible',
     padding: 10,
   },
   nextActionHeader: {
@@ -958,8 +974,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexBasis: 140,
     flexGrow: 1,
-    minHeight: 74,
+    minHeight: 58,
     minWidth: 130,
+    overflow: 'visible',
     paddingHorizontal: 10,
     paddingVertical: 9,
   },
@@ -992,6 +1009,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderRadius: 5,
     marginTop: 7,
+    overflow: 'visible',
     paddingHorizontal: 9,
     paddingVertical: 9,
   },
@@ -1019,7 +1037,8 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderRadius: 6,
     borderWidth: 1,
-    minHeight: 76,
+    minHeight: 58,
+    overflow: 'visible',
     paddingHorizontal: 10,
     paddingVertical: 9,
   },
@@ -1144,6 +1163,7 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     justifyContent: 'center',
     backgroundColor: '#f6eddf',
+    overflow: 'visible',
     shadowColor: '#27313d',
     shadowOpacity: 0.08,
     shadowRadius: 4,
@@ -1245,6 +1265,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderWidth: 1,
     borderColor: '#d2c2aa',
+    overflow: 'visible',
   },
   workOrderCardInteractive: {
     backgroundColor: '#eadbc6',
@@ -1256,9 +1277,17 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2},
   },
   workOrderTitle: {
+    flex: 1,
     fontSize: 15,
     fontWeight: '600',
     color: '#27313d',
+  },
+  cardHeaderRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+    overflow: 'visible',
   },
   workOrderDescription: {
     fontSize: 13,
@@ -1342,7 +1371,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d2c2aa',
     marginTop: 8,
+    overflow: 'visible',
     padding: 16,
+  },
+  emptyHintRow: {
+    alignSelf: 'center',
+    marginTop: 8,
+    overflow: 'visible',
   },
   emptyTitle: {
     color: '#182532',

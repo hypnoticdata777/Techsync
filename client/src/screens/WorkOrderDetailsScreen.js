@@ -4,7 +4,6 @@ import {
   Alert,
   Image,
   Linking,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,6 +14,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import {useAuth} from '../context/AuthContext';
+import HintBubble from '../components/HintBubble';
 import ScreenErrorState from '../components/ScreenErrorState';
 import {
   actionButtonA11y,
@@ -183,7 +183,10 @@ const SectionReadiness = ({row}) => {
       ]}
       accessible
       accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
-      <Text style={styles.sectionReadinessLabel}>{row.label}</Text>
+      <View style={styles.inlineHelpRow}>
+        <Text style={styles.sectionReadinessLabel}>{row.label}</Text>
+        <HintBubble label={row.label} text={row.detail} align="left" />
+      </View>
       <Text
         style={[
           styles.sectionReadinessValue,
@@ -191,21 +194,9 @@ const SectionReadiness = ({row}) => {
         ]}>
         {row.value}
       </Text>
-      <Text style={styles.sectionReadinessDetail}>{row.detail}</Text>
     </View>
   );
 };
-
-const HintBubble = ({label, text}) => (
-  <View
-    style={styles.hintBubble}
-    accessible
-    accessibilityRole="text"
-    accessibilityLabel={`${label}: ${text}`}
-    {...(Platform.OS === 'web' ? {title: text} : {})}>
-    <Text style={styles.hintBubbleText}>?</Text>
-  </View>
-);
 
 const readableStatus = value =>
   value ? String(value).replace(/_/g, ' ') : 'Not recorded';
@@ -816,7 +807,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
                 style={styles.flowItem}
                 accessible
                 accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
-                <Text style={styles.flowLabel}>{row.label}</Text>
+                <View style={styles.inlineHelpRow}>
+                  <Text style={styles.flowLabel}>{row.label}</Text>
+                  <HintBubble label={row.label} text={row.detail} align="left" />
+                </View>
                 <Text
                   style={[
                     styles.flowValue,
@@ -824,7 +818,6 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   ]}>
                   {row.value}
                 </Text>
-                <Text style={styles.flowDetail}>{row.detail}</Text>
               </View>
             ))}
           </View>
@@ -848,14 +841,14 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   ]}
                   accessible
                   accessibilityLabel={`${row.label}. ${row.value}. ${row.detail}`}>
-                  <Text style={styles.storyStepLabel}>{row.label}</Text>
+                  <View style={styles.inlineHelpRow}>
+                    <Text style={styles.storyStepLabel}>{row.label}</Text>
+                    <HintBubble label={row.label} text={row.detail} align="left" />
+                  </View>
                   <Text
                     style={[styles.storyStepValue, {color: getSummaryToneColor(row.tone)}]}
                     numberOfLines={2}>
                     {row.value}
-                  </Text>
-                  <Text style={styles.storyStepDetail} numberOfLines={3}>
-                    {row.detail}
                   </Text>
                 </View>
               ))}
@@ -873,7 +866,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
                 accessible
                 accessibilityRole="button"
                 accessibilityLabel={`${row.label}: ${row.value}. ${row.detail} Jump to ${DETAIL_SECTION_LABELS[row.target] || 'section'}.`}>
-                <Text style={styles.actionPathLabel}>{row.label}</Text>
+                <View style={styles.inlineHelpRow}>
+                  <Text style={styles.actionPathLabel}>{row.label}</Text>
+                  <HintBubble label={row.label} text={row.detail} align="left" />
+                </View>
                 <Text
                   style={[
                     styles.actionPathValue,
@@ -881,9 +877,6 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   ]}
                   numberOfLines={1}>
                   {row.value}
-                </Text>
-                <Text style={styles.actionPathDetail} numberOfLines={2}>
-                  {row.detail}
                 </Text>
                 <Text style={styles.actionPathJump}>Jump</Text>
               </Pressable>
@@ -896,7 +889,10 @@ function WorkOrderDetailsScreen({route, navigation}) {
                 style={styles.eventPlaybookItem}
                 accessible
                 accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
-                <Text style={styles.eventPlaybookLabel}>{row.label}</Text>
+                <View style={styles.inlineHelpRow}>
+                  <Text style={styles.eventPlaybookLabel}>{row.label}</Text>
+                  <HintBubble label={row.label} text={row.detail} align="left" />
+                </View>
                 <Text
                   style={[
                     styles.eventPlaybookValue,
@@ -904,9 +900,6 @@ function WorkOrderDetailsScreen({route, navigation}) {
                   ]}
                   numberOfLines={2}>
                   {row.value}
-                </Text>
-                <Text style={styles.eventPlaybookDetail} numberOfLines={3}>
-                  {row.detail}
                 </Text>
               </View>
             ))}
@@ -931,14 +924,18 @@ function WorkOrderDetailsScreen({route, navigation}) {
                 ]}>
                 {outcomeNotice.title}
               </Text>
-              <Text style={styles.outcomeDetail}>{outcomeNotice.detail}</Text>
+              <View style={styles.inlineHelpRow}>
+                <HintBubble label="Last Update" text={outcomeNotice.detail} align="left" />
+              </View>
             </View>
           ) : null}
           <View style={styles.guidanceStack}>
             {detailGuidanceRows.map(row => (
               <View key={row.key} style={styles.guidanceRow}>
-                <Text style={styles.guidanceLabel}>{row.label}</Text>
-                <Text style={styles.guidanceValue}>{row.value}</Text>
+                <View style={styles.inlineHelpRow}>
+                  <Text style={styles.guidanceLabel}>{row.label}</Text>
+                  <HintBubble label={row.label} text={row.value} align="left" />
+                </View>
               </View>
             ))}
           </View>
@@ -1083,8 +1080,14 @@ function WorkOrderDetailsScreen({route, navigation}) {
             style={styles.communicationNotice}
             accessible
             accessibilityLabel={`${communicationNotice.title}. ${communicationNotice.detail}`}>
-            <Text style={styles.communicationNoticeTitle}>{communicationNotice.title}</Text>
-            <Text style={styles.communicationNoticeDetail}>{communicationNotice.detail}</Text>
+            <View style={styles.inlineHelpRow}>
+              <Text style={styles.communicationNoticeTitle}>{communicationNotice.title}</Text>
+              <HintBubble
+                label={communicationNotice.title}
+                text={communicationNotice.detail}
+                align="left"
+              />
+            </View>
           </View>
 
           {canUseInternalMessages ? (
@@ -1426,21 +1429,14 @@ const styles = StyleSheet.create({
     gap: 6,
     justifyContent: 'space-between',
   },
-  hintBubble: {
+  inlineHelpRow: {
     alignItems: 'center',
-    backgroundColor: '#f6eddf',
-    borderColor: '#bfae94',
-    borderRadius: 999,
-    borderWidth: 1,
-    height: 18,
-    justifyContent: 'center',
-    width: 18,
-  },
-  hintBubbleText: {
-    color: '#2f6f9f',
-    fontSize: 11,
-    fontWeight: '900',
-    lineHeight: 14,
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
+    gap: 6,
+    justifyContent: 'space-between',
+    minHeight: 18,
+    overflow: 'visible',
   },
   commandTitle: {
     color: '#182532',
@@ -1485,11 +1481,12 @@ const styles = StyleSheet.create({
   flowItem: {
     flexBasis: '31%',
     flexGrow: 1,
-    minHeight: 62,
+    minHeight: 56,
     backgroundColor: '#fbf4e8',
     borderWidth: 1,
     borderColor: '#bfae94',
     borderRadius: 6,
+    overflow: 'visible',
     padding: 9,
   },
   flowLabel: {
@@ -1516,6 +1513,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     marginTop: 12,
+    overflow: 'visible',
     padding: 10,
   },
   storyHeader: {
@@ -1542,8 +1540,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexBasis: '31%',
     flexGrow: 1,
-    minHeight: 92,
+    minHeight: 76,
     minWidth: 190,
+    overflow: 'visible',
     paddingHorizontal: 10,
     paddingVertical: 9,
   },
@@ -1582,9 +1581,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     flexBasis: '47%',
     flexGrow: 1,
-    minHeight: 58,
+    minHeight: 56,
     borderLeftColor: '#2f6f9f',
     borderLeftWidth: 2,
+    overflow: 'visible',
     paddingHorizontal: 10,
     paddingVertical: 9,
   },
@@ -1629,10 +1629,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 10,
     marginTop: 12,
+    overflow: 'visible',
     padding: 10,
   },
   eventPlaybookItem: {
-    minHeight: 52,
+    minHeight: 44,
+    overflow: 'visible',
   },
   eventPlaybookLabel: {
     color: '#2f6f9f',
@@ -1701,6 +1703,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     alignItems: 'flex-start',
+    overflow: 'visible',
   },
   guidanceLabel: {
     width: 112,
@@ -1799,6 +1802,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderRadius: 8,
     marginBottom: 10,
+    overflow: 'visible',
     paddingHorizontal: 11,
     paddingVertical: 10,
   },
@@ -1879,6 +1883,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 2,
     borderRadius: 8,
     marginBottom: 10,
+    overflow: 'visible',
     paddingHorizontal: 10,
     paddingVertical: 9,
   },

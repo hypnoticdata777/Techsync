@@ -3,6 +3,30 @@
 This file records meaningful commands and verification steps so future sessions
 can reconstruct what happened without relying on chat history.
 
+## 2026-08-13 - Tooltip-First Role Workspace Polish
+
+Scope:
+
+- Added a reusable client `HintBubble` that opens a small explanation window on
+  hover, keyboard focus, or tap.
+- Moved role-home explanatory copy behind contextual help bubbles for navigation
+  lanes, queue filters, work-order seed context, role actions, next-best action
+  rationale, outcome cards, guidance rows, and event-lane cards.
+- Moved work-order detail explanatory copy behind contextual help bubbles for
+  readiness, flow, work-story, action-path, event playbook, last-update, and
+  communication guidance.
+- Updated documentation so the UI contract is explicit: visible surface shows
+  labels, counts, statuses, work titles, and actions; `?` bubbles carry
+  explanatory text.
+
+Verification:
+
+```powershell
+cd C:\Users\hypno\Documents\Codex\2026-07-21\he\work\Techsync\client
+npm.cmd run test:ci
+npm.cmd run build:web
+```
+
 ## 2026-07-21 - Phase 0 Repo Rehydration
 
 Working directory:
