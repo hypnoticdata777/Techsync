@@ -133,9 +133,6 @@ function WorkOrdersListScreen({navigation}) {
     () => filterWorkOrdersForRoleQueue(user?.role, activeQueueFilter, workOrders),
     [activeQueueFilter, user?.role, workOrders],
   );
-  const isQueueFocused = activeQueueFilter !== 'all';
-  const activeFilterTone = activeFilterRow?.tone || roleNextBestAction.tone || 'active';
-  const activeFilterColor = getStatusColor(activeFilterTone);
 
   useEffect(() => {
     if (!queueFilterRows.some(row => row.key === activeQueueFilter)) {
@@ -284,10 +281,6 @@ function WorkOrdersListScreen({navigation}) {
     setActiveQueueFilter(roleNextBestAction.filterKey || 'all');
   };
 
-  const handleClearFocus = () => {
-    setActiveQueueFilter('all');
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.userBar}>
@@ -323,48 +316,17 @@ function WorkOrdersListScreen({navigation}) {
           </View>
 
           <View style={styles.queueFilterPanel}>
-            {isQueueFocused ? (
-              <View
-                style={[styles.focusStatusPanel, {borderLeftColor: activeFilterColor}]}
-                accessible
-                accessibilityLabel={`${activeFilterRow?.label} focus is active. ${visibleWorkOrders.length} of ${workOrders.length} records are shown. ${activeFilterRow?.detail}`}>
-                <View style={styles.focusStatusCopy}>
-                  <Text style={styles.focusStatusLabel}>Active Focus</Text>
-                  <Text style={[styles.focusStatusTitle, {color: activeFilterColor}]}>
-                    Showing {activeFilterRow?.label}
-                  </Text>
-                  <View style={styles.inlineHelpRow}>
-                    <Text style={styles.focusStatusDetail}>
-                      {visibleWorkOrders.length} of {workOrders.length} records
-                    </Text>
-                    <HintBubble
-                      label="Active Focus"
-                      text="Visible records match this lane. Clear focus to restore the full queue."
-                      align="left"
-                    />
-                  </View>
-                </View>
-                <TouchableOpacity
-                  style={styles.focusClearButton}
-                  onPress={handleClearFocus}
-                  {...actionButtonA11y(
-                    'Clear Focus',
-                    'Restores all visible work orders for this role.',
-                  )}>
-                  <Text style={styles.focusClearText}>Clear Focus</Text>
-                </TouchableOpacity>
-              </View>
-            ) : null}
             <View style={styles.queueFilterRow}>
               {queueFilterRows.map(row => {
                 const selected = row.key === activeQueueFilter;
+                const selectedTone = getStatusColor(row.tone);
                 return (
                   <TouchableOpacity
                     key={row.key}
                     style={[
                       styles.queueFilterChip,
                       selected && styles.queueFilterChipSelected,
-                      selected && {borderColor: getStatusColor(row.tone)},
+                      selected && {borderLeftColor: selectedTone},
                     ]}
                     onPress={() => setActiveQueueFilter(selected && row.key !== 'all' ? 'all' : row.key)}
                     accessibilityRole="button"
@@ -376,7 +338,7 @@ function WorkOrdersListScreen({navigation}) {
                       <Text
                         style={[
                           styles.queueFilterLabel,
-                          selected && {color: getStatusColor(row.tone)},
+                          selected && styles.queueFilterLabelSelected,
                         ]}>
                         {row.label}
                       </Text>
@@ -386,7 +348,9 @@ function WorkOrdersListScreen({navigation}) {
                         align="left"
                       />
                     </View>
-                    <Text style={styles.queueFilterCount}>{row.count}</Text>
+                    <Text style={[styles.queueFilterCount, selected && styles.queueFilterCountSelected]}>
+                      {row.count}
+                    </Text>
                   </TouchableOpacity>
                 );
               })}
@@ -1029,56 +993,6 @@ const styles = StyleSheet.create({
   queueFilterPanel: {
     marginBottom: 10,
   },
-  focusStatusPanel: {
-    alignItems: 'center',
-    backgroundColor: '#fbf4e8',
-    borderColor: '#bfae94',
-    borderLeftWidth: 3,
-    borderRadius: 6,
-    borderWidth: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 8,
-    padding: 10,
-  },
-  focusStatusCopy: {
-    flex: 1,
-    minWidth: 210,
-  },
-  focusStatusLabel: {
-    color: '#2f6f9f',
-    fontSize: 10,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-  },
-  focusStatusTitle: {
-    fontSize: 14,
-    fontWeight: '900',
-    lineHeight: 18,
-    marginTop: 3,
-  },
-  focusStatusDetail: {
-    color: '#4f5f6f',
-    fontSize: 11,
-    lineHeight: 16,
-    marginTop: 3,
-  },
-  focusClearButton: {
-    alignItems: 'center',
-    backgroundColor: '#f6eddf',
-    borderColor: '#bfae94',
-    borderRadius: 5,
-    borderWidth: 1,
-    minHeight: 34,
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-  },
-  focusClearText: {
-    color: '#182532',
-    fontSize: 12,
-    fontWeight: '900',
-  },
   queueFilterRow: {
     gap: 9,
   },
@@ -1100,8 +1014,13 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
   queueFilterChipSelected: {
-    backgroundColor: '#fff8ec',
-    borderWidth: 2,
+    backgroundColor: '#263241',
+    borderColor: '#182532',
+    borderLeftWidth: 4,
+    shadowColor: '#182532',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
   },
   queueFilterTextRow: {
     alignItems: 'center',
@@ -1115,10 +1034,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '900',
   },
+  queueFilterLabelSelected: {
+    color: '#fbf4e8',
+  },
   queueFilterCount: {
     color: '#182532',
     fontSize: 13,
     fontWeight: '900',
+  },
+  queueFilterCountSelected: {
+    color: '#fbf4e8',
   },
   actionGrid: {
     gap: 8,

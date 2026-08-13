@@ -273,6 +273,9 @@ they have been verified in the relevant environment.
 - [x] The left role rail now uses one Work Views control surface with
       count-bearing buttons and contextual `?` help, replacing the older
       navigation/focus split so users can tell what the center queue will show.
+- [x] Selected Work View buttons now carry the active state directly with a
+      darker tab treatment, avoiding a separate active-focus card that adds
+      duplicate rail noise.
 - [x] The signed-in app header now uses a stronger TechSync wordmark and
       polished circled copyright mark so the product identity reads cleanly
       against the lighter SaaS theme.

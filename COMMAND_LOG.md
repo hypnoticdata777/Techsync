@@ -3505,3 +3505,35 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
+
+## 2026-08-13 - Work Views Active Tab Simplification
+
+Decision:
+
+- The separate `Active Focus` panel above Work Views repeated the selected
+  tab state and made the left rail noisier than it needed to be.
+- Keep location feedback on the navigation control itself: the selected Work
+  View should remain visibly active while the center queue changes.
+
+Changes:
+
+- Removed the extra active-focus summary and clear-focus panel from the left
+  rail.
+- Made the selected Work View button use a darker active tab treatment with
+  light text and a semantic edge marker.
+- Preserved the existing tap-again behavior for non-`All Work` views so users
+  can still return to the full queue without a separate reset card.
+- Updated QA and workspace layout docs with the selected-tab contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci
+npm.cmd run build:web
+```
+
+Result:
+
+- Full client tests passed: `8 passed suites`, `66 passed tests`.
+- Expo web export passed and wrote the Vercel-ready build to ignored
+  `client/dist`.

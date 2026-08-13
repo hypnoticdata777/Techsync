@@ -10,7 +10,9 @@ technician, client, viewer, and vendor lanes:
   explanation live behind contextual `?` bubbles so the rail tells the user
   what they can look at without publishing instruction text everywhere. It
   uses a stronger beige rail background so fixed controls read separately from
-  the working data.
+  the working data. The active Work View is indicated directly on the selected
+  button with a darker tab state; do not add a separate active-focus card above
+  the rail because it duplicates the user's location.
 - Center workspace: the primary data the user is acting on, such as work-order
   queues, linked client work, approval items, or vendor work. Work-order cards
   must show an obvious hover/pressed state because opening a record is a core
@@ -43,6 +45,10 @@ lose the role lane or the current work view when moving between screen sizes.
 - Left/right rails use stronger muted surfaces than the center workspace. The
   contrast should create a clear scan boundary without returning to the harsh
   dark POC look.
+- Selected Work View buttons should look like active navigation tabs: darker
+  filled surface, readable light text, and a small semantic edge marker. The
+  active state belongs on the clicked control itself, while tapping that same
+  non-All control again can return the user to `All Work`.
 - Interactable cards and jump surfaces shade on hover/press so users can tell
   they are clickable before committing to a click.
 - Explanatory paragraphs belong in contextual help bubbles next to the label or
