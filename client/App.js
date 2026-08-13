@@ -31,7 +31,12 @@ const Stack = createNativeStackNavigator();
 const BrandTitle = () => (
   <View style={styles.brandTitle}>
     <Text style={styles.brandText}>TechSync</Text>
-    <Text style={styles.brandMark}>©</Text>
+    <View
+      style={styles.brandMark}
+      accessible
+      accessibilityLabel="Copyright TechSync">
+      <Text style={styles.brandMarkText}>{'\u00a9'}</Text>
+    </View>
   </View>
 );
 
@@ -194,26 +199,35 @@ const styles = StyleSheet.create({
   brandTitle: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 6,
+    gap: 8,
   },
   brandText: {
     color: colors.ink,
     fontFamily: typography.heading,
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
   },
   brandMark: {
     alignItems: 'center',
-    borderColor: colors.primary,
+    backgroundColor: colors.ink,
+    borderColor: colors.primarySoft,
     borderRadius: 999,
-    borderWidth: 1,
-    color: colors.primary,
+    borderWidth: 2,
+    height: 18,
+    justifyContent: 'center',
+    shadowColor: colors.ink,
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.18,
+    shadowRadius: 3,
+    width: 18,
+  },
+  brandMarkText: {
+    color: colors.surface,
+    fontFamily: typography.heading,
     fontSize: 10,
     fontWeight: '900',
-    height: 16,
-    lineHeight: 14,
+    lineHeight: 12,
     textAlign: 'center',
-    width: 16,
   },
   loadingContainer: {
     flex: 1,

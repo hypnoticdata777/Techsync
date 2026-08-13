@@ -13,15 +13,17 @@ implemented vs. deferred.
 Role-by-role UX sweep notes are tracked in `ROLE_UX_SWEEP.md`, the current
 role-lane contract lives in `ROLE_LANE_UX.md`, and the shared three-zone
 workspace pattern is documented in `ROLE_WORKSPACE_LAYOUT.md`. Each role home
-now follows a calmer SaaS console structure: left navigation/focus rail, center
-work queue, and right next-action rail. The fixed rails now use stronger muted
+now follows a calmer SaaS console structure: left Work Views rail, center work
+queue, and right next-action rail. The fixed rails now use stronger muted
 surfaces, compact hover/tap `?` help bubbles for explanatory copy, and a
 scrollable next-action panel so the main queue stays easy to scan without
-visible instruction noise. Work-order cards and detail command blocks keep
+visible instruction noise. Work View buttons carry counts and change the center
+list directly, while role promise and filter meaning are available from nearby
+help bubbles instead of exposed instruction blocks. Work-order cards and detail command blocks keep
 titles, counts, states, and actions visible while seed/story explanation,
 lane rationale, and action guidance open from the nearby help bubble on demand.
-The signed-in header gives TechSync stronger brand weight with a small circled
-mark while page and role text stay quieter. Client,
+The signed-in header gives TechSync stronger brand weight with a polished
+circled copyright mark while page and role text stay quieter. Client,
 viewer, and vendor lanes have
 purpose-built portal summaries and communication-channel notices so external
 users can tell what they can see, where replies go, and which controls are

@@ -3022,7 +3022,7 @@ Changes:
 
 - Added tested queue-filter helpers for org admin, coordinator, technician,
   client, viewer, and vendor operating loops.
-- Updated the work-order home queue with `Focus Queue` chips that filter the
+- Updated the work-order home queue with `Work Views` chips that filter the
   visible list by risk, assignment, approval, proof, blocker, read-only, and
   vendor delivery contexts.
 - Added filtered empty-state copy so an empty focus lane explains the selected
@@ -3206,6 +3206,39 @@ Result:
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
 
+## 2026-08-13 - Work Views Rail and Brand Mark Polish
+
+Decision:
+
+- The left rail still split the user's mental model between Navigation and
+  Focus Queue, which made it less clear that the buttons change the center
+  work list.
+- The signed-in TechSync copyright mark needed to read as a deliberate brand
+  signal rather than a weak inline symbol.
+
+Changes:
+
+- Replaced the left-rail Navigation/Focus Queue split with one `Work Views`
+  control surface.
+- Renamed the universal queue button to `All Work` and the client decision
+  filter to `Decisions`.
+- Added per-view `?` help bubbles so filter meaning is available on demand
+  without exposing explanatory copy in the rail.
+- Rebuilt the header copyright mark as a small styled circled lockup and gave
+  the TechSync wordmark stronger visual weight.
+- Updated README, QA checklist, command log, and role workspace layout docs to
+  reflect the Work Views rail contract.
+
+Verification:
+
+```powershell
+npm.cmd run test:ci -- roleWorkflows.test.js
+```
+
+Result:
+
+- Role workflow helper tests passed: `1 passed suite`, `27 passed tests`.
+
 ## 2026-08-13 - Help Bubble Dismissal Polish
 
 Decision:
@@ -3238,8 +3271,8 @@ Decision:
 
 - The light palette improved comfort, but role pages still felt like stacked
   cards with equally loud sections.
-- Standardize the role home UX around a calmer SaaS workspace: left
-  navigation/focus rail, center data lane, and right next-action rail.
+- Standardize the role home UX around a calmer SaaS workspace: left Work Views
+  rail, center data lane, and right next-action rail.
 - Keep beige/white as the foundation, but tone it down slightly and shrink
   large pill-like controls so interaction weight matches the text.
 

@@ -5,9 +5,12 @@
 TechSync Ops uses one shared role workspace pattern across admin, coordinator,
 technician, client, viewer, and vendor lanes:
 
-- Left rail: stable navigation, lane scope, queue filters, and role-permitted
-  creation or management actions. It uses a stronger beige rail background so
-  fixed navigation reads separately from the working data.
+- Left rail: a single Work Views control surface with count-bearing buttons
+  that change the center list. Role scope, lane promise, and filter
+  explanation live behind contextual `?` bubbles so the rail tells the user
+  what they can look at without publishing instruction text everywhere. It
+  uses a stronger beige rail background so fixed controls read separately from
+  the working data.
 - Center workspace: the primary data the user is acting on, such as work-order
   queues, linked client work, approval items, or vendor work. Work-order cards
   must show an obvious hover/pressed state because opening a record is a core
@@ -25,9 +28,8 @@ technician, client, viewer, and vendor lanes:
   surface should keep only labels, counts, statuses, work titles, and actions.
 
 On narrow screens, the same order stacks vertically: identity and scope first,
-then navigation/focus, then primary data, then next actions. The user should
-never lose the role lane or the current queue focus when moving between screen
-sizes.
+then Work Views, then primary data, then next actions. The user should never
+lose the role lane or the current work view when moving between screen sizes.
 
 ## Visual Contract
 
@@ -52,8 +54,8 @@ sizes.
 - Roboto Serif remains the app typography direction for web. Text hierarchy
   should come from size, weight, spacing, and placement instead of loud colors.
 - The signed-in app header gives TechSync the strongest brand weight with a
-  small circled mark; page titles and role content stay smaller so the product
-  identity anchors the workspace without overwhelming the data.
+  polished circled copyright mark; page titles and role content stay smaller
+  so the product identity anchors the workspace without overwhelming the data.
 
 ## Role Navigation Baseline
 
@@ -63,7 +65,7 @@ Each role should always answer three questions from its home workspace:
 - What can I do next?
 - What is waiting on me or my lane?
 
-Role-specific navigation may differ, but it should map into the same zones:
+Role-specific Work Views may differ, but they should map into the same zones:
 
 - Org admin: tenant command, directory, reporting, evidence, risk, approvals.
 - Coordinator: intake, assignment, dispatch risk, escalations, closeout review.

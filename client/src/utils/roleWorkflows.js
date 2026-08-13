@@ -652,7 +652,7 @@ const QUEUE_FILTERS_BY_ROLE = {
   client: [
     {
       key: 'decisions',
-      label: 'Decide',
+      label: 'Decisions',
       detail: 'Approval requests waiting for client response.',
       tone: 'pending',
       match: needsApprovalDecision,
@@ -729,7 +729,7 @@ export const buildRoleQueueFilterRows = (role, workOrders = []) => {
   return [
     {
       key: 'all',
-      label: 'All',
+      label: 'All Work',
       value: pluralize(rows.length, 'item'),
       count: rows.length,
       detail: 'Show every work order visible to this role.',
@@ -802,7 +802,7 @@ const buildNextAction = ({
   workOrder,
   filterKey = 'all',
   actionLabel = 'Open Work Order',
-  filterLabel = 'Focus Queue',
+  filterLabel = 'Work Views',
   tone = 'active',
 }) => ({
   key,

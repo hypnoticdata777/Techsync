@@ -94,6 +94,13 @@ function WorkOrdersListScreen({navigation}) {
   const roleActions = useMemo(() => getRoleActions(user?.role), [user?.role]);
   const queueSummary = useMemo(() => buildQueueSummary(workOrders), [workOrders]);
   const roleLaneRows = useMemo(() => buildRoleLaneRows(user?.role), [user?.role]);
+  const workViewsHelp = useMemo(
+    () =>
+      roleLaneRows
+        .map(row => `${row.label}: ${row.value}`)
+        .join(' '),
+    [roleLaneRows],
+  );
   const portalSummary = useMemo(
     () => getRolePortalSummary(user?.role, queueSummary),
     [user?.role, queueSummary],
@@ -308,35 +315,14 @@ function WorkOrdersListScreen({navigation}) {
       <View style={[styles.workspaceShell, !useWorkspaceLayout && styles.workspaceStack]}>
         <View style={[styles.workspaceNav, !useWorkspaceLayout && styles.workspaceCardStack]}>
           <View style={styles.panelTitleRow}>
-            <Text style={styles.workspaceTitle}>Navigation</Text>
+            <Text style={styles.workspaceTitle}>Work Views</Text>
             <HintBubble
-              label="Navigation"
-              text="Use this column to switch queue lanes and open role-specific tools."
+              label="Work Views"
+              text={`Choose what appears in the center list. Counts show how many records match each view. ${workViewsHelp}`}
             />
-          </View>
-          <View style={styles.laneMap}>
-            {roleLaneRows.map(row => (
-              <View
-                key={row.key}
-                style={styles.laneRow}
-                accessible
-                accessibilityLabel={`${row.label}. ${row.value}`}>
-                <View style={styles.inlineHelpRow}>
-                  <Text style={styles.laneLabel}>{row.label}</Text>
-                  <HintBubble label={row.label} text={row.value} align="left" />
-                </View>
-              </View>
-            ))}
           </View>
 
           <View style={styles.queueFilterPanel}>
-            <View style={styles.panelTitleRow}>
-              <Text style={styles.queueFilterTitle}>Focus Queue</Text>
-              <HintBubble
-                label="Focus Queue"
-                text={activeFilterRow?.detail || 'Filter visible work to the queue lane this role needs next.'}
-              />
-            </View>
             {isQueueFocused ? (
               <View
                 style={[styles.focusStatusPanel, {borderLeftColor: activeFilterColor}]}
@@ -383,16 +369,23 @@ function WorkOrdersListScreen({navigation}) {
                     onPress={() => setActiveQueueFilter(selected && row.key !== 'all' ? 'all' : row.key)}
                     accessibilityRole="button"
                     accessibilityState={{selected}}
-                    accessibilityLabel={`${row.label} queue filter. ${row.value}. ${row.detail}${
+                    accessibilityLabel={`${row.label} work view. ${row.value}. ${row.detail}${
                       selected && row.key !== 'all' ? ' Tap again to clear focus.' : ''
                     }`}>
-                    <Text
-                      style={[
-                        styles.queueFilterLabel,
-                        selected && {color: getStatusColor(row.tone)},
-                      ]}>
-                      {row.label}
-                    </Text>
+                    <View style={styles.queueFilterTextRow}>
+                      <Text
+                        style={[
+                          styles.queueFilterLabel,
+                          selected && {color: getStatusColor(row.tone)},
+                        ]}>
+                        {row.label}
+                      </Text>
+                      <HintBubble
+                        label={`${row.label} view`}
+                        text={row.detail}
+                        align="left"
+                      />
+                    </View>
                     <Text style={styles.queueFilterCount}>{row.count}</Text>
                   </TouchableOpacity>
                 );
@@ -764,9 +757,9 @@ const styles = StyleSheet.create({
   },
   workspaceNav: {
     width: 260,
-    backgroundColor: '#e7d8c3',
+    backgroundColor: '#e1d1b8',
     borderWidth: 1,
-    borderColor: '#bfae94',
+    borderColor: '#ae9a7a',
     borderRadius: 6,
     overflow: 'visible',
     padding: 12,
@@ -798,7 +791,7 @@ const styles = StyleSheet.create({
   },
   workspaceTitle: {
     color: '#182532',
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '900',
   },
   panelTitleRow: {
@@ -844,33 +837,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     marginTop: 2,
-  },
-  laneMap: {
-    gap: 8,
-    marginBottom: 12,
-  },
-  laneRow: {
-    borderLeftColor: '#2f6f9f',
-    borderLeftWidth: 2,
-    minHeight: 34,
-    backgroundColor: '#f6eddf',
-    borderRadius: 5,
-    justifyContent: 'center',
-    paddingLeft: 9,
-    paddingRight: 6,
-    paddingVertical: 7,
-  },
-  laneLabel: {
-    color: '#2f6f9f',
-    fontSize: 10,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-  },
-  laneValue: {
-    color: '#4f5f6f',
-    fontSize: 12,
-    lineHeight: 17,
-    marginTop: 4,
   },
   nextActionPanel: {
     backgroundColor: '#f6eddf',
@@ -1061,16 +1027,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   queueFilterPanel: {
-    borderTopColor: '#d2c2aa',
-    borderTopWidth: 1,
     marginBottom: 10,
-    paddingTop: 10,
-  },
-  queueFilterTitle: {
-    color: '#27313d',
-    fontSize: 12,
-    fontWeight: '900',
-    textTransform: 'uppercase',
   },
   focusStatusPanel: {
     alignItems: 'center',
@@ -1123,24 +1080,35 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   queueFilterRow: {
-    gap: 8,
-    marginTop: 8,
+    gap: 9,
   },
   queueFilterChip: {
     alignItems: 'center',
-    backgroundColor: '#f6eddf',
-    borderColor: '#bfae94',
+    backgroundColor: '#f9f0e3',
+    borderColor: '#ae9a7a',
     borderRadius: 5,
     borderWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 7,
-    minHeight: 34,
-    paddingHorizontal: 10,
+    minHeight: 40,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+    shadowColor: '#655d52',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
   },
   queueFilterChipSelected: {
-    backgroundColor: '#fbf4e8',
+    backgroundColor: '#fff8ec',
     borderWidth: 2,
+  },
+  queueFilterTextRow: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 6,
+    minWidth: 0,
   },
   queueFilterLabel: {
     color: '#4f5f6f',
@@ -1149,7 +1117,7 @@ const styles = StyleSheet.create({
   },
   queueFilterCount: {
     color: '#182532',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '900',
   },
   actionGrid: {

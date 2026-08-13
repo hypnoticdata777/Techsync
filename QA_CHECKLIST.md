@@ -270,6 +270,12 @@ they have been verified in the relevant environment.
 - [x] Role home queues now visually separate the fixed navigation and
       next-action rails from the center data area with stronger muted rail
       backgrounds and an independently scrollable next-action rail.
+- [x] The left role rail now uses one Work Views control surface with
+      count-bearing buttons and contextual `?` help, replacing the older
+      navigation/focus split so users can tell what the center queue will show.
+- [x] The signed-in app header now uses a stronger TechSync wordmark and
+      polished circled copyright mark so the product identity reads cleanly
+      against the lighter SaaS theme.
 - [x] Work-order cards and detail action-path jump cards now shade on
       hover/press so clickable records and jump targets are visible before a
       user clicks.
