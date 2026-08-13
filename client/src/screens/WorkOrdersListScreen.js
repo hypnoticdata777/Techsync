@@ -32,6 +32,7 @@ import {
   buildRoleOutcomeRows,
   buildRoleQueueFilterRows,
   buildRoleLaneRows,
+  buildWorkOrderReference,
   buildWorkOrderFlowRows,
   canManageOperations,
   filterWorkOrdersForRoleQueue,
@@ -73,6 +74,47 @@ const getStatusColor = (status) => {
       return '#655d52'; // gray
   }
 };
+
+const formatWorkOrderDate = value => {
+  if (!value) {
+    return 'No date';
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return 'No date';
+  }
+
+  return parsed.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
+const getWorkOrderLocationLabel = workOrder => {
+  const primary =
+    workOrder?.property_name ||
+    workOrder?.client_display_name ||
+    workOrder?.customer_name ||
+    null;
+  const secondary = workOrder?.address || null;
+
+  if (primary && secondary && primary !== secondary) {
+    return `${primary} | ${secondary}`;
+  }
+  if (primary || secondary) {
+    return primary || secondary;
+  }
+  if (workOrder?.service_type) {
+    return `${workOrder.service_type} request`;
+  }
+  return 'Location context pending';
+};
+
+const getWorkOrderTimelineLabel = workOrder =>
+  workOrder?.updated_at
+    ? `Updated ${formatWorkOrderDate(workOrder.updated_at)}`
+    : `Created ${formatWorkOrderDate(workOrder?.created_at)}`;
 
 function WorkOrdersListScreen({navigation}) {
   const {user, logout, authFetch} = useAuth();
@@ -183,7 +225,7 @@ function WorkOrdersListScreen({navigation}) {
   }, [navigation, fetchWorkOrders]);
 
   const renderWorkOrder = ({item}) => {
-    const flowRows = buildWorkOrderFlowRows(item);
+    const flowRows = buildWorkOrderFlowRows(item, user?.role);
     const cardRows = buildRoleCardRows(user?.role, item);
 
     return (
@@ -194,10 +236,17 @@ function WorkOrdersListScreen({navigation}) {
         ]}
         {...workOrderButtonA11y(item)}
         onPress={() => navigation.navigate('WorkOrderDetails', {workOrder: item})}>
+        <View style={styles.cardKickerRow}>
+          <Text style={styles.workOrderReference}>{buildWorkOrderReference(item)}</Text>
+          <Text style={styles.workOrderUpdated}>{getWorkOrderTimelineLabel(item)}</Text>
+        </View>
         <View style={styles.cardHeaderRow}>
           <Text style={styles.workOrderTitle}>{item.title}</Text>
           <HintBubble label={`${item.title} context`} text={item.description} align="left" />
         </View>
+        <Text style={styles.workOrderLocation} numberOfLines={1}>
+          {getWorkOrderLocationLabel(item)}
+        </Text>
         <Text style={[styles.workOrderMeta, {color: getStatusColor(item.status)}]}>
           Status: {item.status.replace('_', ' ')}
         </Text>
@@ -230,7 +279,10 @@ function WorkOrdersListScreen({navigation}) {
               style={styles.flowChip}
               accessible
               accessibilityLabel={`${row.label}: ${row.value}. ${row.detail}`}>
-              <Text style={styles.flowChipLabel}>{row.label}</Text>
+              <View style={styles.inlineHelpRow}>
+                <Text style={styles.flowChipLabel}>{row.label}</Text>
+                <HintBubble label={row.label} text={row.detail} align="left" />
+              </View>
               <Text
                 style={[
                   styles.flowChipValue,
@@ -1171,9 +1223,35 @@ const styles = StyleSheet.create({
   },
   workOrderTitle: {
     flex: 1,
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
     color: '#27313d',
+  },
+  cardKickerRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+    marginBottom: 7,
+  },
+  workOrderReference: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#27313d',
+    borderColor: '#27313d',
+    borderRadius: 4,
+    borderWidth: 1,
+    color: '#fbf4e8',
+    fontSize: 10,
+    fontWeight: '900',
+    overflow: 'hidden',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    textTransform: 'uppercase',
+  },
+  workOrderUpdated: {
+    color: '#655d52',
+    fontSize: 11,
+    fontWeight: '700',
   },
   cardHeaderRow: {
     alignItems: 'center',
@@ -1186,6 +1264,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#655d52',
     marginTop: 4,
+  },
+  workOrderLocation: {
+    color: '#655d52',
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 5,
   },
   workOrderMeta: {
     fontSize: 12,

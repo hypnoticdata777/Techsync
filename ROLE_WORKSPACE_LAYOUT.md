@@ -16,7 +16,9 @@ technician, client, viewer, and vendor lanes:
 - Center workspace: the primary data the user is acting on, such as work-order
   queues, linked client work, approval items, or vendor work. Work-order cards
   must show an obvious hover/pressed state because opening a record is a core
-  interaction.
+  interaction. Each work-order card should include a stable request reference,
+  visible location/customer context, and quiet last-update timing before the
+  title, so similar requests do not blur together in dense queues.
 - Right action rail: next-best action, waiting-on signals, operating guidance,
   and event-lane cues. It uses the same fixed-rail treatment and scrolls inside
   the rail so long guidance does not push the primary queue out of view.
@@ -54,6 +56,9 @@ lose the role lane or the current work view when moving between screen sizes.
 - Explanatory paragraphs belong in contextual help bubbles next to the label or
   title they explain. Work-order cards should not show synthetic seed/story
   descriptions inline unless that text is part of the user-facing record body.
+- External-facing cards should translate internal handoff states into plain
+  role language. For example, client lanes should see `Operations review` or
+  `Your decision` instead of unexplained internal terms such as `Triage`.
 - Non-action summaries must remain visually quieter than clickable work cards,
   while clickable cards should feel slightly raised at rest and slightly
   pressed/darker on interaction.

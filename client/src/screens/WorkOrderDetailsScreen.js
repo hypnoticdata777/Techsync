@@ -430,8 +430,8 @@ function WorkOrderDetailsScreen({route, navigation}) {
     [attachments.length, messages.length, user?.role, workOrder],
   );
   const workOrderFlowRows = useMemo(
-    () => buildWorkOrderFlowRows(workOrder),
-    [workOrder],
+    () => buildWorkOrderFlowRows(workOrder, user?.role),
+    [user?.role, workOrder],
   );
   const workOrderStoryRows = useMemo(
     () => buildWorkOrderStoryRows(workOrder, attachments, messages),

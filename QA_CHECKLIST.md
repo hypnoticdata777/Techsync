@@ -282,6 +282,12 @@ they have been verified in the relevant environment.
 - [x] Work-order cards and detail action-path jump cards now shade on
       hover/press so clickable records and jump targets are visible before a
       user clicks.
+- [x] Client-facing work-order cards now include stable `Request TS-####`
+      references, visible location/update context, and role-safe waiting-state
+      language such as `Operations review` or `Your decision`.
+- [x] Waiting-state explanations now sit behind contextual help bubbles on the
+      card handoff chips, including the field that previously surfaced
+      ambiguous client-facing `Triage` language.
 - [x] Work-order detail pages now include a work-story timeline covering
       intake, schedule, assignment, field progress, proof/photos, and latest
       update context.

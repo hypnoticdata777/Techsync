@@ -1564,6 +1564,14 @@ const hasAssignedTechnician = workOrder => Boolean(workOrder?.assigned_technicia
 const hasCompletionProof = workOrder =>
   Boolean(workOrder?.completion_proof_verified_at || workOrder?.completion_override_reason);
 
+export const buildWorkOrderReference = (workOrder = {}) => {
+  if (!workOrder?.id) {
+    return 'Request pending';
+  }
+
+  return `Request TS-${String(workOrder.id).padStart(4, '0')}`;
+};
+
 const getNextOwner = workOrder => {
   if (workOrder?.client_approval_status === 'pending') {
     return {
@@ -1639,6 +1647,105 @@ const getWaitingOn = workOrder => {
   return 'Triage';
 };
 
+const CLIENT_WAITING_ON_COPY = {
+  'Client approval': {
+    value: 'Your decision',
+    detail:
+      'Review the visible scope, update, cost/proof context, then approve, decline, or message operations.',
+  },
+  Assignment: {
+    value: 'Operations review',
+    detail:
+      'Operations is confirming scope, priority, owner, and the next visible update before field work moves forward.',
+  },
+  'Proof upload': {
+    value: 'Field proof',
+    detail:
+      'The field team needs to attach client-visible proof before closeout can be reviewed.',
+  },
+  'Status closeout': {
+    value: 'Operations closeout',
+    detail:
+      'Operations is checking status, proof, and client-visible notes before this becomes a completed record.',
+  },
+  'Resume decision': {
+    value: 'Operations update',
+    detail:
+      'Operations is deciding what unblocks the paused request and what the client should see next.',
+  },
+  'Coordinator review': {
+    value: 'Operations review',
+    detail:
+      'Operations is resolving an exception before the next client-visible update or decision.',
+  },
+  'Archive review': {
+    value: 'Closeout review',
+    detail:
+      'Review the final proof and visible timeline; message operations if anything is unclear.',
+  },
+  'Proof review': {
+    value: 'Proof review',
+    detail:
+      'Operations still needs proof or an approved override before the completed request is client-safe.',
+  },
+  'Nothing active': {
+    value: 'No action needed',
+    detail: 'This request has no active handoff for the client right now.',
+  },
+  Triage: {
+    value: 'Operations review',
+    detail: 'Operations is deciding the next owner, status, and client-visible update.',
+  },
+};
+
+const ROLE_WAITING_ON_COPY = {
+  client: CLIENT_WAITING_ON_COPY,
+  viewer: {
+    ...CLIENT_WAITING_ON_COPY,
+    'Client approval': {
+      value: 'Client decision',
+      detail: 'The linked client must approve, decline, or message operations before the request moves forward.',
+    },
+  },
+  vendor: {
+    Assignment: {
+      value: 'Operations dispatch',
+      detail: 'Operations is confirming whether this request should be routed to a vendor.',
+    },
+    Triage: {
+      value: 'Operations review',
+      detail: 'Operations is deciding if the request needs vendor visibility or action.',
+    },
+    'Proof upload': {
+      value: 'Vendor update',
+      detail: 'A vendor-visible update or proof item is needed before closeout.',
+    },
+  },
+};
+
+const DEFAULT_WAITING_ON_DETAILS = {
+  'Client approval': 'The client decision is the next required handoff.',
+  Assignment: 'A coordinator needs to assign an owner or confirm dispatch.',
+  'Proof upload': 'Field proof must be attached before closeout can be trusted.',
+  'Status closeout': 'The work needs final status review before it can close.',
+  'Resume decision': 'Someone must record what unblocks paused work.',
+  'Coordinator review': 'Operations needs to resolve an exception before the next move.',
+  'Archive review': 'Completed work is waiting for archive-ready review.',
+  'Proof review': 'Completed work still needs proof review or override.',
+  'Nothing active': 'No active handoff remains for this request.',
+  Triage: 'Operations needs to decide the first useful owner, status, and path.',
+};
+
+const getRoleWaitingOn = (role, workOrder) => {
+  const rawValue = getWaitingOn(workOrder);
+  const roleCopy = ROLE_WAITING_ON_COPY[role]?.[rawValue];
+
+  return {
+    value: roleCopy?.value || rawValue,
+    detail: roleCopy?.detail || DEFAULT_WAITING_ON_DETAILS[rawValue] || 'Use this to understand the current handoff.',
+  };
+};
+
 const getVisibleTo = workOrder => {
   const audiences = ['Internal'];
   if (hasLinkedClient(workOrder)) {
@@ -1650,8 +1757,9 @@ const getVisibleTo = workOrder => {
   return audiences.join(' + ');
 };
 
-export const buildWorkOrderFlowRows = (workOrder = {}) => {
+export const buildWorkOrderFlowRows = (workOrder = {}, role) => {
   const nextOwner = getNextOwner(workOrder);
+  const waitingOn = getRoleWaitingOn(role, workOrder);
 
   return [
     {
@@ -1664,8 +1772,8 @@ export const buildWorkOrderFlowRows = (workOrder = {}) => {
     {
       key: 'waiting',
       label: 'Waiting On',
-      value: getWaitingOn(workOrder),
-      detail: 'Use this to understand the current handoff.',
+      value: waitingOn.value,
+      detail: waitingOn.detail,
       tone: nextOwner.tone,
     },
     {
@@ -2004,7 +2112,7 @@ const getClientCardAction = workOrder =>
 
 export const buildRoleCardRows = (role, workOrder = {}) => {
   const nextOwner = getNextOwner(workOrder);
-  const waitingOn = getWaitingOn(workOrder);
+  const waitingOn = getRoleWaitingOn(role, workOrder);
   const proofSignal = getProofSignal(workOrder);
   const status = formatStatus(workOrder.status);
   const priority = workOrder.priority || 'normal';
@@ -2017,7 +2125,7 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           key: 'risk',
           label: 'Operational Signal',
           value: `${priority} ${serviceType}`,
-          detail: `${status}; ${waitingOn.toLowerCase()}.`,
+          detail: `${status}; ${waitingOn.value.toLowerCase()}.`,
           tone: workOrder.status || 'default',
         },
         {
@@ -2041,7 +2149,7 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           key: 'handoff',
           label: 'Handoff Target',
           value: nextOwner.value,
-          detail: `Waiting on ${waitingOn.toLowerCase()}.`,
+          detail: `Waiting on ${waitingOn.value.toLowerCase()}. ${waitingOn.detail}`,
           tone: nextOwner.tone,
         },
       ];
@@ -2122,7 +2230,7 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           key: 'status',
           label: 'Status',
           value: status,
-          detail: `Waiting on ${waitingOn.toLowerCase()}.`,
+          detail: `Waiting on ${waitingOn.value.toLowerCase()}. ${waitingOn.detail}`,
           tone: workOrder.status || 'default',
         },
       ];
@@ -2481,6 +2589,7 @@ export default {
   getDetailRoleContext,
   buildDetailSummary,
   buildDetailGuidanceRows,
+  buildWorkOrderReference,
   buildWorkOrderFlowRows,
   buildRoleCardRows,
   buildRoleEventLaneRows,

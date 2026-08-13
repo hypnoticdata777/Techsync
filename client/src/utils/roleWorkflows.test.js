@@ -5,6 +5,7 @@ import {
   buildDetailSectionReadinessRows,
   buildDetailSummary,
   buildRoleGuidanceRows,
+  buildWorkOrderReference,
   buildRoleBoundaryRows,
   buildRoleCardRows,
   buildRoleEventLaneRows,
@@ -798,6 +799,9 @@ describe('role workflow helpers', () => {
   });
 
   test('builds interoperable work-order handoff rows', () => {
+    expect(buildWorkOrderReference({id: 13})).toBe('Request TS-0013');
+    expect(buildWorkOrderReference({})).toBe('Request pending');
+
     expect(
       buildWorkOrderFlowRows({
         status: 'open',
@@ -842,6 +846,46 @@ describe('role workflow helpers', () => {
       expect.arrayContaining([
         expect.objectContaining({key: 'owner', value: 'Technician'}),
         expect.objectContaining({key: 'waiting', value: 'Proof upload'}),
+      ]),
+    );
+
+    expect(
+      buildWorkOrderFlowRows(
+        {
+          id: 13,
+          status: 'open',
+          client_approval_status: 'pending',
+          client_id: 10,
+        },
+        'client',
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: 'waiting',
+          value: 'Your decision',
+          detail: expect.stringContaining('approve, decline, or message operations'),
+        }),
+      ]),
+    );
+
+    expect(
+      buildWorkOrderFlowRows(
+        {
+          id: 14,
+          status: 'open',
+          client_approval_status: 'not_required',
+          client_id: 10,
+        },
+        'client',
+      ),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: 'waiting',
+          value: 'Operations review',
+          detail: expect.stringContaining('confirming scope'),
+        }),
       ]),
     );
   });

@@ -3564,3 +3564,26 @@ Result:
 - Full client tests passed: `8 passed suites`, `66 passed tests`.
 - Expo web export passed and wrote the Vercel-ready build to ignored
   `client/dist`.
+
+## 2026-08-13 - Client Request Identity and Handoff Language
+
+Decision:
+
+- Client work-order cards were close, but similar requests could blur together
+  and the `Waiting On: Triage` language felt like internal operations shorthand.
+- Keep the card surface compact, but make each request identifiable and translate
+  the next required handoff into plain, role-safe language.
+
+Changes:
+
+- Added stable client-safe request references such as `Request TS-0013` to
+  work-order cards.
+- Added quiet location/customer context and last-update timing above each card
+  title so users can distinguish similar linked requests before opening them.
+- Added role-aware waiting-state copy so client lanes see labels like `Your
+  decision`, `Operations review`, `Field proof`, and `Closeout review` instead
+  of raw internal states.
+- Added contextual help bubbles to handoff chips so the explanation of what is
+  required is available on demand without adding always-visible paragraph noise.
+- Passed the active role into detail-page handoff rows so list and detail
+  language stay consistent for external users.

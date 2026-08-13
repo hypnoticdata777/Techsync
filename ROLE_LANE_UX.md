@@ -77,6 +77,15 @@ TechSync Ops is one workflow with separated lanes:
 - The next owner, waiting state, and visible audience should be available anywhere a work order is reviewed.
 - Queue cards should keep the shared handoff model, but use role-specific scan cues:
   admin sees operational signal and tenant context; coordinator sees coordination need and handoff target; technician sees field focus and proof; client sees client action and proof; viewer sees snapshot and read-only mode; vendor sees vendor action and visible thread.
+- Client, viewer, and vendor queue cards should also show a stable request
+  reference, visible location context, and quiet update timing so external
+  users can tell one linked request from another without relying on internal
+  work-order database IDs alone.
+- Waiting-state language must be role-safe. Internal operators may see
+  operational terms like assignment or triage, but client-facing lanes should
+  translate those states into plain language such as `Operations review`,
+  `Your decision`, `Field proof`, or `Closeout review`, with the longer
+  explanation hidden behind the relevant `?` help bubble.
 - Work-order detail pages should carry the queue scan forward with a role-specific action path for approval, communication, proof, and lifecycle so each user knows the next useful move inside their lane.
 - Detail action-path cues should be usable jump controls so users can move from the command panel to approval, communication, proof, or lifecycle work without hunting down the page.
 - Detail sections should open with readiness cues before controls, naming whether approval, communication, proof, or lifecycle work is available, blocked by a prerequisite, read-only, or already satisfied.
