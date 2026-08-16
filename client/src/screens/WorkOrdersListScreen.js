@@ -354,6 +354,7 @@ function WorkOrdersListScreen({navigation}) {
           <Text style={styles.roleBadge}>{roleExperience.roleLabel}</Text>
         </View>
         <TouchableOpacity
+          style={styles.logoutButton}
           onPress={handleLogout}
           {...actionButtonA11y('Logout', 'Signs out of TechSync Ops.')}>
           <Text style={styles.logoutText}>Logout</Text>
@@ -802,7 +803,17 @@ const styles = StyleSheet.create({
   logoutText: {
     fontSize: 12,
     color: '#b24a3a',
-    fontWeight: '600',
+    fontWeight: '900',
+  },
+  logoutButton: {
+    alignItems: 'center',
+    backgroundColor: '#fbf4e8',
+    borderColor: '#d0a298',
+    borderRadius: 999,
+    borderWidth: 1,
+    justifyContent: 'center',
+    minHeight: 30,
+    paddingHorizontal: 12,
   },
   header: {
     padding: 16,
