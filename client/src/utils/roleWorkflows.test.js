@@ -412,6 +412,9 @@ describe('role workflow helpers', () => {
       },
     ];
 
+    expect(getRoleQueueSearchConfig('org_admin').label).toBe('Search');
+    expect(getRoleQueueSearchConfig('org_admin').help).toContain('Options: request ID');
+    expect(getRoleQueueSearchConfig('org_admin').help).toContain('technician');
     expect(getRoleQueueSearchConfig('client').placeholder).toContain('address');
     expect(getRoleQueueSearchConfig('vendor').placeholder).toContain('vendor');
     expect(filterWorkOrdersForRoleSearch('client', 'TS-0019', queue).map(item => item.id))

@@ -35,4 +35,12 @@ describe('HintBubble', () => {
       {label: 'Active', text: 'work still moving'},
     ]);
   });
+
+  test('splits unlabeled option lists into simple rows', () => {
+    expect(splitTooltipItems('request ID | address | client')).toEqual([
+      {label: null, text: 'request ID'},
+      {label: null, text: 'address'},
+      {label: null, text: 'client'},
+    ]);
+  });
 });

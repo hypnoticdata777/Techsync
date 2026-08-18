@@ -1,5 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Platform, Pressable, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 
 const ReactDOM = Platform.OS === 'web' ? require('react-dom') : null;
 
@@ -7,6 +15,9 @@ const TOOLTIP_WIDTH = 252;
 const EDGE_GAP = 12;
 const VERTICAL_GAP = 10;
 const ESTIMATED_TOOLTIP_HEIGHT = 96;
+const TOOLTIP_MAX_HEIGHT = 520;
+const TOOLTIP_VERTICAL_PADDING = 20;
+const TOOLTIP_CLOSE_DELAY_MS = 180;
 
 let nextHintId = 1;
 let activeHintId = null;
@@ -41,12 +52,20 @@ function buildTooltipPosition(anchor, align, windowWidth, windowHeight) {
   const left = clamp(preferredLeft, EDGE_GAP, maxLeft);
 
   const belowTop = anchor.y + anchor.height + VERTICAL_GAP;
-  const top =
-    belowTop + ESTIMATED_TOOLTIP_HEIGHT > windowHeight - EDGE_GAP
-      ? Math.max(EDGE_GAP, anchor.y - ESTIMATED_TOOLTIP_HEIGHT - VERTICAL_GAP)
-      : belowTop;
+  const belowSpace = windowHeight - EDGE_GAP - belowTop;
+  const aboveSpace = anchor.y - VERTICAL_GAP - EDGE_GAP;
+  const placeAbove =
+    belowSpace < ESTIMATED_TOOLTIP_HEIGHT && aboveSpace > belowSpace;
+  const availableHeight = placeAbove ? aboveSpace : belowSpace;
+  const maxHeight = Math.max(
+    ESTIMATED_TOOLTIP_HEIGHT,
+    Math.min(TOOLTIP_MAX_HEIGHT, availableHeight),
+  );
+  const top = placeAbove
+    ? Math.max(EDGE_GAP, anchor.y - maxHeight - VERTICAL_GAP)
+    : belowTop;
 
-  return {left, top};
+  return {left, top, maxHeight};
 }
 
 export const splitTooltipSections = text => {
@@ -103,45 +122,56 @@ export const splitTooltipItems = text =>
       };
     });
 
-function Tooltip({label, text, positionStyle}) {
+function Tooltip({label, text, positionStyle, onTooltipHoverIn, onTooltipHoverOut}) {
   const sections = splitTooltipSections(text);
+  const tooltipPosition = StyleSheet.flatten(positionStyle) || {};
+  const scrollMaxHeight =
+    (tooltipPosition.maxHeight || TOOLTIP_MAX_HEIGHT) - TOOLTIP_VERTICAL_PADDING;
 
   return (
-    <View pointerEvents="none" style={[styles.tooltip, positionStyle]}>
-      <Text style={styles.tooltipTitle}>{label}</Text>
-      {sections.map((section, index) => {
-        if (section.type === 'callout') {
-          const items = splitTooltipItems(section.text);
-          if (items.length > 1) {
+    <View
+      pointerEvents="auto"
+      style={[styles.tooltip, positionStyle]}
+      onMouseEnter={onTooltipHoverIn}
+      onMouseLeave={onTooltipHoverOut}>
+      <ScrollView
+        style={[styles.tooltipScroll, {maxHeight: scrollMaxHeight}]}
+        contentContainerStyle={styles.tooltipContent}>
+        <Text style={styles.tooltipTitle}>{label}</Text>
+        {sections.map((section, index) => {
+          if (section.type === 'callout') {
+            const items = splitTooltipItems(section.text);
+            if (items.length > 1) {
+              return (
+                <View key={`${section.label}-${index}`} style={styles.tooltipSection}>
+                  <Text style={styles.tooltipSectionTitle}>{section.label}</Text>
+                  {items.map((item, itemIndex) => (
+                    <View key={`${item.label || item.text}-${itemIndex}`} style={styles.tooltipItem}>
+                      {item.label ? (
+                        <Text style={styles.tooltipItemLabel}>{item.label}</Text>
+                      ) : null}
+                      <Text style={styles.tooltipItemText}>{item.text}</Text>
+                    </View>
+                  ))}
+                </View>
+              );
+            }
+
             return (
-              <View key={`${section.label}-${index}`} style={styles.tooltipSection}>
-                <Text style={styles.tooltipSectionTitle}>{section.label}</Text>
-                {items.map((item, itemIndex) => (
-                  <View key={`${item.label || item.text}-${itemIndex}`} style={styles.tooltipItem}>
-                    {item.label ? (
-                      <Text style={styles.tooltipItemLabel}>{item.label}</Text>
-                    ) : null}
-                    <Text style={styles.tooltipItemText}>{item.text}</Text>
-                  </View>
-                ))}
-              </View>
+              <Text key={`${section.label}-${index}`} style={styles.tooltipLine}>
+                <Text style={styles.tooltipTerm}>{section.label} </Text>
+                <Text style={styles.tooltipKeyInfo}>{section.text}</Text>
+              </Text>
             );
           }
 
           return (
-            <Text key={`${section.label}-${index}`} style={styles.tooltipLine}>
-              <Text style={styles.tooltipTerm}>{section.label} </Text>
-              <Text style={styles.tooltipKeyInfo}>{section.text}</Text>
+            <Text key={`body-${index}`} style={styles.tooltipText}>
+              {section.text}
             </Text>
           );
-        }
-
-        return (
-          <Text key={`body-${index}`} style={styles.tooltipText}>
-            {section.text}
-          </Text>
-        );
-      })}
+        })}
+      </ScrollView>
     </View>
   );
 }
@@ -160,14 +190,25 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [tappedOpen, setTappedOpen] = useState(false);
+  const [tooltipHovered, setTooltipHovered] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const closeTimerRef = useRef(null);
 
   useEffect(() => subscribeActiveHint(setActiveId), []);
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
+    },
+    [],
+  );
 
   if (!text) return null;
 
   const isActive = activeId === idRef.current;
-  const visible = isActive && !dismissed && (hovered || focused || tappedOpen);
+  const visible =
+    isActive && !dismissed && (hovered || focused || tappedOpen || tooltipHovered);
   const floatingPosition =
     Platform.OS === 'web' ? buildTooltipPosition(anchor, align, windowWidth, windowHeight) : null;
 
@@ -177,7 +218,35 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
     });
   };
 
+  const cancelScheduledClose = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const closeTooltip = () => {
+    setAnchor(null);
+    clearActiveHint(idRef.current);
+  };
+
+  const scheduleHoverClose = () => {
+    cancelScheduledClose();
+    closeTimerRef.current = setTimeout(() => {
+      setTooltipHovered(currentTooltipHovered => {
+        setHovered(currentHovered => {
+          if (!currentHovered && !currentTooltipHovered && !focused && !tappedOpen) {
+            closeTooltip();
+          }
+          return currentHovered;
+        });
+        return currentTooltipHovered;
+      });
+    }, TOOLTIP_CLOSE_DELAY_MS);
+  };
+
   const openFromHover = () => {
+    cancelScheduledClose();
     setHovered(true);
     setTappedOpen(false);
     setDismissed(false);
@@ -189,8 +258,7 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
     setHovered(false);
     setTappedOpen(false);
     setDismissed(false);
-    setAnchor(null);
-    clearActiveHint(idRef.current);
+    scheduleHoverClose();
   };
 
   const openFromFocus = () => {
@@ -203,16 +271,14 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
     setFocused(false);
     setTappedOpen(false);
     setDismissed(false);
-    setAnchor(null);
-    clearActiveHint(idRef.current);
+    scheduleHoverClose();
   };
 
   const toggleFromPress = () => {
     if (visible) {
       setTappedOpen(false);
       setDismissed(true);
-      setAnchor(null);
-      clearActiveHint(idRef.current);
+      closeTooltip();
       return;
     }
 
@@ -234,7 +300,19 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
       : [styles.tooltipInline, align === 'left' ? styles.tooltipLeft : styles.tooltipRight];
   const tooltip =
     visible && (Platform.OS !== 'web' || floatingPosition) ? (
-      <Tooltip label={label} text={text} positionStyle={tooltipPositionStyle} />
+      <Tooltip
+        label={label}
+        text={text}
+        positionStyle={tooltipPositionStyle}
+        onTooltipHoverIn={() => {
+          cancelScheduledClose();
+          setTooltipHovered(true);
+        }}
+        onTooltipHoverOut={() => {
+          setTooltipHovered(false);
+          scheduleHoverClose();
+        }}
+      />
     ) : null;
   const portaledTooltip =
     Platform.OS === 'web' && ReactDOM && typeof document !== 'undefined' && tooltip
@@ -302,6 +380,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.18,
     shadowRadius: 10,
     elevation: 8,
+    maxHeight: TOOLTIP_MAX_HEIGHT,
+  },
+  tooltipScroll: {
+    flexShrink: 1,
+  },
+  tooltipContent: {
+    paddingBottom: 2,
   },
   tooltipInline: {
     position: 'absolute',

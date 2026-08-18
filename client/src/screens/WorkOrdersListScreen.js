@@ -624,6 +624,7 @@ function WorkOrdersListScreen({navigation}) {
           )}
           {!loading && !error && (
             <FlatList
+              style={styles.queueListFrame}
               data={orderedWorkOrders}
               keyExtractor={item => String(item.id)}
               renderItem={renderWorkOrder}
@@ -1374,13 +1375,18 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   queueSearchPanel: {
-    backgroundColor: '#fbf4e8',
-    borderColor: '#d2c2aa',
+    backgroundColor: '#fff8ed',
+    borderBottomWidth: 4,
+    borderColor: '#a99678',
     borderRadius: 6,
     borderWidth: 2,
     gap: 8,
-    marginBottom: 12,
-    padding: 12,
+    marginBottom: 18,
+    padding: 14,
+    shadowColor: '#655d52',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.08,
+    shadowRadius: 5,
   },
   queueSearchHeader: {
     alignItems: 'center',
@@ -1400,10 +1406,10 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   queueSearchInput: {
-    backgroundColor: '#f6eddf',
+    backgroundColor: '#fffdf8',
     borderColor: '#9b8b73',
     borderRadius: 5,
-    borderWidth: 1,
+    borderWidth: 2,
     color: '#182532',
     fontSize: 14,
     minHeight: 42,
@@ -1438,7 +1444,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   queueSortPanel: {
-    borderTopColor: '#efe6d6',
+    borderTopColor: '#d8c7ad',
     borderTopWidth: 1,
     gap: 8,
     overflow: 'visible',
@@ -1487,7 +1493,16 @@ const styles = StyleSheet.create({
   queueSortChipTextSelected: {
     color: '#fbf4e8',
   },
+  queueListFrame: {
+    backgroundColor: '#eadbc6',
+    borderColor: '#c7b695',
+    borderRadius: 6,
+    borderWidth: 2,
+    flex: 1,
+    overflow: 'visible',
+  },
   listContent: {
+    padding: 10,
     paddingBottom: 16,
   },
   emptyListContent: {
