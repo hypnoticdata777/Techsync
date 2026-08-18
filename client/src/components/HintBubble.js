@@ -3,7 +3,7 @@ import {Platform, Pressable, StyleSheet, Text, View, useWindowDimensions} from '
 
 const ReactDOM = Platform.OS === 'web' ? require('react-dom') : null;
 
-const TOOLTIP_WIDTH = 220;
+const TOOLTIP_WIDTH = 252;
 const EDGE_GAP = 12;
 const VERTICAL_GAP = 10;
 const ESTIMATED_TOOLTIP_HEIGHT = 96;
@@ -49,10 +49,65 @@ function buildTooltipPosition(anchor, align, windowWidth, windowHeight) {
   return {left, top};
 }
 
-function Tooltip({children, positionStyle}) {
+export const splitTooltipSections = text => {
+  const source = String(text || '').trim();
+  const labelPattern = /([A-Z][A-Za-z -]{2,28}:)/g;
+  const pieces = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = labelPattern.exec(source)) !== null) {
+    if (match.index > lastIndex) {
+      pieces.push({
+        type: 'body',
+        text: source.slice(lastIndex, match.index).trim(),
+      });
+    }
+
+    const nextMatch = labelPattern.exec(source);
+    labelPattern.lastIndex = nextMatch ? nextMatch.index : source.length;
+    pieces.push({
+      type: 'callout',
+      label: match[1],
+      text: source
+        .slice(match.index + match[1].length, nextMatch ? nextMatch.index : source.length)
+        .trim(),
+    });
+    lastIndex = nextMatch ? nextMatch.index : source.length;
+    if (nextMatch) {
+      labelPattern.lastIndex = nextMatch.index;
+    }
+  }
+
+  if (lastIndex < source.length) {
+    pieces.push({type: 'body', text: source.slice(lastIndex).trim()});
+  }
+
+  return pieces.filter(piece => piece.text || piece.label);
+};
+
+function Tooltip({label, text, positionStyle}) {
+  const sections = splitTooltipSections(text);
+
   return (
     <View pointerEvents="none" style={[styles.tooltip, positionStyle]}>
-      <Text style={styles.tooltipText}>{children}</Text>
+      <Text style={styles.tooltipTitle}>{label}</Text>
+      {sections.map((section, index) => {
+        if (section.type === 'callout') {
+          return (
+            <Text key={`${section.label}-${index}`} style={styles.tooltipLine}>
+              <Text style={styles.tooltipTerm}>{section.label} </Text>
+              <Text style={styles.tooltipKeyInfo}>{section.text}</Text>
+            </Text>
+          );
+        }
+
+        return (
+          <Text key={`body-${index}`} style={styles.tooltipText}>
+            {section.text}
+          </Text>
+        );
+      })}
     </View>
   );
 }
@@ -145,7 +200,7 @@ function HintBubble({label = 'Help', text, align = 'right'}) {
       : [styles.tooltipInline, align === 'left' ? styles.tooltipLeft : styles.tooltipRight];
   const tooltip =
     visible && (Platform.OS !== 'web' || floatingPosition) ? (
-      <Tooltip positionStyle={tooltipPositionStyle}>{text}</Tooltip>
+      <Tooltip label={label} text={text} positionStyle={tooltipPositionStyle} />
     ) : null;
   const portaledTooltip =
     Platform.OS === 'web' && ReactDOM && typeof document !== 'undefined' && tooltip
@@ -202,9 +257,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#182532',
     borderColor: '#2f6f9f',
     borderRadius: 6,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    borderWidth: 2,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     maxWidth: TOOLTIP_WIDTH,
     width: TOOLTIP_WIDTH,
     zIndex: 10000,
@@ -230,8 +285,29 @@ const styles = StyleSheet.create({
   tooltipText: {
     color: '#fbf4e8',
     fontSize: 12,
-    fontWeight: '600',
-    lineHeight: 17,
+    fontWeight: '400',
+    lineHeight: 18,
+    marginTop: 5,
+  },
+  tooltipTitle: {
+    color: '#fbf4e8',
+    fontSize: 13,
+    fontWeight: '900',
+    lineHeight: 18,
+  },
+  tooltipLine: {
+    color: '#fbf4e8',
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 6,
+  },
+  tooltipTerm: {
+    fontWeight: '900',
+  },
+  tooltipKeyInfo: {
+    color: '#f6eddf',
+    fontStyle: 'italic',
+    fontWeight: '400',
   },
 });
 
