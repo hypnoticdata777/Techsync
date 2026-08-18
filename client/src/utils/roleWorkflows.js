@@ -584,21 +584,21 @@ const QUEUE_FILTERS_BY_ROLE = {
     {
       key: 'risk',
       label: 'Risk',
-      detail: 'Approvals, unassigned work, blockers, or proof gaps.',
+      detail: 'Shows: requests that need attention. Includes approvals, missing assignment, blockers, or missing proof.',
       tone: 'pending',
       match: isQueueRiskEvent,
     },
     {
       key: 'active',
       label: 'Active',
-      detail: 'Open, in-progress, paused, and escalated operating work.',
+      detail: 'Shows: work that is still moving. Includes open, in progress, paused, and escalated requests.',
       tone: 'active',
       match: isOpenOrActiveStatus,
     },
     {
       key: 'closeout',
       label: 'Closeout',
-      detail: 'Completed work ready for proof or archive review.',
+      detail: 'Shows: completed requests. Use this to review proof before archive or final reporting.',
       tone: 'verified',
       match: item => item?.status === 'completed',
     },
@@ -607,21 +607,21 @@ const QUEUE_FILTERS_BY_ROLE = {
     {
       key: 'unassigned',
       label: 'Assign',
-      detail: 'Open requests without a technician owner.',
+      detail: 'Shows: open requests with no technician. Use this first when work needs an owner.',
       tone: 'open',
       match: needsAssignment,
     },
     {
       key: 'approvals',
       label: 'Approvals',
-      detail: 'Client decisions waiting on visible context.',
+      detail: 'Shows: client approval requests. Use this when the next move belongs to the client.',
       tone: 'pending',
       match: needsApprovalDecision,
     },
     {
       key: 'blockers',
       label: 'Blockers',
-      detail: 'Paused or escalated work needing recovery.',
+      detail: 'Shows: paused or escalated work. Use this when operations needs to recover the request.',
       tone: 'escalated',
       match: isBlockedStatus,
     },
@@ -630,21 +630,21 @@ const QUEUE_FILTERS_BY_ROLE = {
     {
       key: 'start',
       label: 'Start',
-      detail: 'Assigned open jobs ready for first movement.',
+      detail: 'Shows: assigned open jobs. Start here when you are ready to move a job into field work.',
       tone: 'open',
       match: item => item?.status === 'open',
     },
     {
       key: 'proof',
       label: 'Proof',
-      detail: 'Active jobs needing notes, photos, or completion proof.',
+      detail: 'Shows: active or proof-missing jobs. Use this for notes, photos, and completion proof.',
       tone: 'missing',
       match: item => item?.status === 'in_progress' || needsCompletionProof(item),
     },
     {
       key: 'blockers',
       label: 'Blocked',
-      detail: 'Paused or escalated assigned jobs.',
+      detail: 'Shows: paused or escalated assigned jobs. Add clear notes so operations knows what is stuck.',
       tone: 'escalated',
       match: isBlockedStatus,
     },
@@ -653,21 +653,21 @@ const QUEUE_FILTERS_BY_ROLE = {
     {
       key: 'decisions',
       label: 'Decisions',
-      detail: 'Approval requests waiting for client response.',
+      detail: 'Shows: approval requests waiting for you. Open these to approve, decline, or message operations.',
       tone: 'pending',
       match: needsApprovalDecision,
     },
     {
       key: 'updates',
       label: 'Updates',
-      detail: 'Visible work still moving through operations.',
+      detail: 'Shows: your visible requests that are still moving. Use this to read the latest status.',
       tone: 'active',
       match: isOpenOrActiveStatus,
     },
     {
       key: 'proof',
       label: 'Proof',
-      detail: 'Completed work with visible closeout context.',
+      detail: 'Shows: completed visible requests. Use this to review closeout proof.',
       tone: 'verified',
       match: item => item?.status === 'completed',
     },
@@ -676,21 +676,21 @@ const QUEUE_FILTERS_BY_ROLE = {
     {
       key: 'active',
       label: 'Active',
-      detail: 'Visible linked work still moving.',
+      detail: 'Shows: visible linked work that is still moving. This is read-only.',
       tone: 'active',
       match: isOpenOrActiveStatus,
     },
     {
       key: 'completed',
       label: 'Complete',
-      detail: 'Completed visible work for read-only review.',
+      detail: 'Shows: completed visible work. Use this to review status and proof without changing anything.',
       tone: 'verified',
       match: item => item?.status === 'completed',
     },
     {
       key: 'watch',
       label: 'Watch',
-      detail: 'Open or approval-related items to keep an eye on.',
+      detail: 'Shows: open or approval-related items. Use this when you only need to keep an eye on progress.',
       tone: 'open',
       match: item => item?.status === 'open' || needsApprovalDecision(item),
     },
@@ -699,25 +699,35 @@ const QUEUE_FILTERS_BY_ROLE = {
     {
       key: 'active',
       label: 'Active',
-      detail: 'Linked vendor work still moving.',
+      detail: 'Shows: work linked to this vendor that is still moving. Use this to send vendor-visible updates.',
       tone: 'active',
       match: isOpenOrActiveStatus,
     },
     {
       key: 'blocked',
       label: 'Blocked',
-      detail: 'Paused or escalated vendor-linked work.',
+      detail: 'Shows: paused or escalated vendor work. Use this when operations needs a vendor reply.',
       tone: 'escalated',
       match: isBlockedStatus,
     },
     {
       key: 'complete',
       label: 'Complete',
-      detail: 'Completed linked work with proof context.',
+      detail: 'Shows: completed vendor work. Use this to review finished scope and proof context.',
       tone: 'verified',
       match: item => item?.status === 'completed',
     },
   ],
+};
+
+const ALL_WORK_DETAILS = {
+  org_admin: 'Shows: every request in the tenant. Use this when you need the whole operating picture.',
+  coordinator: 'Shows: every request operations can coordinate. Use this before narrowing to assignment, approvals, or blockers.',
+  technician: 'Shows: every assigned active job. This does not include unrelated jobs or manager pages.',
+  client: 'Shows: every request linked to this client. Internal notes and vendor-only updates stay hidden.',
+  viewer: 'Shows: every visible linked request. This view is read-only.',
+  vendor: 'Shows: every request linked to this vendor. Client and internal messages stay hidden.',
+  default: 'Shows: every request visible to this account.',
 };
 
 const getQueueFiltersForRole = role => QUEUE_FILTERS_BY_ROLE[role] || [];
@@ -732,7 +742,7 @@ export const buildRoleQueueFilterRows = (role, workOrders = []) => {
       label: 'All Work',
       value: pluralize(rows.length, 'item'),
       count: rows.length,
-      detail: 'Show every work order visible to this role.',
+      detail: ALL_WORK_DETAILS[role] || ALL_WORK_DETAILS.default,
       tone: rows.length > 0 ? 'active' : 'default',
     },
     ...roleFilters.map(filter => {
@@ -762,49 +772,49 @@ const ROLE_QUEUE_SEARCH_CONFIG = {
   org_admin: {
     label: 'Tenant Search',
     placeholder: 'Search TS number, client, property, vendor, technician, risk, or status',
-    help: 'Find any visible tenant record by request number, address, linked people, proof state, priority, or work status.',
+    help: 'Search changes only the center list. Type a request ID, address, client, vendor, technician, priority, proof state, or status.',
     emptyTitle: 'No tenant work matches',
     emptyDetail: 'Try a TS number, client name, property, vendor, technician, priority, status, or proof term.',
   },
   coordinator: {
     label: 'Dispatch Search',
     placeholder: 'Search TS number, address, unit, assignee, vendor, client, or status',
-    help: 'Find coordination work by request number, location, client, vendor, assigned technician, priority, status, or waiting state.',
+    help: 'Search changes only the center list. Type a request ID, address, client, vendor, technician, priority, status, or waiting state.',
     emptyTitle: 'No dispatch work matches',
     emptyDetail: 'Try the TS number, address, unit, client, assigned technician, vendor, priority, or status.',
   },
   technician: {
     label: 'Assigned Search',
     placeholder: 'Search TS number, address, unit, service, status, proof, or date',
-    help: 'Find assigned field work by request number, service, location, status, priority, proof state, or recent date.',
+    help: 'Search changes only the center list. Type a request ID, service, address, status, priority, proof state, or date.',
     emptyTitle: 'No assigned work matches',
     emptyDetail: 'Try the TS number, address, service type, status, priority, or proof term.',
   },
   client: {
     label: 'Request Search',
     placeholder: 'Search TS number, address, unit, status, proof, update, or date',
-    help: 'Find client-visible requests by request number, property, unit, status, approval, proof, or update date.',
+    help: 'Search changes only the center list. Type a request ID, property, unit, status, approval, proof, or date.',
     emptyTitle: 'No client requests match',
     emptyDetail: 'Try a TS number, address, unit, status, approval, proof, or date term.',
   },
   viewer: {
     label: 'Snapshot Search',
     placeholder: 'Search TS number, linked work, address, unit, proof, or status',
-    help: 'Find read-only visible work by request number, linked property, status, approval, proof, or update date.',
+    help: 'Search changes only the center list. Type a request ID, property, status, approval, proof, or date. This stays read-only.',
     emptyTitle: 'No visible snapshot matches',
     emptyDetail: 'Try a TS number, address, status, proof, approval, or date term.',
   },
   vendor: {
     label: 'Vendor Search',
     placeholder: 'Search TS number, assigned vendor work, address, service, status, or proof',
-    help: 'Find vendor-visible work by request number, service, address, status, blocker, proof state, or update date.',
+    help: 'Search changes only the center list. Type a request ID, service, address, status, blocker, proof state, or date.',
     emptyTitle: 'No vendor work matches',
     emptyDetail: 'Try a TS number, service, address, status, blocker, proof, or date term.',
   },
   default: {
     label: 'Queue Search',
     placeholder: 'Search TS number, title, address, status, proof, or date',
-    help: 'Find visible work by request number, title, address, status, proof, or update date.',
+    help: 'Search changes only the center list. Type a request ID, title, address, status, proof, or date.',
     emptyTitle: 'No work matches',
     emptyDetail: 'Try a TS number, title, address, status, proof, or date term.',
   },
@@ -902,114 +912,114 @@ const ROLE_QUEUE_SORT_OPTIONS = {
     {
       key: 'risk',
       label: 'Risk First',
-      detail: 'Approvals, missing assignment, blockers, proof gaps, and priority sort to the top.',
+      detail: 'Puts requests needing attention at the top: approvals, missing assignment, blockers, missing proof, then priority.',
     },
     {
       key: 'recent',
       label: 'Recent',
-      detail: 'Most recently updated tenant records sort to the top.',
+      detail: 'Puts the most recently updated tenant requests at the top.',
     },
     {
       key: 'priority',
       label: 'Priority',
-      detail: 'Emergency and high-priority work sort before lower-priority records.',
+      detail: 'Puts emergency and high-priority requests before lower-priority work.',
     },
   ],
   coordinator: [
     {
       key: 'handoff',
       label: 'Handoff First',
-      detail: 'Unassigned work, pending approvals, blockers, and proof gaps sort to the top.',
+      detail: 'Puts the requests a coordinator can move first: assignment, approvals, blockers, then proof gaps.',
     },
     {
       key: 'recent',
       label: 'Recent',
-      detail: 'Most recently updated coordination items sort to the top.',
+      detail: 'Puts the most recently updated coordination items at the top.',
     },
     {
       key: 'priority',
       label: 'Priority',
-      detail: 'Emergency and high-priority work sort before lower-priority handoffs.',
+      detail: 'Puts emergency and high-priority coordination work before lower-priority work.',
     },
   ],
   technician: [
     {
       key: 'field',
       label: 'Field First',
-      detail: 'Active jobs, open starts, blockers, proof gaps, and priority sort to the top.',
+      detail: 'Puts field work you can act on first: active jobs, open starts, blockers, proof gaps, then priority.',
     },
     {
       key: 'recent',
       label: 'Recent',
-      detail: 'Most recently updated assigned jobs sort to the top.',
+      detail: 'Puts the most recently updated assigned jobs at the top.',
     },
     {
       key: 'priority',
       label: 'Priority',
-      detail: 'Emergency and high-priority assigned work sorts first.',
+      detail: 'Puts emergency and high-priority assigned jobs first.',
     },
   ],
   client: [
     {
       key: 'decisions',
       label: 'Decisions First',
-      detail: 'Pending approvals, active updates, completed proof, and priority sort to the top.',
+      detail: 'Puts approval decisions first, then active updates, completed proof, and priority.',
     },
     {
       key: 'recent',
       label: 'Recent',
-      detail: 'Most recently updated client-visible requests sort to the top.',
+      detail: 'Puts the most recently updated client-visible requests at the top.',
     },
     {
       key: 'proof',
       label: 'Proof First',
-      detail: 'Completed requests and proof-ready work sort before earlier lifecycle states.',
+      detail: 'Puts completed requests and visible proof before earlier work states.',
     },
   ],
   viewer: [
     {
       key: 'watch',
       label: 'Watch First',
-      detail: 'Active visible work sorts before completed records for read-only review.',
+      detail: 'Puts active visible work before completed records for read-only review.',
     },
     {
       key: 'recent',
       label: 'Recent',
-      detail: 'Most recently updated visible records sort to the top.',
+      detail: 'Puts the most recently updated visible records at the top.',
     },
     {
       key: 'proof',
       label: 'Proof First',
-      detail: 'Completed and proof-ready records sort before active work.',
+      detail: 'Puts completed and proof-ready records before active work.',
     },
   ],
   vendor: [
     {
       key: 'vendor',
       label: 'Vendor First',
-      detail: 'Blocked and active vendor-linked work sorts before completed scope review.',
+      detail: 'Puts blocked and active vendor work before completed scope review.',
     },
     {
       key: 'recent',
       label: 'Recent',
-      detail: 'Most recently updated vendor-visible work sorts to the top.',
+      detail: 'Puts the most recently updated vendor-visible work at the top.',
     },
     {
       key: 'priority',
       label: 'Priority',
-      detail: 'Emergency and high-priority vendor-linked work sorts first.',
+      detail: 'Puts emergency and high-priority vendor work first.',
     },
   ],
   default: [
     {
       key: 'recent',
       label: 'Recent',
-      detail: 'Most recently updated visible work sorts to the top.',
+      detail: 'Puts the most recently updated visible work at the top.',
     },
     {
       key: 'priority',
       label: 'Priority',
-      detail: 'Emergency and high-priority visible work sorts first.',
+      detail: 'Puts emergency and high-priority visible work first.',
     },
   ],
 };
@@ -1172,7 +1182,7 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
           key: 'admin-risk',
           label: 'Tenant Risk Tool',
           value: 'Resolve highest-risk item',
-          detail: 'Ranks approvals, unassigned work, blockers, proof gaps, priority, and status so the admin opens the operating risk first.',
+          detail: 'This opens the request most likely to need admin attention. It looks for approvals, missing owners, blockers, missing proof, and priority.',
           workOrder: risk,
           filterKey: 'risk',
           actionLabel: 'Open Risk Item',
@@ -1186,8 +1196,8 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
         label: 'Tenant Review Tool',
         value: closeout ? 'Review closeout' : 'Inspect operating queue',
         detail: closeout
-          ? 'No urgent risk found; review completed work for proof and archive readiness.'
-          : 'No urgent risk found; review the full tenant queue for operating narrative.',
+          ? 'No urgent risk is waiting. Open completed work to review proof before archive.'
+          : 'No urgent risk is waiting. Open the full queue to review the tenant picture.',
         workOrder: closeout || pickHighestImpact(rows, () => true),
         filterKey: closeout ? 'closeout' : 'all',
         actionLabel: closeout ? 'Open Closeout' : 'Open Queue Item',
@@ -1202,7 +1212,7 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
           key: 'coordinator-assign',
           label: 'Dispatch Tool',
           value: 'Assign the next request',
-          detail: 'Chooses the highest-impact open request without a technician so the handoff can start.',
+          detail: 'This opens the open request most ready for assignment. Add the right owner so the work can move.',
           workOrder: unassigned,
           filterKey: 'unassigned',
           actionLabel: 'Assign This Work',
@@ -1216,7 +1226,7 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
           key: 'coordinator-approval',
           label: 'Approval Follow-Up',
           value: 'Move client decision',
-          detail: 'Finds the pending approval most likely to block work so the coordinator can add context or follow up.',
+          detail: 'This opens a request waiting on client approval. Add clear client-visible context if the client needs help deciding.',
           workOrder: approval,
           filterKey: 'approvals',
           actionLabel: 'Open Approval',
@@ -1230,7 +1240,7 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
           key: 'coordinator-blocker',
           label: 'Recovery Tool',
           value: 'Recover blocker',
-          detail: 'Surfaces paused or escalated work before it becomes stale client noise.',
+          detail: 'This opens paused or escalated work. Use it to add a reason, owner, or recovery note.',
           workOrder: blocker,
           filterKey: 'blockers',
           actionLabel: 'Open Blocker',
@@ -1260,7 +1270,7 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
           key: 'technician-proof',
           label: 'Field Proof Tool',
           value: 'Update status or proof',
-          detail: 'Picks active or proof-missing assigned work so the field record moves toward clean closeout.',
+          detail: 'This opens assigned work that needs status, notes, photos, or completion proof.',
           workOrder: proof,
           filterKey: 'proof',
           actionLabel: 'Open Field Update',
@@ -1274,7 +1284,7 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
           key: 'technician-start',
           label: 'Start Work Tool',
           value: 'Start next job',
-          detail: 'Selects the highest-priority assigned open job so the technician has one clear first move.',
+          detail: 'This opens the assigned open job that should start next.',
           workOrder: starter,
           filterKey: 'start',
           actionLabel: 'Open Job',
@@ -1288,7 +1298,7 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
             key: 'technician-blocker',
             label: 'Blocker Tool',
             value: 'Clarify blocker',
-            detail: 'Paused or escalated assigned work needs notes before someone else can unblock it.',
+            detail: 'This opens paused or escalated assigned work. Add notes so operations knows what is stuck.',
             workOrder: blocker,
             filterKey: 'blockers',
             actionLabel: 'Open Blocker',
@@ -1304,7 +1314,7 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
           key: 'client-decision',
           label: 'Decision Tool',
           value: 'Approve or decline',
-          detail: 'Finds the pending approval tied to this client so the client can decide without calling operations.',
+          detail: 'This opens your pending approval. Review the visible request, then approve, decline, or message operations.',
           workOrder: approval,
           filterKey: 'decisions',
           actionLabel: 'Open Decision',
@@ -1318,8 +1328,8 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
         label: proof ? 'Proof Review Tool' : 'Update Review Tool',
         value: proof ? 'Review closeout proof' : 'Read latest update',
         detail: proof
-          ? 'No approval is waiting; review completed linked work for proof and closeout clarity.'
-          : 'No approval is waiting; open the most active linked work item for visible status context.',
+          ? 'No approval is waiting. Open completed work to review visible proof.'
+          : 'No approval is waiting. Open active work to read the latest visible update.',
         workOrder: proof || pickHighestImpact(rows, isOpenOrActiveStatus) || pickHighestImpact(rows, () => true),
         filterKey: proof ? 'proof' : 'updates',
         actionLabel: proof ? 'Open Proof' : 'Open Update',
@@ -1335,8 +1345,8 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
         label: 'Read-Only Review Tool',
         value: active ? 'Review progress' : 'Review closeout',
         detail: active
-          ? 'Opens the most important visible active record while keeping the viewer read-only.'
-          : 'No active work is visible; review completed visible work and proof context.',
+          ? 'This opens active visible work for review. You can read it, but you cannot change it.'
+          : 'No active work is visible. Open completed work to review status and proof.',
         workOrder: active || completed || pickHighestImpact(rows, () => true),
         filterKey: active ? 'active' : 'completed',
         actionLabel: 'Open Snapshot',
@@ -1351,7 +1361,7 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
           key: 'vendor-blocker',
           label: 'Vendor Response Tool',
           value: 'Respond to blocker',
-          detail: 'Finds blocked vendor-linked work so the vendor can reply in the right message lane.',
+          detail: 'This opens blocked work linked to this vendor. Reply only in the vendor-visible lane.',
           workOrder: blocker,
           filterKey: 'blocked',
           actionLabel: 'Open Blocker',
@@ -1365,8 +1375,8 @@ export const buildRoleNextBestAction = (role, workOrders = []) => {
         label: 'Vendor Lane Tool',
         value: active ? 'Send vendor update' : 'Review completed scope',
         detail: active
-          ? 'Opens the highest-impact linked vendor job while keeping client/internal context separate.'
-          : 'No active vendor-linked work is waiting; review completed vendor scope.',
+          ? 'This opens active work linked to this vendor. Use vendor-visible messages for updates.'
+          : 'No active vendor work is waiting. Open completed work to review finished scope.',
         workOrder: active || pickHighestImpact(rows, item => item?.status === 'completed') || pickHighestImpact(rows, () => true),
         filterKey: active ? 'active' : 'complete',
         actionLabel: active ? 'Open Vendor Work' : 'Open Completed Work',
@@ -1422,14 +1432,14 @@ export const buildRoleEventLaneRows = (role, workOrders = []) => {
           key: 'risk',
           label: 'Explain Risk',
           value: pluralize(riskEvents, 'event'),
-          detail: 'Approvals, unassigned work, blockers, and proof gaps must have an owner.',
+          detail: 'These are the items admin should be able to explain: approvals, unassigned work, blockers, and proof gaps.',
           tone: riskEvents > 0 ? 'pending' : 'verified',
         },
         {
           key: 'operating-story',
           label: 'Operating Story',
           value: pluralize(rows.length, 'record'),
-          detail: 'Each record should show status, next owner, audience, proof, and audit path.',
+          detail: 'Use this to check whether each request shows status, next owner, audience, proof, and history.',
           tone: rows.length > 0 ? 'active' : 'default',
         },
         {
@@ -1439,7 +1449,7 @@ export const buildRoleEventLaneRows = (role, workOrders = []) => {
           detail:
             completedReady > 0
               ? `${pluralize(completedReady, 'item')} can move toward archive after review.`
-              : 'Completed work will surface here when proof or override is ready.',
+              : 'Completed work appears here when proof or manager override is ready.',
           tone: completedNeedsProof > 0 ? 'missing' : 'verified',
         },
       ];
@@ -1449,21 +1459,21 @@ export const buildRoleEventLaneRows = (role, workOrders = []) => {
           key: 'intake',
           label: 'Intake To Assign',
           value: pluralize(unassigned, 'request'),
-          detail: 'Unassigned open work needs a technician, vendor context, or explicit next owner.',
+          detail: 'These open requests need an owner before field work can start.',
           tone: unassigned > 0 ? 'open' : 'verified',
         },
         {
           key: 'approval',
           label: 'Approval Loop',
           value: pluralize(pendingApprovals, 'decision'),
-          detail: 'Keep client-visible notes focused until the client decides.',
+          detail: 'These requests are waiting on the client. Keep follow-up notes client-visible and clear.',
           tone: pendingApprovals > 0 ? 'pending' : 'default',
         },
         {
           key: 'blockers',
           label: 'Blocker Recovery',
           value: pluralize(blockers, 'blocker'),
-          detail: 'Paused and escalated work need owner, reason, and recovery path.',
+          detail: 'These paused or escalated requests need a reason, owner, or recovery step.',
           tone: blockers > 0 ? 'escalated' : 'verified',
         },
       ];
@@ -1473,21 +1483,21 @@ export const buildRoleEventLaneRows = (role, workOrders = []) => {
           key: 'start',
           label: 'Start Next',
           value: pluralize(countWhere(rows, item => item.status === 'open'), 'job'),
-          detail: 'Open assigned jobs are ready for field movement or notes.',
+          detail: 'These assigned jobs are open and ready to start.',
           tone: unassigned > 0 ? 'open' : 'default',
         },
         {
           key: 'proof',
           label: 'Proof Loop',
           value: pluralize(active, 'active job'),
-          detail: 'Active work needs status movement, field notes, and photo proof before completion.',
+          detail: 'Active work needs status, notes, and photo proof before completion.',
           tone: active > 0 ? 'missing' : 'verified',
         },
         {
           key: 'blockers',
           label: 'Blocked Work',
           value: pluralize(blockers, 'item'),
-          detail: 'Paused or escalated jobs need clear blocker notes for operations.',
+          detail: 'Paused or escalated jobs need clear notes so operations can help.',
           tone: blockers > 0 ? 'escalated' : 'default',
         },
       ];
@@ -1497,21 +1507,21 @@ export const buildRoleEventLaneRows = (role, workOrders = []) => {
           key: 'decision',
           label: 'Needs Decision',
           value: pluralize(pendingApprovals, 'approval'),
-          detail: 'Approve or decline only after reviewing visible scope, notes, and proof context.',
+          detail: 'Open these first. Review the visible request, then approve, decline, or message operations.',
           tone: pendingApprovals > 0 ? 'pending' : 'verified',
         },
         {
           key: 'updates',
           label: 'Visible Updates',
           value: pluralize(openOrActive, 'active item'),
-          detail: 'Client-visible messages are the reply path back to operations.',
+          detail: 'These requests are still moving. Use client-visible messages to reply to operations.',
           tone: openOrActive > 0 ? 'active' : 'default',
         },
         {
           key: 'proof',
           label: 'Proof Review',
           value: pluralize(completed, 'completed item'),
-          detail: 'Closeout evidence appears without exposing internal or vendor-only notes.',
+          detail: 'Completed proof appears here without internal notes or vendor-only messages.',
           tone: completed > 0 ? 'verified' : 'default',
         },
       ];
@@ -1521,21 +1531,21 @@ export const buildRoleEventLaneRows = (role, workOrders = []) => {
           key: 'snapshot',
           label: 'Snapshot Scope',
           value: pluralize(rows.length, 'visible item'),
-          detail: 'Review linked status and proof without changing the record.',
+          detail: 'This is the visible work this viewer can read. It cannot be changed here.',
           tone: rows.length > 0 ? 'active' : 'default',
         },
         {
           key: 'watch',
           label: 'Open Watch',
           value: pluralize(openOrActive, 'active item'),
-          detail: 'Use this view to understand progress; operations owns all changes.',
+          detail: 'Use this to understand progress. Operations owns all changes.',
           tone: openOrActive > 0 ? 'open' : 'verified',
         },
         {
           key: 'boundary',
           label: 'Boundary',
           value: 'Read only',
-          detail: 'No edit, message, approval, upload, dispatch, or archive controls belong here.',
+          detail: 'Edit, message, approval, upload, dispatch, and archive controls stay hidden.',
           tone: 'default',
         },
       ];
@@ -1545,21 +1555,21 @@ export const buildRoleEventLaneRows = (role, workOrders = []) => {
           key: 'linked',
           label: 'Linked Work',
           value: pluralize(rows.length, 'vendor item'),
-          detail: 'Only work connected to this vendor should appear in the queue.',
+          detail: 'Only work connected to this vendor should appear here.',
           tone: rows.length > 0 ? 'active' : 'default',
         },
         {
           key: 'active',
           label: 'Active Delivery',
           value: pluralize(openOrActive, 'active item'),
-          detail: 'Review scope and respond through vendor-visible messages only.',
+          detail: 'Review scope and reply through vendor-visible messages only.',
           tone: openOrActive > 0 ? 'open' : 'verified',
         },
         {
           key: 'boundary',
           label: 'Boundary',
           value: 'Vendor lane',
-          detail: 'Client messages, internal notes, and unrelated vendors stay hidden.',
+          detail: 'Client messages, internal notes, and unrelated vendor work stay hidden.',
           tone: 'default',
         },
       ];
@@ -1636,39 +1646,60 @@ export const getRoleActions = role => {
     {
       key: 'directory',
       label: 'Directory',
-      detail: 'Clients, properties, vendors',
+      detail: 'Opens: client, property, and vendor records. Use it when a request needs better linked context.',
       route: 'PmcDirectory',
       tone: 'directory',
     },
     {
       key: 'dispatch',
       label: 'Dispatch',
-      detail: 'Unassigned work, SLA risk',
+      detail: 'Opens: the assignment board. Use it to match open work with technicians and spot schedule pressure.',
       route: 'DispatchBoard',
       tone: 'dispatch',
     },
     {
       key: 'report',
       label: 'Report',
-      detail: 'Stale work, load, hotspots',
+      detail: 'Opens: operations reporting. Use it to review stale work, workload, and service hot spots.',
       route: 'OperationsReport',
       tone: 'report',
     },
     {
       key: 'evidence',
       label: 'Evidence',
-      detail: 'Role capture plan',
+      detail: 'Opens: the role testing checklist. Use it to confirm each role sees only the right screens.',
       route: 'RoleEvidence',
       tone: 'evidence',
     },
     {
       key: 'create',
       label: 'New Work',
-      detail: 'Create linked request',
+      detail: 'Opens: the new request form. Use it to create a work order linked to the right client and property.',
       route: 'WorkOrderForm',
       tone: 'primary',
     },
   ];
+};
+
+const formatHelpList = rows =>
+  rows.map(row => `${row.label} means ${row.detail.replace(/^Shows:\s*/, '').replace(/^Opens:\s*/, '')}`).join(' ');
+
+export const buildRoleWorkViewsHelp = (role, queueFilters = [], roleActions = []) => {
+  const views = formatHelpList(queueFilters);
+  const actionText =
+    roleActions.length > 0
+      ? formatHelpList(roleActions)
+      : 'This role only opens work from the queue; manager pages are hidden.';
+  const boundaryByRole = {
+    org_admin: 'Admin can use every left-rail page.',
+    coordinator: 'Coordinator can use the same manager pages for dispatch work.',
+    technician: 'Technician stays in assigned work and work-order details.',
+    client: 'Client stays in linked requests, approvals, and client-visible messages.',
+    viewer: 'Viewer can review linked requests but cannot change them.',
+    vendor: 'Vendor stays in linked vendor work and vendor-visible messages.',
+  };
+
+  return `Use the left rail first. It controls what happens in the center list. Views: ${views} Other pages: ${actionText} Boundary: ${boundaryByRole[role] || 'This account only sees its allowed work.'}`;
 };
 
 export const getRoleAccessMessage = role => {
@@ -1901,7 +1932,7 @@ const getNextOwner = workOrder => {
   if (workOrder?.client_approval_status === 'pending') {
     return {
       value: 'Client',
-      detail: 'Approval decision is the next handoff.',
+      detail: 'The client needs to approve, decline, or reply before work moves forward.',
       tone: 'pending',
     };
   }
@@ -1909,7 +1940,7 @@ const getNextOwner = workOrder => {
   if (workOrder?.status === 'open' && !hasAssignedTechnician(workOrder)) {
     return {
       value: 'Coordinator',
-      detail: 'Needs assignment or dispatch review.',
+      detail: 'Operations needs to assign an owner or review dispatch.',
       tone: 'open',
     };
   }
@@ -1918,8 +1949,8 @@ const getNextOwner = workOrder => {
     return {
       value: hasAssignedTechnician(workOrder) ? 'Technician' : 'Coordinator',
       detail: hasAssignedTechnician(workOrder)
-        ? 'Field update, proof, or status movement is next.'
-        : 'Needs assignment before field progress can continue.',
+        ? 'The field owner needs to update status, notes, or proof.'
+        : 'Operations needs to assign an owner before field work can continue.',
       tone: workOrder?.status || 'active',
     };
   }
@@ -1927,7 +1958,7 @@ const getNextOwner = workOrder => {
   if (workOrder?.status === 'completed' && !hasCompletionProof(workOrder)) {
     return {
       value: 'Coordinator',
-      detail: 'Closeout needs proof review or override.',
+      detail: 'Operations needs to review proof or add a manager override.',
       tone: 'missing',
     };
   }
@@ -1935,14 +1966,14 @@ const getNextOwner = workOrder => {
   if (terminalStatuses.includes(workOrder?.status)) {
     return {
       value: 'Operations',
-      detail: 'No active field handoff remains.',
+      detail: 'No active field handoff remains for this request.',
       tone: 'default',
     };
   }
 
   return {
     value: hasAssignedTechnician(workOrder) ? 'Technician' : 'Coordinator',
-    detail: 'Review the work-order state before the next action.',
+    detail: 'Open the request to confirm the next useful action.',
     tone: 'default',
   };
 };
@@ -2105,7 +2136,7 @@ export const buildWorkOrderFlowRows = (workOrder = {}, role) => {
       key: 'visible',
       label: 'Visible To',
       value: getVisibleTo(workOrder),
-      detail: 'Messages still respect internal/client/vendor visibility.',
+      detail: 'This shows who is linked to the request. Individual messages can still be internal, client-visible, or vendor-visible.',
       tone: hasLinkedClient(workOrder) || hasLinkedVendor(workOrder) ? 'active' : 'default',
     },
   ];
@@ -2450,14 +2481,14 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           key: 'risk',
           label: 'Operational Signal',
           value: `${priority} ${serviceType}`,
-          detail: `${status}; ${waitingOn.value.toLowerCase()}.`,
+          detail: `This is the request's scan cue: ${status} status, ${priority} priority, and waiting on ${waitingOn.value.toLowerCase()}.`,
           tone: workOrder.status || 'default',
         },
         {
           key: 'context',
           label: 'Tenant Context',
           value: getWorkContext(workOrder),
-          detail: 'Client, property, and vendor links stay inspectable from detail.',
+          detail: 'This shows the linked client, property, or vendor. Open the request to inspect the full context.',
           tone: hasLinkedClient(workOrder) || hasLinkedVendor(workOrder) ? 'active' : 'missing',
         },
       ];
@@ -2467,14 +2498,14 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           key: 'coordination',
           label: 'Coordination Need',
           value: getCoordinatorCardAction(workOrder),
-          detail: nextOwner.detail,
+          detail: `This explains the coordinator's likely next move. ${nextOwner.detail}`,
           tone: nextOwner.tone,
         },
         {
           key: 'handoff',
           label: 'Handoff Target',
           value: nextOwner.value,
-          detail: `Waiting on ${waitingOn.value.toLowerCase()}. ${waitingOn.detail}`,
+          detail: `This shows who owns the next step. Waiting on ${waitingOn.value.toLowerCase()}. ${waitingOn.detail}`,
           tone: nextOwner.tone,
         },
       ];
@@ -2484,14 +2515,14 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           key: 'field',
           label: 'Field Focus',
           value: getTechnicianCardAction(workOrder),
-          detail: `${priority} priority; ${serviceType} service.`,
+          detail: `This is the field cue for the assigned job: ${priority} priority and ${serviceType} service.`,
           tone: workOrder.status || 'default',
         },
         {
           key: 'proof',
           label: 'Proof',
           value: proofSignal,
-          detail: 'Completion depends on clear proof or manager override.',
+          detail: 'This tells you whether completion proof is still needed before closeout.',
           tone: hasCompletionProof(workOrder) ? 'verified' : 'missing',
         },
       ];
@@ -2503,15 +2534,15 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           value: getClientCardAction(workOrder),
           detail:
             workOrder?.client_approval_status === 'pending'
-              ? 'Approval is waiting on this client lane.'
-              : 'Review visible updates and proof context.',
+              ? 'This request is waiting on the client to approve, decline, or message operations.'
+              : 'Open this request to read visible updates and proof context.',
           tone: workOrder?.client_approval_status === 'pending' ? 'pending' : 'active',
         },
         {
           key: 'proof',
           label: 'Proof',
           value: proofSignal,
-          detail: 'Only client-visible proof context is shown here.',
+          detail: 'This shows proof status without exposing internal or vendor-only notes.',
           tone: hasCompletionProof(workOrder) ? 'verified' : 'default',
         },
       ];
@@ -2521,14 +2552,14 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           key: 'snapshot',
           label: 'Snapshot',
           value: status,
-          detail: 'Read-only review of linked client-visible progress.',
+          detail: 'This shows the current status for read-only review.',
           tone: workOrder.status || 'default',
         },
         {
           key: 'mode',
           label: 'Mode',
           value: 'Read only',
-          detail: 'No mutation controls are available in this lane.',
+          detail: 'This role can read the request but cannot edit, approve, upload, or message.',
           tone: 'default',
         },
       ];
@@ -2538,14 +2569,14 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           key: 'vendor-action',
           label: 'Vendor Action',
           value: workOrder?.status === 'in_progress' ? 'Track active work' : 'Review scope',
-          detail: 'Use vendor-visible messages for external updates only.',
+          detail: 'Open this request to review scope or send a vendor-visible update.',
           tone: workOrder.status || 'default',
         },
         {
           key: 'visibility',
           label: 'Visible Thread',
           value: 'Vendor only',
-          detail: 'Client and internal messages stay out of this lane.',
+          detail: 'This role sees vendor-visible messages only. Client and internal messages stay hidden.',
           tone: hasLinkedVendor(workOrder) ? 'active' : 'missing',
         },
       ];
@@ -2555,7 +2586,7 @@ export const buildRoleCardRows = (role, workOrder = {}) => {
           key: 'status',
           label: 'Status',
           value: status,
-          detail: `Waiting on ${waitingOn.value.toLowerCase()}. ${waitingOn.detail}`,
+          detail: `This shows current status and what is waiting next. Waiting on ${waitingOn.value.toLowerCase()}. ${waitingOn.detail}`,
           tone: workOrder.status || 'default',
         },
       ];
@@ -2910,6 +2941,7 @@ export default {
   buildQueueSummary,
   buildRoleGuidanceRows,
   buildRoleQueueFilterRows,
+  buildRoleWorkViewsHelp,
   filterWorkOrdersForRoleQueue,
   filterWorkOrdersForRoleSearch,
   getRoleQueueSearchConfig,

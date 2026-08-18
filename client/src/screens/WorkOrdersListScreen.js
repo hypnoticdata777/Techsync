@@ -32,7 +32,7 @@ import {
   buildRoleNextBestAction,
   buildRoleOutcomeRows,
   buildRoleQueueFilterRows,
-  buildRoleLaneRows,
+  buildRoleWorkViewsHelp,
   buildWorkOrderReference,
   buildWorkOrderFlowRows,
   canManageOperations,
@@ -146,14 +146,6 @@ function WorkOrdersListScreen({navigation}) {
   );
   const roleActions = useMemo(() => getRoleActions(user?.role), [user?.role]);
   const queueSummary = useMemo(() => buildQueueSummary(workOrders), [workOrders]);
-  const roleLaneRows = useMemo(() => buildRoleLaneRows(user?.role), [user?.role]);
-  const workViewsHelp = useMemo(
-    () =>
-      roleLaneRows
-        .map(row => `${row.label}: ${row.value}`)
-        .join(' '),
-    [roleLaneRows],
-  );
   const portalSummary = useMemo(
     () => getRolePortalSummary(user?.role, queueSummary),
     [user?.role, queueSummary],
@@ -177,6 +169,10 @@ function WorkOrdersListScreen({navigation}) {
   const queueFilterRows = useMemo(
     () => buildRoleQueueFilterRows(user?.role, workOrders),
     [user?.role, workOrders],
+  );
+  const workViewsHelp = useMemo(
+    () => buildRoleWorkViewsHelp(user?.role, queueFilterRows, roleActions),
+    [queueFilterRows, roleActions, user?.role],
   );
   const queueSortOptions = useMemo(
     () => getRoleQueueSortOptions(user?.role),
@@ -407,7 +403,7 @@ function WorkOrdersListScreen({navigation}) {
             <Text style={styles.workspaceTitle}>Work Views</Text>
             <HintBubble
               label="Work Views"
-              text={`Choose what appears in the center list. Counts show how many records match each view. ${workViewsHelp}`}
+              text={workViewsHelp}
             />
           </View>
 
@@ -561,7 +557,7 @@ function WorkOrdersListScreen({navigation}) {
                   <Text style={styles.queueSortLabel}>Queue Order</Text>
                   <HintBubble
                     label="Queue Order"
-                    text={`Changes the center list order without changing the active work view. Current order: ${activeSortOption?.label || 'Role default'}.`}
+                    text={`Queue Order changes only the sequence of cards in the center list. Current order: ${activeSortOption?.label || 'Role default'}. Meaning: ${activeSortOption?.detail || 'The role default puts the most useful work first.'} Work Views and Search decide which cards are visible.`}
                     align="left"
                   />
                 </View>
@@ -667,7 +663,7 @@ function WorkOrdersListScreen({navigation}) {
             <Text style={styles.workspaceTitle}>Next Actions</Text>
             <HintBubble
               label="Next Actions"
-              text="Shows the safest next click, what is waiting on this user, and why it matters."
+              text="Use this right rail after choosing a Work View. Open button: opens the suggested request. Show button: switches the left rail view. Cards below explain why this action matters."
             />
           </View>
           <ScrollView
@@ -760,7 +756,11 @@ function WorkOrdersListScreen({navigation}) {
                   accessibilityLabel={`${row.label}. ${row.value}`}>
                   <View style={styles.inlineHelpRow}>
                     <Text style={styles.guidanceLabel}>{row.label}</Text>
-                    <HintBubble label={row.label} text={row.value} align="left" />
+                      <HintBubble
+                        label={row.label}
+                        text={`This note explains the current role context. Meaning: ${row.value}`}
+                        align="left"
+                      />
                   </View>
                 </View>
               ))}

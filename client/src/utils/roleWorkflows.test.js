@@ -13,6 +13,7 @@ import {
   buildRoleLaneRows,
   buildRoleNextBestAction,
   buildRoleQueueFilterRows,
+  buildRoleWorkViewsHelp,
   buildQueueSummary,
   buildWorkOrderFlowRows,
   canAccessMainRoute,
@@ -312,7 +313,7 @@ describe('role workflow helpers', () => {
         expect.objectContaining({
           label: 'Boundary',
           value: 'Vendor lane',
-          detail: expect.stringContaining('unrelated vendors'),
+          detail: expect.stringContaining('unrelated vendor work'),
         }),
       ]),
     );
@@ -349,6 +350,39 @@ describe('role workflow helpers', () => {
     expect(filterWorkOrdersForRoleQueue('vendor', 'blocked', queue).map(item => item.id))
       .toEqual([4, 5]);
     expect(filterWorkOrdersForRoleQueue('vendor', 'unknown', queue)).toBe(queue);
+  });
+
+  test('explains Event 1 work views in simple role-specific page language', () => {
+    const adminFilters = buildRoleQueueFilterRows('org_admin', [{status: 'open'}]);
+    const adminHelp = buildRoleWorkViewsHelp(
+      'org_admin',
+      adminFilters,
+      getRoleActions('org_admin'),
+    );
+
+    expect(adminHelp).toContain('Use the left rail first');
+    expect(adminHelp).toContain('All Work means every request in the tenant');
+    expect(adminHelp).toContain('Directory means client, property, and vendor records');
+    expect(adminHelp).toContain('Dispatch means the assignment board');
+    expect(adminHelp).toContain('Report means operations reporting');
+    expect(adminHelp).toContain('Evidence means the role testing checklist');
+    expect(adminHelp).toContain('New Work means the new request form');
+
+    const viewerHelp = buildRoleWorkViewsHelp(
+      'viewer',
+      buildRoleQueueFilterRows('viewer', []),
+      getRoleActions('viewer'),
+    );
+    expect(viewerHelp).toContain('This role only opens work from the queue');
+    expect(viewerHelp).toContain('Viewer can review linked requests but cannot change them');
+
+    const vendorHelp = buildRoleWorkViewsHelp(
+      'vendor',
+      buildRoleQueueFilterRows('vendor', []),
+      getRoleActions('vendor'),
+    );
+    expect(vendorHelp).toContain('Vendor stays in linked vendor work');
+    expect(vendorHelp).toContain('Client and internal messages stay hidden');
   });
 
   test('filters visible queues by role-aware search terms', () => {
@@ -924,7 +958,7 @@ describe('role workflow helpers', () => {
       expect.objectContaining({
         key: 'owner',
         value: 'Client',
-        detail: expect.stringContaining('Approval decision'),
+        detail: expect.stringContaining('approve, decline, or reply'),
       }),
       expect.objectContaining({
         key: 'waiting',
@@ -944,7 +978,7 @@ describe('role workflow helpers', () => {
     ).toEqual(
       expect.objectContaining({
         value: 'Coordinator',
-        detail: expect.stringContaining('assignment'),
+        detail: expect.stringContaining('assign an owner'),
       }),
     );
 
@@ -1017,7 +1051,7 @@ describe('role workflow helpers', () => {
       expect.objectContaining({
         label: 'Client Action',
         value: 'Review approval',
-        detail: expect.stringContaining('waiting on this client lane'),
+        detail: expect.stringContaining('approve, decline, or message operations'),
       }),
       expect.objectContaining({
         label: 'Proof',
