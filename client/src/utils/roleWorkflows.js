@@ -897,6 +897,216 @@ const scoreWorkOrder = item =>
   (needsAssignment(item) ? 14 : 0) +
   (needsCompletionProof(item) ? 10 : 0);
 
+const ROLE_QUEUE_SORT_OPTIONS = {
+  org_admin: [
+    {
+      key: 'risk',
+      label: 'Risk First',
+      detail: 'Approvals, missing assignment, blockers, proof gaps, and priority sort to the top.',
+    },
+    {
+      key: 'recent',
+      label: 'Recent',
+      detail: 'Most recently updated tenant records sort to the top.',
+    },
+    {
+      key: 'priority',
+      label: 'Priority',
+      detail: 'Emergency and high-priority work sort before lower-priority records.',
+    },
+  ],
+  coordinator: [
+    {
+      key: 'handoff',
+      label: 'Handoff First',
+      detail: 'Unassigned work, pending approvals, blockers, and proof gaps sort to the top.',
+    },
+    {
+      key: 'recent',
+      label: 'Recent',
+      detail: 'Most recently updated coordination items sort to the top.',
+    },
+    {
+      key: 'priority',
+      label: 'Priority',
+      detail: 'Emergency and high-priority work sort before lower-priority handoffs.',
+    },
+  ],
+  technician: [
+    {
+      key: 'field',
+      label: 'Field First',
+      detail: 'Active jobs, open starts, blockers, proof gaps, and priority sort to the top.',
+    },
+    {
+      key: 'recent',
+      label: 'Recent',
+      detail: 'Most recently updated assigned jobs sort to the top.',
+    },
+    {
+      key: 'priority',
+      label: 'Priority',
+      detail: 'Emergency and high-priority assigned work sorts first.',
+    },
+  ],
+  client: [
+    {
+      key: 'decisions',
+      label: 'Decisions First',
+      detail: 'Pending approvals, active updates, completed proof, and priority sort to the top.',
+    },
+    {
+      key: 'recent',
+      label: 'Recent',
+      detail: 'Most recently updated client-visible requests sort to the top.',
+    },
+    {
+      key: 'proof',
+      label: 'Proof First',
+      detail: 'Completed requests and proof-ready work sort before earlier lifecycle states.',
+    },
+  ],
+  viewer: [
+    {
+      key: 'watch',
+      label: 'Watch First',
+      detail: 'Active visible work sorts before completed records for read-only review.',
+    },
+    {
+      key: 'recent',
+      label: 'Recent',
+      detail: 'Most recently updated visible records sort to the top.',
+    },
+    {
+      key: 'proof',
+      label: 'Proof First',
+      detail: 'Completed and proof-ready records sort before active work.',
+    },
+  ],
+  vendor: [
+    {
+      key: 'vendor',
+      label: 'Vendor First',
+      detail: 'Blocked and active vendor-linked work sorts before completed scope review.',
+    },
+    {
+      key: 'recent',
+      label: 'Recent',
+      detail: 'Most recently updated vendor-visible work sorts to the top.',
+    },
+    {
+      key: 'priority',
+      label: 'Priority',
+      detail: 'Emergency and high-priority vendor-linked work sorts first.',
+    },
+  ],
+  default: [
+    {
+      key: 'recent',
+      label: 'Recent',
+      detail: 'Most recently updated visible work sorts to the top.',
+    },
+    {
+      key: 'priority',
+      label: 'Priority',
+      detail: 'Emergency and high-priority visible work sorts first.',
+    },
+  ],
+};
+
+export const getRoleQueueSortOptions = role =>
+  ROLE_QUEUE_SORT_OPTIONS[role] || ROLE_QUEUE_SORT_OPTIONS.default;
+
+const getWorkOrderTimestamp = item => {
+  const parsed = Date.parse(item?.updated_at || item?.created_at || '');
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+const getRoleQueueSortScore = (role, sortKey, item) => {
+  switch (sortKey) {
+    case 'priority':
+      return (PRIORITY_SCORE[item?.priority] || 0) + (STATUS_SCORE[item?.status] || 0);
+    case 'recent':
+      return getWorkOrderTimestamp(item);
+    case 'handoff':
+      return (
+        (needsAssignment(item) ? 120 : 0) +
+        (needsApprovalDecision(item) ? 90 : 0) +
+        (isBlockedStatus(item) ? 70 : 0) +
+        (needsCompletionProof(item) ? 50 : 0) +
+        scoreWorkOrder(item)
+      );
+    case 'field':
+      return (
+        (item?.status === 'in_progress' ? 140 : 0) +
+        (item?.status === 'open' && !needsApprovalDecision(item) ? 100 : 0) +
+        (isBlockedStatus(item) ? 80 : 0) +
+        (needsCompletionProof(item) ? 70 : 0) +
+        (PRIORITY_SCORE[item?.priority] || 0)
+      );
+    case 'decisions':
+      return (
+        (needsApprovalDecision(item) ? 120 : 0) +
+        (isOpenOrActiveStatus(item) ? 60 : 0) +
+        (item?.status === 'completed' ? 40 : 0) +
+        (PRIORITY_SCORE[item?.priority] || 0)
+      );
+    case 'proof':
+      return (
+        (item?.status === 'completed' ? 100 : 0) +
+        (hasCompletionProof(item) ? 70 : 0) +
+        (needsCompletionProof(item) ? 60 : 0) +
+        getWorkOrderTimestamp(item) / 100000000000
+      );
+    case 'watch':
+      return (
+        (isOpenOrActiveStatus(item) ? 100 : 0) +
+        (needsApprovalDecision(item) ? 40 : 0) +
+        (item?.status === 'completed' ? 20 : 0) +
+        getWorkOrderTimestamp(item) / 100000000000
+      );
+    case 'vendor':
+      return (
+        (isBlockedStatus(item) ? 160 : 0) +
+        (item?.status === 'in_progress' ? 120 : 0) +
+        (item?.status === 'open' ? 80 : 0) +
+        (item?.status === 'completed' ? 30 : 0) +
+        (PRIORITY_SCORE[item?.priority] || 0)
+      );
+    case 'risk':
+    default:
+      return scoreWorkOrder(item);
+  }
+};
+
+export const sortWorkOrdersForRoleQueue = (role, sortKey, workOrders = []) => {
+  const rows = workOrders || [];
+  const options = getRoleQueueSortOptions(role);
+  const resolvedSortKey = options.some(option => option.key === sortKey)
+    ? sortKey
+    : options[0]?.key;
+
+  if (!resolvedSortKey) {
+    return rows;
+  }
+
+  return rows.slice().sort((left, right) => {
+    const scoreDelta =
+      getRoleQueueSortScore(role, resolvedSortKey, right) -
+      getRoleQueueSortScore(role, resolvedSortKey, left);
+    if (scoreDelta !== 0) {
+      return scoreDelta;
+    }
+
+    const recentDelta = getWorkOrderTimestamp(right) - getWorkOrderTimestamp(left);
+    if (recentDelta !== 0) {
+      return recentDelta;
+    }
+
+    return (left?.id || 0) - (right?.id || 0);
+  });
+};
+
 const pickHighestImpact = (rows, predicate) =>
   rows
     .filter(predicate)
@@ -2703,6 +2913,8 @@ export default {
   filterWorkOrdersForRoleQueue,
   filterWorkOrdersForRoleSearch,
   getRoleQueueSearchConfig,
+  getRoleQueueSortOptions,
+  sortWorkOrdersForRoleQueue,
   getDetailRoleContext,
   buildDetailSummary,
   buildDetailGuidanceRows,

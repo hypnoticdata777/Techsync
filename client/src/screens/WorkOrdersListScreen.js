@@ -44,8 +44,10 @@ import {
   getRoleHome,
   getRolePortalSummary,
   getRoleQueueSearchConfig,
+  getRoleQueueSortOptions,
   getRoleUserExperience,
   getWorkOrdersEndpointForRole,
+  sortWorkOrdersForRoleQueue,
 } from '../utils/roleWorkflows';
 
 // Helper function to get status color
@@ -127,6 +129,7 @@ function WorkOrdersListScreen({navigation}) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [activeQueueFilter, setActiveQueueFilter] = useState('all');
+  const [activeQueueSort, setActiveQueueSort] = useState('role-default');
   const [queueSearch, setQueueSearch] = useState('');
   const canManageWorkOrders = canManageOperations(user?.role);
   const useWorkspaceLayout = width >= 1040;
@@ -175,6 +178,17 @@ function WorkOrdersListScreen({navigation}) {
     () => buildRoleQueueFilterRows(user?.role, workOrders),
     [user?.role, workOrders],
   );
+  const queueSortOptions = useMemo(
+    () => getRoleQueueSortOptions(user?.role),
+    [user?.role],
+  );
+  const activeSortKey =
+    activeQueueSort === 'role-default'
+      ? queueSortOptions[0]?.key
+      : activeQueueSort;
+  const activeSortOption =
+    queueSortOptions.find(option => option.key === activeSortKey) ||
+    queueSortOptions[0];
   const activeFilterRow = useMemo(
     () => queueFilterRows.find(row => row.key === activeQueueFilter) || queueFilterRows[0],
     [activeQueueFilter, queueFilterRows],
@@ -187,6 +201,10 @@ function WorkOrdersListScreen({navigation}) {
     () => filterWorkOrdersForRoleSearch(user?.role, queueSearch, filteredWorkOrders),
     [filteredWorkOrders, queueSearch, user?.role],
   );
+  const orderedWorkOrders = useMemo(
+    () => sortWorkOrdersForRoleQueue(user?.role, activeSortKey, visibleWorkOrders),
+    [activeSortKey, user?.role, visibleWorkOrders],
+  );
   const hasActiveSearch = queueSearch.trim().length > 0;
 
   useEffect(() => {
@@ -194,6 +212,15 @@ function WorkOrdersListScreen({navigation}) {
       setActiveQueueFilter('all');
     }
   }, [activeQueueFilter, queueFilterRows]);
+
+  useEffect(() => {
+    if (
+      activeQueueSort !== 'role-default' &&
+      !queueSortOptions.some(option => option.key === activeQueueSort)
+    ) {
+      setActiveQueueSort('role-default');
+    }
+  }, [activeQueueSort, queueSortOptions]);
 
   const fetchWorkOrders = useCallback(async () => {
     try {
@@ -526,6 +553,45 @@ function WorkOrdersListScreen({navigation}) {
                   </TouchableOpacity>
                 ) : null}
               </View>
+              <View
+                style={styles.queueSortPanel}
+                accessible
+                accessibilityLabel={`Queue order. ${activeSortOption?.label || 'Role default'}. ${activeSortOption?.detail || ''}`}>
+                <View style={styles.queueSortHeader}>
+                  <Text style={styles.queueSortLabel}>Queue Order</Text>
+                  <HintBubble
+                    label="Queue Order"
+                    text={`Changes the center list order without changing the active work view. Current order: ${activeSortOption?.label || 'Role default'}.`}
+                    align="left"
+                  />
+                </View>
+                <View style={styles.queueSortChipRow}>
+                  {queueSortOptions.map(option => {
+                    const selected = option.key === activeSortKey;
+                    return (
+                      <TouchableOpacity
+                        key={option.key}
+                        style={[
+                          styles.queueSortChip,
+                          selected && styles.queueSortChipSelected,
+                        ]}
+                        onPress={() => setActiveQueueSort(option.key)}
+                        accessibilityRole="button"
+                        accessibilityState={{selected}}
+                        accessibilityLabel={`${option.label} queue order. ${option.detail}`}>
+                        <Text
+                          style={[
+                            styles.queueSortChipText,
+                            selected && styles.queueSortChipTextSelected,
+                          ]}
+                          numberOfLines={1}>
+                          {option.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
             </View>
           )}
 
@@ -562,7 +628,7 @@ function WorkOrdersListScreen({navigation}) {
           )}
           {!loading && !error && (
             <FlatList
-              data={visibleWorkOrders}
+              data={orderedWorkOrders}
               keyExtractor={item => String(item.id)}
               renderItem={renderWorkOrder}
               ListEmptyComponent={
@@ -1360,6 +1426,56 @@ const styles = StyleSheet.create({
     color: '#fbf4e8',
     fontSize: 12,
     fontWeight: '900',
+  },
+  queueSortPanel: {
+    borderTopColor: '#efe6d6',
+    borderTopWidth: 1,
+    gap: 8,
+    overflow: 'visible',
+    paddingTop: 8,
+  },
+  queueSortHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    justifyContent: 'space-between',
+    overflow: 'visible',
+  },
+  queueSortLabel: {
+    color: '#655d52',
+    fontSize: 11,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+  },
+  queueSortChipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 7,
+  },
+  queueSortChip: {
+    alignItems: 'center',
+    backgroundColor: '#f6eddf',
+    borderColor: '#bfae94',
+    borderRadius: 5,
+    borderWidth: 1,
+    flexGrow: 1,
+    justifyContent: 'center',
+    minHeight: 34,
+    minWidth: 98,
+    paddingHorizontal: 10,
+  },
+  queueSortChipSelected: {
+    backgroundColor: '#263241',
+    borderColor: '#182532',
+  },
+  queueSortChipText: {
+    color: '#27313d',
+    fontSize: 11,
+    fontWeight: '900',
+    textAlign: 'center',
+  },
+  queueSortChipTextSelected: {
+    color: '#fbf4e8',
   },
   listContent: {
     paddingBottom: 16,

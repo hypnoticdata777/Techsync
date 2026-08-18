@@ -27,9 +27,11 @@ import {
   getRoleLane,
   getRolePortalSummary,
   getRoleQueueSearchConfig,
+  getRoleQueueSortOptions,
   getCommunicationLaneNotice,
   getRoleUserExperience,
   getWorkOrdersEndpointForRole,
+  sortWorkOrdersForRoleQueue,
 } from './roleWorkflows';
 
 describe('role workflow helpers', () => {
@@ -387,6 +389,73 @@ describe('role workflow helpers', () => {
     expect(filterWorkOrdersForRoleSearch('viewer', 'proof verified', queue).map(item => item.id))
       .toEqual([20]);
     expect(filterWorkOrdersForRoleSearch('technician', '', queue)).toBe(queue);
+  });
+
+  test('sorts visible queues with role-specific default order', () => {
+    const queue = [
+      {
+        id: 21,
+        title: 'Recently completed proof',
+        status: 'completed',
+        priority: 'low',
+        completion_proof_verified_at: '2026-08-12T00:00:00Z',
+        client_approval_status: 'approved',
+        updated_at: '2026-08-17T10:00:00Z',
+      },
+      {
+        id: 22,
+        title: 'Emergency unassigned request',
+        status: 'open',
+        priority: 'emergency',
+        client_approval_status: 'not_required',
+        updated_at: '2026-08-12T10:00:00Z',
+      },
+      {
+        id: 23,
+        title: 'Client approval needed',
+        status: 'open',
+        priority: 'normal',
+        assigned_technician_id: 9,
+        client_approval_status: 'pending',
+        updated_at: '2026-08-13T10:00:00Z',
+      },
+      {
+        id: 24,
+        title: 'Active field work',
+        status: 'in_progress',
+        priority: 'medium',
+        assigned_technician_id: 9,
+        client_approval_status: 'not_required',
+        updated_at: '2026-08-14T10:00:00Z',
+      },
+      {
+        id: 25,
+        title: 'Escalated vendor blocker',
+        status: 'escalated',
+        priority: 'high',
+        assigned_technician_id: 9,
+        client_approval_status: 'not_required',
+        updated_at: '2026-08-15T10:00:00Z',
+      },
+    ];
+
+    expect(getRoleQueueSortOptions('coordinator')[0]).toEqual(
+      expect.objectContaining({key: 'handoff', label: 'Handoff First'}),
+    );
+    expect(sortWorkOrdersForRoleQueue('coordinator', 'handoff', queue).map(item => item.id))
+      .toEqual([22, 23, 25, 24, 21]);
+    expect(sortWorkOrdersForRoleQueue('technician', 'field', queue).map(item => item.id))
+      .toEqual([24, 22, 25, 23, 21]);
+    expect(sortWorkOrdersForRoleQueue('client', 'decisions', queue).map(item => item.id))
+      .toEqual([23, 22, 25, 24, 21]);
+    expect(sortWorkOrdersForRoleQueue('viewer', 'watch', queue).map(item => item.id))
+      .toEqual([23, 25, 24, 22, 21]);
+    expect(sortWorkOrdersForRoleQueue('vendor', 'vendor', queue).map(item => item.id))
+      .toEqual([25, 24, 22, 23, 21]);
+    expect(sortWorkOrdersForRoleQueue('org_admin', 'unknown', queue).map(item => item.id))
+      .toEqual([22, 25, 23, 24, 21]);
+    expect(sortWorkOrdersForRoleQueue('client', 'recent', queue).map(item => item.id))
+      .toEqual([21, 25, 24, 23, 22]);
   });
 
   test('selects an operable next-best queue action for each role', () => {
