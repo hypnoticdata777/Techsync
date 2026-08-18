@@ -1,4 +1,4 @@
-import {splitTooltipSections} from './HintBubble';
+import {splitTooltipItems, splitTooltipSections} from './HintBubble';
 
 describe('HintBubble', () => {
   test('separates normal guidance from named key sections', () => {
@@ -21,6 +21,18 @@ describe('HintBubble', () => {
         label: 'Works With:',
         text: 'Coordinator and technician stakeholders.',
       },
+    ]);
+  });
+
+  test('splits section copy into scannable tooltip rows', () => {
+    expect(
+      splitTooltipItems(
+        'All Work = every request in the tenant | Risk = requests that need attention | Active = work still moving',
+      ),
+    ).toEqual([
+      {label: 'All Work', text: 'every request in the tenant'},
+      {label: 'Risk', text: 'requests that need attention'},
+      {label: 'Active', text: 'work still moving'},
     ]);
   });
 });

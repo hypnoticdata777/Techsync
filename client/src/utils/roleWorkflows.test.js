@@ -361,12 +361,12 @@ describe('role workflow helpers', () => {
     );
 
     expect(adminHelp).toContain('Use the left rail first');
-    expect(adminHelp).toContain('All Work means every request in the tenant');
-    expect(adminHelp).toContain('Directory means client, property, and vendor records');
-    expect(adminHelp).toContain('Dispatch means the assignment board');
-    expect(adminHelp).toContain('Report means operations reporting');
-    expect(adminHelp).toContain('Evidence means the role testing checklist');
-    expect(adminHelp).toContain('New Work means the new request form');
+    expect(adminHelp).toContain('All Work = every request in the tenant');
+    expect(adminHelp).toContain('Directory = client, property, and vendor records');
+    expect(adminHelp).toContain('Dispatch = the assignment board');
+    expect(adminHelp).toContain('Report = operations reporting');
+    expect(adminHelp).toContain('Evidence = the role testing checklist');
+    expect(adminHelp).toContain('New Work = the new request form');
 
     const viewerHelp = buildRoleWorkViewsHelp(
       'viewer',

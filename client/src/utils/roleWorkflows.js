@@ -1682,7 +1682,9 @@ export const getRoleActions = role => {
 };
 
 const formatHelpList = rows =>
-  rows.map(row => `${row.label} means ${row.detail.replace(/^Shows:\s*/, '').replace(/^Opens:\s*/, '')}`).join(' ');
+  rows
+    .map(row => `${row.label} = ${row.detail.replace(/^Shows:\s*/, '').replace(/^Opens:\s*/, '')}`)
+    .join(' | ');
 
 export const buildRoleWorkViewsHelp = (role, queueFilters = [], roleActions = []) => {
   const views = formatHelpList(queueFilters);

@@ -86,6 +86,23 @@ export const splitTooltipSections = text => {
   return pieces.filter(piece => piece.text || piece.label);
 };
 
+export const splitTooltipItems = text =>
+  String(text || '')
+    .split('|')
+    .map(item => item.trim())
+    .filter(Boolean)
+    .map(item => {
+      const separatorIndex = item.indexOf('=');
+      if (separatorIndex === -1) {
+        return {label: null, text: item};
+      }
+
+      return {
+        label: item.slice(0, separatorIndex).trim(),
+        text: item.slice(separatorIndex + 1).trim(),
+      };
+    });
+
 function Tooltip({label, text, positionStyle}) {
   const sections = splitTooltipSections(text);
 
@@ -94,6 +111,23 @@ function Tooltip({label, text, positionStyle}) {
       <Text style={styles.tooltipTitle}>{label}</Text>
       {sections.map((section, index) => {
         if (section.type === 'callout') {
+          const items = splitTooltipItems(section.text);
+          if (items.length > 1) {
+            return (
+              <View key={`${section.label}-${index}`} style={styles.tooltipSection}>
+                <Text style={styles.tooltipSectionTitle}>{section.label}</Text>
+                {items.map((item, itemIndex) => (
+                  <View key={`${item.label || item.text}-${itemIndex}`} style={styles.tooltipItem}>
+                    {item.label ? (
+                      <Text style={styles.tooltipItemLabel}>{item.label}</Text>
+                    ) : null}
+                    <Text style={styles.tooltipItemText}>{item.text}</Text>
+                  </View>
+                ))}
+              </View>
+            );
+          }
+
           return (
             <Text key={`${section.label}-${index}`} style={styles.tooltipLine}>
               <Text style={styles.tooltipTerm}>{section.label} </Text>
@@ -300,6 +334,43 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     marginTop: 6,
+  },
+  tooltipSection: {
+    borderTopColor: '#2f6f9f',
+    borderTopWidth: 1,
+    marginTop: 9,
+    paddingTop: 8,
+  },
+  tooltipSectionTitle: {
+    color: '#fbf4e8',
+    fontSize: 12,
+    fontWeight: '900',
+    lineHeight: 16,
+    marginBottom: 4,
+  },
+  tooltipItem: {
+    backgroundColor: '#223142',
+    borderColor: '#3a5268',
+    borderLeftColor: '#6fa5ca',
+    borderLeftWidth: 2,
+    borderRadius: 5,
+    borderWidth: 1,
+    marginTop: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  tooltipItemLabel: {
+    color: '#fbf4e8',
+    fontSize: 11,
+    fontWeight: '900',
+    lineHeight: 15,
+  },
+  tooltipItemText: {
+    color: '#f6eddf',
+    fontSize: 11,
+    fontWeight: '400',
+    lineHeight: 16,
+    marginTop: 2,
   },
   tooltipTerm: {
     fontWeight: '900',
