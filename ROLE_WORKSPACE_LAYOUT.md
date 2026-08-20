@@ -21,11 +21,12 @@ technician, client, viewer, and vendor lanes:
   title, so similar requests do not blur together in dense queues.
 - Role search: every lane gets a compact search panel directly above the center
   queue. Search must run inside the active Work View rather than replacing it,
-  and wording should match the lane: Tenant Search for admins, Dispatch Search
-  for coordinators, Assigned Search for technicians, Request Search for
-  clients, Snapshot Search for viewers, and Vendor Search for vendors. Matching
-  should include request reference, title, address/unit, status, dates,
-  proof/approval state, and role-relevant linked names.
+  and the visible label should stay plain: `Search`. The help bubble beside it
+  explains the searchable options for the active role. Matching should include
+  request reference, title, address/unit, status, dates, proof/approval state,
+  and role-relevant linked client, technician, property, or vendor names. The
+  search surface should read as a control panel, visually separated from the
+  queue cards that change below it.
 - Right action rail: next-best action, waiting-on signals, operating guidance,
   and event-lane cues. It uses the same fixed-rail treatment and scrolls inside
   the rail so long guidance does not push the primary queue out of view.
@@ -35,8 +36,10 @@ technician, client, viewer, and vendor lanes:
   may stay active at a time, and clicking the active bubble dismisses it so
   tooltip copy never stacks over the workspace. On web, help popovers should
   render through a document-level portal and clamp away from viewport edges so
-  they are not hidden by rails, cards, or scroll panes. The always-visible
-  surface should keep only labels, counts, statuses, work titles, and actions.
+  they are not hidden by rails, cards, or scroll panes. Long help popovers
+  should be hover-stable and scroll internally so users can move the cursor
+  into the explanation and read the full content. The always-visible surface
+  should keep only labels, counts, statuses, work titles, and actions.
 
 On narrow screens, the same order stacks vertically: identity and scope first,
 then Work Views, then primary data, then next actions. The user should never

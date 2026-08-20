@@ -66,15 +66,24 @@ TechSync Ops is shaped around six user lanes:
 | Vendor | See linked vendor work and vendor-visible communication only. |
 
 The UX direction is a calmer SaaS console: a persistent left Work Views rail,
-a center work queue or detail record, and a right next-actions rail. Each lane
-also has role-aware queue search, applied after the selected Work View, so users
-can narrow their own visible work by `Request TS-####`, address/unit, status,
-dates, proof or approval state, and relevant people or vendor context.
-Explanatory copy is being moved into compact help bubbles so the visible
-interface can focus on work, status, and action. Client-facing work cards now
-expose a stable `Request TS-####` identifier, visible location/update context,
-and plain handoff language so linked requests are easy to distinguish without
-leaking internal operations shorthand.
+a center work queue or detail record, and a right Next Actions rail. Event 1 for
+each role starts from that same predictable workspace shape, then narrows the
+visible work by the user's lane and permissions.
+
+Each lane has a plain `Search` tool applied after the selected Work View, so
+users can narrow only the visible center list. Search supports `Request
+TS-####`, address/unit, status, dates, proof or approval state, and the
+role-relevant client, technician, property, or vendor context. The search panel
+is visually separated from the work-order results so controls and queue content
+read as different surfaces.
+
+Explanatory copy now lives in compact `?` help bubbles so the visible interface
+can focus on work, status, and action. Long help bubbles use scannable sections,
+plain language, and scrollable hover/tap popovers so role guidance is readable
+without covering the whole workspace. Client-facing work cards expose a stable
+`Request TS-####` identifier, visible location/update context, and plain
+handoff language so linked requests are easy to distinguish without leaking
+internal operations shorthand.
 
 ## Live Staging Loop
 
